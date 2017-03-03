@@ -44,7 +44,7 @@ Code reviews in the SSSD are managed through the Fedora Hosted <a class="ext-lin
 </p>
 <h3 id="Configuringadevelopmenttree">Configuring a development tree</h3>
 <ol><li>Check out the source repository, if you haven't already done so.
-<pre class="wiki">git clone git://git.fedorahosted.org/git/sssd.git
+<pre class="wiki">git clone https://pagure.io/SSSD/sssd.git
 </pre></li><li>In the SSSD source checkout, run the following command to set the location of the ReviewBoard server:
 <pre class="wiki">git config reviewboard.url https://fedorahosted.org/reviewboard/
 </pre></li></ol><h3 id="Creatingacode-review:TheAutomatedWay">Creating a code-review: The Automated Way</h3>
@@ -73,9 +73,9 @@ list of known repositories on the server.
 This means you did not properly create the branch to generate the review requests from. This branch must be based off of the upstream master (or branch). Chances are, the branch you're trying to commit is based off of a private git repo branch like Fedora People.
 </p>
 <ul><li>If you see:
-<pre class="wiki">'The repository path "git://git.fedorahosted.org/sssd.git" is not in the list of known repositories on the server.'
+<pre class="wiki">'The repository path "https://pagure.io/SSSD/sssd.git" is not in the list of known repositories on the server.'
 </pre></li></ul><p>
-This means you have your remote repo configured to use the alias for the SSSD repo instead of the proper full path. You will want to do edit your .git/config file and edit the URL for this repo to be <tt>git://git.fedorahosted.org/git/sssd.git</tt>
+This means you have your remote repo configured to use the alias for the SSSD repo instead of the proper full path. You will want to do edit your .git/config file and edit the URL for this repo to be <tt>https://pagure.io/SSSD/sssd.git</tt>
 </p>
 <h3 id="Creatingacode-review:TheManualWay">Creating a code-review: The Manual Way</h3>
 <p>
