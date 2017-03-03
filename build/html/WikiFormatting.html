@@ -1,0 +1,1387 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>WikiFormatting &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="wikiformatting">
+<h1><a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html">WikiFormatting</a><a class="headerlink" href="#wikiformatting" title="Permalink to this headline">¶</a></h1>
+<div class="system-message"><p><strong>Error: Macro TracGuideToc(None) failed</strong></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;NoneType&#39;</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span> <span class="s1">&#39;find&#39;</span>
+</pre></div>
+</div>
+</div><p>Wiki markup is a core feature in Trac, tightly integrating all the other
+parts of Trac into a flexible and powerful whole.</p>
+<p>Trac has a built in small and powerful wiki rendering engine. This wiki
+engine implements an ever growing subset of the commands from other
+popular Wikis, especially <a class="reference external" href="http://moinmo.in/">​MoinMoin</a> and
+<a class="reference external" href="http://trac.edgewall.org/intertrac/WikiCreole">​WikiCreole</a>.</p>
+<p>This page will give you an in-depth explanation of the wiki markup
+available anywhere
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html">WikiFormatting</a>
+is allowed.</p>
+<p>The <em>Cheat sheet</em> below gives you a quick overview for the most common
+syntax, each link in the <em>Category</em> column will lead you to the more
+detailed explanation later in this page.</p>
+<p>A few other wiki pages present the advanced features of the Trac wiki
+markup in more depth:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/TracLinks.html">TracLinks</a>
+covers all the possible ways to refer precisely to any Trac resource
+or parts thereof,</li>
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiPageNames.html">WikiPageNames</a>
+talks about the various names a wiki page can take,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/CamelCase.html">CamelCase</a> or
+not</li>
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiMacros.html">WikiMacros</a>
+lists the macros available for generating dynamic content,</li>
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiProcessors.html">WikiProcessors</a>
+and <a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiHtml.html">WikiHtml</a>
+details how parts of the wiki text can be processed in special ways</li>
+</ul>
+<div class="section" id="cheat-sheet">
+<h2>Cheat sheet<a class="headerlink" href="#cheat-sheet" title="Permalink to this headline">¶</a></h2>
+<p><strong>Category</strong></p>
+<p><strong>Wiki Markup</strong></p>
+<p><strong>Display</strong></p>
+<p><a class="reference external" href="https://fedorahosted.org/sssd#FontStyles">Font Styles</a></p>
+<p><code class="docutils literal"><span class="pre">'''bold'''</span></code>, <code class="docutils literal"><span class="pre">''italic''</span></code>, <code class="docutils literal"><span class="pre">'''''Wikipedia</span> <span class="pre">style'''''</span></code></p>
+<p><strong>bold</strong>, <em>italic</em>, <strong>*Wikipedia style*</strong></p>
+<p><code class="docutils literal"><span class="pre">`monospaced</span> <span class="pre">(''other</span> <span class="pre">markup</span> <span class="pre">ignored'')`</span></code></p>
+<p><code class="docutils literal"><span class="pre">monospaced</span> <span class="pre">(''other</span> <span class="pre">markup</span> <span class="pre">ignored'')</span></code></p>
+<p><code class="docutils literal"><span class="pre">**bold**</span></code>, <code class="docutils literal"><span class="pre">//italic//</span></code>, <code class="docutils literal"><span class="pre">**//!WikiCreole</span> <span class="pre">style//**</span></code></p>
+<p><strong>bold</strong>, <em>italic</em>, <strong>*WikiCreole style*</strong></p>
+<p><a class="reference external" href="https://fedorahosted.org/sssd#Headings">Headings</a></p>
+</div>
+<div class="section" id="level-2">
+<h2>Level 2<a class="headerlink" href="#level-2" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="level-3-sup-note-https-fedorahosted-org-sssd-hn">
+<h3>Level 3 <a href="#id1"><span class="problematic" id="id2">:sup:`(`note &lt;https://fedorahosted.org/sssd#hn&gt;`__</span></a>)`<a class="headerlink" href="#level-3-sup-note-https-fedorahosted-org-sssd-hn" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://fedorahosted.org/sssd#Paragraphs">Paragraphs</a></p>
+<p>First paragraph on multiple lines.</p>
+<p>Second paragraph.</p>
+<p><a class="reference external" href="https://fedorahosted.org/sssd#Lists">Lists</a></p>
+<ul class="simple">
+<li>bullets list on multiple lines<ol class="arabic">
+<li>nested list<ol class="arabic">
+<li>different numbering styles</li>
+</ol>
+</li>
+</ol>
+</li>
+</ul>
+<p><a class="reference external" href="https://fedorahosted.org/sssd#DefinitionLists">Definition Lists</a></p>
+<dl class="docutils">
+<dt>term</dt>
+<dd>definition on multiple lines</dd>
+</dl>
+<p><a class="reference external" href="https://fedorahosted.org/sssd#PreformattedText">Preformatted Text</a></p>
+<p><a class="reference external" href="https://fedorahosted.org/sssd#Blockquotes">Blockquotes</a></p>
+<p><a class="reference external" href="https://fedorahosted.org/sssd#DiscussionCitations">Discussion
+Citations</a></p>
+<p><a class="reference external" href="https://fedorahosted.org/sssd#Tables">Tables</a></p>
+<p>Table Header</p>
+<p>Cell</p>
+<p>(details below)</p>
+<p><a class="reference external" href="https://fedorahosted.org/sssd#Links">Links</a></p>
+<p><code class="docutils literal"><span class="pre">http://trac.edgewall.org</span></code></p>
+<p><a class="reference external" href="http://trac.edgewall.org">​http://trac.edgewall.org</a></p>
+<p><code class="docutils literal"><span class="pre">WikiFormatting</span> <span class="pre">(CamelCase)</span></code></p>
+<p><a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html">WikiFormatting</a>
+(<a class="reference external" href="https://docs.pagure.org/sssd-test2/CamelCase.html">CamelCase</a>)</p>
+<p><a class="reference external" href="https://fedorahosted.org/sssd#TracLinks">TracLinks</a></p>
+<p><code class="docutils literal"><span class="pre">wiki:WikiFormatting</span></code>, <code class="docutils literal"><span class="pre">wiki:&quot;WikiFormatting&quot;</span></code></p>
+<p><a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html">wiki:WikiFormatting</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html">wiki:&#8221;WikiFormatting&#8221;</a></p>
+<p><code class="docutils literal"><span class="pre">#1</span> <span class="pre">(ticket)</span></code>, <code class="docutils literal"><span class="pre">[1]</span> <span class="pre">(changeset)</span></code>, <code class="docutils literal"><span class="pre">{1}</span> <span class="pre">(report)</span></code></p>
+<p><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1">#1</a> (ticket), [1]
+(changeset), <a class="reference external" href="https://fedorahosted.org/sssd/report/1">{1}</a> (report)</p>
+<p><code class="docutils literal"><span class="pre">ticket:1,</span> <span class="pre">ticket:1#comment:1</span></code></p>
+<p><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1">ticket:1</a>,
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/1#comment:1">ticket:1#comment:1</a></p>
+<p><code class="docutils literal"><span class="pre">Ticket</span> <span class="pre">[ticket:1]</span></code>, <code class="docutils literal"><span class="pre">[ticket:1&nbsp;ticket&nbsp;one]</span></code></p>
+<p>Ticket <a class="reference external" href="https://fedorahosted.org/sssd/ticket/1">1</a>,
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/1">ticket&nbsp;one</a></p>
+<p><code class="docutils literal"><span class="pre">Ticket</span> <span class="pre">[[ticket:1]]</span></code>, <code class="docutils literal"><span class="pre">[[ticket:1|ticket&nbsp;one]]</span></code></p>
+<p>Ticket <a class="reference external" href="https://fedorahosted.org/sssd/ticket/1">1</a>,
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/1">ticket&nbsp;one</a></p>
+<p><a class="reference external" href="https://fedorahosted.org/sssd#SettingAnchors">Setting Anchors</a></p>
+<p><code class="docutils literal"><span class="pre">[=#point1</span> <span class="pre">(1)]</span> <span class="pre">First...</span></code></p>
+<ol class="arabic simple">
+<li>First...</li>
+</ol>
+<p><code class="docutils literal"><span class="pre">see</span> <span class="pre">[#point1</span> <span class="pre">(1)]</span></code></p>
+<p>see <a class="reference external" href="https://fedorahosted.org/sssd#point1">(1)</a></p>
+<p><a class="reference external" href="https://fedorahosted.org/sssd#Escaping">Escaping Markup</a></p>
+<p><code class="docutils literal"><span class="pre">!''</span> <span class="pre">doubled</span> <span class="pre">quotes</span></code></p>
+<p>&#8216;&#8217; doubled quotes</p>
+<p><code class="docutils literal"><span class="pre">!wiki:WikiFormatting</span></code>, <code class="docutils literal"><span class="pre">!WikiFormatting</span></code></p>
+<p>wiki:WikiFormatting, WikiFormatting</p>
+<p><code class="docutils literal"><span class="pre">`</span></code><code class="docutils literal"><span class="pre">{{{-}}}</span></code><code class="docutils literal"><span class="pre">`</span></code>`` triple curly brackets``</p>
+<p><code class="docutils literal"><span class="pre">{{{-}}}</span></code> triple curly brackets</p>
+<p><a class="reference external" href="https://fedorahosted.org/sssd#Images">Images</a></p>
+<p><code class="docutils literal"><span class="pre">[[Image(</span></code><em>link</em><code class="docutils literal"><span class="pre">)]]</span></code></p>
+<p><a href="#id53"><span class="problematic" id="id54">|trac\_logo\_mini.png|</span></a></p>
+<p><a class="reference external" href="https://fedorahosted.org/sssd#Macros">Macros</a></p>
+<p><code class="docutils literal"><span class="pre">[[MacroList(*)]]</span></code></p>
+<p><em>(short list of all available macros)</em></p>
+<p><code class="docutils literal"><span class="pre">[[Image?]]</span></code></p>
+<p><em>(help for the Image macro)</em></p>
+<p><a class="reference external" href="https://fedorahosted.org/sssd#Processors">Processors</a></p>
+<div class="wikipage" style="font-size: 80%"><p>Code highlighting:</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">hello</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="s2">&quot;world&quot;</span>
+</pre></div>
+</div>
+</div></div><p><a class="reference external" href="https://fedorahosted.org/sssd#Comments">Comments</a></p>
+<p><a class="reference external" href="https://fedorahosted.org/sssd#Miscellaneous">Miscellaneous</a></p>
+<div class="line-block">
+<div class="line">Line</div>
+<div class="line">break Line</div>
+<div class="line">break</div>
+</div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="font-styles">
+<h2>Font Styles<a class="headerlink" href="#font-styles" title="Permalink to this headline">¶</a></h2>
+<p>The Trac wiki supports the following font styles:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><dl class="first docutils">
+<dt>y ! &#8216;&#8217;&#8216;,</dt>
+<dd><ul class="first last simple">
+<li>&#8216;&#8217;italic&#8217;&#8216;</li>
+<li>&#8216;&#8217;&#8216;&#8217;&#8216;bold italic&#8217;&#8216;&#8217;&#8216;&#8217; or &#8216;&#8217;it</li>
+</ul>
+</dd>
+<dt>alic and</dt>
+<dd><blockquote class="first">
+<div>&#8216;&#8217;&#8217; italic bold &#8216;&#8217;&#8217; &#8216;&#8217;</div></blockquote>
+<ul class="last simple">
+<li>__underline__</li>
+<li>{{{monospace}}} or <a href="#id3"><span class="problematic" id="id4">`</span></a>monospace</li>
+</ul>
+</dd>
+</dl>
+<dl class="docutils">
+<dt><a href="#id5"><span class="problematic" id="id6">`</span></a></dt>
+<dd>(hence <cite>{{{</cite> or {{{`}}} quoti</dd>
+<dt>ng)</dt>
+<dd><ul class="first last simple">
+<li>~~strike-through~~</li>
+<li>^superscript^</li>
+<li>,,subscript,,</li>
+<li><strong>also bold</strong>, //italic as we</li>
+</ul>
+</dd>
+<dt>ll//,</dt>
+<dd>and <a href="#id7"><span class="problematic" id="id8">**</span></a>&#8216;&#8217; bold italic <a href="#id9"><span class="problematic" id="id10">**</span></a>&#8216;&#8217; //(</dd>
+</dl>
+<p class="last">since 0.12)//</p>
+</td>
+<td><ul class="first last simple">
+<li><strong>bold</strong>, <strong>triple quotes &#8216;&#8217;&#8217; can
+be bold too if prefixed by !</strong> ,</li>
+<li><em>italic</em></li>
+<li><strong>*bold italic*</strong> or <em>italic and
+**italic bold**</em></li>
+<li>underline</li>
+<li><code class="docutils literal"><span class="pre">monospace</span></code> or <code class="docutils literal"><span class="pre">monospace</span></code>
+(hence <code class="docutils literal"><span class="pre">{{{</span></code> or <code class="docutils literal"><span class="pre">`</span></code> quoting)</li>
+<li>[STRIKEOUT:strike-through]</li>
+<li><sup>superscript</sup></li>
+<li><sub>subscript</sub></li>
+<li><strong>also bold</strong>, <em>italic as well</em>,
+and <strong>*bold italic*</strong> ** <em>(since
+0.12)</em></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Notes:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">{{{...}}}</span></code> and <code class="docutils literal"><span class="pre">`...`</span></code> commands not only select a monospace
+font, but also treat their content as verbatim text, meaning that no
+further wiki processing is done on this text.</li>
+<li>`` ! `` tells wiki parser to not take the following characters as
+wiki format, so pay attention to put a space after !, e.g. when
+ending bold.</li>
+<li>all the font styles marks have to be used in opening/closing pairs,
+and they must nest properly (in particular, an <code class="docutils literal"><span class="pre">''</span></code> italic can&#8217;t be
+paired with a <code class="docutils literal"><span class="pre">//</span></code> one, and <code class="docutils literal"><span class="pre">'''</span></code> can&#8217;t be paired with <code class="docutils literal"><span class="pre">**</span></code>)</li>
+</ul>
+</div>
+<div class="section" id="headings">
+<h2>Headings<a class="headerlink" href="#headings" title="Permalink to this headline">¶</a></h2>
+<p>You can create heading by starting a line with one up to six <em>equal</em>
+characters (&#8220;=&#8221;) followed by a single space and the headline text.</p>
+<blockquote>
+<div>The headline text can be followed by the same number of &#8220;=&#8221; characters,</div></blockquote>
+<p>but this is no longer mandatory.</p>
+<p>Finally, the heading might optionally be followed by an explicit id. If
+not, an implicit but nevertheless readable id will be generated.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><dl class="first last docutils">
+<dt>cit-id-in-heading</dt>
+<dd>== Subheading #sub2</dd>
+</dl>
+</td>
+<td><div class="first"><div class="wikipage"></div><p class="rubric" id="heading">Heading</p>
+<p class="rubric" id="subheading">Subheading</p>
+<p class="rubric" id="aboutthis">About <em>this</em></p>
+<p class="rubric" id="using-explicit-id-in-headi">Explicit id</p>
+<p>ng</p>
+<p class="rubric" id="sub2">Subheading</p>
+<div class="last"></div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="paragraphs">
+<h2>Paragraphs<a class="headerlink" href="#paragraphs" title="Permalink to this headline">¶</a></h2>
+<p>A new text paragraph is created whenever two blocks of text are
+separated by one or more empty lines.</p>
+<p>A forced line break can also be inserted, using:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&nbsp;</td>
+<td><div class="first line-block">
+<div class="line">Line 1</div>
+<div class="line">Line 2</div>
+</div>
+<p>Paragraph one</p>
+<p class="last">Paragraph two</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="lists">
+<h2>Lists<a class="headerlink" href="#lists" title="Permalink to this headline">¶</a></h2>
+<p>The wiki supports both ordered/numbered and unordered lists.</p>
+<p>Example:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><dl class="first docutils">
+<dt>ng of a line</dt>
+<dd>and they can span multiple lin</dd>
+<dt>es</dt>
+<dd><ul class="first last simple">
+<li>be careful though to continu</li>
+</ul>
+</dd>
+<dt>e the line</dt>
+<dd>with the appropriate indentati</dd>
+<dt>on, otherwise</dt>
+<dd>that will start a new paragraph.</dd>
+</dl>
+<blockquote>
+<div><blockquote>
+<div><ol class="arabic simple">
+<li>Item 1</li>
+</ol>
+<blockquote>
+<div><p>a. Item 1.a
+a. Item 1.b</p>
+<blockquote>
+<div>i. Item 1.b.i
+i. Item 1.b.ii</div></blockquote>
+</div></blockquote>
+<ol class="arabic simple">
+<li>Item 2</li>
+</ol>
+</div></blockquote>
+<p>And numbered lists can also be r</p>
+</div></blockquote>
+<dl class="last docutils">
+<dt>estarted</dt>
+<dd><dl class="first last docutils">
+<dt>with an explicit number:</dt>
+<dd><ol class="first last arabic simple" start="3">
+<li>Item 3</li>
+</ol>
+</dd>
+</dl>
+</dd>
+</dl>
+</td>
+<td><ul class="first simple">
+<li>Item 1<ul>
+<li>Item 1.1<ul>
+<li>Item 1.1.1</li>
+<li>Item 1.1.2</li>
+<li>Item 1.1.3</li>
+</ul>
+</li>
+<li>Item 1.2</li>
+</ul>
+</li>
+<li>Item 2</li>
+<li>items can start at the beginning
+of a line and they can span
+multiple lines<ul>
+<li>be careful though to continue
+the line with the appropriate
+indentation, otherwise</li>
+</ul>
+</li>
+</ul>
+<p>that will start a new paragraph...</p>
+<ol class="arabic simple">
+<li>Item 1<ol class="arabic">
+<li>Item 1.a</li>
+<li>Item 1.b<ol class="arabic">
+<li>Item 1.b.i</li>
+<li>Item 1.b.ii</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>Item 2</li>
+</ol>
+<p>And numbered lists can also be
+restarted with an explicit number:</p>
+<ol class="last arabic simple" start="3">
+<li>Item 3</li>
+</ol>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="definition-lists">
+<h2>Definition Lists<a class="headerlink" href="#definition-lists" title="Permalink to this headline">¶</a></h2>
+<p>The wiki also supports definition lists.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><dl class="first last docutils">
+<dt>r</dt>
+<dd><blockquote class="first">
+<div><dl class="docutils">
+<dt>ppython::</dt>
+<dd>some kind of reptile, without</dd>
+</dl>
+</div></blockquote>
+<dl class="last docutils">
+<dt>hair</dt>
+<dd>(can you spot the typo?)</dd>
+</dl>
+</dd>
+</dl>
+</td>
+<td><dl class="first last docutils">
+<dt>llama</dt>
+<dd>some kind of mammal, with hair</dd>
+<dt>ppython</dt>
+<dd>some kind of reptile, without
+hair (can you spot the typo?)</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Note that you need a space in front of the defined term.</p>
+</div>
+<div class="section" id="preformatted-text">
+<h2>Preformatted Text<a class="headerlink" href="#preformatted-text" title="Permalink to this headline">¶</a></h2>
+<p>Block containing preformatted text are suitable for source code
+snippets, notes and examples. Use three <em>curly braces</em> wrapped around
+the text to define a block quote. The curly braces need to be on a
+separate line.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<p>Note that this kind of block is also used for selecting lines that
+should be processed through
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiProcessors.html">WikiProcessors</a>.</p>
+</div>
+<div class="section" id="blockquotes">
+<h2>Blockquotes<a class="headerlink" href="#blockquotes" title="Permalink to this headline">¶</a></h2>
+<p>In order to mark a paragraph as blockquote, indent that paragraph with
+two spaces.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>one else.</td>
+<td><p class="first">Paragraph</p>
+<blockquote class="last">
+<div>This text is a quote from
+someone else.</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="discussion-citations">
+<h2>Discussion Citations<a class="headerlink" href="#discussion-citations" title="Permalink to this headline">¶</a></h2>
+<p>To delineate a citation in an ongoing discussion thread, such as the
+ticket comment area, e-mail-like citation marks (&#8220;&gt;&#8221;, &#8220;&gt;&gt;&#8221;, etc.) may be
+used.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><dl class="first last docutils">
+<dt>ki markup</dt>
+<dd>My reply text</dd>
+</dl>
+</td>
+<td><blockquote class="first">
+<div><blockquote>
+<div>Someone&#8217;s original text</div></blockquote>
+<p>Someone else&#8217;s reply text</p>
+<ul class="simple">
+<li>which can be any kind of Wiki
+markup</li>
+</ul>
+</div></blockquote>
+<p class="last">My reply text</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="tables">
+<h2>Tables<a class="headerlink" href="#tables" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="simple-tables">
+<h3>Simple Tables<a class="headerlink" href="#simple-tables" title="Permalink to this headline">¶</a></h3>
+<p>Simple tables can be created like this:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&nbsp;</td>
+<td><table border="1" class="first last docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Cell 1</td>
+<td>Cell 2</td>
+<td>Cell 3</td>
+</tr>
+<tr class="row-even"><td>Cell 4</td>
+<td>Cell 5</td>
+<td>Cell 6</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Cell headings can be specified by wrapping the content in a pair of &#8216;=&#8217;
+characters. Note that the &#8216;=&#8217; characters have to stick to the cell
+separators, like this:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><dl class="first docutils">
+<dt>ev||</dt>
+<dd>||= 0.11 =||  0.11.6  || 0.11.7d</dd>
+</dl>
+<p class="last">ev||</p>
+</td>
+<td><table border="1" class="first last docutils">
+<colgroup>
+<col width="26%" />
+<col width="32%" />
+<col width="42%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>&nbsp;</td>
+<td>stable</td>
+<td>latest</td>
+</tr>
+<tr class="row-even"><td>0.10</td>
+<td>0.10.5</td>
+<td>0.10.6dev</td>
+</tr>
+<tr class="row-odd"><td>0.11</td>
+<td>0.11.6</td>
+<td>0.11.7dev</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Finally, specifying an empty cell means that the next non empty cell
+will span the empty cells. For example:</p>
+<p>Wiki Markup</p>
+<p>Display</p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>1-2</p>
+<p>3</p>
+<p>1</p>
+<p>2-3</p>
+<p>1-2-3</p>
+<p>Note that if the content of a cell &#8220;sticks&#8221; to one side of the cell and
+only one, then the text will be aligned on that side. Example:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&nbsp;</td>
+<td><table border="1" class="first last docutils">
+<colgroup>
+<col width="66%" />
+<col width="34%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Text</th>
+<th class="head">Numbers</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>left align</td>
+<td>1.0</td>
+</tr>
+<tr class="row-odd"><td>center</td>
+<td>4.5</td>
+</tr>
+<tr class="row-even"><td>right align</td>
+<td>4.5</td>
+</tr>
+<tr class="row-odd"><td>default alignment</td>
+<td>2.5</td>
+</tr>
+<tr class="row-even"><td>default</td>
+<td>2.5</td>
+</tr>
+<tr class="row-odd"><td>default</td>
+<td>2.5</td>
+</tr>
+<tr class="row-even"><td>default</td>
+<td>2.5</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<p>If contrary to the example above, the cells in your table contain more
+text, it might be convenient to spread a table row over multiple lines
+of markup. The <code class="docutils literal"><span class="pre">\</span></code> character placed at the end of a line after a cell
+separator tells Trac to not start a new row for the cells on the next
+line.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="100%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><dl class="first last docutils">
+<dt>|| </dt>
+<dd>|| this is column 2 [<a class="reference external" href="http://trac.edgewall.org/roadmap">http://trac.edgewall.org/roadmap</a> the road ahead</dd>
+<dt>] || </dt>
+<dd>|| that&#8217;s column 3 and last one ||</dd>
+</dl>
+</td>
+</tr>
+<tr class="row-odd"><td>Display</td>
+</tr>
+<tr class="row-even"><td><p class="first">+&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;
+&#8211;+&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;
+&#8212;&#8212;+&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;+
+| this is column 1 <a class="reference external" href="http://trac.edgewall.org/newticket">​new ticket</a></p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">this is column 2 <a href="#id11"><span class="problematic" id="id12">`</span></a>​the road ahead &lt;<a class="reference external" href="http://trac.edgewall.org/roadmap">http://trac.edgewall.org/roadmap</a>&gt;</div>
+</div>
+</div></blockquote>
+<p class="last"><a href="#id13"><span class="problematic" id="id14">`</span></a>__   | that&#8217;s column 3 and last one   |
++&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;
+&#8211;+&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;
+&#8212;&#8212;+&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="complex-tables">
+<h3>Complex Tables<a class="headerlink" href="#complex-tables" title="Permalink to this headline">¶</a></h3>
+<p>If the possibilities offered by the simple &#8220;pipe&#8221;-based markup for
+tables described above are not enough for your needs, you can create
+more elaborated tables by using <a class="reference external" href="https://fedorahosted.org/sssd#Processors-example-tables">WikiProcessor based
+tables</a>.</p>
+</div>
+</div>
+<div class="section" id="links">
+<h2>Links<a class="headerlink" href="#links" title="Permalink to this headline">¶</a></h2>
+<p>Hyperlinks are automatically created for
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiPageNames.html">WikiPageNames</a>
+and URLs. WikiPageLinks can be disabled by prepending an exclamation
+mark &#8221;!&#8221; character, such as <code class="docutils literal"><span class="pre">!WikiPageLink</span></code>.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>com/, !NotAlink</td>
+<td><a class="reference external" href="https://docs.pagure.org/sssd-test2/TitleIndex.html">TitleIndex</a>,
+<a class="reference external" href="http://www.edgewall.com/">​http://www.edgewall.com/</a>,
+NotAlink</td>
+</tr>
+</tbody>
+</table>
+<p>Links can be given a more descriptive title by writing the link followed
+by a space and a title and all this inside square brackets. If the
+descriptive title is omitted, then the explicit prefix is discarded,
+unless the link is an external link. This can be useful for wiki pages
+not adhering to the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiPageNames.html">WikiPageNames</a>
+convention.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><dl class="first last docutils">
+<dt>wall Software]</dt>
+<dd><ul class="first last simple">
+<li>[wiki:TitleIndex Title Index]</li>
+<li>[wiki:TitleIndex]</li>
+<li>[wiki:ISO9000]</li>
+</ul>
+</dd>
+</dl>
+</td>
+<td><ul class="first simple">
+<li><a href="#id15"><span class="problematic" id="id16">`</span></a>​Edgewall
+Software &lt;<a class="reference external" href="http://www.edgewall.com">http://www.edgewall.com</a></li>
+</ul>
+<p>&gt;`__
+-  <a href="#id17"><span class="problematic" id="id18">`</span></a>Title</p>
+<blockquote>
+<div>Index &lt;<a class="reference external" href="https://docs.pagure.org/ss">https://docs.pagure.org/ss</a></div></blockquote>
+<p class="last">sd-test2/TitleIndex.html&gt;`__
+-  <a class="reference external" href="https://docs.pagure.org/sssd-test2/TitleIndex.html">TitleIndex</a>
+-  <a class="reference external" href="https://docs.pagure.org/sssd-test2/ISO9000.html">ISO9000?</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Following the
+<a class="reference external" href="http://trac.edgewall.org/intertrac/WikiCreole">​WikiCreole</a> trend,
+the descriptive title can also be specified by writing the link followed
+by a pipe (&#8216;|&#8217;) and a title and all this inside <em>double</em> square
+brackets.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><dl class="first docutils">
+<dt>ewall Software]]</dt>
+<dd><ul class="first last simple">
+<li>[[wiki:TitleIndex|Title Index</li>
+</ul>
+</dd>
+</dl>
+<dl class="docutils">
+<dt>]]</dt>
+<dd>or even [[TitleIndex|Title In</dd>
+<dt>dex]]</dt>
+<dd><ul class="first last simple">
+<li>[[wiki:TitleIndex]]
+&#8216;&#8217;&#8217; but not ![[TitleIndex]]!</li>
+</ul>
+</dd>
+</dl>
+<dl class="last docutils">
+<dt>&#8216;&#8217;&#8216;</dt>
+<dd><ul class="first last simple">
+<li>[[ISO9000]]</li>
+</ul>
+</dd>
+</dl>
+</td>
+<td><ul class="first simple">
+<li><a href="#id19"><span class="problematic" id="id20">`</span></a>​Edgewall
+Software &lt;<a class="reference external" href="http://www.edgewall.com">http://www.edgewall.com</a></li>
+</ul>
+<p>&gt;`__
+-  <a href="#id21"><span class="problematic" id="id22">`</span></a>Title</p>
+<blockquote>
+<div>Index &lt;<a class="reference external" href="https://docs.pagure.org/ss">https://docs.pagure.org/ss</a></div></blockquote>
+<dl class="docutils">
+<dt>sd-test2/TitleIndex.html&gt;`__</dt>
+<dd>or even <a href="#id23"><span class="problematic" id="id24">`</span></a>Title
+Index &lt;<a class="reference external" href="https://docs.pagure.org/ss">https://docs.pagure.org/ss</a></dd>
+</dl>
+<p>sd-test2/TitleIndex.html&gt;`__
+-  <a class="reference external" href="https://docs.pagure.org/sssd-test2/TitleIndex.html">TitleIndex</a></p>
+<blockquote>
+<div><strong>but not [[TitleIndex]]!</strong></div></blockquote>
+<ul class="simple">
+<li><a href="#id25"><span class="problematic" id="id26">`</span></a>ISO9000? &lt;<a class="reference external" href="https://docs.pagure.or">https://docs.pagure.or</a></li>
+</ul>
+<p class="last">g/sssd-test2/ISO9000.html&gt;`__</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note</strong>: the
+<a class="reference external" href="http://trac.edgewall.org/intertrac/WikiCreole">​WikiCreole</a> style
+for links is quick to type and certainly looks familiar as it&#8217;s the one
+used on Wikipedia and in many other wikis. Unfortunately it conflicts
+with the syntax for <a class="reference external" href="https://fedorahosted.org/sssd#Macros">macros</a>.
+So in the rare case when you need to refer to a page which is named
+after a macro (typical examples being
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TitleIndex.html">TitleIndex</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InterTrac.html">InterTrac</a> and
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InterWiki.html">InterWiki</a>), by
+writing <code class="docutils literal"><span class="pre">[[TitleIndex]]</span></code> you will actually call the macro instead of
+linking to the page.</p>
+</div>
+<div class="section" id="trac-links">
+<h2>Trac Links<a class="headerlink" href="#trac-links" title="Permalink to this headline">¶</a></h2>
+<p>Wiki pages can link directly to other parts of the Trac system. Pages
+can refer to tickets, reports, changesets, milestones, source files and
+other Wiki pages using the following notations:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><dl class="first docutils">
+<dt>set:1</dt>
+<dd><ul class="first last simple">
+<li>...</li>
+<li>targeting other Trac instance</li>
+</ul>
+</dd>
+<dt>s,</dt>
+<dd>so called InterTrac links:
+- Tickets: #Trac1 or Trac:tic</dd>
+<dt>ket:1</dt>
+<dd><ul class="first last simple">
+<li>Changesets: [Trac1] or Trac</li>
+</ul>
+</dd>
+</dl>
+<p class="last">:changeset:1</p>
+</td>
+<td><ul class="first simple">
+<li>Tickets:
+<a href="#id27"><span class="problematic" id="id28">`</span></a>#1 &lt;<a class="reference external" href="https://fedorahosted.org/sss">https://fedorahosted.org/sss</a></li>
+</ul>
+<dl class="docutils">
+<dt>d/ticket/1&gt;`__</dt>
+<dd>or
+<a href="#id29"><span class="problematic" id="id30">`</span></a>ticket:1 &lt;https://fedorahosted.o</dd>
+</dl>
+<p>rg/sssd/ticket/1&gt;`__
+-  Reports:</p>
+<blockquote>
+<div><a href="#id31"><span class="problematic" id="id32">`</span></a>{1} &lt;<a class="reference external" href="https://fedorahosted.org/ss">https://fedorahosted.org/ss</a></div></blockquote>
+<dl class="docutils">
+<dt>sd/report/1&gt;`__</dt>
+<dd>or
+<a href="#id33"><span class="problematic" id="id34">`</span></a>report:1 &lt;https://fedorahosted.o</dd>
+</dl>
+<p>rg/sssd/report/1&gt;`__
+-  Changesets: r1, [1] or</p>
+<blockquote>
+<div>changeset:1</div></blockquote>
+<ul class="simple">
+<li>...</li>
+<li>targeting other Trac instances,
+so called
+<a href="#id35"><span class="problematic" id="id36">`</span></a>InterTrac &lt;<a class="reference external" href="https://docs.pagure.o">https://docs.pagure.o</a></li>
+</ul>
+<dl class="last docutils">
+<dt>rg/sssd-test2/InterTrac.html&gt;`__</dt>
+<dd><p class="first">links:</p>
+<ul class="last simple">
+<li>Tickets: #Trac1 or
+Trac:ticket:1</li>
+<li>Changesets: [Trac1] or
+Trac:changeset:1</li>
+</ul>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p>There are many more flavors of Trac links, see
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracLinks.html">TracLinks</a> for
+more in-depth information and a reference for all the default link
+resolvers.</p>
+</div>
+<div class="section" id="setting-anchors">
+<h2>Setting Anchors<a class="headerlink" href="#setting-anchors" title="Permalink to this headline">¶</a></h2>
+<p>An anchor, or more correctly speaking, an <a class="reference external" href="http://www.w3.org/TR/REC-html40/struct/links.html#h-12.2.1">​anchor
+name</a> can
+be added explicitly at any place in the Wiki page, in order to uniquely
+identify a position in the document:</p>
+<p>This syntax was chosen to match the format for explicitly naming the
+header id <a class="reference external" href="https://fedorahosted.org/sssd#Headings">documented above</a>.
+For example:</p>
+<p>It&#8217;s also very close to the syntax for the corresponding link to that
+anchor:</p>
+<p>Optionally, a label can be given to the anchor:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><p class="first">t]</p>
+<blockquote class="last">
+<div><p>...</p>
+<p>Point2:  [=#point2] Jump here</p>
+</div></blockquote>
+</td>
+<td><blockquote class="first">
+<div><a href="#id37"><span class="problematic" id="id38">`</span></a>jump to the second
+point &lt;<a class="reference external" href="https://fedorahosted.org/">https://fedorahosted.org/</a></div></blockquote>
+<p>sssd#point2&gt;`__</p>
+<blockquote class="last">
+<div><p>...</p>
+<p>Point2: Jump here</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p>For more complex anchors (e.g. when a custom title is wanted), one can
+use the Span macro, e.g.
+<code class="docutils literal"><span class="pre">[[span(id=point2,</span> <span class="pre">class=wikianchor,</span> <span class="pre">title=Point</span> <span class="pre">2,</span> <span class="pre">^(2)^)]]</span></code>.</p>
+</div>
+<div class="section" id="escaping-links-wikipagenames-and-other-markup">
+<h2>Escaping Links, <a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiPageNames.html">WikiPageNames</a> and other Markup<a class="headerlink" href="#escaping-links-wikipagenames-and-other-markup" title="Permalink to this headline">¶</a></h2>
+<p>You may avoid making hyperlinks out of
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracLinks.html">TracLinks</a> by
+preceding an expression with a single &#8221;!&#8221; (exclamation mark).</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><dl class="first last docutils">
+<dt>st markup:</dt>
+<dd><cite>-</cite> escaped minus sign \
+<a href="#id39"><span class="problematic" id="id40">``</span></a>1. escaped number  \
+{{{*}}} escaped asterisk sign</dd>
+</dl>
+</td>
+<td><blockquote class="first">
+<div>NoHyperLink #42 is not a link</div></blockquote>
+<p>Various forms of escaping for list
+markup:</p>
+<blockquote class="last">
+<div><div class="line-block">
+<div class="line"><code class="docutils literal"><span class="pre">-</span></code> escaped minus sign</div>
+<div class="line"><a href="#id41"><span class="problematic" id="id42">``</span></a><a href="#id43"><span class="problematic" id="id44">``</span></a>1. escaped number</div>
+<div class="line"><code class="docutils literal"><span class="pre">*</span></code> escaped asterisk sign</div>
+</div>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="images">
+<h2>Images<a class="headerlink" href="#images" title="Permalink to this headline">¶</a></h2>
+<p>Urls ending with <code class="docutils literal"><span class="pre">.png</span></code>, <code class="docutils literal"><span class="pre">.gif</span></code> or <code class="docutils literal"><span class="pre">.jpg</span></code> are no longer
+automatically interpreted as image links, and converted to <code class="docutils literal"><span class="pre">&lt;img&gt;</span></code>
+tags.</p>
+<p>You now have to use the [[Image]] macro. The simplest way to include an
+image is to upload it as attachment to the current page, and put the
+filename in a macro call like <code class="docutils literal"><span class="pre">[[Image(picture.gif)]]</span></code>.</p>
+<p>In addition to the current page, it is possible to refer to other
+resources:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">[[Image(wiki:WikiFormatting:picture.gif)]]</span></code> (referring to
+attachment on another page)</li>
+<li><code class="docutils literal"><span class="pre">[[Image(ticket:1:picture.gif)]]</span></code> (file attached to a ticket)</li>
+<li><code class="docutils literal"><span class="pre">[[Image(htdocs:picture.gif)]]</span></code> (referring to a file inside the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracEnvironment.html">environment</a>
+<code class="docutils literal"><span class="pre">htdocs</span></code> directory)</li>
+<li><code class="docutils literal"><span class="pre">[[Image(source:/trunk/trac/htdocs/trac_logo_mini.png)]]</span></code> (a file
+in repository)</li>
+</ul>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>go_mini.png)]]</td>
+<td><a href="#id55"><span class="problematic" id="id56">|trac\_logo\_mini.png|</span></a></td>
+</tr>
+</tbody>
+</table>
+<p>See <a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiMacros.html">WikiMacros</a>
+for further documentation on the <code class="docutils literal"><span class="pre">[[Image()]]</span></code> macro, which has
+several useful options (<code class="docutils literal"><span class="pre">title=</span></code>, <code class="docutils literal"><span class="pre">link=</span></code>, etc.)</p>
+</div>
+<div class="section" id="macros">
+<h2>Macros<a class="headerlink" href="#macros" title="Permalink to this headline">¶</a></h2>
+<p>Macros are <em>custom functions</em> to insert dynamic content in a page.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&nbsp;</td>
+<td><div class="first"><div></div><p class="rubric" id="section">06/08/15</p>
+<ul class="simple">
+<li><a href="#id45"><span class="problematic" id="id46">`</span></a>TracUpgrade &lt;<a class="reference external" href="https://docs.pagure">https://docs.pagure</a></li>
+</ul>
+<dl class="docutils">
+<dt>.org/sssd-test2/TracUpgrade.html&gt;`__</dt>
+<dd>(<a href="#id47"><span class="problematic" id="id48">`</span></a>diff &lt;<a class="reference external" href="https://docs.pagure.org/s">https://docs.pagure.org/s</a></dd>
+</dl>
+<p>ssd-test2/TracUpgrade?action=diff&amp;ve
+rsion=3.html&gt;`__)
+-  <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracRoadmap.html">TracRoadmap</a></p>
+<blockquote>
+<div>(<a href="#id49"><span class="problematic" id="id50">`</span></a>diff &lt;<a class="reference external" href="https://docs.pagure.org/s">https://docs.pagure.org/s</a></div></blockquote>
+<p>ssd-test2/TracRoadmap?action=diff&amp;ve
+rsion=3.html&gt;`__)
+-  <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTickets.html">TracTickets</a></p>
+<blockquote>
+<div>(<a href="#id51"><span class="problematic" id="id52">`</span></a>diff &lt;<a class="reference external" href="https://docs.pagure.org/s">https://docs.pagure.org/s</a></div></blockquote>
+<p>ssd-test2/TracTickets?action=diff&amp;ve
+rsion=3.html&gt;`__)</p>
+<div class="last"></div></div></td>
+</tr>
+</tbody>
+</table>
+<p>See <a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiMacros.html">WikiMacros</a>
+for more information, and a list of installed macros.</p>
+<p>The detailed help for a specific macro can also be obtained more
+directly by appending a &#8221;?&#8221; to the macro name.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&nbsp;</td>
+<td><div class="first"><div class="trac-macrolist"></div><p class="rubric" id="macrolist-macro"><code class="docutils literal"><span class="pre">[[MacroList]]</span></code></p>
+<p>Display a list of all installed Wiki
+macros, including documentation if
+available.</p>
+<p>Optionally, the name of a specific
+macro can be provided as an
+argument. In that case, only the
+documentation for that macro will be
+rendered.</p>
+<p>Note that this macro will not be
+able to display the documentation of
+macros if the <code class="docutils literal"><span class="pre">PythonOptimize</span></code>
+option is enabled for mod_python!</p>
+<div class="last"></div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="processors">
+<h2>Processors<a class="headerlink" href="#processors" title="Permalink to this headline">¶</a></h2>
+<p>Trac supports alternative markup formats using
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiProcessors.html">WikiProcessors</a>.
+For example, processors are used to write pages in
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiRestructuredText.html">reStructuredText</a>
+or <a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiHtml.html">HTML</a>.</p>
+<p>Wiki Markup</p>
+<p>Display</p>
+<blockquote>
+<div>Example 1: HTML</div></blockquote>
+</div>
+</div>
+<div class="section" id="html-test">
+<h1>HTML Test<a class="headerlink" href="#html-test" title="Permalink to this headline">¶</a></h1>
+<blockquote>
+<div>Example 2: Code Highlighting</div></blockquote>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Test</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span> <span class="s2">&quot;Hello World&quot;</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+   <span class="n">Test</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+
+ Example 3: Complex Tables<p>With the <code class="docutils literal"><span class="pre">#td</span></code> and <code class="docutils literal"><span class="pre">#th</span></code> processors, table cells can contain any
+content:</p>
+<ul class="simple">
+<li>lists</li>
+<li>embedded tables</li>
+<li>simple multiline content</li>
+</ul>
+<p>As processors can be easily nested, so can be tables:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Example:</td>
+<td><p class="first">+&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;
+&#8211;+
+| must be at the third level now...</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div></blockquote>
+<p class="last">+&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;
+&#8211;+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Even when you don&#8217;t have complex markup, this form of table cells can be
+convenient to write content on multiple lines.</p>
+<p>See
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiProcessors.html">WikiProcessors</a>
+for more information.</p>
+<div class="section" id="comments">
+<h2>Comments<a class="headerlink" href="#comments" title="Permalink to this headline">¶</a></h2>
+<p>Comments can be added to the plain text. These will not be rendered and
+will not display in any other format than plain text.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&nbsp;</td>
+<td><p class="first">Nothing to</p>
+<p class="last">see ;-)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="miscellaneous">
+<h2>Miscellaneous<a class="headerlink" href="#miscellaneous" title="Permalink to this headline">¶</a></h2>
+<p>An horizontal line can be used to separated different parts of your
+page:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><dl class="first last docutils">
+<dt>aced</dt>
+<dd>See?</dd>
+</dl>
+</td>
+<td><p class="first">Four or more dashes will be replaced
+by an horizontal line (&lt;HR&gt;)</p>
+<p class="last">See?</p>
+</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td><div class="first last line-block">
+<div class="line">&#8220;macro&#8221; style</div>
+<div class="line">line break</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td>&nbsp;</td>
+<td><div class="first last line-block">
+<div class="line">WikiCreole style</div>
+<div class="line">line</div>
+<div class="line">break</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">WikiFormatting</a><ul>
+<li><a class="reference internal" href="#cheat-sheet">Cheat sheet</a></li>
+<li><a class="reference internal" href="#level-2">Level 2</a><ul>
+<li><a class="reference internal" href="#level-3-sup-note-https-fedorahosted-org-sssd-hn">Level 3 :sup:`(`note &lt;https://fedorahosted.org/sssd#hn&gt;`__)`</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#font-styles">Font Styles</a></li>
+<li><a class="reference internal" href="#headings">Headings</a></li>
+<li><a class="reference internal" href="#paragraphs">Paragraphs</a></li>
+<li><a class="reference internal" href="#lists">Lists</a></li>
+<li><a class="reference internal" href="#definition-lists">Definition Lists</a></li>
+<li><a class="reference internal" href="#preformatted-text">Preformatted Text</a></li>
+<li><a class="reference internal" href="#blockquotes">Blockquotes</a></li>
+<li><a class="reference internal" href="#discussion-citations">Discussion Citations</a></li>
+<li><a class="reference internal" href="#tables">Tables</a><ul>
+<li><a class="reference internal" href="#simple-tables">Simple Tables</a></li>
+<li><a class="reference internal" href="#complex-tables">Complex Tables</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#links">Links</a></li>
+<li><a class="reference internal" href="#trac-links">Trac Links</a></li>
+<li><a class="reference internal" href="#setting-anchors">Setting Anchors</a></li>
+<li><a class="reference internal" href="#escaping-links-wikipagenames-and-other-markup">Escaping Links, WikiPageNames and other Markup</a></li>
+<li><a class="reference internal" href="#images">Images</a></li>
+<li><a class="reference internal" href="#macros">Macros</a></li>
+<li><a class="reference internal" href="#processors">Processors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#html-test">HTML Test</a><ul>
+<li><a class="reference internal" href="#comments">Comments</a></li>
+<li><a class="reference internal" href="#miscellaneous">Miscellaneous</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/WikiFormatting.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/WikiFormatting.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

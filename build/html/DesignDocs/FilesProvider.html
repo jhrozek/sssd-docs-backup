@@ -1,0 +1,344 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Feature Name &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><a class="reference external" href="#FeatureName">Feature Name</a><ol class="arabic">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#Problemstatement">Problem statement</a></li>
+<li><a class="reference external" href="#Usecases">Use cases</a><ol class="arabic">
+<li><a class="reference external" href="#UseCase:DefaultConfiguration">Use Case: Default
+Configuration</a></li>
+<li><a class="reference external" href="#UseCase:ProgramaticallymanagingPOSIXattributesofauseroragroup">Use Case: Programatically managing POSIX attributes of a
+user or a
+group</a></li>
+<li><a class="reference external" href="#UseCase:Manageextendedattributesofusersandgroups">Use Case: Manage extended attributes of users and
+groups</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#Overviewofthesolution">Overview of the solution</a></li>
+<li><a class="reference external" href="#Implementationdetails">Implementation details</a></li>
+<li><a class="reference external" href="#Configurationchanges">Configuration changes</a></li>
+<li><a class="reference external" href="#Performanceimpact">Performance impact</a></li>
+<li><a class="reference external" href="#Compatibilityissues">Compatibility issues</a></li>
+<li><a class="reference external" href="#Packagingissues">Packaging issues</a></li>
+<li><a class="reference external" href="#HowToTest">How To Test</a></li>
+<li><a class="reference external" href="#HowToDebug">How To Debug</a></li>
+<li><a class="reference external" href="#Authors">Authors</a></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="feature-name">
+<h1>Feature Name<a class="headerlink" href="#feature-name" title="Permalink to this headline">¶</a></h1>
+<p>&#8220;Files&#8221; data provider</p>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li>The umbrella tracking ticket:
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/2228">​https://fedorahosted.org/sssd/ticket/2228</a></li>
+</ul>
+<p>which includes the following sub-tasks:</p>
+<ul class="simple">
+<li>Ship an immutable recovery mode config for local accounts -
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/2229">​https://fedorahosted.org/sssd/ticket/2229</a></li>
+<li>[RFE] Support UID/GID changes -
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/2244">​https://fedorahosted.org/sssd/ticket/2244</a></li>
+<li>Provide a &#8220;writable&#8221; D-Bus management API for local users -
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/3242">​https://fedorahosted.org/sssd/ticket/3242</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>SSSD does not behave well with nscd, so we recommend that it be
+disabled. However, this comes with a price in the form of every
+nameservice lookup hitting the disk for <code class="docutils literal"><span class="pre">/etc/passwd</span></code> and friends
+every time. SSSD should be able to read and monitor these files and
+serve them from its cache, allowing <code class="docutils literal"><span class="pre">sss</span></code> to sort before <code class="docutils literal"><span class="pre">files</span></code> in
+<code class="docutils literal"><span class="pre">/etc/nsswitch.conf</span></code></p>
+<p>In addition, SSSD provides some useful interfaces, such as <a class="reference external" href="https://docs.pagure.org/sssd-test2/DesignDocs/DBusUsersAndGroups.html">​the dbus
+interface</a>
+which only work for users and groups SSSD knows about.</p>
+</div>
+<div class="section" id="use-cases">
+<h2>Use cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="use-case-default-configuration">
+<h3>Use Case: Default Configuration<a class="headerlink" href="#use-case-default-configuration" title="Permalink to this headline">¶</a></h3>
+<p>SSSD (and its useful APIs) should always be available. This means that
+SSSD must ship with a default configuration that works (and requires no
+manual configuration or joining a domain). This default configuration
+should provide a fast in-memory cache for all user and group information
+that SSSD can support, including those traditionally stored in
+<code class="docutils literal"><span class="pre">/etc/passwd</span></code> and friends.</p>
+</div>
+<div class="section" id="use-case-programatically-managing-posix-attributes-of-a-user-or-a-group">
+<h3>Use Case: Programatically managing POSIX attributes of a user or a group<a class="headerlink" href="#use-case-programatically-managing-posix-attributes-of-a-user-or-a-group" title="Permalink to this headline">¶</a></h3>
+<p>Currently the available ways to manage users and groups is either spawn
+and call shadow-utils binaries like <code class="docutils literal"><span class="pre">useradd</span></code> or libuser. SSSD already
+has a D-Bus API used to provide custom attributes of domain users. This
+interface should be be extended to provide &#8216;writable&#8217; methods to manage
+users and groups from files. This is tracked by <a class="reference external" href="https://fedorahosted.org/sssd/ticket/3242">​ticket
+#3242</a></p>
+</div>
+<div class="section" id="use-case-manage-extended-attributes-of-users-and-groups">
+<h3>Use Case: Manage extended attributes of users and groups<a class="headerlink" href="#use-case-manage-extended-attributes-of-users-and-groups" title="Permalink to this headline">¶</a></h3>
+<p>Some applications (such as desktop environments) additional attributes
+(such as keyboard layout) should be stored along with the user. Since
+the passwd file has only a fixed number of fields, it might make sense
+to allow additional attributes to be stored in SSSD database and
+retrieved with sssd&#8217;s D-Bus interface. Again, this is tracked by
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/3242">​ticket #3242</a></p>
+</div>
+</div>
+<div class="section" id="overview-of-the-solution">
+<h2>Overview of the solution<a class="headerlink" href="#overview-of-the-solution" title="Permalink to this headline">¶</a></h2>
+<p>SSSD should ship a <code class="docutils literal"><span class="pre">files</span></code> provider as part of its required minimal
+package. Absent any user modifications, SSSD should be configured to
+start at boot and use this provider to serve local identity information.</p>
+<p>This provider may or may not be optional. For example, we might decide
+that it always exists as the first domain in the list, even if not
+explicitly specified. Alternatively, distributions that wish to always
+include the files provider will be able (starting with SSSD 1.14 and its
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/DesignDocs/ding-libs/INIConfigMerge.html">​config merging
+feature</a>)
+to drop a definition of the files provider into <code class="docutils literal"><span class="pre">/etc/sssd/conf.d</span></code>. In
+order for this functionality to work, we would have to deprecate the
+<code class="docutils literal"><span class="pre">domains</span></code> line and instead load all <code class="docutils literal"><span class="pre">[domain/XXXX]</span></code> sections from
+all available sources, unless the <code class="docutils literal"><span class="pre">domains</span></code> line is specified for
+backwards-compatibility.</p>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<p>Upon SSSD startup, the <code class="docutils literal"><span class="pre">files</span></code> provider will always run a complete
+enumeration pass on the <code class="docutils literal"><span class="pre">/etc/passwd</span></code>, <code class="docutils literal"><span class="pre">/etc/group</span></code> and other files
+as appropriate. The provider will then configure an appropriate set of
+file monitors (using <code class="docutils literal"><span class="pre">inotify()</span></code>) and will re-run the enumeration if
+any of those files are modified or replaced. The implementation of
+enumeration would use the <code class="docutils literal"><span class="pre">nss_files</span></code> module interface - we would
+<code class="docutils literal"><span class="pre">dlopen</span></code> the module and <code class="docutils literal"><span class="pre">dlsym</span></code> the appropriate functions like
+<code class="docutils literal"><span class="pre">__nss_files_getpwent</span></code>.</p>
+<p>The fast-cache must also be flushed any time the enumeration is run, to
+ensure that stale data is cleaned up. We should also consider turning
+off the fast memory cache while we are performing the update.</p>
+<p>In addition, the nscd cache (if applicable) should also be flushed
+during an update. The updates to the files should be sufficiently rare
+so the performance impact would be negligible.</p>
+<p>The <code class="docutils literal"><span class="pre">files</span></code> provider in its first incarnation is expected to be a
+read-only tool, making no direct modifications to local passwords. In
+future enhancements, the Infopipe may grow the capability to serve the
+AccountsServices API and make changes.</p>
+<p>When a change in the files is detected, we should also flush the
+negative cache - either only the changes or just flush it whole. This
+would prevent scenarios like:</p>
+<p>from confusing admins.</p>
+</div>
+<div class="section" id="configuration-changes">
+<h2>Configuration changes<a class="headerlink" href="#configuration-changes" title="Permalink to this headline">¶</a></h2>
+<p>We may need the ability to choose non-default locations for files. This
+can be a hidden (undocumented) option in the first version and if there
+is a need to actually configure a non-default location, we can later
+expose these configuration options.</p>
+<p>We may also need to set a configurable number of seconds between
+detecting a change and running enumerations. This could be implemented
+in waiting a short time (2-3 seconds perhaps?) before detecting the
+change and running the enumeration to avoid excessive enumerations and
+invalidating the fastacache during subsequent shadow-utils invocations.</p>
+</div>
+<div class="section" id="performance-impact">
+<h2>Performance impact<a class="headerlink" href="#performance-impact" title="Permalink to this headline">¶</a></h2>
+<p>For measuring performance impact, we have developed a simple project
+called <a class="reference external" href="https://github.com/jhrozek/nssbench">​nssbench</a> which
+measures the time spent in NSS with systemtap. For each case, results
+are included for a single lookup which simulate the simplest case of an
+application that is spawned and exists and a case where an application
+performs several lookup and is able to benefit from the memory cache
+which is opened once per application. For single lookups, we ran the
+tests 10 times and averaged the Below are test results from different
+scenarios:</p>
+<ol class="arabic simple">
+<li>Base-line: Looking up a local user directly from <code class="docutils literal"><span class="pre">nss_files</span></code><ul>
+<li>Single lookup</li>
+<li>100 lookups</li>
+</ul>
+</li>
+<li>Failover from <code class="docutils literal"><span class="pre">sss</span></code> to <code class="docutils literal"><span class="pre">files</span></code> when SSSD is not running - this is
+the &#8216;worst&#8217; case where <code class="docutils literal"><span class="pre">sss</span></code> is enabled in <code class="docutils literal"><span class="pre">nsswitch.conf</span></code> but
+the deamon is not running at all, so the system falls back from
+<code class="docutils literal"><span class="pre">sss</span></code> to <code class="docutils literal"><span class="pre">files</span></code> for user lookups.<ul>
+<li>Single lookup</li>
+<li>100 lookups</li>
+</ul>
+</li>
+<li>Round-trip between SSSD deamon&#8217;s populated cache and OS when the
+memory cache is not used or not populated<ul>
+<li>Single lookup</li>
+<li>100 lookups</li>
+</ul>
+</li>
+<li>Performance benefit from using the memory cache<ul>
+<li>Single lookup</li>
+<li>100 lookups</li>
+</ul>
+</li>
+</ol>
+<p>The testing shows substantial benefit from SSSD cache for applications
+that perform several lookup. The first lookup, which opens the memory
+cache file takes about as much time as lookup against files. However,
+subsequent lookups are almost an order of magnitude faster.</p>
+<p>For setups that do not run SSSD by default, there is a performance hit
+by failover from <code class="docutils literal"><span class="pre">sss</span></code> to <code class="docutils literal"><span class="pre">files</span></code>. During testing, the failover took
+up to 300us, about ~70us was spent in the <code class="docutils literal"><span class="pre">sss</span></code> module and about ~200
+us seems to be the failover in libc itself.</p>
+</div>
+<div class="section" id="compatibility-issues">
+<h2>Compatibility issues<a class="headerlink" href="#compatibility-issues" title="Permalink to this headline">¶</a></h2>
+<p>Unless the ordering is specified, the files provider should be loaded
+first.</p>
+<p>Other distributions should be involved as well - we should work with
+Ubuntu as well.</p>
+<p>abrt and coredumpd must be run with <code class="docutils literal"><span class="pre">SSS_LOOPS=no</span></code> in order to avoid
+looping when analyzing a crash. We need to test this by reverting the
+order of modules, attaching a debugger and crashing SSSD on purpose.</p>
+</div>
+<div class="section" id="packaging-issues">
+<h2>Packaging issues<a class="headerlink" href="#packaging-issues" title="Permalink to this headline">¶</a></h2>
+<p>We need to add conflicts between glibc an an sssd version that doesn&#8217;t
+provide the files provider.</p>
+</div>
+<div class="section" id="how-to-test">
+<h2>How To Test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<p>When properly configured, SSSD should be able to serve local users and
+groups. Testing this could be as simple as</p>
+<p>Of course, testing on the distribution level could be more involved. For
+the first phase, of just adding the files provider, nothing should break
+and the only thing the user should notice is improved performance.
+Corner cases like running <code class="docutils literal"><span class="pre">sssd_nss</span></code> under gdb or corefile generation
+with setup where <code class="docutils literal"><span class="pre">sss</span></code> is set first in nsswitch.conf must be done as
+well.</p>
+</div>
+<div class="section" id="how-to-debug">
+<h2>How To Debug<a class="headerlink" href="#how-to-debug" title="Permalink to this headline">¶</a></h2>
+<p>A simple way of checking is some issue is caused by this new setup is to
+revert the order of NSS modules back to read <code class="docutils literal"><span class="pre">files</span> <span class="pre">sss</span></code>.</p>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Stephen Gallagher
+&lt;<a class="reference external" href="mailto:sgallagh&#37;&#52;&#48;redhat&#46;com">​sgallagh<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+<li>Jakub Hrozek &lt;<a class="reference external" href="mailto:jhrozek&#37;&#52;&#48;redhat&#46;com">​jhrozek<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Feature Name</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem statement</a></li>
+<li><a class="reference internal" href="#use-cases">Use cases</a><ul>
+<li><a class="reference internal" href="#use-case-default-configuration">Use Case: Default Configuration</a></li>
+<li><a class="reference internal" href="#use-case-programatically-managing-posix-attributes-of-a-user-or-a-group">Use Case: Programatically managing POSIX attributes of a user or a group</a></li>
+<li><a class="reference internal" href="#use-case-manage-extended-attributes-of-users-and-groups">Use Case: Manage extended attributes of users and groups</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#overview-of-the-solution">Overview of the solution</a></li>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a></li>
+<li><a class="reference internal" href="#configuration-changes">Configuration changes</a></li>
+<li><a class="reference internal" href="#performance-impact">Performance impact</a></li>
+<li><a class="reference internal" href="#compatibility-issues">Compatibility issues</a></li>
+<li><a class="reference internal" href="#packaging-issues">Packaging issues</a></li>
+<li><a class="reference internal" href="#how-to-test">How To Test</a></li>
+<li><a class="reference internal" href="#how-to-debug">How To Debug</a></li>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/FilesProvider.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/FilesProvider.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

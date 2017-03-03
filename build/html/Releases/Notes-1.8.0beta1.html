@@ -1,0 +1,276 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Support for the service map in NSS</li>
+<li>Support for setting default SELinux user context from FreeIPA</li>
+<li>Support for retrieving SSH user and host keys from LDAP
+(Experimental)</li>
+<li>Support for caching autofs LDAP requests (Experimental)</li>
+<li>Support for caching SUDO rules (Experimental)</li>
+</ul>
+</div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Jakub Hrozek (42):</p>
+<ul class="simple">
+<li>sss_get_cased_name utility function</li>
+<li>Return user and group names lowercased in case insensitive domains</li>
+<li>Honor case sensitive flag when creating the ccname template</li>
+<li>HBAC: create empty groups with one NULL element</li>
+<li>Do not call krb5_child when changing passwords and provider went
+offline</li>
+<li>IPA netgroups: Do not reuse loop iterator variable</li>
+<li>Add a configure switch to specify 3rd party app libraries location</li>
+<li>Export libsss_sudo as a separate package</li>
+<li>Add a new Makefile target to build RPMs with the experimental flag</li>
+<li>Do not use sudo symbols in LDAP provider unconditionally</li>
+<li>PAM: Fix reversed logic</li>
+<li>SUDO: include the sources in the IPA provider, too</li>
+<li>PAM: Do not overwrite ret</li>
+<li>DP: Refactor responder_dp_req so it&#8217;s reusable by other responders</li>
+<li>SUDO: Provide a sudo DP request based on the internal_req</li>
+<li>Use the new SUDO request in DP and sudo responder</li>
+<li>Fix sudo compilation on RHEL5</li>
+<li>Include sudo manual pages only conditionally</li>
+<li>docs: Use absolute srcdir path</li>
+<li>SUDO: Provide documentation for the SUDO API</li>
+<li>SYSDB: index sudoUser</li>
+<li>Refactor nss_cmd_send_empty</li>
+<li>Use profiling Docbook XSLT only if available, fall back to normal</li>
+<li>RESPONDERS: Provide a common sss_cmd_send_error function</li>
+<li>NSS: Use sss_hash_create instead of destructor</li>
+<li>Fixes for sudo_timed</li>
+<li>ConfigAPI: add sudo to known services</li>
+<li>SUDO: introduce a new config option &#8211;with-sudo</li>
+<li>Move BUILD_SUDO outside the generic LDAP source files</li>
+<li>Fix configure with old autoconf versions</li>
+<li>BUILD: Introduce a &#8211;with-autofs config option</li>
+<li>SYSDB: Remove code duplication between member_add and member_del</li>
+<li>AUTOFS: sysdb interface</li>
+<li>AUTOFS: a client library</li>
+<li>AUTOFS: a command-line test client</li>
+<li>AUTOFS: Data Provider request</li>
+<li>RESPONDERS: Refactor setent_req_list</li>
+<li>Split the logic to check cache expiration into separate function</li>
+<li>AUTOFS: responder</li>
+<li>AUTOFS: LDAP provider</li>
+<li>Do not call sudo functions if built without-sudo</li>
+<li>Make sudo installation path configurable, install into libdir by
+default</li>
+</ul>
+<p>Jan Cholasta (10):</p>
+<ul class="simple">
+<li>UTIL: Provide base64 encoding and decoding functions</li>
+<li>BUILD: Introduce a &#8211;with-ssh config option</li>
+<li>LDAP: Add support for SSH user public keys</li>
+<li>DP: Add host info handler</li>
+<li>IPA: Add host info handler</li>
+<li>DP: Add support for hosts in sss_dp_get_account</li>
+<li>SSH: Responder</li>
+<li>SSH: Common client code</li>
+<li>SSH: OpenSSH authorized_keys client</li>
+<li>SSH: OpenSSH known_hosts client</li>
+</ul>
+<p>Jan Zeleny (18):</p>
+<ul class="simple">
+<li>Add info about ipa_host_search_base to man page</li>
+<li>Support multiple search bases in HBAC</li>
+<li>Fixed wrong position of ldap_service_search_base</li>
+<li>Implemented support for multiple search bases in HBAC rules and
+services</li>
+<li>Fixed minor memory-hierarchy-related issue in IPA HBAC</li>
+<li>Add support for generic IPA config retrieval</li>
+<li>Make password migration code use the IPA config retrieval code</li>
+<li>Renamed some sysdb constants for their wider usage</li>
+<li>Added some SELinux-related utility functions</li>
+<li>Added some SELinux-related sysdb routines</li>
+<li>SELinux support in PAM responder</li>
+<li>SELinux support in PAM module</li>
+<li>Separate the host-retrieval code from IPA HBAC to common IPA code</li>
+<li>Delete unused structure in IPA access code</li>
+<li>Add session target in data provider</li>
+<li>Session target in IPA provider</li>
+<li>Man pages for the session target and SELinux user maps fetching</li>
+<li>Update shadowLastChanged attribute during LDAP password change</li>
+</ul>
+<p>Pavel Březina (15):</p>
+<ul class="simple">
+<li>SUDO Integration review issues</li>
+<li>SUDO Integration - wrap data provider with tevent_req</li>
+<li>sysdb_get_bool() and sysdb_get_bool() functions</li>
+<li>SUDO Integration - functions for manipulating with &#8216;refreshed&#8217;
+attribute</li>
+<li>SUDO Integration - periodical update of rules in data provider</li>
+<li>SUDO Integration - make sysdb_get_sudo_filter() more configurable</li>
+<li>SUDO Integration - prepare data provider for new responder commands</li>
+<li>SUDO Integration - responder command for cn=defaults</li>
+<li>SUDO Integration - SUDO API can request only cn=defaults record</li>
+<li>SUDO Integration - test client changed</li>
+<li>SUDO Integration - manual page</li>
+<li>SUDO Integration - in-memory cache in responder</li>
+<li>SUDO Integration - responder &#8216;sudo_timed&#8217; option</li>
+<li>SUDO Integration - fix offline behaviour</li>
+<li>SUDO Integration - sysdb_sudo_check_time() fix</li>
+</ul>
+<p>Simo Sorce (9):</p>
+<ul class="simple">
+<li>make dist fixes</li>
+<li>tests: fix test group of utf8 tests</li>
+<li>nsssrv: remove unused macro</li>
+<li>nsssrv: add string manipulation helper</li>
+<li>nsssrv: use sized_string in fill_pwent</li>
+<li>nsssrv: use sized_string in fill_grent</li>
+<li>util: add murmurhash3 hash function</li>
+<li>Add a random + identity test for murmurhash3</li>
+<li>util: Fix murmurhash3 on machines with old glibc</li>
+</ul>
+<p>Stephen Gallagher (46):</p>
+<ul class="simple">
+<li>Bump version to 1.8.0</li>
+<li>Add compatibility layer for Heimdal Kerberos implementation</li>
+<li>Importing new translations for 1.7.0 release</li>
+<li>Log fixes for sdap_call_conn_cb</li>
+<li>LDAP: Copy URI instead of pointing at failover service record</li>
+<li>NSS: Validate input string lengths</li>
+<li>NSS: Improve DEBUG messages for netgroup cache</li>
+<li>Raise the debug level of two very noisy statements</li>
+<li>IPA: Detect nsupdate support for the realm directive</li>
+<li>NSS: Add sss_readrep_copy_string</li>
+<li>LDAP: Add option to disable paging control</li>
+<li>SYSDB: Redundant check is redundant.</li>
+<li>Fix invalid index in pidfile()</li>
+<li>RESPONDER: Extend sss_dp_account_send() to include extra data</li>
+<li>DP: Fix bugs in sss_dp_get_account_int</li>
+<li>LDAP: Improve debugging for sdap_parse_deref</li>
+<li>Move sized_string declaration to utils</li>
+<li>UTIL: Add strtouint16</li>
+<li>SYSDB: Move add_string and add_ulong to sysdb_private.h</li>
+<li>DP: Handle parsing extra results in be_get_account_info</li>
+<li>SYSDB: Add sysdb routines for manipulating service entries</li>
+<li>SYSDB: Add indexes for servicePort and serviceProtocol</li>
+<li>NSS: Add client support for services (non-enumeration)</li>
+<li>DP: Add support for services in dp requests</li>
+<li>NSS: Add negative cache routines for services</li>
+<li>NSS: Add getservbyname and getservbyport support to the NSS Responder</li>
+<li>PROXY: add support for service lookups (non-enumeration)</li>
+<li>NSS: Add client support for [set|get|end]servent()</li>
+<li>SYSDB: add support for enumerating services</li>
+<li>NSS: Add service enumeration support to NSS provider</li>
+<li>PROXY: add support for enumerating services</li>
+<li>Rename sss_dp_type to sss_dp_sudo_type</li>
+<li>SSSDConfigAPI: Move sssd.api.* to /usr/share/sssd</li>
+<li>SYSDB: extend sysdb_store_service() to accept additional attributes</li>
+<li>SYSDB: Add sysdb_attrs_get_uint16_t</li>
+<li>LDAP: Add support for service lookups (non-enum)</li>
+<li>LDAP: Add enumeration support for services</li>
+<li>IPA: Add support for services lookups (non-enum)</li>
+<li>LDAP: Add new options for service maps</li>
+<li>KRB5: Add syslog messages for Kerberos failures</li>
+<li>LDAP: Do not fail if RootDSE check cannot determine search bases</li>
+<li>LDAP: Fix incorrect search timeouts</li>
+<li>NSS: Add individual timeouts for entry types</li>
+<li>Build all experimental features during &#8216;make distcheck&#8217;</li>
+<li>Set version to 1.7.91 for 1.8.0beta1</li>
+<li>Updating translatable strings for string freeze</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.8.0beta1.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.8.0beta1.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

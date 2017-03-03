@@ -1,0 +1,293 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Wiki Processors &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="wiki-processors">
+<h1>Wiki Processors<a class="headerlink" href="#wiki-processors" title="Permalink to this headline">¶</a></h1>
+<p>Processors are
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiMacros.html">WikiMacros</a>
+designed to provide alternative markup formats for the <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracWiki.html">Wiki
+engine</a>. Processors
+can be thought of as <em>macro functions to process user-edited text</em>.</p>
+<p>Wiki processors can be used in any Wiki text throughout Trac, for
+various different purposes, like:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd#CodeHighlightingSupport">syntax
+highlighting</a>
+or for rendering text verbatim,</li>
+<li>rendering <a class="reference external" href="https://fedorahosted.org/sssd#HTMLrelated">Wiki markup inside a
+context</a>, like inside
+&lt;div&gt; blocks or &lt;span&gt; or within &lt;td&gt; or &lt;th&gt; table cells,</li>
+<li>using an alternative markup syntax, like <a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiHtml.html">raw
+HTML</a> and
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiRestructuredText.html">Restructured
+Text</a>,
+or <a class="reference external" href="http://www.textism.com/tools/textile/">​textile</a></li>
+</ul>
+<div class="section" id="using-processors">
+<h2>Using Processors<a class="headerlink" href="#using-processors" title="Permalink to this headline">¶</a></h2>
+<p>To use a processor on a block of text, first delimit the lines using a
+Wiki <em>code block</em>:</p>
+<p>Immediately after the <code class="docutils literal"><span class="pre">{{{</span></code> or on the line just below, add <code class="docutils literal"><span class="pre">#!</span></code>
+followed by the <em>processor name</em>.</p>
+<p>This is the &#8220;shebang&#8221; notation, familiar to most UNIX users.</p>
+<p>Besides their content, some Wiki processors can also accept
+<em>parameters</em>, which are then given as <code class="docutils literal"><span class="pre">key=value</span></code> pairs after the
+processor name, on the same line. If <code class="docutils literal"><span class="pre">value</span></code> has to contain space, as
+it&#8217;s often the case for the style parameter, a quoted string can be used
+(<code class="docutils literal"><span class="pre">key=&quot;value</span> <span class="pre">with</span> <span class="pre">space&quot;</span></code>).</p>
+<p>As some processors are meant to process Wiki markup, it&#8217;s quite possible
+to <em>nest</em> processor blocks. You may want to indent the content of nested
+blocks for increased clarity, this extra indentation will be ignored
+when processing the content.</p>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>Wiki Markup</p>
+<p>Display</p>
+<blockquote>
+<div>Example 1: Inserting raw HTML</div></blockquote>
+</div>
+</div>
+<div class="section" id="this-is-raw-html">
+<h1>This is raw HTML<a class="headerlink" href="#this-is-raw-html" title="Permalink to this headline">¶</a></h1>
+<blockquote>
+<div>Example 2: Highlighted Python code in a &lt;div&gt; block with custom
+style</div></blockquote>
+<div class="wikipage" style="background: #ffd; border: 3px ridge"><p>This is an example of embedded &#8220;code&#8221; block:</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">hello</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s2">&quot;world&quot;</span>
+</pre></div>
+</div>
+</div></div>
+
+ Example 3: Searching tickets from a wiki page, by keywords.<div></div><div class="section" id="available-processors">
+<h2>Available Processors<a class="headerlink" href="#available-processors" title="Permalink to this headline">¶</a></h2>
+<p>The following processors are included in the Trac distribution:</p>
+<p><strong>``#!default``</strong></p>
+<p>Present the text verbatim in a preformatted text block. This is the same
+as specifying <em>no</em> processor name (and no <code class="docutils literal"><span class="pre">#!</span></code>)</p>
+<p><strong>``#!comment``</strong></p>
+<p>Do not process the text in this section (i.e. contents exist only in the
+plain text - not in the rendered page).</p>
+<p><strong>HTML related</strong></p>
+<p><strong>``#!html``</strong></p>
+<p>Insert custom HTML in a wiki page.</p>
+<p><strong>``#!htmlcomment``</strong></p>
+<p>Insert an HTML comment in a wiki page (<em>since 0.12</em>).</p>
+<p>Note that <code class="docutils literal"><span class="pre">#!html</span></code> blocks have to be <em>self-contained</em>, i.e. you can&#8217;t
+start an HTML element in one block and close it later in a second block.
+Use the following processors for achieving a similar effect.</p>
+<p><strong>``#!div``</strong></p>
+<p>Wrap an arbitrary Wiki content inside a &lt;div&gt; element (<em>since 0.11</em>).</p>
+<p><strong>``#!span``</strong></p>
+<p>Wrap an arbitrary Wiki content inside a &lt;span&gt; element (<em>since 0.11</em>).</p>
+<p><strong>``#!td``</strong></p>
+<p>Wrap an arbitrary Wiki content inside a &lt;td&gt; element (<em>since 0.12</em>)</p>
+<p><strong>``#!th``</strong></p>
+<p>Wrap an arbitrary Wiki content inside a &lt;th&gt; element (<em>since 0.12</em>)</p>
+<p><strong>``#!tr``</strong></p>
+<p>Can optionally be used for wrapping <code class="docutils literal"><span class="pre">#!td</span></code> and <code class="docutils literal"><span class="pre">#!th</span></code> blocks, either
+for specifying row attributes of better visual grouping (<em>since 0.12</em>)</p>
+<p>See <a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiHtml.html">WikiHtml</a> for
+example usage and more details about these processors.</p>
+<p><strong>Other Markups</strong></p>
+<p><strong>``#!rst``</strong></p>
+<p>Trac support for Restructured Text. See
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiRestructuredText.html">WikiRestructuredText</a>.</p>
+<p><strong>``#!textile``</strong></p>
+<p>Supported if <a class="reference external" href="http://cheeseshop.python.org/pypi/textile">​Textile</a> is
+installed. See <a class="reference external" href="http://www.textism.com/tools/textile/">​a Textile
+reference</a>.</p>
+<p><strong>Code Highlighting Support</strong></p>
+<div class="line-block">
+<div class="line"><strong>``#!c``</strong></div>
+<div class="line"><strong>``#!cpp``</strong> (C++)</div>
+<div class="line"><strong>``#!python``</strong></div>
+<div class="line"><strong>``#!perl``</strong></div>
+<div class="line"><strong>``#!ruby``</strong></div>
+<div class="line"><strong>``#!php``</strong></div>
+<div class="line"><strong>``#!asp``</strong></div>
+<div class="line"><strong>``#!java``</strong></div>
+<div class="line"><strong>``#!js``</strong> (Javascript)</div>
+<div class="line"><strong>``#!sql``</strong></div>
+<div class="line"><strong>``#!xml``</strong> (XML or HTML)</div>
+<div class="line"><strong>``#!sh``</strong> (Bourne/Bash shell)</div>
+<div class="line"><strong>etc.</strong></div>
+</div>
+<div class="line-block">
+<div class="line">Trac includes processors to provide inline syntax highlighting for
+source code in various languages.</div>
+<div class="line">Trac relies on external software packages for syntax coloring, like
+<a class="reference external" href="http://pygments.org">​Pygments</a>.</div>
+<div class="line">See
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracSyntaxColoring.html">TracSyntaxColoring</a>
+for information about which languages are supported and how to enable
+support for more languages.</div>
+</div>
+<p><strong>MIME Type Processors</strong></p>
+<p>Using the MIME type as processor, it is possible to syntax-highlight the
+same languages that are supported when browsing source code.</p>
+<p>Some examples:</p>
+<p>The result will be syntax highlighted HTML code:</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">text</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</div><p>The same is valid for all other <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracSyntaxColoring.html#SyntaxColoringSupport">mime types
+supported</a>.</p>
+<p><strong>``#!diff``</strong> has a particularly nice renderer:</p>
+<div class="diff" xmlns="http://www.w3.org/1999/xhtml"><ul>
+<li><p class="first rubric" id="version">Version</p>
+<p><a href="#id1"><span class="problematic" id="id2">**</span></a></p>
+<p>115</p>
+<p>115</p>
+<p>&nbsp; &nbsp; name=&#8217;TracHelloWorld&#8217;, version=&#8216;1.0&#8217;,</p>
+<p>116</p>
+<p>116</p>
+<p>&nbsp; &nbsp; packages=find_packages(exclude=[&#8216;*.tests*&#8217;]),</p>
+<p>117</p>
+<p>&nbsp; &nbsp; entry_points = &#8220;&#8221;&#8220;</p>
+<p>118</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; [trac.plugins]</p>
+<p>119</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; helloworld = myplugs.helloworld</p>
+<p>120</p>
+<p>&nbsp; &nbsp; &#8220;&#8221;&#8221;,</p>
+<p>117</p>
+<p>&nbsp; &nbsp; entry_points = {</p>
+<p>118</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; &#8216;trac.plugins&#8217;: [</p>
+<p>119</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &#8216;helloworld = myplugs.helloworld&#8217;,</p>
+<p>120</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; ],</p>
+<p>121</p>
+<p>&nbsp; &nbsp; },</p>
+<p>121</p>
+<p>122</p>
+<p>)</p>
+</li>
+</ul>
+</div><p>For more processor macros developed and/or contributed by users, visit:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://trac.edgewall.org/intertrac/ProcessorBazaar">​ProcessorBazaar</a></li>
+<li><a class="reference external" href="http://trac.edgewall.org/intertrac/MacroBazaar">​MacroBazaar</a></li>
+<li><a class="reference external" href="http://trac-hacks.org">​Trac Hacks</a> community site</li>
+</ul>
+<p>Developing processors is no different from Wiki macros. In fact they
+work the same way, only the usage syntax differs. See
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiMacros.html#DevelopingCustomMacros">WikiMacros#DevelopingCustomMacros</a>
+for more information.</p>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiMacros.html">WikiMacros</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiHtml.html">WikiHtml</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiRestructuredText.html">WikiRestructuredText</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracSyntaxColoring.html">TracSyntaxColoring</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html">WikiFormatting</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracGuide.html">TracGuide</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Wiki Processors</a><ul>
+<li><a class="reference internal" href="#using-processors">Using Processors</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#this-is-raw-html">This is raw HTML</a><ul>
+<li><a class="reference internal" href="#available-processors">Available Processors</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/WikiProcessors.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/WikiProcessors.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

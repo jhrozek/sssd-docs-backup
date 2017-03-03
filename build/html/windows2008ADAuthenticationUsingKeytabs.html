@@ -1,0 +1,475 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Synopsis &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <p>I&#8217;d like to do a page that only has authentication via keytabs and does
+not involve samba. Just in case someone else wants this information.</p>
+<div class="wiki-toc"><ol class="arabic simple">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#Synopsis">Synopsis</a></li>
+<li><a class="reference external" href="#Windows2008ServerSetup">Windows 2008 Server Setup</a><ol class="arabic">
+<li><a class="reference external" href="#OperatingSystemInstallation">Operating System
+Installation</a></li>
+<li><a class="reference external" href="#DomainConfiguration">Domain Configuration</a></li>
+<li><a class="reference external" href="#EnablingLDAPSearches">Enabling LDAP Searches</a><ol class="arabic">
+<li><a class="reference external" href="#UsingSASLGSSAPIBindsforLDAPSearches">Using SASL/GSSAPI Binds for LDAP
+Searches</a><ol class="arabic">
+<li><a class="reference external" href="#CreatingServiceKeytabwithSamba">Creating Service Keytab with
+Samba</a></li>
+<li><a class="reference external" href="#etcsambasmb.conf">/etc/samba/smb.conf</a></li>
+<li><a class="reference external" href="#CreatingServiceKeytabonAD">Creating Service Keytab on
+AD</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#UsingDNPasswordBindsforLDAPSearches">Using DN/Password Binds for LDAP
+Searches</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#AddingaGroup">Adding a Group</a></li>
+<li><a class="reference external" href="#AddingaUser">Adding a User</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#LinuxClientSetup">Linux Client Setup</a><ol class="arabic">
+<li><a class="reference external" href="#etckrb5.conf">/etc/krb5.conf</a></li>
+<li><a class="reference external" href="#etcsssdsssd.conf">/etc/sssd/sssd.conf</a></li>
+<li><a class="reference external" href="#NSSPAMConfiguration">NSS/PAM Configuration</a><ol class="arabic">
+<li><a class="reference external" href="#FedoraRHEL">Fedora/RHEL</a></li>
+<li><a class="reference external" href="#DebianUbuntu">Debian/Ubuntu?</a></li>
+<li><a class="reference external" href="#ConfigureNSSPAMmanually">Configure NSS/PAM manually</a><ol class="arabic">
+<li><a class="reference external" href="#etcnsswitch.conf">/etc/nsswitch.conf</a></li>
+<li><a class="reference external" href="#etcpam.dcommon-auth">/etc/pam.d/common-auth</a></li>
+<li><a class="reference external" href="#etcpam.dcommon-account">/etc/pam.d/common-account</a></li>
+<li><a class="reference external" href="#etcpam.dcommon-password">/etc/pam.d/common-password</a></li>
+<li><a class="reference external" href="#etcpam.dcommon-session">/etc/pam.d/common-session</a></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><a class="reference external" href="#UnderstandingKerberosActiveDirectory">Understanding Kerberos &amp; Active
+Directory</a><ol class="arabic">
+<li><a class="reference external" href="#OptionalFinalTest">Optional Final Test</a></li>
+<li><a class="reference external" href="#Furtherreading">Further reading</a></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="synopsis">
+<h1>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h1>
+<p>This describes how to configure SSSD to authenticate with a Windows 2008
+Domain Server. This guide is a work in progress.</p>
+</div>
+<div class="section" id="windows-2008-server-setup">
+<h1>Windows 2008 Server Setup<a class="headerlink" href="#windows-2008-server-setup" title="Permalink to this headline">¶</a></h1>
+<p>The domain to be configured is <em>ad.example.com</em> using realm
+<em>AD.EXAMPLE.COM</em>, the Windows server is <em>server.ad.example.com</em>, and the
+client host where SSSD is running is <em>client.ad.example.com</em>. Reboot
+Windows during installation and setup when prompted and complete the
+needed steps as Administrator.</p>
+<div class="section" id="operating-system-installation">
+<h2>Operating System Installation<a class="headerlink" href="#operating-system-installation" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Boot from the Windows 2008 Server DVD</li>
+<li>Install Windows 2008 Server using the hostname
+<em>server.ad.example.com</em></li>
+<li>Make sure <em>server.ad.example.com</em> is in DNS</li>
+</ul>
+</div>
+<div class="section" id="domain-configuration">
+<h2>Domain Configuration<a class="headerlink" href="#domain-configuration" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>In <em>Server Manager</em> add the <em>Active Directory Domain Services</em> role</li>
+<li>Create a new domain named <em>ad.example.com</em></li>
+<li>Required: in <em>Server Manager</em> add the <em>Identity Management for UNIX</em>
+Role Service for <em>Active Directory Domain Services</em>, use the domain
+name for the NIS domain name<ul>
+<li>Currently SSSD won&#8217;t work with AD in a meaningful fashion without
+this (this might change if
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/995">#995</a> and
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/996">#996</a> are solved)</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="enabling-ldap-searches">
+<h2>Enabling LDAP Searches<a class="headerlink" href="#enabling-ldap-searches" title="Permalink to this headline">¶</a></h2>
+<p>In order to allow SSSD to do LDAP searches for user information in AD
+SSSD must be configured to bind with SASL/GSSAPI or DN/password. GSSAPI
+is recommended.</p>
+<div class="section" id="using-sasl-gssapi-binds-for-ldap-searches">
+<h3>Using SASL/GSSAPI Binds for LDAP Searches<a class="headerlink" href="#using-sasl-gssapi-binds-for-ldap-searches" title="Permalink to this headline">¶</a></h3>
+<p>Create the service keytab for the host running SSSD on AD. Either do
+this with Samba, or using Windows. Samba is recommended.</p>
+<div class="section" id="creating-service-keytab-with-samba">
+<h4>Creating Service Keytab with Samba<a class="headerlink" href="#creating-service-keytab-with-samba" title="Permalink to this headline">¶</a></h4>
+<p>On the Linux client with properly configured <em>/etc/krb5.conf</em> (see
+below) and suitable <em>/etc/samba/smb.conf</em>:</p>
+</div>
+<div class="section" id="etc-samba-smb-conf">
+<h4>/etc/samba/smb.conf<a class="headerlink" href="#etc-samba-smb-conf" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><em>net ads join -U Administrator</em><ul>
+<li>Or do <em>kinit Administrator</em> first and use <em>-k</em> instead of <em>-U
+Administrator</em></li>
+</ul>
+</li>
+<li>Additional principals can be created later with <em>net ads keytab add</em>
+if needed.</li>
+</ul>
+<p>You don&#8217;t need a Domain Administrator account to do this, you just need
+an account with sufficient rights to join a machine to the domain. This
+is a notable advantage of this approach over generating the keytab
+directly on the AD controller. If you&#8217;re using NFS you may want to
+specify a different createupn argument here. This does not cause any
+problems for sssd. This would be done using:</p>
+<p><em>net ads join
+createupn=&#8221;nfs/client.ad.example.com&#64;````AD.EXAMPLE.COM&#8221; -U
+Administrator</em></p>
+</div>
+<div class="section" id="creating-service-keytab-on-ad">
+<h4>Creating Service Keytab on AD<a class="headerlink" href="#creating-service-keytab-on-ad" title="Permalink to this headline">¶</a></h4>
+<p>Do not do this step if you&#8217;ve already created a keytab using Samba.</p>
+<p>On the Windows server:</p>
+<ul class="simple">
+<li>Open <em>Users &amp; Computers</em> snap-in</li>
+<li>Create a new <em>Computer</em> object named <em>client</em> (i.e., the name of the
+host running SSSD)</li>
+<li>On the command prompt:<ul>
+<li><em>setspn -A host/client.ad.example.com&#64;````AD.EXAMPLE.COM
+client</em></li>
+<li><em>setspn -L client</em></li>
+<li><em>ktpass /princ host/client.ad.example.com&#64;````AD.EXAMPLE.COM
+/out client-host.keytab /crypto all /ptype KRB5_NT_PRINCIPAL
+-desonly /mapuser AD\client$ /pass *</em><ul>
+<li>This sets the machine account password and UPN for the
+principal</li>
+<li>If you create additional keytabs for the host add <em>-setpass
+-setupn</em> for the above command to prevent resetting the machine
+password (thus changing kvno) and to prevent overwriting the
+UPN</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Transfer the keytab created in a secure manner to the client as
+<em>/etc/krb5.keytab</em> and make sure its permissions are correct:<ul>
+<li><em>chown root:root /etc/krb5.keytab</em></li>
+<li><em>chmod 0600 /etc/krb5.keytab</em></li>
+<li><em>restorecon /etc/krb5.keytab</em></li>
+</ul>
+</li>
+</ul>
+<p>See the <em>Linux Client Setup</em> section for verifying the keytab file and
+the example sssd.conf below for the needed SSSD configuration.</p>
+</div>
+</div>
+<div class="section" id="using-dn-password-binds-for-ldap-searches">
+<h3>Using DN/Password Binds for LDAP Searches<a class="headerlink" href="#using-dn-password-binds-for-ldap-searches" title="Permalink to this headline">¶</a></h3>
+<p>Not generally recommended but see the example sssd.conf below.</p>
+</div>
+</div>
+<div class="section" id="adding-a-group">
+<h2>Adding a Group<a class="headerlink" href="#adding-a-group" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Open <em>Administrative Tools</em> -&gt; <em>Active Directory Users and Computers</em></li>
+<li>Browse to <em>ad.example.com</em>, then to <em>Users</em></li>
+<li>Right click on <em>Users</em> and <em>Create a New Group</em> named <em>unixusers</em></li>
+<li>Double click on the <em>unixusers</em> group then switch to the <em>UNIX
+Attributes</em> tab</li>
+<li>Select the NIS Domain created earlier</li>
+<li>Set the <em>GID</em> as appropriate</li>
+</ul>
+</div>
+<div class="section" id="adding-a-user">
+<h2>Adding a User<a class="headerlink" href="#adding-a-user" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Open <em>Administrative Tools</em> -&gt; <em>Active Directory Users and Computers</em></li>
+<li>Browse to <em>ad.example.com</em>, then to <em>Users</em></li>
+<li>Right click on <em>Users</em> and <em>Create a New User</em> named <em>aduser</em></li>
+<li>Make sure <em>User must change password at next logon</em> and <em>Account is
+disabled</em> are unchecked</li>
+<li>Double click on the <em>aduser</em> group then switch to the <em>UNIX
+Attributes</em> tab</li>
+<li>Select the NIS Domain created earlier</li>
+<li>Set the <em>UID</em> as appropriate</li>
+<li>Set the <em>Login Shell</em> to <em>/bin/bash</em></li>
+<li>Set the <em>Home Directory</em> to <em>/home/aduser</em></li>
+<li>Set <em>Primary Group Name/GID</em> to <em>unixusers</em></li>
+</ul>
+</div>
+</div>
+<div class="section" id="linux-client-setup">
+<h1>Linux Client Setup<a class="headerlink" href="#linux-client-setup" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Install <em>sssd</em> package on the Linux client machine</li>
+<li>Make configuration changes to the files below</li>
+<li>Start the <em>sssd</em> service</li>
+</ul>
+<div class="section" id="etc-krb5-conf">
+<h2>/etc/krb5.conf<a class="headerlink" href="#etc-krb5-conf" title="Permalink to this headline">¶</a></h2>
+<p>Make sure <em>kinit aduser&#64;````AD.EXAMPLE.COM</em> works properly. Add the
+Windows server IP/hostname to <em>/etc/hosts</em> only if needed.</p>
+<p>If using SASL/GSSAPI to bind to AD also test that the keytab is working
+properly:</p>
+<p><em>klist -ke</em></p>
+<p><em>kinit -k CLIENT$&#64;````AD.EXAMPLE.COM</em></p>
+<p>If you generated your keytab with a different createupn argument, it&#8217;s
+possible this won&#8217;t work and the following works instead. This is
+absolutely fine as far as sssd is concerned, and you can instead
+generate a ticket for the upn you have created:</p>
+<p><em>kinit -k -t /etc/krb5.keytab
+&#8216;nfs/client.ad.example.com&#64;````AD.EXAMPLE.COM&#8217;</em></p>
+<p>Now using this credential you&#8217;ve just created try fetching data from the
+server with <em>ldapsearch</em> (in case of issues make sure
+<em>/etc/openldap/ldap.conf</em> does not contain any unwanted settings):</p>
+<p><em>/usr/bin/ldapsearch -H ldap://server.ad.example.com/ -Y GSSAPI -N -b
+&#8220;dc=ad,dc=example,dc=com&#8221;
+&#8220;(&amp;(objectClass=user)(sAMAccountName=aduser))&#8221;</em></p>
+<p>By using the credential from the keytab, you&#8217;ve verified that this
+credential has sufficient rights to retrieve user information.</p>
+<p>After both <em>kinit</em> and <em>ldapsearch</em> work properly proceed to actual SSSD
+configuration.</p>
+</div>
+<div class="section" id="etc-sssd-sssd-conf">
+<h2>/etc/sssd/sssd.conf<a class="headerlink" href="#etc-sssd-sssd-conf" title="Permalink to this headline">¶</a></h2>
+<p>Example <em>sssd.conf</em> configuration, additional options can be added as
+needed.</p>
+</div>
+<div class="section" id="nss-pam-configuration">
+<h2>NSS/PAM Configuration<a class="headerlink" href="#nss-pam-configuration" title="Permalink to this headline">¶</a></h2>
+<p>Depending on your distribution you have different options how to enable
+SSSD.</p>
+<div class="section" id="fedora-rhel">
+<h3>Fedora/RHEL<a class="headerlink" href="#fedora-rhel" title="Permalink to this headline">¶</a></h3>
+<p>Use <em>authconfig</em> to enable SSSD, install <em>oddjob-mkhomedir</em> to make sure
+home directory creation works with SELinux:</p>
+<p><em>authconfig &#8211;enablesssd &#8211;enablesssdauth &#8211;enablemkhomedir &#8211;update</em></p>
+</div>
+<div class="section" id="debian-ubuntu">
+<h3><a class="reference external" href="https://docs.pagure.org/sssd-test2/Debian/Ubuntu.html">Debian/Ubuntu?</a><a class="headerlink" href="#debian-ubuntu" title="Permalink to this headline">¶</a></h3>
+<p>Install <em>libnss-sss</em> and <em>libpam-sss</em> to have SSSD added as NSS/PAM
+provider in <em>/etc/nsswitch.conf</em> and <em>/etc/pam.d/common-*</em>
+configuration files. Add <em>pam_mkhomedir.so</em> to PAM session
+configuration manually. Restart SSSD after these changes.</p>
+</div>
+<div class="section" id="configure-nss-pam-manually">
+<h3>Configure NSS/PAM manually<a class="headerlink" href="#configure-nss-pam-manually" title="Permalink to this headline">¶</a></h3>
+<p>Manual configuration can be done with the following changes. The PAM
+example file paths are from
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Debian/Ubuntu.html">Debian/Ubuntu?</a>,
+in Fedora/RHEL corresponding manual configuration should be done in
+<em>/etc/pam.d/system-auth</em> and <em>/etc/pam.d/password-auth</em>.</p>
+<div class="section" id="etc-nsswitch-conf">
+<h4>/etc/nsswitch.conf<a class="headerlink" href="#etc-nsswitch-conf" title="Permalink to this headline">¶</a></h4>
+<p>More maps will be available later (see at least tickets
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/359">#359</a>,
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/360">#360</a>,
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/900">#900</a>,
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/901">#901</a>,
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/929">#929</a>).</p>
+</div>
+<div class="section" id="etc-pam-d-common-auth">
+<h4>/etc/pam.d/common-auth<a class="headerlink" href="#etc-pam-d-common-auth" title="Permalink to this headline">¶</a></h4>
+<p>Right after the <em>pam_unix.so</em> line, add</p>
+</div>
+<div class="section" id="etc-pam-d-common-account">
+<h4>/etc/pam.d/common-account<a class="headerlink" href="#etc-pam-d-common-account" title="Permalink to this headline">¶</a></h4>
+<p>Right after the <em>pam_unix.so</em> line, add</p>
+</div>
+<div class="section" id="etc-pam-d-common-password">
+<h4>/etc/pam.d/common-password<a class="headerlink" href="#etc-pam-d-common-password" title="Permalink to this headline">¶</a></h4>
+<p>Right after the <em>pam_unix.so</em> line, add</p>
+</div>
+<div class="section" id="etc-pam-d-common-session">
+<h4>/etc/pam.d/common-session<a class="headerlink" href="#etc-pam-d-common-session" title="Permalink to this headline">¶</a></h4>
+<p>Just before the <em>pam_unix.so</em> line, add</p>
+<p>Right after the <em>pam_unix.so</em> line, add</p>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="understanding-kerberos-active-directory">
+<h1>Understanding Kerberos &amp; Active Directory<a class="headerlink" href="#understanding-kerberos-active-directory" title="Permalink to this headline">¶</a></h1>
+<p>It is important to understand that (unlike Linux MIT based KDC) Active
+Directory based KDC divides Kerberos principals into two groups:</p>
+<ul class="simple">
+<li><em>User Principals</em> - usually equals to the sAMAccountname attribute of
+the object in AD. In short, User Principal is entitled to obtain TGT
+(ticket granting ticket). User Principals could be hence used to
+generate a TGT via <code class="docutils literal"><span class="pre">kinit</span> <span class="pre">-k</span> <span class="pre">&lt;principalname&gt;</span></code></li>
+<li><em>Service Principals</em> - represents which Kerberized service can can be
+used on the computer in question. Service principals can NOT be used
+to obtain a TGT -&gt; can not be used to grant an access to Active
+Directory controller for example.</li>
+</ul>
+<p>Each user object in Active Directory (understand that a computer object
+in AD is de-facto user object as well) can have:</p>
+<ul class="simple">
+<li>maximum of 2 User Principal Names (UPN). One is pre-defined by its
+<em>sAMAccountName</em> LDAP attribute (mentioned above, for computer
+objects it has a form of &#8220;&lt;hostname&gt;$&#8221;) and second by its
+<em>`UserPrincipalName? &lt;https://docs.pagure.org/sssd-test2/UserPrincipalName.html&gt;`__</em>
+string attribute</li>
+<li>many Service Principal Names (typically one for each Kerberized
+service we want to enable on the computer) defined by the
+<em>`ServicePrincipalName? &lt;https://docs.pagure.org/sssd-test2/ServicePrincipalName.html&gt;`__</em>
+(SPN) list attribute. The attributes can be seen/set using the
+ADSIedit snap-in for example.</li>
+</ul>
+<div class="section" id="optional-final-test">
+<h2>Optional Final Test<a class="headerlink" href="#optional-final-test" title="Permalink to this headline">¶</a></h2>
+<p>You may have made iterative changes to your setup while learning about
+SSSD. To make sure that your setup actually works, and you&#8217;re not
+relying on cached credentials, or cached LDAP information, you may want
+to clear out the local cache. Obviously this will erase local
+credentials, and all cached user information, so you should only do this
+for testing, and while on the network with network access to the AD
+servers.</p>
+<p><em>service sssd stop; rm -f /var/lib/sss/db/*; service sssd start</em></p>
+<p>If all looks well on your system after this, you know that sssd is able
+to use the kerberos and ldap services you&#8217;ve configured.</p>
+</div>
+<div class="section" id="further-reading">
+<h2>Further reading<a class="headerlink" href="#further-reading" title="Permalink to this headline">¶</a></h2>
+<p>Please see the following article on Technet site
+(<a class="reference external" href="http://technet.microsoft.com/en-us/library/cc772815%28WS.10%29.aspx">​http://technet.microsoft.com/en-us/library/cc772815%28WS.10%29.aspx</a>)
+for more in-depth Kerberos understanding</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Synopsis</a></li>
+<li><a class="reference internal" href="#windows-2008-server-setup">Windows 2008 Server Setup</a><ul>
+<li><a class="reference internal" href="#operating-system-installation">Operating System Installation</a></li>
+<li><a class="reference internal" href="#domain-configuration">Domain Configuration</a></li>
+<li><a class="reference internal" href="#enabling-ldap-searches">Enabling LDAP Searches</a><ul>
+<li><a class="reference internal" href="#using-sasl-gssapi-binds-for-ldap-searches">Using SASL/GSSAPI Binds for LDAP Searches</a><ul>
+<li><a class="reference internal" href="#creating-service-keytab-with-samba">Creating Service Keytab with Samba</a></li>
+<li><a class="reference internal" href="#etc-samba-smb-conf">/etc/samba/smb.conf</a></li>
+<li><a class="reference internal" href="#creating-service-keytab-on-ad">Creating Service Keytab on AD</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-dn-password-binds-for-ldap-searches">Using DN/Password Binds for LDAP Searches</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#adding-a-group">Adding a Group</a></li>
+<li><a class="reference internal" href="#adding-a-user">Adding a User</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#linux-client-setup">Linux Client Setup</a><ul>
+<li><a class="reference internal" href="#etc-krb5-conf">/etc/krb5.conf</a></li>
+<li><a class="reference internal" href="#etc-sssd-sssd-conf">/etc/sssd/sssd.conf</a></li>
+<li><a class="reference internal" href="#nss-pam-configuration">NSS/PAM Configuration</a><ul>
+<li><a class="reference internal" href="#fedora-rhel">Fedora/RHEL</a></li>
+<li><a class="reference internal" href="#debian-ubuntu">Debian/Ubuntu?</a></li>
+<li><a class="reference internal" href="#configure-nss-pam-manually">Configure NSS/PAM manually</a><ul>
+<li><a class="reference internal" href="#etc-nsswitch-conf">/etc/nsswitch.conf</a></li>
+<li><a class="reference internal" href="#etc-pam-d-common-auth">/etc/pam.d/common-auth</a></li>
+<li><a class="reference internal" href="#etc-pam-d-common-account">/etc/pam.d/common-account</a></li>
+<li><a class="reference internal" href="#etc-pam-d-common-password">/etc/pam.d/common-password</a></li>
+<li><a class="reference internal" href="#etc-pam-d-common-session">/etc/pam.d/common-session</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#understanding-kerberos-active-directory">Understanding Kerberos &amp; Active Directory</a><ul>
+<li><a class="reference internal" href="#optional-final-test">Optional Final Test</a></li>
+<li><a class="reference internal" href="#further-reading">Further reading</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/windows2008ADAuthenticationUsingKeytabs.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/windows2008ADAuthenticationUsingKeytabs.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

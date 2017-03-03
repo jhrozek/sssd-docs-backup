@@ -1,0 +1,1016 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Better Integration with The Desktop &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <p>Note well: this is at the <em>spitballing</em> stage, so it can all get shot
+down.</p>
+<div class="section" id="better-integration-with-the-desktop">
+<h1>Better Integration with The Desktop<a class="headerlink" href="#better-integration-with-the-desktop" title="Permalink to this headline">¶</a></h1>
+<p>What we&#8217;re suggesting as the point of focus for integration is to have
+SSSD provide a superset of the <em>org.freedesktop.Accounts</em> D-Bus API.</p>
+<div class="section" id="the-org-freedesktop-accounts-d-bus-api-as-currently-implemented-by-accountsservice">
+<h2>The org.freedesktop.Accounts D-Bus API as currently implemented by <em>accountsservice</em><a class="headerlink" href="#the-org-freedesktop-accounts-d-bus-api-as-currently-implemented-by-accountsservice" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://live.gnome.org/ThreePointThree/Features/UserPanel/Service">​The current
+API</a>
+offers:</p>
+<ul class="simple">
+<li>Creation/removal of user accounts.</li>
+<li>Enumeration of user accounts which are known to the service.<ul>
+<li>Currently this resolves to a subset of the local system&#8217;s
+accounts.</li>
+</ul>
+</li>
+<li>Signals broadcast when a user account is added/removed/modified.</li>
+<li>Ability to mark the user user account as a &#8220;Standard&#8221; user or an
+&#8220;Administrator&#8221;.<ul>
+<li>Under the covers, the user is added to or removed from the <em>wheel</em>
+group, but UID=0 is always considered to be an administrator.</li>
+</ul>
+</li>
+<li>Ability to lock or unlock the user&#8217;s account and query its lock
+status.</li>
+<li>Ability to check, set, or reset that the user must change password at
+next login.</li>
+<li>Password can be changed to a new <strong>hashed</strong> value, as returned by
+<em>crypt(3)</em> or it can be removed, after which no password is required
+for login.</li>
+<li>Attributes exposed via specific get/set methods and the properties
+interface:<ul>
+<li>login name</li>
+<li>full name</li>
+<li>email</li>
+<li>preferred locale</li>
+<li>preferred X session name</li>
+<li>physical location</li>
+<li>home directory pathname</li>
+<li>login shell</li>
+<li>login frequency</li>
+<li>icon/thumbnail filename<ul>
+<li>the contents of this file are copied to
+/var/lib/AccountsService/icons/$user</li>
+</ul>
+</li>
+<li>autologin</li>
+<li>password hint</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="the-org-freedesktop-accounts-d-bus-api-as-it-would-be-provided-by-sssd">
+<h2>The org.freedesktop.Accounts D-Bus API as it would be provided by <em>SSSD</em><a class="headerlink" href="#the-org-freedesktop-accounts-d-bus-api-as-it-would-be-provided-by-sssd" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Local users live in the SSSD <em>local</em> provider&#8217;s domain, full
+creation/removal support.</li>
+<li>Local <strong>groups</strong> are now exposed and managed.<ul>
+<li>Groups can contain users and other groups.</li>
+</ul>
+</li>
+<li>Enumeration of users defaults to returning those known to the <em>local</em>
+domain and all identities from other domains that are in SSSD&#8217;s
+cache.</li>
+<li>Signals broadcast when a user account or group is added to the
+<em>local</em> domain&#8217;s database, or an entry is added to SSSD&#8217;s cache for
+any other domains. Likewise, signals emitted when knowledge of a user
+or group is updated or removed from either location.</li>
+<li><em>Local</em> users can be marked as <em>Standard</em> or <em>Administrator</em>
+accounts, and this information can be retrieved.<ul>
+<li>[STRIKEOUT:This will add or remove the user from the <em>local</em>
+<em>wheel</em> group. Some POSIX applications may be confused by this.]</li>
+<li>[STRIKEOUT:Users from other domains may also be added or removed
+from the <em>local</em> <em>wheel</em> group.]</li>
+</ul>
+</li>
+<li><em>Local</em> user accounts can be locked or unlocked, and their account
+lock status can be checked.</li>
+<li><em>Local</em> user accounts can have their account flagged to require a
+password change at the next login.<ul>
+<li>When the user is part of a non-<em>local</em> domain, this may be known
+up-front, or it may be discovered as a side-effect of performing
+an authentication attempt.</li>
+</ul>
+</li>
+<li><em>Local</em> user accounts can have their password changed to a new
+<strong>clear</strong> or <strong>hashed</strong> value, or removed.<ul>
+<li>User accounts in non-<em>local</em> domains can have their password
+changed to a new <strong>clear</strong> value if the old value is also
+provided.</li>
+</ul>
+</li>
+<li><em>Local</em> user accounts have their attributes stored in the database as
+entry attributes along with the already-kept POSIX attributes, and
+can be modified.<ul>
+<li>For user accounts in non-<em>local</em> domains, if an attribute is
+configured to be writable, its value is fetched from the identity
+provider only if there is no value for it, for the user, already
+present in the cache. Because SSSD does not know how to push
+updated information to identity providers, if the attribute is
+writable, only the cached value is updated.</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="api-additions-useful-to-non-desktop-cases">
+<h2>API additions useful to non-desktop cases<a class="headerlink" href="#api-additions-useful-to-non-desktop-cases" title="Permalink to this headline">¶</a></h2>
+<p>Some of these look like reasonable extensions to the existing D-Bus
+APIs, others won&#8217;t.</p>
+<ul class="simple">
+<li>A new method for obtaining a list of SSSD&#8217;s domains.<ul>
+<li>The answer can depend on who&#8217;s asking, as reported by the bus.</li>
+</ul>
+</li>
+<li>New methods for creating and deleting <em>local</em> groups, and for adding
+or removing a <em>local</em> user or group from the list of a <em>local</em>
+group&#8217;s members.</li>
+<li>A new method for enumerating the groups known to the <em>local</em> domain
+and any identities from other domains that are in SSSD&#8217;s cache.<ul>
+<li>[STRIKEOUT:A variation on this method] [STRIKEOUT:An optional
+argument for this method] A variation on this method which narrows
+the scope to a specified domain.</li>
+</ul>
+</li>
+<li>[STRIKEOUT:A variation on] [STRIKEOUT:An optional argument for the]
+An additional user enumeration method which narrows the scope to a
+specified domain.</li>
+<li>A new method for performing authentication checks.<ul>
+<li>Conceptually similar to the application&#8217;s part of a PAM
+conversation, but explicitly includes the concept of an
+authentication domain and enough context to tell if we&#8217;re asking
+for a password, an OTP, a smart card PIN, etc.</li>
+<li>Can be multi-step.</li>
+<li>RHEV-M would likely use this instead of nsswitch+PAM because its
+users wouldn&#8217;t be (and wouldn&#8217;t need to be) complete POSIX users.</li>
+<li>A user&#8217;s secondary identities, if serviced by a mechanism that
+SSSD can/will/does support, <em>can</em> also be authenticated here,
+though it would generally only be useful to do so if
+authentication provided some sort of SSO credential for SSSD to
+manage on the user&#8217;s behalf.</li>
+</ul>
+</li>
+<li>A new method for performing password changes.<ul>
+<li>[STRIKEOUT:As above, conceptually similar to the application&#8217;s
+part of a PAM conversation, again including the concept of an
+authentication domain.]</li>
+<li>[STRIKEOUT:Add a flag to the existing password change method to
+indicate that an unhashed password is being provided, and allow
+password change to fail if the flag is not set.]</li>
+<li>Calling signature is similar to the authentication API, except
+that the caller is told when it will be supplying the new
+password.</li>
+</ul>
+</li>
+<li>A new method for obtaining a list of groups to which a user belongs.
+These wouldn&#8217;t necessarily be POSIX groups, as the accounts service
+is uninterested in groups in the general case (the main exception
+being that it maps Administatorness to membership in the <em>wheel</em>
+group), but they&#8217;d be whatever the domain considered to be groups.</li>
+<li>A new method or three for determining which users are in a group,
+which groups are in a group, and which users are in a group by way of
+being in other groups.</li>
+<li>A new signal broadcast when a user&#8217;s password or equivalent is about
+to expire, along with how much time is left, if we can know that.<ul>
+<li>Would need something running in the user&#8217;s session to catch them
+and offer to initiate a password change via the above
+password-changing method. Not provided by SSSD.</li>
+</ul>
+</li>
+<li>A new signal broadcast when a user&#8217;s SSO credentials (e.g. Kerberos
+TGT) are about to expire.<ul>
+<li>Would need something running in the user&#8217;s session to catch them
+and offer to reinitialize them by calling the above authentication
+method. Not provided by SSSD.</li>
+</ul>
+</li>
+<li>A new signal broadcast when a user&#8217;s SSO credentials are
+reinitialized.<ul>
+<li>Would want something running in the user&#8217;s session to catch them
+and rescind offers to reinitialize them that aren&#8217;t in-progress.
+Not provided by SSSD.</li>
+</ul>
+</li>
+<li>The ability to fetch and manage more string attributes than the
+current accountsService API offers.<ul>
+<li>This may just take the form of more properties, perhaps without
+friendly get/set methods, particularly if</li>
+<li>The set would be configured in SSSD on a per-domain basis.</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="breaking-it-down-to-the-api-level">
+<h1>Breaking It Down To The API Level<a class="headerlink" href="#breaking-it-down-to-the-api-level" title="Permalink to this headline">¶</a></h1>
+<p>We&#8217;re talking about providing a superset of the D-Bus API currently
+offered by the <em>accountsservice</em> package.</p>
+<p>The APIs themselves are advertised to clients via D-Bus introspection,
+so they can be browsed using tools such as <em>d-feet</em>, and what follows is
+heavily based on that information and the introspection information
+included with the package.</p>
+<div class="section" id="the-very-very-very-short-d-bus-primer">
+<h2>The very, very, very short D-Bus Primer<a class="headerlink" href="#the-very-very-very-short-d-bus-primer" title="Permalink to this headline">¶</a></h2>
+<p>The D-Bus service model is a tree of objects. Each object has a path
+name (an <em>object path</em>) which resembles a filesystem path, and can both
+emit broadcast notifications referred to as <em>signals</em> and provide
+callable functions referred to as <em>method call</em>s, as well as
+possessing data members called <em>properties</em>. When a process connects to
+a bus, it is given a connection-specific name (typically of the form
+&#8221;:1.121&#8221;) which is used to route replies back to it. A process which
+intends to offer services typically also registers a name (of a form
+such as &#8220;org.freedesktop.Accounts&#8221;) which clients can use to specify the
+destination for <em>method call</em>s that they intend to make use of. The
+names of methods can be namespaced using <em>interface</em> names, but in many
+cases, unless necessary for disambiguation, they are optional.</p>
+</div>
+<div class="section" id="the-singleton-management-object">
+<h2>The Singleton Management Object<a class="headerlink" href="#the-singleton-management-object" title="Permalink to this headline">¶</a></h2>
+<p>The <em>accountsservice</em> package currently provides a service which can be
+reached using the name <em>org.freedesktop.Accounts</em>, which provides one
+singleton object of note: <em>/org/freedesktop/Accounts</em>, which provides
+five methods, two signals, and one property, all as part of an interface
+named <em>org.freedesktop.Accounts</em>. Methods and properties that we add
+that are specific to SSSD should grouped as part of an SSSD-specific
+interface name.</p>
+<ul class="simple">
+<li><strong>method</strong> CreateUser(String name, String fullname, Int accountType)<ul>
+<li><em>name</em>: the user&#8217;s login name</li>
+<li><em>fullname</em>: the user&#8217;s real name</li>
+<li><em>accountType</em>: an enumerated value which flags the account as a
+<em>Standard</em> or <em>Administrator</em> account</li>
+<li>returns: Path <em>user</em>: the path for the user&#8217;s object</li>
+<li>Error <em>org.freedesktop.Accounts.Error.PermissionDenied</em>: caller
+lacks appropriate PolicyKit authorization</li>
+<li>Error <em>org.freedesktop.Accounts.Error.Failed</em>: generic operation
+failure</li>
+<li>Creates a user with a given name in the default local provider
+domain. Note that the UID is not specified by the caller, as it is
+allocated by the provider. The caller can retrieve it from the
+user&#8217;s entry if the call succeeds. The meaning of account types is
+not specified, but in the current implementation the difference
+between a <em>Standard</em> user and an <em>Administrator</em> is whether or not
+the user is a member of the <em>wheel</em> group.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>method</strong> CreateUserInDomain(String domain, String name,
+String fullname, Int accountType)<ul>
+<li><em>domain</em>: the domain in which the caller wants the account to be
+created, can be left empty or unspecified to implicitly select the
+default local provider domain, to which the caller must already be
+allowed access</li>
+<li><em>name</em>: the user&#8217;s login name</li>
+<li><em>fullname</em>: the user&#8217;s real name</li>
+<li><em>accountType</em>: an enumerated value which flags the account as a
+<em>Standard</em> or <em>Administrator</em> account</li>
+<li>returns: Path <em>user</em>: the path for the user&#8217;s object</li>
+<li>Error <em>org.freedesktop.Accounts.Error.PermissionDenied</em>: caller
+lacks appropriate PolicyKit authorization</li>
+<li>Error <em>org.freedesktop.Accounts.Error.Failed</em>: generic operation
+failure</li>
+<li>Creates a user with a given name. Note that the UID is not
+specified by the caller, as it is allocated by the provider. The
+caller can retrieve it from the user&#8217;s entry if the call succeeds.
+The meaning of account types is not specified, but in the current
+implementation the difference between a <em>Standard</em> user and an
+<em>Administrator</em> is whether or not the user is a member of the
+<em>wheel</em> group.</li>
+</ul>
+</li>
+<li><strong>method</strong> DeleteUser(Int64 user, Boolean removeFiles)<ul>
+<li><em>user</em>: the user ID of the user to be removed</li>
+<li><em>removeFiles</em>: whether or not to remove the user&#8217;s home directory</li>
+<li>Error <em>org.freedesktop.Accounts.Error.PermissionDenied</em>: caller
+lacks appropriate PolicyKit authorization</li>
+<li>Error <em>org.freedesktop.Accounts.Error.Failed</em>: generic operation
+failure</li>
+<li>Deletes the user with the given UID.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>method</strong> DeleteUserInDomain(String domain, Int64 user,
+Boolean removeFiles)<ul>
+<li><em>domain</em>: the domain to which the user belongs</li>
+<li><em>user</em>: the user ID of the user to be removed</li>
+<li><em>removeFiles</em>: whether or not to remove the user&#8217;s home directory</li>
+<li>Error <em>org.freedesktop.Accounts.Error.PermissionDenied</em>: caller
+lacks appropriate PolicyKit authorization</li>
+<li>Error <em>org.freedesktop.Accounts.Error.Failed</em>: generic operation
+failure</li>
+<li>Deletes the user with the given UID if a matching user exists in
+the named domain.</li>
+</ul>
+</li>
+<li><strong>method</strong> FindUserById(Int64 id)<ul>
+<li><em>id</em>: the user&#8217;s UID</li>
+<li>returns: Path <em>user</em>: the path for the user&#8217;s object. All
+configured domains are searched.</li>
+<li>Error <em>org.freedesktop.Accounts.Error.Failed</em>: no such user exists</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>method</strong> FindUserByIdInDomain(String domain, Int64 id)<ul>
+<li><em>id</em>: the user&#8217;s UID</li>
+<li><em>domain</em>: the name of the domain to search</li>
+<li>returns: Path <em>user</em>: the path for the user&#8217;s object, if a
+matching user exists in the domain.</li>
+<li>Error <em>org.freedesktop.Accounts.Error.Failed</em>: no such user exists</li>
+</ul>
+</li>
+<li><strong>method</strong> FindUserByName(String name)<ul>
+<li><em>name</em>: the user&#8217;s login name</li>
+<li>returns: Path <em>user</em>: the path for the user&#8217;s object. The search
+is performed over all configured domains.</li>
+<li>Error <em>org.freedesktop.Accounts.Error.Failed</em>: no such user exists</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>method</strong> FindUserByNameInDomain(String domain, String name)<ul>
+<li><em>domain</em>: the name of the domain to search</li>
+<li><em>name</em>: the user&#8217;s login name</li>
+<li>returns: Path <em>user</em>: the path for the user&#8217;s object</li>
+<li>Error <em>org.freedesktop.Accounts.Error.Failed</em>: no such user exists</li>
+</ul>
+</li>
+<li><strong>method</strong> ListCachedUsers()<ul>
+<li>returns: <em>users</em>: an array of paths for the user objects</li>
+<li>Returns a subset of the users who exist, typically those who have
+logged in recently, for populating chooser lists such as those
+used by GDM&#8217;s greeter.</li>
+<li>Currently the <em>accountsservice</em> process scans /etc/passwd for
+users, filters out those with UID values which are below a
+threshold point to screen out system users, and sorts the rest by
+the number of times the users in question appear in /var/log/wtmp.
+Above a certain length, it&#8217;s expected that the caller will
+disregard the list and present only an entry field. The entry
+field always needs to be available because we know that some
+results may be missing from this list.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>method</strong> ListDomainUsers(String domain)<ul>
+<li><em>domain</em>: the domain name in which the caller is interested</li>
+<li>returns: <em>users</em>: an array of paths for all known user objects</li>
+<li>Returns all of the objects for users about which SSSD is aware.
+This may be a very large list, particularly if enumeration is
+enabled for the domain.</li>
+</ul>
+</li>
+<li><strong>signal</strong> UserAdded(Path user)<ul>
+<li><em>path</em>: the path for the user&#8217;s object</li>
+<li><strong>MODIFY</strong> this signal is emitted when a user is created or
+appears in the cache for a remote domain</li>
+</ul>
+</li>
+<li><strong>signal</strong> UserDeleted(Path user)<ul>
+<li><em>path</em>: the path for the user&#8217;s object</li>
+<li><strong>MODIFY</strong> this signal is emitted when a user is deleted or
+disappears from the cache for a remote domain, though the latter
+is not expected to happen often</li>
+</ul>
+</li>
+<li><strong>property</strong> String DaemonVersion<ul>
+<li>The version of the running daemon.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>method</strong> CreateGroup(String name)<ul>
+<li><em>name</em>: the group&#8217;s name</li>
+<li>returns: Path <em>group</em>: the path for the new group object</li>
+<li>Error <em>org.freedesktop.Accounts.Error.PermissionDenied</em>: caller
+lacks appropriate PolicyKit authorization</li>
+<li>Error <em>org.freedesktop.Accounts.Error.Failed</em>: generic operation
+failure</li>
+<li>Creates a group with the given name in the default local provider
+domain. As with users, the GID is allocated by the provider, and
+the caller can retrieve it from the group&#8217;s entry if the call
+succeeds.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>method</strong> CreateGroupInDomain(String domain, String name)<ul>
+<li><em>domain</em>: the domain name in which the caller wants the group to
+be created</li>
+<li><em>name</em>: the group&#8217;s name</li>
+<li>returns: Path <em>group</em>: the path for the new group object</li>
+<li>Error <em>org.freedesktop.Accounts.Error.PermissionDenied</em>: caller
+lacks appropriate PolicyKit authorization</li>
+<li>Error <em>org.freedesktop.Accounts.Error.Failed</em>: generic operation
+failure</li>
+<li>Creates a group with the given name in the given domain. As with
+users, the GID is allocated by the provider, and the caller can
+retrieve it from the group&#8217;s entry if the call succeeds.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>method</strong> DeleteGroup(Int group)<ul>
+<li><em>group</em>: the group ID of the group to be removed</li>
+<li>Error <em>org.freedesktop.Accounts.Error.PermissionDenied</em>: caller
+lacks appropriate PolicyKit authorization</li>
+<li>Error <em>org.freedesktop.Accounts.Error.Failed</em>: generic operation
+failure</li>
+<li>Deletes the group with the given GID.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>method</strong> DeleteGroupInDomain(String domain, Int group)<ul>
+<li><em>domain</em>: the name of the domain to which the group belongs</li>
+<li><em>group</em>: the group ID of the group to be removed</li>
+<li>Error <em>org.freedesktop.Accounts.Error.PermissionDenied</em>: caller
+lacks appropriate PolicyKit authorization</li>
+<li>Error <em>org.freedesktop.Accounts.Error.Failed</em>: generic operation
+failure</li>
+<li>Deletes the group with the given GID.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>method</strong> ListCachedGroups()<ul>
+<li>returns: <em>groups</em>: a subset of the known group objects</li>
+<li>Error <em>org.freedesktop.Accounts.Error.PermissionDenied</em>: caller
+lacks appropriate PolicyKit authorization</li>
+<li>Error <em>org.freedesktop.Accounts.Error.Failed</em>: generic operation
+failure</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>method</strong> ListDomainGroups(String domain)<ul>
+<li><em>domain</em>: the domain name in which the caller is interested</li>
+<li>returns: <em>groups</em>: an array of paths for the group objects
+representing all of the groups of which SSSD is aware in the named
+domain</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>method</strong> FindGroupById(Int64 id)<ul>
+<li><em>id</em>: the group&#8217;s GID</li>
+<li>returns: Path <em>group</em>: the path for the group object</li>
+<li>Error <em>org.freedesktop.Accounts.Error.Failed</em>: no such group
+exists</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>method</strong> FindGroupByIdInDomain(String domain, Int64 id)<ul>
+<li><em>id</em>: the group&#8217;s GID</li>
+<li><em>domain</em>: the groups&#8217;s domain name</li>
+<li>returns: Path <em>group</em>: the path for the group object</li>
+<li>Error <em>org.freedesktop.Accounts.Error.Failed</em>: no such group
+exists</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>method</strong> FindGroupByName(String name)<ul>
+<li><em>name</em>: the group&#8217;s name</li>
+<li>returns: Path <em>group</em>: the path for the group object</li>
+<li>Error <em>org.freedesktop.Accounts.Error.Failed</em>: no such group
+exists</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>method</strong> FindGroupByNameInDomain(String domain, String
+name)<ul>
+<li><em>name</em>: the group&#8217;s name</li>
+<li><em>domain</em>: the groups&#8217;s domain name.</li>
+<li>returns: Path <em>group</em>: the path for the group object</li>
+<li>Error <em>org.freedesktop.Accounts.Error.Failed</em>: no such group
+exists</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>signal</strong> GroupAdded(Path group)<ul>
+<li><em>path</em>: the path for the group&#8217;s object</li>
+<li>this signal is emitted when a group is created or appears in the
+cache for a remote domain</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>signal</strong> GroupDeleted(Path group)<ul>
+<li><em>path</em>: the path for the group&#8217;s object</li>
+<li>this signal is emitted when a group is deleted or disappears from
+the cache for a remote domain, though the latter is not expected
+to happen often</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>method</strong> ListDomains()<ul>
+<li>returns: <em>domains</em>: a list of domain name strings</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="user-objects">
+<h2>User Objects<a class="headerlink" href="#user-objects" title="Permalink to this headline">¶</a></h2>
+<p>Users are represented by objects as well. The object path name used for
+an object need not contain any identifying information about the user,
+so no assumptions should be made about it. That all said, a typical user
+object path is currently <em>/org/freedesktop/Accounts/User500</em>.</p>
+<p>User objects typically provide several properties, methods for setting
+the properties which can be written to, and one signal, all grouped as
+part of the <em>org.fredesktop.Accounts.User</em> interface:</p>
+<ul class="simple">
+<li><strong>property</strong> Boolean AutomaticLogin, <strong>method</strong>
+SetAutomaticLogin(Boolean enabled)<ul>
+<li>Whether the user should be logged in automatically at boot.</li>
+</ul>
+</li>
+<li><strong>property</strong> Boolean Locked, <strong>method</strong> SetLocked(Boolean locked)<ul>
+<li>Whether the user&#8217;s account is locked.</li>
+</ul>
+</li>
+<li><strong>property</strong> Int AccountType, <strong>method</strong> SetAccountType(Int type)<ul>
+<li>The type of the account. 0 is a <em>Standard</em> user, while 1 indicates
+an <em>Administrator</em>.</li>
+</ul>
+</li>
+<li><strong>property</strong> Int PasswordMode, <strong>method</strong> SetPasswordMode(Int mode)<ul>
+<li>Password flags. 0 is normal, 1 indicates that the password must be
+changed at next login, and 2 indicates that no password is
+necessary.</li>
+</ul>
+</li>
+<li><strong>property</strong> Boolean SystemAccount<ul>
+<li>Whether or not the account is a system account, such as <em>adm</em>.
+System accounts aren&#8217;t returned by <em>ListCachedUsers</em> and should
+generally be ignored.</li>
+</ul>
+</li>
+<li><strong>property</strong> String Email, <strong>method</strong> SetEmail(String email)<ul>
+<li>The user&#8217;s email address.</li>
+</ul>
+</li>
+<li><strong>property</strong> String HomeDirectory, <strong>method</strong> SetHomeDirectory(String
+homedir)<ul>
+<li>The user&#8217;s home directory. If changed, the user&#8217;s files are moved.</li>
+</ul>
+</li>
+<li><strong>property</strong> String IconFile, <strong>method</strong> SetIconFile(String path)<ul>
+<li>The user&#8217;s icon file. Its contents are copied from the specified
+location to a location managed by the service, and when the value
+is read, the location of the service&#8217;s copy is returned.</li>
+</ul>
+</li>
+<li><strong>property</strong> String Language, <strong>method</strong> SetLanguage(String locale)<ul>
+<li>The user&#8217;s preferred language.</li>
+</ul>
+</li>
+<li><strong>property</strong> String Location, <strong>method</strong> SetLocation(String where)<ul>
+<li>The user&#8217;s location, as a free-form string.</li>
+</ul>
+</li>
+<li><strong>property</strong> String RealName, <strong>method</strong> SetRealName(String fullname)<ul>
+<li>The user&#8217;s real, full name.</li>
+</ul>
+</li>
+<li><strong>property</strong> String Shell, <strong>method</strong> SetShell(String path)<ul>
+<li>The user&#8217;s login shell.</li>
+</ul>
+</li>
+<li><strong>property</strong> String UserName, <strong>method</strong> SetUserName(String name)<ul>
+<li>The user&#8217;s login name.</li>
+</ul>
+</li>
+<li><strong>property</strong> String XSession, <strong>method</strong> SetXSession(String session)<ul>
+<li>The user&#8217;s preferred graphical session, e.g. <em>gnome-fallback</em>.</li>
+</ul>
+</li>
+<li><strong>property</strong> Int64 Uid<ul>
+<li>The user&#8217;s UID. Note that it is read-only.</li>
+<li><strong>MODIFY</strong> this is allowed to not be set.</li>
+</ul>
+</li>
+<li><strong>property</strong> Int64 LoginFrequency<ul>
+<li>The user&#8217;s login frequency. Currently this is the number of times
+the user appears in lastlog (or maybe utmp).</li>
+</ul>
+</li>
+<li><strong>property</strong> String PasswordHint<ul>
+<li>The user&#8217;s password hint.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>property</strong> String Domain<ul>
+<li>The user&#8217;s domain.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>property</strong> Int CredentialLifetime<ul>
+<li>The number of seconds left before the user&#8217;s credentials expire,
+if the service is managing and monitoring some on the user&#8217;s
+behalf.</li>
+</ul>
+</li>
+<li><strong>method</strong> SetPassword(String crypted, String hint)<ul>
+<li>Resets the password mode to normal.</li>
+<li>Unlocks the account.</li>
+<li>Currently takes a <strong>crypt</strong> string as a parameter.</li>
+<li><strong>ADD</strong> Error
+<em>org.fedorahosted.SSSD.Error.PasswordMustBePlaintext</em>: this user&#8217;s
+password must be set as plaintext by calling <em>SetAuthenticator</em>.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>method</strong> FindGroups(Boolean direct, Boolean indirect)<ul>
+<li><em>direct</em>: return groups which explicitly list the user as a member</li>
+<li><em>indirect</em>: return groups which have the user as a member by
+virtue of having, as a member, a group which lists the user as a
+member</li>
+<li>returns: <em>groups</em>: an array of paths for the matched group objects</li>
+</ul>
+</li>
+<li><strong>signal</strong> Changed()<ul>
+<li>Emitted when the user&#8217;s properties change.</li>
+</ul>
+</li>
+<li>Any attempt to change a property value can result in these errors:<ul>
+<li>Error <em>org.freedesktop.Accounts.Error.PermissionDenied</em>: caller
+lacks appropriate PolicyKit authorization</li>
+<li>Error <em>org.freedesktop.Accounts.Error.Failed</em>: generic operation
+failure</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>method</strong> Authenticate((Array of Bytes) handle, (Array of
+String) types, (Array of Struct(Int, Array of Variant)) responses)<ul>
+<li>(Array of Bytes) <em>handle</em>: opaque <em>handle</em> returned by a previous
+call to Authenticate(), an empty array or a previously-obtained
+<em>info.session</em> value on the first call</li>
+<li>(Array of String) <em>types</em>: a list of enumerated types of
+information which the caller can supply (see below)</li>
+<li>(Array of Struct(Int id, (Array of Variant) data)) <em>responses</em>:
+array of responses to request for information returned by a
+previous call to Authenticate()<ul>
+<li><em>id</em>: an identifier specific to this request which identifiers
+information being provided in response to a particular item
+from a request</li>
+<li><em>data</em>: the information being provided in response to a
+particular item requested by a previous call to Authenticate()</li>
+</ul>
+</li>
+<li>returns (Array of Bytes) <em>handle</em>: an opaque handle used to track
+an ongoing authentication request</li>
+<li>returns Boolean <em>more</em>: true if more information is needed; false
+if authentication has succeeded (N.B.: failure is indicated by a
+D-Bus-level error)</li>
+<li>returns Int <em>timer</em>: amount of time the service is willing to wait
+for answers to its requests for information, in seconds</li>
+<li>returns (Array of Struct(Int id, String type, Variant prompt,
+Boolean sensitive, Signature format)) <em>requests</em>: information and
+requests for information<ul>
+<li><em>id</em>: an identifier specific to this request which should be
+used to identify the corresponding response when it is later
+provided</li>
+<li><em>type</em>: a label which attempts to catalogue the various kinds
+of information which may be provided or requested<ul>
+<li><em>info.user</em>: user object (<em>prompt</em> is a Path), no input
+requested (<em>format</em> is ignored)</li>
+<li><em>info.text</em>: user visible feedback (<em>prompt</em> is a String),
+no input requested (<em>format</em> is ignored)</li>
+<li><em>input.text</em>: interactively-obtained string (<em>prompt</em> is a
+String, <em>format</em>=String)<ul>
+<li>the service attempts to use this as infrequently as
+possible</li>
+</ul>
+</li>
+<li><em>input.boolean</em>: interactively-obtained boolean (<em>prompt</em> is
+a String, <em>format</em>=Boolean)<ul>
+<li>the service attempts to use this as infrequently as
+possible</li>
+</ul>
+</li>
+<li><em>input.password</em>: current password (<em>prompt</em> is a String,
+<em>format</em>=String)</li>
+<li><em>input.new-password</em>: new password value (<em>prompt</em> is a
+String, <em>format</em>=String)</li>
+<li><em>input.otp</em>: current OTP value (<em>prompt</em> is a String,
+<em>format</em>=String)</li>
+<li><em>input.otp-secret</em>: new OTP secret (<em>prompt</em> is a String,
+<em>format</em>=Array of Byte)</li>
+<li><em>input.otp-next</em>: next OTP value (<em>prompt</em> is a String,
+<em>format</em>=String)</li>
+<li><em>input.otp-new</em>: new OTP value (<em>prompt</em> is a String,
+<em>format</em>=String)</li>
+<li><em>authz-data. ...</em>: authorization data returned on success,
+the portion of the name after <em>authz-data.</em> is namespaced
+either as an OID in text form or as a reversed domain name
+(resembling a D-Bus interface name)</li>
+<li><em>info.cacheable</em>: an indicator that the calling application
+is willing to accept results based on non-live (i.e. cached)
+data</li>
+<li><em>info.session</em>: a handle for any SSO credentials obtained
+during authentication (<em>prompt</em> is an Array of Bytes),
+returned only when authentication succeeds, no input
+requested; if the caller doesn&#8217;t specify that it can accept
+a handle, any SSO credentials which are obtained as a
+side-effect of the authentication process (think: Kerberos
+TGTs) are discarded; if the caller receives a session
+handle, it accepts responsibility for eventually cleaning it
+up</li>
+<li>...</li>
+</ul>
+</li>
+<li><em>prompt</em>: as indicated by and appropriate for <em>type</em><ul>
+<li>When an (Array of Byte) is expected, the <em>prompt</em> is usually
+empty or an (Array of Byte) and the application is expected
+to respond as indicated based only on <em>type</em>.</li>
+</ul>
+</li>
+<li><em>sensitive</em>: if the user is supplying the value, if the value
+is sensitive information.<ul>
+<li>For example, passwords are often considered to be sensitive.</li>
+</ul>
+</li>
+<li><em>format</em>: the D-Bus type of the data which should be returned<ul>
+<li>usually Boolean, Int64, String, or Array of Byte</li>
+</ul>
+</li>
+<li>The overlap between <em>input.text</em> and various other input types
+is intentional, as it should allow applications and the service
+to share contextual information in cases where both support it,
+and to still be able to function (though at a less convenient
+level, programmatically) when one or the other is ignorant of
+the specifics of a particular authentication exchange. If a
+password is needed, for example, applications which advertise
+that they can provide both <em>input.text</em> and <em>input.password</em>
+will be prompted specifically for the password, while
+applications which only claim to be able to handle <em>input.text</em>
+will be prompted via that means. Hopefully this will provide
+some level of compatibility, even if it is less than ideal, as
+input types are added.</li>
+<li>As a rule, multiple requests for <em>input.text</em> type should not
+be assumed to be multiple requests for the same information,
+and <em>input.text</em> values should not be considered appropriate
+for being cached.</li>
+<li>The input type mechanism is notionally related to Kerberos
+preauthentication and authorization data, particularly in that
+some <em>requests</em> are merely informational, and attempts to
+provide a groundwork for eventually passing through binary
+methods such as GSSAPI.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>method</strong> CancelAuthentication((Array of Bytes) handle)<ul>
+<li>(Array of Bytes) <em>handle</em>: opaque <em>handle</em> returned by a previous
+call to Authenticate()</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>method</strong> ClearSession((Array of Bytes) handle)<ul>
+<li>(Array of Bytes) <em>handle</em>: opaque <em>info.session</em> value returned by
+a previous call to Authenticate()</li>
+<li>Cleans up any resources being used to maintain the session&#8217;s
+credentials</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>method</strong> SelectSession((Array of Bytes) handle, (Array of
+String) types)<ul>
+<li>(Array of Bytes) <em>handle</em>: opaque <em>info.session</em> value returned by
+a previous call to Authenticate()</li>
+<li>(Array of String) <em>types</em>: a list of types of returned information
+which the caller is able to usefully consume</li>
+<li>returns (Array of Struct(String type, Variant value)) <em>info</em>:
+information which the caller will need</li>
+<li>Makes previously-obtained SSO credentials available for use by the
+caller. When using Kerberos, the returned array includes an
+<em>environment</em> value of type <em>Array of String</em>, one of which is a
+KRB5CCNAME value which will be valid until the next time either
+<em>SelectSession</em> or <em>ClearSession</em> is called, or the
+<em>SessionCleared</em> signal is emitted. At this time, the only SSO
+credentials which SSSD &#8220;knows&#8221; how to obtain are Kerberos
+credentials, so the returned array will typically only contain an
+<em>environment</em> member, but this may grow to include other data
+items as additional authentication providers are added to SSSD.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>method</strong> SetAuthenticator((Array of Bytes) handle, (Array
+of String) types, (Array of Struct(Int, Array of Bytes)) responses)<ul>
+<li>Same calling setup as <em>Authenticate</em>.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>signal</strong> AuthenticationOperationSucceeded((Array of Bytes)
+handle)<ul>
+<li>Emitted when authentication or authenticator change succeeds.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>signal</strong> AuthenticationOperationFailed((Array of Bytes)
+handle)<ul>
+<li>Emitted when authentication or authenticator change fails.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>signal</strong> AuthenticationOperationCanceled((Array of Bytes)
+handle)<ul>
+<li>Emitted when authentication or authenticator change is canceled or
+times out.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>signal</strong> SessionExpiring((Array of Bytes) session, Int
+soon)<ul>
+<li>Emitted when the user&#8217;s SSO credentials will soon need to be
+refreshed, if the service is hanging on to and monitoring some on
+the user&#8217;s behalf.</li>
+<li>(Array of Bytes) <em>session</em>: opaque <em>info.session</em> value returned
+by a previous call to Authenticate()</li>
+<li>Int <em>soon</em>: the amount of time left, in seconds, before the
+credentials expire.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>signal</strong> SessionCleared(Array of Bytes) session)<ul>
+<li>(Array of Bytes) <em>session</em>: opaque <em>info.session</em> value returned
+by a previous call to Authenticate()</li>
+<li>Emitted when the user&#8217;s credentials are either explicitly cleared
+or expire.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>signal</strong> SessionRefreshed((Array of Bytes) session)<ul>
+<li>(Array of Bytes) <em>session</em>: opaque <em>info.session</em> value returned
+by a previous call to Authenticate()</li>
+<li>Emitted when the user&#8217;s credentials are refreshed, if the service
+is managing and monitoring some on the user&#8217;s behalf.</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="group-objects-all-new">
+<h2>Group Objects (All New)<a class="headerlink" href="#group-objects-all-new" title="Permalink to this headline">¶</a></h2>
+<p>Going forward, groups, which were previously not exposed via this API,
+will also be represented by objects. The object path name used for an
+object need not contain any identifying information about the group, so
+no assumptions should be made about it. That all said, a typical group
+object path will be <em>/org/freedesktop/Accounts/Domain2/Group500</em>.</p>
+<p>Group objects will typically need to provide a few properties, methods
+for setting the properties which can be written to, and one signal, all
+grouped as part of the <em>org.fredesktop.Accounts.Group</em>, or more likely
+an SSSD-specific, interface:</p>
+<ul class="simple">
+<li><strong>ADD</strong> <strong>property</strong> Boolean SystemGroup<ul>
+<li>Whether or not the account is a system group, such as <em>adm</em>.
+System groups aren&#8217;t returned by <em>ListCachedGroups</em> and should
+generally be ignored.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>property</strong> String IconFile, <strong>method</strong> SetIconFile(String
+path)<ul>
+<li>The group&#8217;s icon file. Its contents are copied from the specified
+location to a location managed by the service, and when the value
+is read, the location of the service&#8217;s copy is returned.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>property</strong> String GroupName, <strong>method</strong> SetGroupName(String
+name)<ul>
+<li>The group&#8217;s name.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>property</strong> Int64 Gid<ul>
+<li>The group&#8217;s GID. This is read-only, optional, and is allowed to
+not be set.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>signal</strong> Changed()<ul>
+<li>Emitted when the group&#8217;s properties change.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>property</strong> String Domain<ul>
+<li>The group&#8217;s domain.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>property</strong> (array of Paths) Users<ul>
+<li>An list of the group&#8217;s member user objects.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>property</strong> (array of Paths) Groups<ul>
+<li>An list of the group&#8217;s member group objects.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>method</strong> AddUser(Path user)<ul>
+<li><em>user</em>: the object path of the user to add to the group&#8217;s list of
+users</li>
+<li>If the user&#8217;s domain and the group&#8217;s domain are different, this is
+allowed to fail.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>method</strong> RemoveUser(Path user)<ul>
+<li><em>user</em>: the object path of the user to remove from the group&#8217;s
+list of users</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>method</strong> AddGroup(Path group)<ul>
+<li><em>group</em>: the object path of the group to add to the group&#8217;s list
+of groups</li>
+<li>If the groups are not in the same domain, this is allowed to fail.</li>
+<li>If the domain does not support groups being members of groups,
+this will fail.</li>
+</ul>
+</li>
+<li><strong>ADD</strong> <strong>method</strong> RemoveGroup(Path group)<ul>
+<li><em>group</em>: the object path of the group to remove from the group&#8217;s
+list of groups</li>
+</ul>
+</li>
+<li>Any attempt to change a property value or alter membership can result
+in these errors:<ul>
+<li>Error <em>org.freedesktop.Accounts.Error.PermissionDenied</em>: caller
+lacks appropriate PolicyKit authorization</li>
+<li>Error <em>org.freedesktop.Accounts.Error.Failed</em>: generic operation
+failure</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="deficiencies">
+<h2>Deficiencies<a class="headerlink" href="#deficiencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>No indication of primary group [mvo] (Current assumption: primary
+groups are not exposed.)</li>
+<li>What are the semantics of system groups [mvo] (Current assumption:
+there is no concept of system groups.)</li>
+<li>What are the semantics of cached groups [stefw]</li>
+<li>Why are domains not first class DBus objects [stefw]</li>
+<li>Does the local domain have a special value/identifier/path? [mvo]
+(Current assumption: empty string, but there is also LocalGroup,
+similar to LocalUser.)</li>
+<li>We should have FindGroups also on Group objects. [mvo]</li>
+<li>&#8216;direct&#8217; argument to FindGroups seems unmotivated. [mvo]</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Better Integration with The Desktop</a><ul>
+<li><a class="reference internal" href="#the-org-freedesktop-accounts-d-bus-api-as-currently-implemented-by-accountsservice">The org.freedesktop.Accounts D-Bus API as currently implemented by <em>accountsservice</em></a></li>
+<li><a class="reference internal" href="#the-org-freedesktop-accounts-d-bus-api-as-it-would-be-provided-by-sssd">The org.freedesktop.Accounts D-Bus API as it would be provided by <em>SSSD</em></a></li>
+<li><a class="reference internal" href="#api-additions-useful-to-non-desktop-cases">API additions useful to non-desktop cases</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#breaking-it-down-to-the-api-level">Breaking It Down To The API Level</a><ul>
+<li><a class="reference internal" href="#the-very-very-very-short-d-bus-primer">The very, very, very short D-Bus Primer</a></li>
+<li><a class="reference internal" href="#the-singleton-management-object">The Singleton Management Object</a></li>
+<li><a class="reference internal" href="#user-objects">User Objects</a></li>
+<li><a class="reference internal" href="#group-objects-all-new">Group Objects (All New)</a></li>
+<li><a class="reference internal" href="#deficiencies">Deficiencies</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/AccountsService.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/AccountsService.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,355 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Feature Name &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="feature-name">
+<h1>Feature Name<a class="headerlink" href="#feature-name" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2553">​https://fedorahosted.org/sssd/ticket/2553</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>The InfoPipe responder adds a listing capability to the frontend code,
+allowing the user to list users matching a very simple filter. To
+implement the back end part of this feature properly, we need to add the
+possibility to retrieve multiple, but not all entries with a single DP
+request.</p>
+<p>For details of the InfoPipe API, please see the <a class="reference external" href="https://docs.pagure.org/sssd-test2/DesignDocs/DBusUsersAndGroups.html">​DBus responder design
+page</a>.</p>
+</div>
+<div class="section" id="use-cases">
+<h2>Use cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+<p>A web application, using the InfoPipe interface requests all users
+starting with the letter &#8216;a&#8217; so the users can be displayed in the
+application UI on a sigle page. The SSSD must fetch and return all
+matching user entries, but without requiring enumeration, which would
+pull down too many users.</p>
+</div>
+<div class="section" id="overview-of-the-solution">
+<h2>Overview of the solution<a class="headerlink" href="#overview-of-the-solution" title="Permalink to this headline">¶</a></h2>
+<p>Currently, the input that Data Provider receives can only be a single
+user or group name. Wildcards are not supported at all, the back end
+actively sanitizes the input to escape any characters that have a
+special meaning in LDAP. Therefore, we need to add functionality to the
+Data Provider to mark the request as a wildcard.</p>
+<p>Only requests by name will support wildcards, not i.e. requests by SID,
+mostly because there would be no consumer of this functionality.
+Technically we could allow wildcard searches on any attribute with the
+same code, though. Also, only requests for users and groups will support
+wildcards.</p>
+<p>When the wildcard request is received by the back end, sanitization will
+be done, but modified in order to avoid escaping the wildcard. After the
+request finishes, a search-and-delete operation must be run in order to
+remove entries that matched the wildcard search previously but were
+removed from the server.</p>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<p>The wildcard request will only be used by the InfoPipe responder, but
+will be implemented in the common responder code, in particular the new
+<code class="docutils literal"><span class="pre">cache_req</span></code> request.</p>
+<p>The following sub-sections document the changes explained earlier in
+more detail.</p>
+<div class="section" id="responder-lookup-changes">
+<h3>Responder lookup changes<a class="headerlink" href="#responder-lookup-changes" title="Permalink to this headline">¶</a></h3>
+<p>The responder code changes will be done only in the new cache lookup
+code (<code class="docutils literal"><span class="pre">src/responder/common/responder_cache_req.c</span></code>). Since the NSS
+responder wouldn&#8217;t initially expose the functionality of wildcard
+lookups, we don&#8217;t need to update the lookup code currently in use by the
+NSS responder.</p>
+<p>The <code class="docutils literal"><span class="pre">cache_req_input_create()</span></code> function should be extended to denote
+that the <code class="docutils literal"><span class="pre">name</span></code> input contains a wildcard to make sure the caller
+really intends to left the asterisk unsanitized. Internally, the
+<code class="docutils literal"><span class="pre">cache_req_type</span></code> would add a new value as well.</p>
+<p>We might add a new user function and a group function that would grab
+all entries by sysdb filter, which can be more or less a wrapper around
+<code class="docutils literal"><span class="pre">sysdb_search_entry</span></code>, just setting the right search bases and default
+attributes. This new function must be able to handle views.</p>
+<p>These responder changes should be developed as a first phase of the work
+as they can be initially tested with enumeration enabled on the back end
+side.</p>
+</div>
+<div class="section" id="responder-data-provider-communication">
+<h3>Responder &lt;-&gt; Data Provider communication<a class="headerlink" href="#responder-data-provider-communication" title="Permalink to this headline">¶</a></h3>
+<p>The request between the responders and the Data Provider is driven by a
+string filter, formatted as follows:</p>
+<p>Where <code class="docutils literal"><span class="pre">type</span></code> can be one of <code class="docutils literal"><span class="pre">name</span></code>, <code class="docutils literal"><span class="pre">idnumer</span></code> or <code class="docutils literal"><span class="pre">secid</span></code>. The
+<code class="docutils literal"><span class="pre">value</span></code> field is the username, ID number or SID value and extra
+currently denotes either lookup with views or lookup by UPN instead of
+name.</p>
+<p>To support the wildcard lookups, we have two options here - add a new
+<code class="docutils literal"><span class="pre">type</span></code> option (perhaps <code class="docutils literal"><span class="pre">wildcard_name</span></code>) or add another
+<code class="docutils literal"><span class="pre">extra_value</span></code>.</p>
+<p>Adding a new <code class="docutils literal"><span class="pre">type</span></code> would be easier since it&#8217;s just addition of new
+code, not changing existing code. On the backend side, the <code class="docutils literal"><span class="pre">type</span></code>
+would be typically handled together with <code class="docutils literal"><span class="pre">name</span></code> lookups, just sanitize
+the input differently. The downside is that if we wanted to ever allow
+wildcard lookups for anything else, we&#8217;d have to add yet another type.
+Code-wise, adding a new type would translate to adding new values for
+the <code class="docutils literal"><span class="pre">sss_dp_acct_type</span></code> enum which would then print the new type value
+when formatting the sbus message.</p>
+<p>The other option would be to allow multivalued <code class="docutils literal"><span class="pre">extra</span></code> field:</p>
+<p>However, that would involve changing how we currently handle the
+<code class="docutils literal"><span class="pre">extra</span></code> field, which is higher risk of regressions. Also, the back
+ends can technically be developed by a third party, so we should be
+extremely careful about changing the protocol between DP and providers.
+Since we don&#8217;t expect to allow any other wildcard requests than by name
+yet, I&#8217;m proposing to go with the first option and add a comment to the
+code to change to using the extra field if we need wildcard lookups by
+another attribute.</p>
+</div>
+<div class="section" id="relax-the-sss-filter-sanitize-function">
+<h3>Relax the <code class="docutils literal"><span class="pre">sss_filter_sanitize</span></code> function<a class="headerlink" href="#relax-the-sss-filter-sanitize-function" title="Permalink to this headline">¶</a></h3>
+<p>When a wildcard request is received, we still need to sanitize the input
+and escape special LDAP characters, but we must not escape the asterisk
+(<code class="docutils literal"><span class="pre">*</span></code>).</p>
+<p>As a part of the patchset we need to add a parameter that will denote
+characters that should be skipped during sanitization.</p>
+</div>
+<div class="section" id="delete-cached-entries-removed-from-the-server">
+<h3>Delete cached entries removed from the server<a class="headerlink" href="#delete-cached-entries-removed-from-the-server" title="Permalink to this headline">¶</a></h3>
+<p>After a request finishes, the back end needs to remove entries that are
+cached from a previous lookup using the same filter, but no longer
+present on the server.</p>
+<p>Because wildcard requests can match multiple entries, we need to save
+the time of the backend request start and delete all entries that match
+a sysdb filter analogous to the LDAP filter, but were last updated prior
+to the start of the request.</p>
+<p>Care must be taken about case sensitivity. Since the LDAP servers are
+typically case-insensitive, but sysdb (and POSIX systems) are
+case-sensitive, we will default to matching only case-sensitive <code class="docutils literal"><span class="pre">name</span></code>
+attribute by default as well. With case-insensitive back ends, the
+search function must match also the <code class="docutils literal"><span class="pre">nameAlias</span></code> attribute.</p>
+</div>
+<div class="section" id="ldap-provider-changes">
+<h3>LDAP provider changes<a class="headerlink" href="#ldap-provider-changes" title="Permalink to this headline">¶</a></h3>
+<p>The LDAP provider is the lowest common denominator of other providers
+and hence it would contain the low-level changes related to this
+feature.</p>
+<p>In the LDAP provider, we need to use the relaxed version of the input
+sanitizing and the wildcard method to delete matched entries. These
+changes will be contained to the <code class="docutils literal"><span class="pre">users_get_send()</span></code> and
+<code class="docutils literal"><span class="pre">groups_get_send()</span></code> requests.</p>
+<p>The requests that fetch and store the users or groups from LDAP
+currently have a parameter called <code class="docutils literal"><span class="pre">enumerate</span></code> that is used to check
+whether it&#8217;s OK to receive multiple results or not. We should rename the
+parameter or even invert it along with renaming (i.e change the name to
+<code class="docutils literal"><span class="pre">direct_lookup</span></code> or similar).</p>
+<p>We also need to limit the number of entries returned from the server,
+otherwise the wildcard request might easily turn into a full
+enumeration. To this end, we will add a new configuration option
+<code class="docutils literal"><span class="pre">wildcard_search_limit</span></code>. Internally, we would change the boolan
+parameter of <code class="docutils literal"><span class="pre">sdap_get_users_send</span></code> to a tri-state that would control
+whether we expect only a single entry (ie don&#8217;t use the paging control),
+multiple entries with a search limit (wildcard request) or multiple
+entries with no limit (enumeration). We need to make sure during
+implementation that it is discoverable via DEBUG messages that the upper
+limit was reached.</p>
+</div>
+<div class="section" id="ipa-provider-changes">
+<h3>IPA provider changes<a class="headerlink" href="#ipa-provider-changes" title="Permalink to this headline">¶</a></h3>
+<p>The tricky part about IPA provider are the views. The lookups with views
+have two branches - either an override object matches the input and then
+we look up the corresponding original object or the other way around.
+The code must be changed to support multiple matches for both overrides
+and original objects in the first pass. We might end up fetching more
+entries than needed because the resulting object wouldn&#8217;t match in the
+responder after applying the override, but the merging on the responder
+side will only filter out the appropriate entries.</p>
+<p>Currently, the request handles all account lookups in a single tevent
+request, with branches for special cases, such as initgroup lookups or
+resolving ghost members during group lookups. We might need to refactor
+the single request a bit into per-object tevent lookups to keep the code
+readable.</p>
+<p>Please keep in mind that each tevent request has a bit of performance
+overhead, so adding new request is always a trade-off. Care must be
+taken to not regression performance of the default case unless
+necessary.</p>
+<p>If the first override lookup matches, then we must loop over all
+returned overrides and find matching originals. The current code re-uses
+the state-&gt;ar structure, which is single-valued, we need to add another
+multi-valued structure instead (<code class="docutils literal"><span class="pre">state-&gt;override_ar</span></code>) and perhaps even
+split the lookup of original objects into a separate request, depending
+on the complexity.</p>
+<p>Conversely, when the original objects match first, we need to loop over
+the original matches and fetch overrides for each of the objects found.
+Here, the <code class="docutils literal"><span class="pre">get_object_from_cache()</span></code> function needs to be able to
+return multiple results and the following code must be turned into a
+loop.</p>
+<p>When looking up the overrides, the <code class="docutils literal"><span class="pre">be_acct_req_to_override_filter()</span></code>
+must be enhanced to be able to construct a wildcard filter. The
+<code class="docutils literal"><span class="pre">ipa_get_ad_override_done</span></code> must also return all matched objects if
+needed, not just the first array entry. The rest of the
+<code class="docutils literal"><span class="pre">ipa_get_ad_override_send()</span></code> request is generic enough already.</p>
+</div>
+<div class="section" id="ipa-subdomain-lookups-via-the-extdom-plugin">
+<h3>IPA subdomain lookups via the extdom plugin<a class="headerlink" href="#ipa-subdomain-lookups-via-the-extdom-plugin" title="Permalink to this headline">¶</a></h3>
+<p>Currently the extdom plugin only supports direct entry lookups, even on
+the server side. We could add a new request that accepts a filter with
+asterisk and returns a list of matching DNs or names, but because of the
+complexity of the changes, this part of implementation should be
+deferred until requested specifically.</p>
+<p>If the IPA subdomain would receive a wildcard request, it would reply
+with an error code that would make it clear this request is not
+supported.</p>
+<p>Making sure the IPA provider in server mode is capable of returning
+wildcard entries and adding a wildcard-enabled function for the
+<code class="docutils literal"><span class="pre">libnss_sss_idmap</span></code> library would a prerequisity so that the extop
+plugin can request multiple entries from the SSSD running in the server
+mode.</p>
+</div>
+<div class="section" id="ad-provider-changes">
+<h3>AD provider changes<a class="headerlink" href="#ad-provider-changes" title="Permalink to this headline">¶</a></h3>
+<p>No changes seem to be required for the AD provider, since the AD
+provider mostly just passes around the original <code class="docutils literal"><span class="pre">ar</span></code> request to a
+Global Catalog lookup or an LDAP lookup. However, testing must be
+performed in an environment where some users have POSIX attributes but
+those attributes are not replicated to the Global Catalog to make sure
+we handle the fallback between connections well.</p>
+</div>
+<div class="section" id="other-providers">
+<h3>Other providers<a class="headerlink" href="#other-providers" title="Permalink to this headline">¶</a></h3>
+<p>Proxy provider support is not realistic, since the proxy provider only
+uses the NSS functions of the wrapped module which means it would rely
+on enumeration anyway. With enumeration enabled, the responders would be
+able to return the required matching entries already. The local provider
+is not a real back end, so it should get the wildcard support for free,
+just with the changes to the responder.</p>
+</div>
+</div>
+<div class="section" id="configuration-changes">
+<h2>Configuration changes<a class="headerlink" href="#configuration-changes" title="Permalink to this headline">¶</a></h2>
+<p>A new option <code class="docutils literal"><span class="pre">wildcard_search_limit</span></code> will be added. The default value
+would be 1000, which is also typically the size of one page.</p>
+</div>
+<div class="section" id="how-to-test">
+<h2>How To Test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<p>When the InfoPipe API is ready, then testing will be done using the
+methods such as ListByName. Until then, the feature is not exposed or
+used anyway, so developers can test using a special command-line tool
+that would send the DP request directly. This tool wouldn&#8217;t be commited
+to the git tree.</p>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Jakub Hrozek &lt;<a class="reference external" href="mailto:jhrozek&#37;&#52;&#48;redhat&#46;com">​jhrozek<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Feature Name</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem statement</a></li>
+<li><a class="reference internal" href="#use-cases">Use cases</a></li>
+<li><a class="reference internal" href="#overview-of-the-solution">Overview of the solution</a></li>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a><ul>
+<li><a class="reference internal" href="#responder-lookup-changes">Responder lookup changes</a></li>
+<li><a class="reference internal" href="#responder-data-provider-communication">Responder &lt;-&gt; Data Provider communication</a></li>
+<li><a class="reference internal" href="#relax-the-sss-filter-sanitize-function">Relax the <code class="docutils literal"><span class="pre">sss_filter_sanitize</span></code> function</a></li>
+<li><a class="reference internal" href="#delete-cached-entries-removed-from-the-server">Delete cached entries removed from the server</a></li>
+<li><a class="reference internal" href="#ldap-provider-changes">LDAP provider changes</a></li>
+<li><a class="reference internal" href="#ipa-provider-changes">IPA provider changes</a></li>
+<li><a class="reference internal" href="#ipa-subdomain-lookups-via-the-extdom-plugin">IPA subdomain lookups via the extdom plugin</a></li>
+<li><a class="reference internal" href="#ad-provider-changes">AD provider changes</a></li>
+<li><a class="reference internal" href="#other-providers">Other providers</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuration-changes">Configuration changes</a></li>
+<li><a class="reference internal" href="#how-to-test">How To Test</a></li>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/WildcardRefresh.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/WildcardRefresh.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

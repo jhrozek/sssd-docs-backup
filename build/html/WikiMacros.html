@@ -1,0 +1,659 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Trac Macros &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="trac-macros">
+<h1>Trac Macros<a class="headerlink" href="#trac-macros" title="Permalink to this headline">¶</a></h1>
+<div class="wiki-toc"><ol class="arabic simple">
+<li><a class="reference external" href="#TracMacros">Trac Macros</a><ol class="arabic">
+<li><a class="reference external" href="#UsingMacros">Using Macros</a><ol class="arabic">
+<li><a class="reference external" href="#GettingDetailedHelp">Getting Detailed Help</a></li>
+<li><a class="reference external" href="#Example">Example</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#AvailableMacros">Available Macros</a></li>
+<li><a class="reference external" href="#Macrosfromaroundtheworld">Macros from around the world</a></li>
+<li><a class="reference external" href="#DevelopingCustomMacros">Developing Custom Macros</a><ol class="arabic">
+<li><a class="reference external" href="#Macrowithoutarguments">Macro without arguments</a></li>
+<li><a class="reference external" href="#Macrowitharguments">Macro with arguments</a></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</div><p>Trac macros are plugins to extend the Trac engine with custom
+&#8216;functions&#8217; written in Python. A macro inserts dynamic HTML data in any
+context supporting
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html">WikiFormatting</a>.</p>
+<p>Another kind of macros are
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiProcessors.html">WikiProcessors</a>.
+They typically deal with alternate markup formats and representation of
+larger blocks of information (like source code highlighting).</p>
+<div class="section" id="using-macros">
+<h2>Using Macros<a class="headerlink" href="#using-macros" title="Permalink to this headline">¶</a></h2>
+<p>Macro calls are enclosed in two <em>square brackets</em>. Like Python
+functions, macros can also have arguments, a comma separated list within
+parentheses.</p>
+<div class="section" id="getting-detailed-help">
+<h3>Getting Detailed Help<a class="headerlink" href="#getting-detailed-help" title="Permalink to this headline">¶</a></h3>
+<p>The list of available macros and the full help can be obtained using the
+MacroList macro, as seen
+<a class="reference external" href="https://fedorahosted.org/sssd#AvailableMacros">below</a>.</p>
+<p>A brief list can be obtained via [[MacroList(*)]] or [[?]].</p>
+<p>Detailed help on a specific macro can be obtained by passing it as an
+argument to MacroList, e.g. [[MacroList(MacroList)]], or, more
+conveniently, by appending a question mark (?) to the macro&#8217;s name, like
+in [[MacroList?]].</p>
+</div>
+<div class="section" id="example">
+<h3>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h3>
+<p>A list of 3 most recently changed wiki pages starting with &#8216;Trac&#8217;:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&nbsp;</td>
+<td><div class="first"><div></div><p class="rubric" id="section">06/08/15</p>
+<ul class="simple">
+<li><a href="#id1"><span class="problematic" id="id2">`</span></a>TracUpgrade &lt;<a class="reference external" href="https://docs.pagure">https://docs.pagure</a></li>
+</ul>
+<dl class="docutils">
+<dt>.org/sssd-test2/TracUpgrade.html&gt;`__</dt>
+<dd>(<a href="#id3"><span class="problematic" id="id4">`</span></a>diff &lt;<a class="reference external" href="https://docs.pagure.org/s">https://docs.pagure.org/s</a></dd>
+</dl>
+<p>ssd-test2/TracUpgrade?action=diff&amp;ve
+rsion=3.html&gt;`__)
+-  <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracRoadmap.html">TracRoadmap</a></p>
+<blockquote>
+<div>(<a href="#id5"><span class="problematic" id="id6">`</span></a>diff &lt;<a class="reference external" href="https://docs.pagure.org/s">https://docs.pagure.org/s</a></div></blockquote>
+<p>ssd-test2/TracRoadmap?action=diff&amp;ve
+rsion=3.html&gt;`__)
+-  <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTickets.html">TracTickets</a></p>
+<blockquote>
+<div>(<a href="#id7"><span class="problematic" id="id8">`</span></a>diff &lt;<a class="reference external" href="https://docs.pagure.org/s">https://docs.pagure.org/s</a></div></blockquote>
+<p>ssd-test2/TracTickets?action=diff&amp;ve
+rsion=3.html&gt;`__)</p>
+<div class="last"></div></div></td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td><div class="first"><div class="trac-macrolist"></div><p class="rubric" id="recentchanges-macro"><code class="docutils literal"><span class="pre">[[RecentChanges]]</span></code></p>
+<p>List all pages that have recently
+been modified, grouping them by the
+day they were last modified.</p>
+<p>This macro accepts two parameters.
+The first is a prefix string: if
+provided, only pages with names that
+start with the prefix are included
+in the resulting list. If this
+parameter is omitted, all pages are
+listed.</p>
+<p>The second parameter is a number for
+limiting the number of pages
+returned. For example, specifying a
+limit of 5 will result in only the
+five most recently changed pages to
+be included in the list.</p>
+<div class="last"></div></div></td>
+</tr>
+<tr class="row-even"><td>&nbsp;</td>
+<td><div class="first"><div class="trac-macrolist"
+style="font-size: 80%"></div><p class="rubric" id="image"><code class="docutils literal"><span class="pre">[[Image]]</span></code></p>
+<p>Embed an image in wiki-formatted
+text. The first argument is the file
+…
+.. rubric:: <code class="docutils literal"><span class="pre">[[InterTrac]]</span></code></p>
+<blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">name:</th><td class="field-body">intertrac</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>Provide a list of known
+<a class="reference external" href="/wiki/InterTrac">InterTrac</a>
+prefixes.
+.. rubric:: <code class="docutils literal"><span class="pre">[[InterWiki]]</span></code></p>
+<blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">name:</th><td class="field-body">interwiki</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>Provide a description list for the
+known
+<a class="reference external" href="/wiki/InterWiki">InterWiki</a>
+prefixes.
+.. rubric:: <code class="docutils literal"><span class="pre">[[KnownMimeTypes]]</span></code></p>
+<blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">name:</th><td class="field-body">knownmimetypes</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>List all known mime-types which can
+be used as
+<a class="reference external" href="/wiki/WikiProcessors">WikiProcessors</a>.
+Can be …</p>
+</div><p class="last">etc.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="available-macros">
+<h2>Available Macros<a class="headerlink" href="#available-macros" title="Permalink to this headline">¶</a></h2>
+<p><em>Note that the following list will only contain the macro documentation
+if you&#8217;ve not enabled ``-OO`` optimizations, or not set the
+``PythonOptimize`` option for
+`mod_python &lt;https://docs.pagure.org/sssd-test2/TracModPython.html&gt;`__.</em></p>
+<div class="trac-macrolist"><p class="rubric" id="branches-macro"><code class="docutils literal"><span class="pre">[[Branches]]</span></code></p>
+<p>Render a list of available branches.</p>
+<p class="rubric" id="image-macro"><code class="docutils literal"><span class="pre">[[Image]]</span></code></p>
+<p>Embed an image in wiki-formatted text.</p>
+<p>The first argument is the file specification. The file specification may
+reference attachments in three ways:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">module:id:file</span></code>, where module can be either <strong>wiki</strong> or
+<strong>ticket</strong>, to refer to the attachment named <em>file</em> of the specified
+wiki page or ticket.</li>
+<li><code class="docutils literal"><span class="pre">id:file</span></code>: same as above, but id is either a ticket shorthand or a
+Wiki page name.</li>
+<li><code class="docutils literal"><span class="pre">file</span></code> to refer to a local attachment named &#8216;file&#8217;. This only works
+from within that wiki page or a ticket.</li>
+</ul>
+<p>Also, the file specification may refer to repository files, using the
+<code class="docutils literal"><span class="pre">source:file</span></code> syntax (<code class="docutils literal"><span class="pre">source:file&#64;rev</span></code> works also).</p>
+<p>Files can also be accessed with a direct URLs; <code class="docutils literal"><span class="pre">/file</span></code> for a
+project-relative, <code class="docutils literal"><span class="pre">//file</span></code> for a server-relative, or
+<code class="docutils literal"><span class="pre">http://server/file</span></code> for absolute location of the file.</p>
+<p>The remaining arguments are optional and allow configuring the
+attributes and style of the rendered <code class="docutils literal"><span class="pre">&lt;img&gt;</span></code> element:</p>
+<ul class="simple">
+<li>digits and unit are interpreted as the size (ex. 120, 25%) for the
+image</li>
+<li><code class="docutils literal"><span class="pre">right</span></code>, <code class="docutils literal"><span class="pre">left</span></code>, <code class="docutils literal"><span class="pre">center</span></code>, <code class="docutils literal"><span class="pre">top</span></code>, <code class="docutils literal"><span class="pre">bottom</span></code> and <code class="docutils literal"><span class="pre">middle</span></code>
+are interpreted as the alignment for the image (alternatively, the
+first three can be specified using <code class="docutils literal"><span class="pre">align=...</span></code> and the last three
+using <code class="docutils literal"><span class="pre">valign=...</span></code>)</li>
+<li><code class="docutils literal"><span class="pre">link=some</span> <span class="pre">TracLinks...</span></code> replaces the link to the image source by
+the one specified using a
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracLinks.html">TracLinks</a>. If
+no value is specified, the link is simply removed.</li>
+<li><code class="docutils literal"><span class="pre">nolink</span></code> means without link to image source (deprecated, use
+<code class="docutils literal"><span class="pre">link=</span></code>)</li>
+<li><code class="docutils literal"><span class="pre">key=value</span></code> style are interpreted as HTML attributes or CSS style
+indications for the image. Valid keys are:<ul>
+<li>align, valign, border, width, height, alt, title, longdesc, class,
+margin, margin-(left,right,top,bottom), id and usemap</li>
+<li><code class="docutils literal"><span class="pre">border</span></code>, <code class="docutils literal"><span class="pre">margin</span></code>, and <code class="docutils literal"><span class="pre">margin-</span></code>* can only be a single
+number</li>
+<li><code class="docutils literal"><span class="pre">margin</span></code> is superseded by <code class="docutils literal"><span class="pre">center</span></code> which uses auto margins</li>
+</ul>
+</li>
+</ul>
+<p>Examples:</p>
+<p>You can use image from other page, other ticket or other module.</p>
+<p><em>Adapted from the Image.py macro created by Shun-ichi Goto
+&lt;`​gotoh&#64;taiyo.co.jp &lt;mailto:gotoh&#64;taiyo.co.jp&gt;`__&gt;</em></p>
+<p class="rubric" id="intertrac-macro"><code class="docutils literal"><span class="pre">[[InterTrac]]</span></code></p>
+<p>Provide a list of known
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InterTrac.html">InterTrac</a>
+prefixes.</p>
+<p class="rubric" id="interwiki-macro"><code class="docutils literal"><span class="pre">[[InterWiki]]</span></code></p>
+<p>Provide a description list for the known
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InterWiki.html">InterWiki</a>
+prefixes.</p>
+<p class="rubric" id="knownmimetypes-macro"><code class="docutils literal"><span class="pre">[[KnownMimeTypes]]</span></code></p>
+<p>List all known mime-types which can be used as
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiProcessors.html">WikiProcessors</a>.</p>
+<p>Can be given an optional argument which is interpreted as mime-type
+filter.</p>
+<p class="rubric" id="macrolist-macro"><code class="docutils literal"><span class="pre">[[MacroList]]</span></code></p>
+<p>Display a list of all installed Wiki macros, including documentation if
+available.</p>
+<p>Optionally, the name of a specific macro can be provided as an argument.
+In that case, only the documentation for that macro will be rendered.</p>
+<p>Note that this macro will not be able to display the documentation of
+macros if the <code class="docutils literal"><span class="pre">PythonOptimize</span></code> option is enabled for mod_python!</p>
+<p class="rubric" id="pageoutline-macro"><code class="docutils literal"><span class="pre">[[PageOutline]]</span></code></p>
+<p>Display a structural outline of the current wiki page, each item in the
+outline being a link to the corresponding heading.</p>
+<p>This macro accepts three optional parameters:</p>
+<ul class="simple">
+<li>The first is a number or range that allows configuring the minimum
+and maximum level of headings that should be included in the outline.
+For example, specifying &#8220;1&#8221; here will result in only the top-level
+headings being included in the outline. Specifying &#8220;2-3&#8221; will make
+the outline include all headings of level 2 and 3, as a nested list.
+The default is to include all heading levels.</li>
+<li>The second parameter can be used to specify a custom title (the
+default is no title).</li>
+<li>The third parameter selects the style of the outline. This can be
+either <code class="docutils literal"><span class="pre">inline</span></code> or <code class="docutils literal"><span class="pre">pullout</span></code> (the latter being the default). The
+<code class="docutils literal"><span class="pre">inline</span></code> style renders the outline as normal part of the content,
+while <code class="docutils literal"><span class="pre">pullout</span></code> causes the outline to be rendered in a box that is
+by default floated to the right side of the other content.</li>
+</ul>
+<p class="rubric" id="id9"><code class="docutils literal"><span class="pre">[[RecentChanges]]</span></code></p>
+<p>List all pages that have recently been modified, grouping them by the
+day they were last modified.</p>
+<p>This macro accepts two parameters. The first is a prefix string: if
+provided, only pages with names that start with the prefix are included
+in the resulting list. If this parameter is omitted, all pages are
+listed.</p>
+<p>The second parameter is a number for limiting the number of pages
+returned. For example, specifying a limit of 5 will result in only the
+five most recently changed pages to be included in the list.</p>
+<p class="rubric" id="repositoryindex-macro"><code class="docutils literal"><span class="pre">[[RepositoryIndex]]</span></code></p>
+<p>Display the list of available repositories.</p>
+<p>Can be given the following named arguments:</p>
+<dl class="docutils">
+<dt><em>format</em></dt>
+<dd><p class="first">Select the rendering format:</p>
+<ul class="last simple">
+<li><em>compact</em> produces a comma-separated list of repository prefix
+names (default)</li>
+<li><em>list</em> produces a description list of repository prefix names</li>
+<li><em>table</em> produces a table view, similar to the one visible in the
+<em>Browse View</em> page</li>
+</ul>
+</dd>
+<dt><em>glob</em></dt>
+<dd>Do a glob-style filtering on the repository names (defaults to &#8216;*&#8217;)</dd>
+<dt><em>order</em></dt>
+<dd>Order repositories by the given column (one of &#8220;name&#8221;, &#8220;date&#8221; or
+&#8220;author&#8221;)</dd>
+<dt><em>desc</em></dt>
+<dd>When set to 1, order by descending order</dd>
+</dl>
+<p>(<em>since 0.12</em>)</p>
+<p class="rubric" id="toc-macro"><code class="docutils literal"><span class="pre">[[TOC]]</span></code></p>
+<p>Generate a table of contents for the current page or a set of pages. If
+no arguments are given, a table of contents is generated for the current
+page, with the top-level title stripped:</p>
+<p>To generate a table of contents for a set of pages, simply pass them as
+comma separated arguments to the TOC macro, e.g. as in</p>
+<p>A wildcard &#8216;*&#8217; can be used to fetch a sorted list of all pages starting
+with the preceding pagename stub:</p>
+<p>The following <em>control</em> arguments change the default behaviour of the
+TOC macro:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="13%" />
+<col width="87%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Meaning</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">heading=&lt;x&gt;</span></code></td>
+<td>Override the default heading of &#8220;Table of Contents&#8221;</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">noheading</span></code></td>
+<td>Suppress display of the heading.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">depth=&lt;n&gt;</span></code></td>
+<td>Display headings of <em>subsequent</em> pages to a maximum depth of <strong>&lt;n&gt;</strong>.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">inline</span></code></td>
+<td>Display TOC inline rather than as a side-bar.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">sectionindex</span></code></td>
+<td>Only display the page name and title of each page in the wiki section.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">titleindex</span></code></td>
+<td>Only display the page name and title of each page, similar to <a class="reference external" href="https://docs.pagure.org/sssd-test2/TitleIndex.html">TitleIndex</a>.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">notitle</span></code></td>
+<td>Supress display of page title.</td>
+</tr>
+</tbody>
+</table>
+<p>For &#8216;titleindex&#8217; argument, an empty pagelist will evaluate to all pages:</p>
+<p>&#8216;sectionindex&#8217; allows to generate a title index for all pages in a given
+section of the wiki. A section is defined by wiki page name, using &#8216;/&#8217;
+as a section level delimiter (like directories in a file system). Giving
+&#8216;/&#8217; or &#8216;*&#8217; as the page name produces the same result as &#8216;titleindex&#8217;
+(title of all pages). If a page name ends with a &#8216;/&#8217;, only children of
+this page will be processed. Else the page given in the argument is also
+included, if it exists. For &#8216;sectionindex&#8217; argument, an empty pagelist
+will evaluate to all page below the same parent as the current page:</p>
+<p class="rubric" id="ticketquery-macro"><code class="docutils literal"><span class="pre">[[TicketQuery]]</span></code></p>
+<p>Wiki macro listing tickets that match certain criteria.</p>
+<p>This macro accepts a comma-separated list of keyed parameters, in the
+form &#8220;key=value&#8221;.</p>
+<p>If the key is the name of a field, the value must use the syntax of a
+filter specifier as defined in
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracQuery.html#QueryLanguage">TracQuery#QueryLanguage</a>.
+Note that this is <em>not</em> the same as the simplified URL syntax used for
+<code class="docutils literal"><span class="pre">query:</span></code> links starting with a <code class="docutils literal"><span class="pre">?</span></code> character. Commas (<code class="docutils literal"><span class="pre">,</span></code>) can be
+included in field values by escaping them with a backslash (<code class="docutils literal"><span class="pre">\</span></code>).</p>
+<p>Groups of field constraints to be OR-ed together can be separated by a
+litteral <code class="docutils literal"><span class="pre">or</span></code> argument.</p>
+<p>In addition to filters, several other named parameters can be used to
+control how the results are presented. All of them are optional.</p>
+<p>The <code class="docutils literal"><span class="pre">format</span></code> parameter determines how the list of tickets is
+presented:</p>
+<ul class="simple">
+<li><strong>list</strong> &#8211; the default presentation is to list the ticket ID next to
+the summary, with each ticket on a separate line.</li>
+<li><strong>compact</strong> &#8211; the tickets are presented as a comma-separated list of
+ticket IDs.</li>
+<li><strong>count</strong> &#8211; only the count of matching tickets is displayed</li>
+<li><strong>table</strong> &#8211; a view similar to the custom query view (but without the
+controls)</li>
+</ul>
+<p>The <code class="docutils literal"><span class="pre">max</span></code> parameter can be used to limit the number of tickets shown
+(defaults to <strong>0</strong>, i.e. no maximum).</p>
+<p>The <code class="docutils literal"><span class="pre">order</span></code> parameter sets the field used for ordering tickets
+(defaults to <strong>id</strong>).</p>
+<p>The <code class="docutils literal"><span class="pre">desc</span></code> parameter indicates whether the order of the tickets should
+be reversed (defaults to <strong>false</strong>).</p>
+<p>The <code class="docutils literal"><span class="pre">group</span></code> parameter sets the field used for grouping tickets
+(defaults to not being set).</p>
+<p>The <code class="docutils literal"><span class="pre">groupdesc</span></code> parameter indicates whether the natural display order
+of the groups should be reversed (defaults to <strong>false</strong>).</p>
+<p>The <code class="docutils literal"><span class="pre">verbose</span></code> parameter can be set to a true value in order to get the
+description for the listed tickets. For <strong>table</strong> format only.
+<em>deprecated in favor of the ``rows`` parameter</em></p>
+<p>The <code class="docutils literal"><span class="pre">rows</span></code> parameter can be used to specify which field(s) should be
+viewed as a row, e.g. <code class="docutils literal"><span class="pre">rows=description|summary</span></code></p>
+<p>For compatibility with Trac 0.10, if there&#8217;s a last positional parameter
+given to the macro, it will be used to specify the <code class="docutils literal"><span class="pre">format</span></code>. Also,
+using &#8220;&amp;&#8221; as a field separator still works (except for <code class="docutils literal"><span class="pre">order</span></code>) but is
+deprecated.</p>
+<p class="rubric" id="titleindex-macro"><code class="docutils literal"><span class="pre">[[TitleIndex]]</span></code></p>
+<p>Insert an alphabetic list of all wiki pages into the output.</p>
+<p>Accepts a prefix string as parameter: if provided, only pages with names
+that start with the prefix are included in the resulting list. If this
+parameter is omitted, all pages are listed. If the prefix is specified,
+a second argument of value &#8216;hideprefix&#8217; can be given as well, in order
+to remove that prefix from the output.</p>
+<p>Alternate <code class="docutils literal"><span class="pre">format</span></code> and <code class="docutils literal"><span class="pre">depth</span></code> named parameters can be specified:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">format=compact</span></code>: The pages are displayed as comma-separated links.</li>
+<li><code class="docutils literal"><span class="pre">format=group</span></code>: The list of pages will be structured in groups
+according to common prefix. This format also supports a <code class="docutils literal"><span class="pre">min=n</span></code>
+argument, where <code class="docutils literal"><span class="pre">n</span></code> is the minimal number of pages for a group.</li>
+<li><code class="docutils literal"><span class="pre">format=hierarchy</span></code>: The list of pages will be structured according
+to the page name path hierarchy. This format also supports a
+<code class="docutils literal"><span class="pre">min=n</span></code> argument, where higher <code class="docutils literal"><span class="pre">n</span></code> flatten the display hierarchy</li>
+<li><code class="docutils literal"><span class="pre">depth=n</span></code>: limit the depth of the pages to list. If set to 0, only
+toplevel pages will be shown, if set to 1, only immediate children
+pages will be shown, etc. If not set, or set to -1, all pages in the
+hierarchy will be shown.</li>
+</ul>
+<p class="rubric" id="tracadminhelp-macro"><code class="docutils literal"><span class="pre">[[TracAdminHelp]]</span></code></p>
+<p>Display help for trac-admin commands.</p>
+<p>Examples:</p>
+<p class="rubric" id="tracguidetoc-macro"><code class="docutils literal"><span class="pre">[[TracGuideToc]]</span></code></p>
+<p>Display a table of content for the Trac guide.</p>
+<p>This macro shows a quick and dirty way to make a table-of-contents for
+the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Help/Guide.html">Help/Guide?</a>.
+The table of contents will contain the Trac* and
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html">WikiFormatting</a>
+pages, and can&#8217;t be customized. Search for
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TocMacro.html">TocMacro?</a> for a a
+more customizable table of contents.</p>
+<p class="rubric" id="tracini-macro"><code class="docutils literal"><span class="pre">[[TracIni]]</span></code></p>
+<p>Produce documentation for the Trac configuration file.</p>
+<p>Typically, this will be used in the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">TracIni</a> page.
+Optional arguments are a configuration section filter, and a
+configuration option name filter: only the configuration options whose
+section and name start with the filters are output.</p>
+</div></div>
+<div class="section" id="macros-from-around-the-world">
+<h2>Macros from around the world<a class="headerlink" href="#macros-from-around-the-world" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference external" href="http://trac-hacks.org/">​Trac Hacks</a> site provides a wide
+collection of macros and other Trac
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracPlugins.html">plugins</a>
+contributed by the Trac community. If you&#8217;re looking for new macros, or
+have written one that you&#8217;d like to share with the world, please don&#8217;t
+hesitate to visit that site.</p>
+</div>
+<div class="section" id="developing-custom-macros">
+<h2>Developing Custom Macros<a class="headerlink" href="#developing-custom-macros" title="Permalink to this headline">¶</a></h2>
+<p>Macros, like Trac itself, are written in the <a class="reference external" href="http://python.org/">​Python programming
+language</a> and are developed as part of
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracPlugins.html">TracPlugins</a>.</p>
+<p>For more information about developing macros, see the <a class="reference external" href="http://trac.edgewall.org/intertrac/TracDev">​development
+resources</a> on the main
+project site.</p>
+<p>Here are 2 simple examples showing how to create a Macro with Trac 0.11.</p>
+<p>Also, have a look at
+<a class="reference external" href="http://trac.edgewall.org/intertrac/source%3Atags/trac-0.11/sample-plugins/Timestamp.py">​Timestamp.py</a>
+for an example that shows the difference between old style and new style
+macros and at the
+<a class="reference external" href="http://trac.edgewall.org/intertrac/source%3Atags/trac-0.11/wiki-macros/README">​macros/README</a>
+which provides a little more insight about the transition.</p>
+<div class="section" id="macro-without-arguments">
+<h3>Macro without arguments<a class="headerlink" href="#macro-without-arguments" title="Permalink to this headline">¶</a></h3>
+<p>To test the following code, you should saved it in a
+<code class="docutils literal"><span class="pre">timestamp_sample.py</span></code> file located in the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracEnvironment.html">TracEnvironment</a>&#8216;s
+<code class="docutils literal"><span class="pre">plugins/</span></code> directory.</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
+<span class="c1"># Note: since Trac 0.11, datetime objects are used internally</span>
+
+<span class="kn">from</span> <span class="nn">genshi.builder</span> <span class="k">import</span> <span class="n">tag</span>
+
+<span class="kn">from</span> <span class="nn">trac.util.datefmt</span> <span class="k">import</span> <span class="n">format_datetime</span><span class="p">,</span> <span class="n">utc</span>
+<span class="kn">from</span> <span class="nn">trac.wiki.macros</span> <span class="k">import</span> <span class="n">WikiMacroBase</span>
+
+<span class="k">class</span> <span class="nc">TimeStampMacro</span><span class="p">(</span><span class="n">WikiMacroBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Inserts the current time (in seconds) into the wiki page.&quot;&quot;&quot;</span>
+
+    <span class="n">revision</span> <span class="o">=</span> <span class="s2">&quot;$Rev$&quot;</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;$URL$&quot;</span>
+
+    <span class="k">def</span> <span class="nf">expand_macro</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">formatter</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">utc</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">tag</span><span class="o">.</span><span class="n">b</span><span class="p">(</span><span class="n">format_datetime</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%c</span><span class="s1">&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div></div>
+<div class="section" id="macro-with-arguments">
+<h3>Macro with arguments<a class="headerlink" href="#macro-with-arguments" title="Permalink to this headline">¶</a></h3>
+<p>To test the following code, you should saved it in a
+<code class="docutils literal"><span class="pre">helloworld_sample.py</span></code> file located in the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracEnvironment.html">TracEnvironment</a>&#8216;s
+<code class="docutils literal"><span class="pre">plugins/</span></code> directory.</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">genshi.core</span> <span class="k">import</span> <span class="n">Markup</span>
+
+<span class="kn">from</span> <span class="nn">trac.wiki.macros</span> <span class="k">import</span> <span class="n">WikiMacroBase</span>
+
+<span class="k">class</span> <span class="nc">HelloWorldMacro</span><span class="p">(</span><span class="n">WikiMacroBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Simple HelloWorld macro.</span>
+
+<span class="sd">    Note that the name of the class is meaningful:</span>
+<span class="sd">     - it must end with &quot;Macro&quot;</span>
+<span class="sd">     - what comes before &quot;Macro&quot; ends up being the macro name</span>
+
+<span class="sd">    The documentation of the class (i.e. what you&#39;re reading)</span>
+<span class="sd">    will become the documentation of the macro, as shown by</span>
+<span class="sd">    the !MacroList macro (usually used in the WikiMacros page).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">revision</span> <span class="o">=</span> <span class="s2">&quot;$Rev$&quot;</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;$URL$&quot;</span>
+
+    <span class="k">def</span> <span class="nf">expand_macro</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">formatter</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return some output that will be displayed in the Wiki content.</span>
+
+<span class="sd">        `name` is the actual name of the macro (no surprise, here it&#39;ll be</span>
+<span class="sd">        `&#39;HelloWorld&#39;`),</span>
+<span class="sd">        `text` is the text enclosed in parenthesis at the call of the macro.</span>
+<span class="sd">          Note that if there are &#39;&#39;no&#39;&#39; parenthesis (like in, e.g.</span>
+<span class="sd">          [[HelloWorld]]), then `text` is `None`.</span>
+<span class="sd">        `args` are the arguments passed when HelloWorld is called using a</span>
+<span class="sd">        `#!HelloWorld` code block.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;Hello World, text = </span><span class="si">%s</span><span class="s1">, args = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> \
+            <span class="p">(</span><span class="n">Markup</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">text</span><span class="p">),</span> <span class="n">Markup</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">args</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div><p>Note that <code class="docutils literal"><span class="pre">expand_macro</span></code> optionally takes a 4<sup>th</sup> parameter
+<em>``args``</em>. When the macro is called as a
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiProcessors.html">WikiProcessor</a>,
+it&#8217;s also possible to pass <code class="docutils literal"><span class="pre">key=value</span></code> <a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiProcessors.html#UsingProcessors">processor
+parameters</a>.
+If given, those are stored in a dictionary and passed in this extra
+<code class="docutils literal"><span class="pre">args</span></code> parameter. On the contrary, when called as a macro, <code class="docutils literal"><span class="pre">args</span></code> is
+<code class="docutils literal"><span class="pre">None</span></code>. (<em>since 0.12</em>).</p>
+<p>For example, when writing:</p>
+<p>One should get:</p>
+<p>Note that the return value of <code class="docutils literal"><span class="pre">expand_macro</span></code> is <strong>not</strong> HTML escaped.
+Depending on the expected result, you should escape it by yourself
+(using <code class="docutils literal"><span class="pre">return</span> <span class="pre">Markup.escape(result)</span></code>) or, if this is indeed HTML,
+wrap it in a Markup object (<code class="docutils literal"><span class="pre">return</span> <span class="pre">Markup(result)</span></code>) with <code class="docutils literal"><span class="pre">Markup</span></code>
+coming from Genshi, (<code class="docutils literal"><span class="pre">from</span> <span class="pre">genshi.core</span> <span class="pre">import</span> <span class="pre">Markup</span></code>).</p>
+<p>You can also recursively use a wiki Formatter
+(<code class="docutils literal"><span class="pre">from</span> <span class="pre">trac.wiki</span> <span class="pre">import</span> <span class="pre">Formatter</span></code>) to process the <code class="docutils literal"><span class="pre">text</span></code> as wiki
+markup, for example by doing:</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">genshi.core</span> <span class="k">import</span> <span class="n">Markup</span>
+<span class="kn">from</span> <span class="nn">trac.wiki.macros</span> <span class="k">import</span> <span class="n">WikiMacroBase</span>
+<span class="kn">from</span> <span class="nn">trac.wiki</span> <span class="k">import</span> <span class="n">Formatter</span>
+<span class="kn">import</span> <span class="nn">StringIO</span>
+
+<span class="k">class</span> <span class="nc">HelloWorldMacro</span><span class="p">(</span><span class="n">WikiMacroBase</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">expand_macro</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">formatter</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;whatever &#39;&#39;&#39;wiki&#39;&#39;&#39; markup you want, even containing other macros&quot;</span>
+                <span class="c1"># Convert Wiki markup to HTML, new style</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">StringIO</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+                <span class="n">Formatter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">,</span> <span class="n">formatter</span><span class="o">.</span><span class="n">context</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">Markup</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">getvalue</span><span class="p">())</span>
+</pre></div>
+</div>
+</div></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Trac Macros</a><ul>
+<li><a class="reference internal" href="#using-macros">Using Macros</a><ul>
+<li><a class="reference internal" href="#getting-detailed-help">Getting Detailed Help</a></li>
+<li><a class="reference internal" href="#example">Example</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#available-macros">Available Macros</a></li>
+<li><a class="reference internal" href="#macros-from-around-the-world">Macros from around the world</a></li>
+<li><a class="reference internal" href="#developing-custom-macros">Developing Custom Macros</a><ul>
+<li><a class="reference internal" href="#macro-without-arguments">Macro without arguments</a></li>
+<li><a class="reference internal" href="#macro-with-arguments">Macro with arguments</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/WikiMacros.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/WikiMacros.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Installing Trac as CGI &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="installing-trac-as-cgi">
+<h1>Installing Trac as CGI<a class="headerlink" href="#installing-trac-as-cgi" title="Permalink to this headline">¶</a></h1>
+<div class="important">
+
+ *Please note that using Trac via CGI is the slowest deployment
+ method available. It is slower than
+ `mod\_python <https://docs.pagure.org/sssd-test2/TracModPython.html>`__,
+ `FastCGI <https://docs.pagure.org/sssd-test2/TracFastCgi.html>`__
+ and even
+ `​IIS/AJP <http://trac.edgewall.org/intertrac/TracOnWindowsIisAjp>`__
+ on Windows.*</div><p>CGI script is the entrypoint that web-server calls when a web-request to
+an application is made. To generate the <code class="docutils literal"><span class="pre">trac.cgi</span></code> script run:</p>
+<p><code class="docutils literal"><span class="pre">trac.cgi</span></code> will be in the <code class="docutils literal"><span class="pre">cgi-bin</span></code> folder inside the given path.
+<em>Make sure it is executable by your web server</em>. This command also
+copies <code class="docutils literal"><span class="pre">static</span> <span class="pre">resource</span></code> files to a <code class="docutils literal"><span class="pre">htdocs</span></code> directory of a given
+destination.</p>
+<div class="section" id="apache-web-server-configuration">
+<h2>Apache web-server configuration<a class="headerlink" href="#apache-web-server-configuration" title="Permalink to this headline">¶</a></h2>
+<p>In <a class="reference external" href="http://httpd.apache.org/">​Apache</a> there are two ways to run Trac
+as CGI:</p>
+<ol class="arabic simple">
+<li>Use a <code class="docutils literal"><span class="pre">ScriptAlias</span></code> directive that maps an URL to the <code class="docutils literal"><span class="pre">trac.cgi</span></code>
+script (recommended)</li>
+<li>Copy the <code class="docutils literal"><span class="pre">trac.cgi</span></code> file into the directory for CGI executables
+used by your web server (commonly named <code class="docutils literal"><span class="pre">cgi-bin</span></code>). You can also
+create a symbolic link, but in that case make sure that the
+<code class="docutils literal"><span class="pre">FollowSymLinks</span></code> option is enabled for the <code class="docutils literal"><span class="pre">cgi-bin</span></code> directory.</li>
+</ol>
+<p>To make Trac available at <code class="docutils literal"><span class="pre">http://yourhost.example.org/trac</span></code> add
+<code class="docutils literal"><span class="pre">ScriptAlias</span></code> directive to Apache configuration file, changing
+<code class="docutils literal"><span class="pre">trac.cgi</span></code> path to match your installation:</p>
+<p>If you&#8217;re using Trac with a single project you need to set its location
+using the <code class="docutils literal"><span class="pre">TRAC_ENV</span></code> environment variable:</p>
+<p>Or to use multiple projects you can specify their common parent
+directory using the <code class="docutils literal"><span class="pre">TRAC_ENV_PARENT_DIR</span></code> variable:</p>
+<p>If you are using the <a class="reference external" href="http://httpd.apache.org/docs/suexec.html">​Apache
+suEXEC</a> feature please see
+<a class="reference external" href="http://trac.edgewall.org/wiki/ApacheSuexec">​http://trac.edgewall.org/wiki/ApacheSuexec</a>.</p>
+<p>On some systems, you <em>may</em> need to edit the shebang line in the
+<code class="docutils literal"><span class="pre">trac.cgi</span></code> file to point to your real Python installation path. On a
+Windows system you may need to configure Windows to know how to execute
+a .cgi file (Explorer -&gt; Tools -&gt; Folder Options -&gt; File Types -&gt; CGI).</p>
+<div class="section" id="using-wsgi">
+<h3>Using WSGI<a class="headerlink" href="#using-wsgi" title="Permalink to this headline">¶</a></h3>
+<p>You can run a <a class="reference external" href="http://henry.precheur.org/python/how_to_serve_cgi">​WSGI
+handler</a> <a class="reference external" href="http://pythonweb.org/projects/webmodules/doc/0.5.3/html_multipage/lib/example-webserver-web-wsgi-simple-cgi.html">​under
+CGI</a>.
+You can <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracModWSGI.html#Thetrac.wsgiscript">write your own application
+function</a>,
+or use the deployed trac.wsgi&#8217;s application.</p>
+</div>
+</div>
+<div class="section" id="mapping-static-resources">
+<h2>Mapping Static Resources<a class="headerlink" href="#mapping-static-resources" title="Permalink to this headline">¶</a></h2>
+<p>See
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracInstall.html#MappingStaticResources">TracInstall#MappingStaticResources</a>.</p>
+</div>
+<div class="section" id="adding-authentication">
+<h2>Adding Authentication<a class="headerlink" href="#adding-authentication" title="Permalink to this headline">¶</a></h2>
+<p>See
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracInstall.html#ConfiguringAuthentication">TracInstall#ConfiguringAuthentication</a>.</p>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracGuide.html">TracGuide</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracInstall.html">TracInstall</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracModWSGI.html">TracModWSGI</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracFastCgi.html">TracFastCgi</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracModPython.html">TracModPython</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installing Trac as CGI</a><ul>
+<li><a class="reference internal" href="#apache-web-server-configuration">Apache web-server configuration</a><ul>
+<li><a class="reference internal" href="#using-wsgi">Using WSGI</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#mapping-static-resources">Mapping Static Resources</a></li>
+<li><a class="reference internal" href="#adding-authentication">Adding Authentication</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracCgi.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracCgi.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

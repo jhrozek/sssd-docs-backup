@@ -1,0 +1,254 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>This release focuses primarily on bug fixes, especially for use cases
+where SSSD is acting as an Active Directory client</li>
+<li>The simple access provider supports specifying users and groups using
+their NetBIOS domain name (such as <code class="docutils literal"><span class="pre">DOMAIN\username</span></code>)</li>
+<li>Support for enumerating users and groups from trusted AD domains was
+added to the AD provider</li>
+<li>The Active Directory site discovery was made more robust for
+configurations which use multiple trusted domains</li>
+<li>Several bugs in the LDAP provider that affected setups which mapped
+Windows SIDs to POSIX IDs were fixed</li>
+<li>The SSSD is now able to use One Time Password (OTP) authentication
+configured on an IPA server. Please note that this functionality is
+not present in the released FreeIPA versions yet</li>
+</ul>
+</div>
+<div class="section" id="documentation-changes">
+<h1>Documentation Changes<a class="headerlink" href="#documentation-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>The <code class="docutils literal"><span class="pre">krb5_use_fast</span></code> option changes its default from <code class="docutils literal"><span class="pre">never</span></code> to
+<code class="docutils literal"><span class="pre">try</span></code> in the IPA provider. The config option value did not change
+in the other providers.</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/2142">#2142</a></dt>
+<dd>AD Enumeration reads data from LDAP while regular lookups connect to
+GC</dd>
+<dt><a class="reference external" href="/sssd/ticket/2152">#2152</a></dt>
+<dd>Implement heuristics to detect if POSIX attributes have been
+replicated to the Global Catalog or not</dd>
+<dt><a class="reference external" href="/sssd/ticket/2160">#2160</a></dt>
+<dd>sssd_be crashes when ad_access_filter uses FOREST keyword.</dd>
+<dt><a class="reference external" href="/sssd/ticket/2164">#2164</a></dt>
+<dd>&#8220;System Error&#8221; when invalid ad_access_filter is used</dd>
+<dt><a class="reference external" href="/sssd/ticket/2169">#2169</a></dt>
+<dd>RHEL7 sssd not setting IPA AD trusted user homedir</dd>
+<dt><a class="reference external" href="/sssd/ticket/2172">#2172</a></dt>
+<dd>Enabling ldap_id_mapping doesn&#8217;t exclude uidNumber in filter</dd>
+<dt><a class="reference external" href="/sssd/ticket/2186">#2186</a></dt>
+<dd>FAST does not work in SSSD 1.11.2 in Fedora 20</dd>
+<dt><a class="reference external" href="/sssd/ticket/2189">#2189</a></dt>
+<dd>Access denied for users from gc domain when using format
+DOMAIN\user</dd>
+<dt><a class="reference external" href="/sssd/ticket/2190">#2190</a></dt>
+<dd>Group membership lookup issue</dd>
+<dt><a class="reference external" href="/sssd/ticket/2191">#2191</a></dt>
+<dd>Group lookup does not return member with multiple names after user
+lookup</dd>
+<dt><a class="reference external" href="/sssd/ticket/2196">#2196</a></dt>
+<dd>sssd ad trusted sub domain do not inherit fallbacks and overrides
+settings</dd>
+<dt><a class="reference external" href="/sssd/ticket/2199">#2199</a></dt>
+<dd>sssd_be crashes when ldap_search_base cannot be parsed.</dd>
+<dt><a class="reference external" href="/sssd/ticket/2200">#2200</a></dt>
+<dd>sssd_be aborts a request if it doesn&#8217;t match any configured idmap
+domain</dd>
+<dt><a class="reference external" href="/sssd/ticket/2202">#2202</a></dt>
+<dd>sssd_be should hint about increasing the krb5_auth_timeout if
+krb5 auth times out</dd>
+<dt><a class="reference external" href="/sssd/ticket/2208">#2208</a></dt>
+<dd>Warn with a user-friendly error message when permissions on
+sssd.conf are incorrect</dd>
+<dt><a class="reference external" href="/sssd/ticket/2213">#2213</a></dt>
+<dd>sudo rules time filter is nondeterministic</dd>
+<dt><a class="reference external" href="/sssd/ticket/2215">#2215</a></dt>
+<dd>Man page states default_shell option supersedes other shell options
+but in fact override_shell does.</dd>
+<dt><a class="reference external" href="/sssd/ticket/2237">#2237</a></dt>
+<dd>SSSD needs to enable FAST by default</dd>
+</dl>
+</div></div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Alexander Bokovoy (1):</p>
+<ul class="simple">
+<li>FAST: when parsing krb5_child response, make sure to not miss OTP
+message if it was last one</li>
+</ul>
+<p>Benjamin Franzke (1):</p>
+<ul class="simple">
+<li>dlopen-tests: Check the result of asprintf</li>
+</ul>
+<p>Jakub Hrozek (27):</p>
+<ul class="simple">
+<li>Updating the version for the 1.11.4 release</li>
+<li>LDAP: Fix typo and use the right attribute map</li>
+<li>LDAP: Add a new error code for malformed access control filter</li>
+<li>tests: Remove tests that check creating public directories</li>
+<li>UTIL: Inherit parent domain&#8217;s default_shell</li>
+<li>NSS: Use plain user name when expanding homedir</li>
+<li>AD: Don&#8217;t fail the request if ad_account_can_shortcut fails</li>
+<li>MAN: Fix a typo</li>
+<li>LDAP: Fix error check</li>
+<li>LDAP: Don&#8217;t abort request if no id mapping domain matches</li>
+<li>AD: Don&#8217;t mark domain as enumerated twice</li>
+<li>AD: Store info on whether a subdomain is set to enumerate</li>
+<li>LDAP: Pass a private context to enumeration ptask instead of
+hardcoded connection</li>
+<li>LDAP: Add enum request with custom connection</li>
+<li>AD: Enumerate users from GC, other entities from LDAP</li>
+<li>LDAP: Don&#8217;t clobber original_member during enumeration</li>
+<li>DB: Add sss_ldb_el_to_string_list</li>
+<li>AD: Establish cross-domain memberships after enumeration finishes</li>
+<li>MAN: clarify which shell option takes precedence</li>
+<li>LDAP: Detect the presence of POSIX attributes</li>
+<li>AD: Only download domains that are set to enumerate</li>
+<li>AD: Remove dead code</li>
+<li>LDAP: Handle errors from sdap_id_op properly in enum code</li>
+<li>SSS_CACHE: Reset the initgroups attribute when resetting users</li>
+<li>IPA: Default to krb5_use_fast=try</li>
+<li>MAN: Clarify the new krb5_use_fast IPA default</li>
+<li>Updating translations for the 1.11.4 release</li>
+</ul>
+<p>Lukas Slebodnik (7):</p>
+<ul class="simple">
+<li>AD: Return right error code from netlogon_get_flat_name</li>
+<li>LDAP: Don&#8217;t fail if subdomain cannot be found by sid</li>
+<li>LDAP: update id mapping detection for ldap provider</li>
+<li>sdap_idamp: Fall back to another method if sid is wrong</li>
+<li>krb5: fix warning may be used uninitialized</li>
+<li>LDAP: store group if subdomain cannot be found by sid</li>
+<li>LDAP: require attribute groupType for AD groups</li>
+</ul>
+<p>Pavel Březina (2):</p>
+<ul class="simple">
+<li>sudo: memset tm when converting time attributes</li>
+<li>IPA: default krb5_fast_principal to <a class="reference external" href="mailto:host/$client&#37;&#52;&#48;$realm">host/$client<span>&#64;</span>$realm</a></li>
+</ul>
+<p>Pavel Reichl (10):</p>
+<ul class="simple">
+<li>responder: Set forest attribute in AD domains</li>
+<li>simple access: match objects using flat name</li>
+<li>simple access: refresh master domain info</li>
+<li>NSS: add support for subdomain_homedir</li>
+<li>krb5: hint to increase krb5_auth_timeout</li>
+<li>MONITOR: Incorrect permissions on sssd.conf</li>
+<li>Revert &#8220;NSS: add support for subdomain_homedir&#8221;</li>
+<li>AD: support for subdomain_homedir</li>
+<li>MAN: update of subdomain_homedir usage</li>
+<li>utils: handling NULL params in sss_parse_name</li>
+</ul>
+<p>Sumit Bose (2):</p>
+<ul class="simple">
+<li>IPA: fix for recent AD group membership changes</li>
+<li>AD SRV: use right domain name for CLDAP ping</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#documentation-changes">Documentation Changes</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.11.4.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.11.4.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,458 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>class SSSDDomain &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><a class="reference external" href="#classSSSDDomain">class SSSDDomain</a><ol class="arabic">
+<li><code class="docutils literal"><span class="pre">`__init__(name,</span> <span class="pre">apischema)</span></code> &lt;#__init__nameapischema&gt;`__<ol class="arabic">
+<li><a class="reference external" href="#Returns">Returns</a></li>
+<li><a class="reference external" href="#Errors">Errors</a></li>
+</ol>
+</li>
+<li><code class="docutils literal"><span class="pre">`set_name(name)</span></code> &lt;#set_namename&gt;`__<ol class="arabic">
+<li><a class="reference external" href="#Returns1">Returns</a></li>
+<li><a class="reference external" href="#Errors1">Errors</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#set_activeactive">set_active(active)</a><ol class="arabic">
+<li><a class="reference external" href="#Returns2">Returns</a></li>
+<li><a class="reference external" href="#Errors2">Errors</a></li>
+</ol>
+</li>
+<li><code class="docutils literal"><span class="pre">`list_options()</span></code> &lt;#list_options&gt;`__<ol class="arabic">
+<li><a class="reference external" href="#Returns3">Returns</a></li>
+<li><a class="reference external" href="#Errors3">Errors</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#list_provider_optionstypesubtype">list_provider_options(type[,
+subtype])</a><ol class="arabic">
+<li><a class="reference external" href="#Returns4">Returns</a></li>
+<li><a class="reference external" href="#Errors4">Errors</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#list_providers">list_providers()</a><ol class="arabic">
+<li><a class="reference external" href="#Returns5">Returns</a></li>
+<li><a class="reference external" href="#Errors5">Errors</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#add_providertypesubtype">add_provider(type, subtype)</a><ol class="arabic">
+<li><a class="reference external" href="#Returns6">Returns</a></li>
+<li><a class="reference external" href="#Errors6">Errors</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#remove_providertypesubtype">remove_provider(type, subtype)</a><ol class="arabic">
+<li><a class="reference external" href="#Returns7">Returns</a></li>
+<li><a class="reference external" href="#Errors7">Errors</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#set_optionoptionnamevalue">set_option(optionname, value)</a><ol class="arabic">
+<li><a class="reference external" href="#Returns8">Returns</a></li>
+<li><a class="reference external" href="#Errors8">Errors</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#get_optionoptionname">get_option(optionname)</a><ol class="arabic">
+<li><a class="reference external" href="#Returns9">Returns</a></li>
+<li><a class="reference external" href="#Errors9">Errors</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#remove_option">remove_option</a><ol class="arabic">
+<li><a class="reference external" href="#Returns10">Returns</a></li>
+<li><a class="reference external" href="#Errors10">Errors</a></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="class-sssddomain">
+<h1>class SSSDDomain<a class="headerlink" href="#class-sssddomain" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="init-name-apischema">
+<h2><code class="docutils literal"><span class="pre">__init__(name,</span> <span class="pre">apischema)</span></code><a class="headerlink" href="#init-name-apischema" title="Permalink to this headline">¶</a></h2>
+<p><em>Creates a new, empty
+`SSSDDomain &lt;https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDDomain.html#classSSSDDomain&gt;`__.
+This domain is inactive by default. This constructor should not be used
+directly. Use
+`SSSDConfig.new_domain() &lt;https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#new_domainname&gt;`__
+instead.</em></p>
+<dl class="docutils">
+<dt><strong>name</strong></dt>
+<dd>The domain name.</dd>
+<dt><strong>apischema</strong></dt>
+<dd>An
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfigSchema.html">SSSDConfigSchema?</a>
+object created by
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#__init__schemafileschemaplugindir">SSSDConfig.__init__()</a></dd>
+</dl>
+<div class="section" id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Permalink to this headline">¶</a></h3>
+<p>The newly-created
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDDomain.html#classSSSDDomain">SSSDDomain</a>
+object.</p>
+</div>
+<div class="section" id="errors">
+<h3>Errors<a class="headerlink" href="#errors" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">No errors</div>
+</div>
+</div>
+</div>
+<div class="section" id="set-name-name">
+<h2><code class="docutils literal"><span class="pre">set_name(name)</span></code><a class="headerlink" href="#set-name-name" title="Permalink to this headline">¶</a></h2>
+<p><em>Change the name of the domain. This will update the active domain list
+as appropriate when saved to an SSSDConfig</em></p>
+<dl class="docutils">
+<dt><strong>name</strong></dt>
+<dd>The new name for the domain.</dd>
+</dl>
+<div class="section" id="id1">
+<h3>Returns<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>No return value.</p>
+</div>
+<div class="section" id="id2">
+<h3>Errors<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">No errors</div>
+</div>
+</div>
+</div>
+<div class="section" id="set-active-active">
+<h2>set_active(active)<a class="headerlink" href="#set-active-active" title="Permalink to this headline">¶</a></h2>
+<p><em>Enable or disable this domain</em></p>
+<dl class="docutils">
+<dt><strong>active</strong></dt>
+<dd>Boolean value. If True, this domain will be added to the active
+domains list when it is saved. If False, it will be removed from the
+active domains list when it is saved.</dd>
+</dl>
+<div class="section" id="id3">
+<h3>Returns<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>No return value</p>
+</div>
+<div class="section" id="id4">
+<h3>Errors<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">No errors</div>
+</div>
+</div>
+</div>
+<div class="section" id="list-options">
+<h2><code class="docutils literal"><span class="pre">list_options()</span></code><a class="headerlink" href="#list-options" title="Permalink to this headline">¶</a></h2>
+<p><em>List options available for the currently-configured providers.</em></p>
+<div class="section" id="id5">
+<h3>Returns<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>A dictionary of configurable options. This dictionary is keyed on the
+option name with a tuple of the variable type and subtype (if the type
+is a collection type) as the value.</p>
+</div>
+<div class="section" id="id6">
+<h3>Errors<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">No errors</div>
+</div>
+</div>
+</div>
+<div class="section" id="list-provider-options-type-subtype">
+<h2>list_provider_options(type[, subtype])<a class="headerlink" href="#list-provider-options-type-subtype" title="Permalink to this headline">¶</a></h2>
+<p><em>If target is specified, list all options applicable to that target,
+otherwise list all possible options available for a provider.</em></p>
+<dl class="docutils">
+<dt><strong>type</strong></dt>
+<dd>Provider backend type. (e.g. <code class="docutils literal"><span class="pre">local</span></code>, <code class="docutils literal"><span class="pre">ldap</span></code>, <code class="docutils literal"><span class="pre">krb5</span></code>, etc.)</dd>
+<dt><strong>subtype</strong></dt>
+<dd>Subtype of the backend type. (e.g. <code class="docutils literal"><span class="pre">id</span></code>, <code class="docutils literal"><span class="pre">auth</span></code>, <code class="docutils literal"><span class="pre">chpass</span></code>)</dd>
+</dl>
+<div class="section" id="id7">
+<h3>Returns<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<p>A dictionary of configurable options for the specified provider type.
+This dictionary is keyed on the option name with a tuple of the variable
+type and subtype (if the type is a collection type) as the value.</p>
+</div>
+<div class="section" id="id8">
+<h3>Errors<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>NoSuchProviderError</strong></dt>
+<dd>The specified provider is not listed in the schema or plugins</dd>
+<dt><strong>NoSuchProviderSubtypeError</strong></dt>
+<dd>The specified provider subtype is not listed in the schema</dd>
+</dl>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="list-providers">
+<h2>list_providers()<a class="headerlink" href="#list-providers" title="Permalink to this headline">¶</a></h2>
+<p><em>Return a dictionary of providers.</em></p>
+<div class="section" id="id9">
+<h3>Returns<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<p>Returns a dictionary of providers, keyed on the primary type, with the
+value being a tuple of the subtypes it supports.</p>
+</div>
+<div class="section" id="id10">
+<h3>Errors<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">No Errors</div>
+</div>
+</div>
+</div>
+<div class="section" id="add-provider-type-subtype">
+<h2>add_provider(type, subtype)<a class="headerlink" href="#add-provider-type-subtype" title="Permalink to this headline">¶</a></h2>
+<p><em>Add a new provider type to the domain</em></p>
+<dl class="docutils">
+<dt><strong>type</strong></dt>
+<dd>Provider backend type. (e.g. <code class="docutils literal"><span class="pre">local</span></code>, <code class="docutils literal"><span class="pre">ldap</span></code>, <code class="docutils literal"><span class="pre">krb5</span></code>, etc.)</dd>
+<dt><strong>subtype</strong></dt>
+<dd>Subtype of the backend type. (e.g. <code class="docutils literal"><span class="pre">id</span></code>, <code class="docutils literal"><span class="pre">auth</span></code>, <code class="docutils literal"><span class="pre">chpass</span></code>)</dd>
+</dl>
+<div class="section" id="id11">
+<h3>Returns<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<p>No return value.</p>
+</div>
+<div class="section" id="id12">
+<h3>Errors<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>ProviderSubtypeInUse</strong></dt>
+<dd>Another backend is already providing this subtype</dd>
+<dt><strong>NoSuchProviderError</strong></dt>
+<dd>The specified provider is not listed in the schema or plugins</dd>
+<dt><strong>NoSuchProviderSubtypeError</strong></dt>
+<dd>The specified provider subtype is not listed in the schema</dd>
+</dl>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="remove-provider-type-subtype">
+<h2>remove_provider(type, subtype)<a class="headerlink" href="#remove-provider-type-subtype" title="Permalink to this headline">¶</a></h2>
+<p><em>Remove a provider from the domain. This will also remove any options
+specific to this ``subtype``, or all of ``type`` if no more providers of
+``type`` are present. If this provider type and subtype are not present,
+no changes occur.</em></p>
+<dl class="docutils">
+<dt><strong>type</strong></dt>
+<dd>Provider backend type. (e.g. <code class="docutils literal"><span class="pre">local</span></code>, <code class="docutils literal"><span class="pre">ldap</span></code>, <code class="docutils literal"><span class="pre">krb5</span></code>, etc.)</dd>
+<dt><strong>subtype</strong></dt>
+<dd>Subtype of the backend type. (e.g. <code class="docutils literal"><span class="pre">id</span></code>, <code class="docutils literal"><span class="pre">auth</span></code>, <code class="docutils literal"><span class="pre">chpass</span></code>)</dd>
+</dl>
+<div class="section" id="id13">
+<h3>Returns<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<p>No return value.</p>
+</div>
+<div class="section" id="id14">
+<h3>Errors<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">No Errors</div>
+</div>
+</div>
+</div>
+<div class="section" id="set-option-optionname-value">
+<h2>set_option(optionname, value)<a class="headerlink" href="#set-option-optionname-value" title="Permalink to this headline">¶</a></h2>
+<p><em>Set a domain option to the specified value (or values)</em></p>
+<dl class="docutils">
+<dt><strong>optionname</strong></dt>
+<dd>The option to change.</dd>
+<dt><strong>value</strong></dt>
+<dd>The value to set. This may be a single value or a list of values. If
+it is set to None, it resets the option to its default.</dd>
+</dl>
+<div class="section" id="id15">
+<h3>Returns<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<p>No return value.</p>
+</div>
+<div class="section" id="id16">
+<h3>Errors<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>NoOptionError</strong></dt>
+<dd>The specified option is not listed in the schema</dd>
+<dt><strong>TypeError</strong></dt>
+<dd>The value specified was not of the expected type</dd>
+</dl>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="get-option-optionname">
+<h2>get_option(optionname)<a class="headerlink" href="#get-option-optionname" title="Permalink to this headline">¶</a></h2>
+<p><em>Return the value of a domain option</em></p>
+<div class="section" id="id17">
+<h3>Returns<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
+<p>A list of values for the specified service option.</p>
+</div>
+<div class="section" id="id18">
+<h3>Errors<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>NoOptionError</strong></dt>
+<dd>The specified option was not listed in the service</dd>
+</dl>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="remove-option">
+<h2>remove_option<a class="headerlink" href="#remove-option" title="Permalink to this headline">¶</a></h2>
+<p><em>Remove an option from the domain. If the option does not exist, it is
+ignored.</em></p>
+<div class="section" id="id19">
+<h3>Returns<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
+<p>No return value</p>
+</div>
+<div class="section" id="id20">
+<h3>Errors<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h3>
+<p>No errors</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">class SSSDDomain</a><ul>
+<li><a class="reference internal" href="#init-name-apischema"><code class="docutils literal"><span class="pre">__init__(name,</span> <span class="pre">apischema)</span></code></a><ul>
+<li><a class="reference internal" href="#returns">Returns</a></li>
+<li><a class="reference internal" href="#errors">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#set-name-name"><code class="docutils literal"><span class="pre">set_name(name)</span></code></a><ul>
+<li><a class="reference internal" href="#id1">Returns</a></li>
+<li><a class="reference internal" href="#id2">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#set-active-active">set_active(active)</a><ul>
+<li><a class="reference internal" href="#id3">Returns</a></li>
+<li><a class="reference internal" href="#id4">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#list-options"><code class="docutils literal"><span class="pre">list_options()</span></code></a><ul>
+<li><a class="reference internal" href="#id5">Returns</a></li>
+<li><a class="reference internal" href="#id6">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#list-provider-options-type-subtype">list_provider_options(type[, subtype])</a><ul>
+<li><a class="reference internal" href="#id7">Returns</a></li>
+<li><a class="reference internal" href="#id8">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#list-providers">list_providers()</a><ul>
+<li><a class="reference internal" href="#id9">Returns</a></li>
+<li><a class="reference internal" href="#id10">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#add-provider-type-subtype">add_provider(type, subtype)</a><ul>
+<li><a class="reference internal" href="#id11">Returns</a></li>
+<li><a class="reference internal" href="#id12">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#remove-provider-type-subtype">remove_provider(type, subtype)</a><ul>
+<li><a class="reference internal" href="#id13">Returns</a></li>
+<li><a class="reference internal" href="#id14">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#set-option-optionname-value">set_option(optionname, value)</a><ul>
+<li><a class="reference internal" href="#id15">Returns</a></li>
+<li><a class="reference internal" href="#id16">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#get-option-optionname">get_option(optionname)</a><ul>
+<li><a class="reference internal" href="#id17">Returns</a></li>
+<li><a class="reference internal" href="#id18">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#remove-option">remove_option</a><ul>
+<li><a class="reference internal" href="#id19">Returns</a></li>
+<li><a class="reference internal" href="#id20">Errors</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/SSSDPythonConfigApi/SSSDDomain.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/SSSDPythonConfigApi/SSSDDomain.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>The Trac Roadmap &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="the-trac-roadmap">
+<h1>The Trac Roadmap<a class="headerlink" href="#the-trac-roadmap" title="Permalink to this headline">¶</a></h1>
+<div class="system-message"><p><strong>Error: Macro TracGuideToc(None) failed</strong></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;NoneType&#39;</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span> <span class="s1">&#39;find&#39;</span>
+</pre></div>
+</div>
+</div><p>The roadmap provides a view on the <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTickets.html">ticket
+system</a> that
+helps planning and managing the future development of a project.</p>
+<div class="section" id="the-roadmap-view">
+<h2>The Roadmap View<a class="headerlink" href="#the-roadmap-view" title="Permalink to this headline">¶</a></h2>
+<p>Basically, the roadmap is just a list of future milestones. You can add
+a description to milestones (using
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html">WikiFormatting</a>)
+describing main objectives, for example. In addition, tickets targeted
+for a milestone are aggregated, and the ratio between active and
+resolved tickets is displayed as a milestone progress bar. It is
+possible to further <a class="reference external" href="http://trac.edgewall.org/intertrac/TracRoadmapCustomGroups">​customise the ticket
+grouping</a>
+and have multiple ticket statuses shown on the progress bar.</p>
+<p>The roadmap can be filtered to show or hide <em>completed milestones</em> and
+<em>milestones with no due date</em>. In the case that both <em>show completed
+milestones</em> and <em>hide milestones with no due date</em> are selected,
+<em>completed</em> milestones with no due date will be shown.</p>
+</div>
+<div class="section" id="the-milestone-view">
+<h2>The Milestone View<a class="headerlink" href="#the-milestone-view" title="Permalink to this headline">¶</a></h2>
+<p>You can add a description for each milestone (using
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html">WikiFormatting</a>)
+describing main objectives, for example. In addition, tickets targeted
+for a milestone are aggregated, and the ratio between active and
+resolved tickets is displayed as a milestone progress bar. It is
+possible to further <a class="reference external" href="http://trac.edgewall.org/intertrac/TracRoadmapCustomGroups">​customise the ticket
+grouping</a>
+and have multiple ticket statuses shown on the progress bar.</p>
+<p>It is possible to drill down into this simple statistic by viewing the
+individual milestone pages. By default, the active/resolved ratio will
+be grouped and displayed by component. You can also regroup the status
+by other criteria, such as ticket owner or severity. Ticket numbers are
+linked to <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracQuery.html">custom
+queries</a> listing
+corresponding tickets.</p>
+</div>
+<div class="section" id="roadmap-administration">
+<h2>Roadmap Administration<a class="headerlink" href="#roadmap-administration" title="Permalink to this headline">¶</a></h2>
+<p>With appropriate permissions it is possible to add, modify and remove
+milestones using either the web interface (roadmap and milestone pages),
+web administration interface or by using <code class="docutils literal"><span class="pre">trac-admin</span></code>.</p>
+<p><strong>Note:</strong> Milestone descriptions can not currently be edited using
+&#8216;trac-admin&#8217;.</p>
+</div>
+<div class="section" id="icalendar-support">
+<h2>iCalendar Support<a class="headerlink" href="#icalendar-support" title="Permalink to this headline">¶</a></h2>
+<p>The Roadmap supports the
+<a class="reference external" href="http://www.ietf.org/rfc/rfc2445.txt">​iCalendar</a> format to keep
+track of planned milestones and related tickets from your favorite
+calendar software. Many calendar applications support the iCalendar
+specification including</p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.apple.com/ical/">​Apple iCal</a> for Mac OS X</li>
+<li>the cross-platform <a class="reference external" href="http://www.mozilla.org/projects/calendar/">​Mozilla
+Calendar</a></li>
+<li><a class="reference external" href="http://chandlerproject.org">​Chandler</a></li>
+<li><a class="reference external" href="http://kontact.kde.org/korganizer/">​Korganizer</a> (the calendar
+application of the <a class="reference external" href="http://www.kde.org/">​KDE</a> project)</li>
+<li><a class="reference external" href="http://www.novell.com/de-de/products/desktop/features/evolution.html">​Evolution</a>
+also support iCalendar</li>
+<li><a class="reference external" href="http://office.microsoft.com/en-us/outlook/">​Microsoft Outlook</a>
+can also read iCalendar files (it appears as a new static calendar in
+Outlook)</li>
+<li><a class="reference external" href="https://www.google.com/calendar/">​Google Calendar</a></li>
+</ul>
+<p>To subscribe to the roadmap, copy the iCalendar link from the roadmap
+(found at the bottom of the page) and choose the &#8220;Subscribe to remote
+calendar&#8221; action (or similar) of your calendar application, and insert
+the URL just copied.</p>
+<p><strong>Note:</strong> For tickets to be included in the calendar as tasks, you need
+to be logged in when copying the link. You will only see tickets
+assigned to yourself, and associated with a milestone.</p>
+<p><strong>Note:</strong> To include the milestones in Google Calendar you might need to
+rewrite the URL.</p>
+<p>More information about iCalendar can be found at
+<a class="reference external" href="http://en.wikipedia.org/wiki/ICalendar">​Wikipedia</a>.</p>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTickets.html">TracTickets</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracReports.html">TracReports</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracQuery.html">TracQuery</a>,
+<a class="reference external" href="http://trac.edgewall.org/intertrac/TracRoadmapCustomGroups">​TracRoadmapCustomGroups</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">The Trac Roadmap</a><ul>
+<li><a class="reference internal" href="#the-roadmap-view">The Roadmap View</a></li>
+<li><a class="reference internal" href="#the-milestone-view">The Milestone View</a></li>
+<li><a class="reference internal" href="#roadmap-administration">Roadmap Administration</a></li>
+<li><a class="reference internal" href="#icalendar-support">iCalendar Support</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracRoadmap.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracRoadmap.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

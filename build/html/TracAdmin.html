@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>TracAdmin &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="tracadmin">
+<h1><a class="reference external" href="https://docs.pagure.org/sssd-test2/TracAdmin.html">TracAdmin</a><a class="headerlink" href="#tracadmin" title="Permalink to this headline">¶</a></h1>
+<div class="system-message"><p><strong>Error: Macro TracGuideToc(None) failed</strong></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;NoneType&#39;</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span> <span class="s1">&#39;find&#39;</span>
+</pre></div>
+</div>
+</div><p>Trac is distributed with a powerful command-line configuration tool.
+This tool can be used to configure and customize your Trac-installation
+to better fit your needs.</p>
+<p>Some of those operations can also be performed via the <em>Admin</em> web
+interface, an updated version of the
+<a class="reference external" href="http://trac.edgewall.org/intertrac/WebAdmin">​WebAdmin</a> plugin now
+integrated within Trac (since version 0.11).</p>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>For nearly every <code class="docutils literal"><span class="pre">trac-admin</span></code> command, you&#8217;ll need to specify the path
+to the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracEnvironment.html">TracEnvironment</a>
+that you want to administer as the first argument, for example:</p>
+<p>The only exception is for the <code class="docutils literal"><span class="pre">help</span></code> command, but even in this case if
+you omit the environment, you&#8217;ll only get a very succinct list of
+commands (<code class="docutils literal"><span class="pre">help</span></code> and <code class="docutils literal"><span class="pre">initenv</span></code>), the same list you&#8217;d get when
+invoking <code class="docutils literal"><span class="pre">trac-admin</span></code> alone. Also, <code class="docutils literal"><span class="pre">trac-admin</span> <span class="pre">--version</span></code> will tell
+you about the Trac version (e.g. 0.12) corresponding to the program.</p>
+<p>If you want to get a comprehensive list of the available commands and
+sub-commands, you need to specify an existing environment:</p>
+<p>Some commands have a more detailed help, which you can access by
+specifying the command&#8217;s name as a subcommand for <code class="docutils literal"><span class="pre">help</span></code>:</p>
+<div class="section" id="trac-admin-targetdir-initenv">
+<h3><code class="docutils literal"><span class="pre">trac-admin</span> <span class="pre">&lt;targetdir&gt;</span> <span class="pre">initenv</span></code><a class="headerlink" href="#trac-admin-targetdir-initenv" title="Permalink to this headline">¶</a></h3>
+<p>This subcommand is very important as it&#8217;s the one used to create a
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracEnvironment.html">TracEnvironment</a>
+in the specified <code class="docutils literal"><span class="pre">&lt;targetdir&gt;</span></code>. That directory must not exist prior to
+the call.</p>
+<p>It supports an extra <code class="docutils literal"><span class="pre">--inherit</span></code> option, which can be used to specify
+a global configuration file which can be used share settings between
+several environments. You can also inherit from a shared configuration
+afterwards, by setting the <code class="docutils literal"><span class="pre">[inherit]</span> <span class="pre">file</span></code> option in the
+<code class="docutils literal"><span class="pre">conf/trac.ini</span></code> file in your newly created environment, but the
+advantage of specifying the inherited configuration file at environment
+creation time is that only the options <em>not</em> already specified in the
+global configuration file will be written in the created environment&#8217;s
+<code class="docutils literal"><span class="pre">conf/trac.ini</span></code> file. See
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#GlobalConfiguration">TracIni#GlobalConfiguration</a>.</p>
+<p>Note that in version 0.11 of Trac, <code class="docutils literal"><span class="pre">initenv</span></code> lost an extra last
+argument <code class="docutils literal"><span class="pre">&lt;templatepath&gt;</span></code>, which was used in previous versions to
+point to the <code class="docutils literal"><span class="pre">templates</span></code> folder. If you are using the one-liner
+&#8216;<code class="docutils literal"><span class="pre">trac-admin</span> <span class="pre">/path/to/trac/</span> <span class="pre">initenv</span> <span class="pre">&lt;projectname&gt;</span> <span class="pre">&lt;db&gt;</span> <span class="pre">&lt;repostype&gt;</span> <span class="pre">&lt;repospath&gt;</span></code>&#8216;
+in the above and getting an error that reads
+<strong>&#8216;``Wrong number of arguments to initenv: 4``</strong>&#8216;, then this is because
+you&#8217;re using a <code class="docutils literal"><span class="pre">trac-admin</span></code> script from an <strong>older</strong> version of Trac.</p>
+</div>
+</div>
+<div class="section" id="interactive-mode">
+<h2>Interactive Mode<a class="headerlink" href="#interactive-mode" title="Permalink to this headline">¶</a></h2>
+<p>When passing the environment path as the only argument, <code class="docutils literal"><span class="pre">trac-admin</span></code>
+starts in interactive mode. Commands can then be executed on the
+selected environment using the prompt, which offers tab-completion (on
+non-Windows environments, and when the Python <code class="docutils literal"><span class="pre">readline</span></code> module is
+available) and automatic repetition of the last command issued.</p>
+<p>Once you&#8217;re in interactive mode, you can also get help on specific
+commands or subsets of commands:</p>
+<p>For example, to get an explanation of the <code class="docutils literal"><span class="pre">resync</span></code> command, run:</p>
+<p>To get help on all the Wiki-related commands, run:</p>
+</div>
+<div class="section" id="full-command-reference">
+<h2>Full Command Reference<a class="headerlink" href="#full-command-reference" title="Permalink to this headline">¶</a></h2>
+<p>You&#8217;ll find below the detailed help for all the commands available by
+default in <code class="docutils literal"><span class="pre">trac-admin</span></code>. Note that this may not match the list given
+by <code class="docutils literal"><span class="pre">trac-admin</span> <span class="pre">&lt;yourenv&gt;</span> <span class="pre">help</span></code>, as the commands pertaining to
+components disabled in that environment won&#8217;t be available and
+conversely some plugins activated in the environment can add their own
+commands.</p>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracGuide.html">TracGuide</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracBackup.html">TracBackup</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracPermissions.html">TracPermissions</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracEnvironment.html">TracEnvironment</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">TracIni</a>,
+<a class="reference external" href="http://trac.edgewall.org/intertrac/TracMigrate">​TracMigrate</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">TracAdmin</a><ul>
+<li><a class="reference internal" href="#usage">Usage</a><ul>
+<li><a class="reference internal" href="#trac-admin-targetdir-initenv"><code class="docutils literal"><span class="pre">trac-admin</span> <span class="pre">&lt;targetdir&gt;</span> <span class="pre">initenv</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#interactive-mode">Interactive Mode</a></li>
+<li><a class="reference internal" href="#full-command-reference">Full Command Reference</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracAdmin.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracAdmin.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

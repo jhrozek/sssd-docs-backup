@@ -1,0 +1,266 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>This release focuses primarily on bug fixes.</li>
+<li>The release addresses an issue where the SSSD was not able to detect
+all domains in the forest if it was connected to an AD DC which was
+not the forest root</li>
+<li>A new AD sudo provider was introduced. Setting <code class="docutils literal"><span class="pre">sudo_provider=ad</span></code>
+uses the same connection options as <code class="docutils literal"><span class="pre">id_provider=ad</span></code>, which
+simplifies the configuration for users who store sudo rules on an
+Active Directory server.</li>
+<li>The ID mapping ranges are checked for collisions before being used,
+making SSSD more robust in cases where the ranges would collide</li>
+<li>Password changes when using OTPs with an IPA server are now
+supported. Please note that this functionality is not present in the
+released FreeIPA versions yet.</li>
+<li>Several bugs related to setting an SELinux user context from an IPA
+server were fixed</li>
+</ul>
+</div>
+<div class="section" id="documentation-changes">
+<h1>Documentation Changes<a class="headerlink" href="#documentation-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>A new pam_sss option <code class="docutils literal"><span class="pre">ignore_unknown_user</span></code> was added. Setting this
+option makes pam_sss return <code class="docutils literal"><span class="pre">PAM_IGNORE</span></code> when processing an uknown
+user instead of <code class="docutils literal"><span class="pre">PAM_USER_UNKNOWN</span></code>. This option is mostly useful
+for BSD systems.</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/1955">#1955</a></dt>
+<dd>SSSD pam module accepts usernames with leading spaces</dd>
+<dt><a class="reference external" href="/sssd/ticket/1958">#1958</a></dt>
+<dd>[RFE] Expose the list of trusted domains to IPA</dd>
+<dt><a class="reference external" href="/sssd/ticket/2153">#2153</a></dt>
+<dd>If both IPA and LDAP are set up with enumeration on, two enum tasks
+are running</dd>
+<dt><a class="reference external" href="/sssd/ticket/2218">#2218</a></dt>
+<dd>sssd.conf man pages don&#8217;t list a configuration option.</dd>
+<dt><a class="reference external" href="/sssd/ticket/2226">#2226</a></dt>
+<dd>Make SSSD compilable on systems with non-standard paths to krb5
+includes</dd>
+<dt><a class="reference external" href="/sssd/ticket/2232">#2232</a></dt>
+<dd>[freebsd] pam_sss: add ignore_unknown_user option</dd>
+<dt><a class="reference external" href="/sssd/ticket/2235">#2235</a></dt>
+<dd>MAN: Remove misleading memberof example from ldap_access_filter
+example</dd>
+<dt><a class="reference external" href="/sssd/ticket/2251">#2251</a></dt>
+<dd>not retrieving homedirs of AD users with posix attributes</dd>
+<dt><a class="reference external" href="/sssd/ticket/2252">#2252</a></dt>
+<dd>Document that `sssd` cache needs to be cleared manually, if ID
+mapping configuration changes</dd>
+<dt><a class="reference external" href="/sssd/ticket/2253">#2253</a></dt>
+<dd>Check IPA idranges before saving them to the cache</dd>
+<dt><a class="reference external" href="/sssd/ticket/2256">#2256</a></dt>
+<dd>Evaluate usage of sudo LDAP provider together with the AD provider</dd>
+<dt><a class="reference external" href="/sssd/ticket/2257">#2257</a></dt>
+<dd>Setting int option to 0 yields the default value</dd>
+<dt><a class="reference external" href="/sssd/ticket/2263">#2263</a></dt>
+<dd>ipa-server-mode: Use lower-case user name component in home dir path</dd>
+<dt><a class="reference external" href="/sssd/ticket/2264">#2264</a></dt>
+<dd>SSSD Does not cache SELinux map from FreeIPA correctly</dd>
+<dt><a class="reference external" href="/sssd/ticket/2270">#2270</a></dt>
+<dd>IPA SELinux code looks for the host in the wrong sysdb subdir when a
+trusted user logs in</dd>
+<dt><a class="reference external" href="/sssd/ticket/2271">#2271</a></dt>
+<dd>sssd fails to handle expired passwords when OTP is used</dd>
+<dt><a class="reference external" href="/sssd/ticket/2279">#2279</a></dt>
+<dd>Add another Kerberos error code to trigger IPA password migration</dd>
+<dt><a class="reference external" href="/sssd/ticket/2280">#2280</a></dt>
+<dd>Double OK when starting the service</dd>
+<dt><a class="reference external" href="/sssd/ticket/2282">#2282</a></dt>
+<dd>SSSD should create the SELinux mapping file with format expected by
+pam_selinux</dd>
+<dt><a class="reference external" href="/sssd/ticket/2284">#2284</a></dt>
+<dd>Valgrind: Invalid read of int while processing netgroup</dd>
+<dt><a class="reference external" href="/sssd/ticket/2285">#2285</a></dt>
+<dd>other subdomains are unavailable when joined to a subdomain in the
+ad forest</dd>
+<dt><a class="reference external" href="/sssd/ticket/2289">#2289</a></dt>
+<dd>Error during password change</dd>
+<dt><a class="reference external" href="/sssd/ticket/2293">#2293</a></dt>
+<dd>configure time variables not expanded when running ./configure</dd>
+<dt><a class="reference external" href="/sssd/ticket/2300">#2300</a></dt>
+<dd>RHEL7 IPA selinuxusermap hbac rule not always matching</dd>
+</dl>
+</div></div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Alexey Shabalin (1):</p>
+<ul class="simple">
+<li>Use KRB5_CFLAGS where appropriate</li>
+</ul>
+<p>Jakub Hrozek (16):</p>
+<ul class="simple">
+<li>Updating the version for the 1.11.5 release</li>
+<li>IPA: Don&#8217;t call tevent_req_post outside _send</li>
+<li>IPA: Don&#8217;t fail if apply_subdomain_homedir returns ENOENT</li>
+<li>OPTS: Allow using defaults for blobs</li>
+<li>DP: Provide separate dp_copy_defaults function</li>
+<li>MAN: Clarify the ldap_access_filter option further</li>
+<li>MAN: Clarify that changing ID mapping options might require purging
+the cache</li>
+<li>IPA: Do not save intermediate data to sysdb</li>
+<li>AD: Only connect to GC for subdomain users</li>
+<li>MAN: Clarify the GC support a bit</li>
+<li>IPA: Use the correct domain when processing SELinux rules</li>
+<li>IPA: Write SELinux usernames in the right case</li>
+<li>KRB5: Do not attempt to get a TGT after a password change using OTP</li>
+<li>AD: connect to forest root when downloading the list of subdomains</li>
+<li>IPA: Fix SELinux mapping order memory hierarchy</li>
+<li>Updating the translations for the 1.11.5 release</li>
+</ul>
+<p>Lukas Slebodnik (10):</p>
+<ul class="simple">
+<li>SPEC: Use systemd on available platforms</li>
+<li>LDAP: Setup periodic task only once.</li>
+<li>UTIL: Sanitize whitespaces.</li>
+<li>DOC: Fix names of arguments in doxygen comments</li>
+<li>AD: Continue if sssd failes to check extra members</li>
+<li>SYSV: Do not call functions success and fail itself</li>
+<li>IPA: Use function sysdb_attrs_get_el in safe way</li>
+<li>Makefile: Add missing library to the dp_opt_tests</li>
+<li>TESTS: Link libsss_test_common with tevent</li>
+<li>Makefile: Use alternative method to replace *bindir</li>
+</ul>
+<p>Michal Zidek (1):</p>
+<ul class="simple">
+<li>Possible null dereference in SELinux code</li>
+</ul>
+<p>Nathaniel McCallum (1):</p>
+<ul class="simple">
+<li>Fix krb5 changepw when FAST-only preauth methods are used (like OTP)</li>
+</ul>
+<p>Pete Fritchman (1):</p>
+<ul class="simple">
+<li>PAM: add ignore_unknown_user option</li>
+</ul>
+<p>Stef Walter (1):</p>
+<ul class="simple">
+<li>providers: Fix types passed to dbus varargs functions</li>
+</ul>
+<p>Sumit Bose (13):</p>
+<ul class="simple">
+<li>IDMAP: add sss_idmap_check_collision(_ex)</li>
+<li>IPA: refactor idmap code and add test</li>
+<li>IPA: check ranges for collisions before saving them</li>
+<li>libsss_idmap: bump version-info</li>
+<li>config API: add missing subdomain target to AD provider test</li>
+<li>SUDO: AD provider</li>
+<li>ipa-server-mode: use lower-case user name for home dir</li>
+<li>IPA: Use GC for AD initgroup requests</li>
+<li>IPA/KRB5: handle KRB5_PROG_ETYPE_NOSUPP during IPA password
+migration</li>
+<li>krb5_child: remove unused option lifetime_str from
+k5c_setup_fast()</li>
+<li>krb5-child: extract lifetime settings into set_lifetime_options()</li>
+<li>krb5_client: rename krb5_set_canonicalize() to
+set_canonicalize_option()</li>
+<li>krb5-child: add revert_changepw_options()</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#documentation-changes">Documentation Changes</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.11.5.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.11.5.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,459 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Synopsis &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#Synopsis">Synopsis</a></li>
+<li><a class="reference external" href="#SettingOpenLDAP">Setting OpenLDAP</a><ol class="arabic">
+<li><a class="reference external" href="#InstallingOpenLDAPpackages">Installing OpenLDAP packages</a></li>
+<li><a class="reference external" href="#StartLDAPservercalling">Start LDAP server calling</a></li>
+<li><a class="reference external" href="#Loadsomebasisschemas">Load some basis schemas</a></li>
+<li><a class="reference external" href="#Definingserverback-end">Defining server back-end</a></li>
+<li><a class="reference external" href="#Definingserverfront-end">Defining server front-end</a></li>
+<li><a class="reference external" href="#Quicktest">Quick test</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#Paswordpolicyppolicy">Pasword policy (ppolicy)</a><ol class="arabic">
+<li><a class="reference external" href="#Loadingppolicyschema">Loading ppolicy schema</a></li>
+<li><a class="reference external" href="#Loadingppolicymodule">Loading ppolicy module</a></li>
+<li><a class="reference external" href="#Loadingppolicyoverlay">Loading ppolicy overlay</a></li>
+<li><a class="reference external" href="#Settingdefaultppolicysettings">Setting default ppolicy
+settings</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#SSHkeysinopenldap">SSH keys in openldap</a></li>
+<li><a class="reference external" href="#MISC">MISC</a><ol class="arabic">
+<li><a class="reference external" href="#Permanentlylockuseraccount">Permanently lock user account</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#Sources">Sources</a></li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="synopsis">
+<h1>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h1>
+<p>This page describes how to configure OpenLDAP with enabled password
+policy and added support for user&#8217;s SSH keys on Fedora. Main purpose for
+creating such an environment is mainly for testing SSSD. This guide is a
+work in progress.</p>
+</div>
+<div class="section" id="setting-openldap">
+<h1>Setting OpenLDAP<a class="headerlink" href="#setting-openldap" title="Permalink to this headline">¶</a></h1>
+<p>This is part is heavily based on article
+<a class="reference external" href="https://help.ubuntu.com/10.04/serverguide/openldap-server.html">​OpenLDAP</a>,
+so please see it for more details.</p>
+<div class="section" id="installing-openldap-packages">
+<h2>Installing OpenLDAP packages<a class="headerlink" href="#installing-openldap-packages" title="Permalink to this headline">¶</a></h2>
+<p>Package openldap-clients useful command-line utilities such as ldapadd,
+ldapsearch, ldapmodify, etc., package openldap-servers contains schemas.</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">dnf</span> <span class="n">install</span> <span class="n">openldap</span> <span class="n">openldap</span><span class="o">-</span><span class="n">clients</span> <span class="n">openldap</span><span class="o">-</span><span class="n">servers</span>
+</pre></div>
+</div>
+</div></div>
+<div class="section" id="start-ldap-server-calling">
+<h2>Start LDAP server calling<a class="headerlink" href="#start-ldap-server-calling" title="Permalink to this headline">¶</a></h2>
+<p>To start with OpenLDAP configuration, server must be running.</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">systemctl</span> <span class="n">start</span> <span class="n">slapd</span>
+</pre></div>
+</div>
+</div></div>
+<div class="section" id="load-some-basis-schemas">
+<h2>Load some basis schemas<a class="headerlink" href="#load-some-basis-schemas" title="Permalink to this headline">¶</a></h2>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ldapadd</span> <span class="o">-</span><span class="n">Y</span> <span class="n">EXTERNAL</span> <span class="o">-</span><span class="n">H</span> <span class="n">ldapi</span><span class="p">:</span><span class="o">///</span> <span class="o">-</span><span class="n">f</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openldap</span><span class="o">/</span><span class="n">schema</span><span class="o">/</span><span class="n">cosine</span><span class="o">.</span><span class="n">ldif</span>
+<span class="n">ldapadd</span> <span class="o">-</span><span class="n">Y</span> <span class="n">EXTERNAL</span> <span class="o">-</span><span class="n">H</span> <span class="n">ldapi</span><span class="p">:</span><span class="o">///</span> <span class="o">-</span><span class="n">f</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openldap</span><span class="o">//</span><span class="n">schema</span><span class="o">/</span><span class="n">nis</span><span class="o">.</span><span class="n">ldif</span>
+<span class="n">ldapadd</span> <span class="o">-</span><span class="n">Y</span> <span class="n">EXTERNAL</span> <span class="o">-</span><span class="n">H</span> <span class="n">ldapi</span><span class="p">:</span><span class="o">///</span> <span class="o">-</span><span class="n">f</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openldap</span><span class="o">/</span><span class="n">schema</span><span class="o">/</span><span class="n">inetorgperson</span><span class="o">.</span><span class="n">ldif</span>
+</pre></div>
+</div>
+</div></div>
+<div class="section" id="defining-server-back-end">
+<h2>Defining server back-end<a class="headerlink" href="#defining-server-back-end" title="Permalink to this headline">¶</a></h2>
+<p><em>backend.example.com.ldif</em> describes basic properties of server backend.
+Please note the <em>olcRootPW</em> which holds administrator&#8217;s password.</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cat</span> <span class="o">&lt;&lt;</span><span class="n">EOF</span> <span class="o">&gt;</span><span class="n">backend</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">com</span><span class="o">.</span><span class="n">ldif</span>
+<span class="c1"># Load dynamic backend modules</span>
+<span class="n">dn</span><span class="p">:</span> <span class="n">cn</span><span class="o">=</span><span class="n">module</span><span class="p">,</span><span class="n">cn</span><span class="o">=</span><span class="n">config</span>
+<span class="n">objectClass</span><span class="p">:</span> <span class="n">olcModuleList</span>
+<span class="n">cn</span><span class="p">:</span> <span class="n">module</span>
+<span class="n">olcModulepath</span><span class="p">:</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">ldap</span>
+<span class="n">olcModuleload</span><span class="p">:</span> <span class="n">back_hdb</span>
+
+<span class="c1"># Database settings</span>
+<span class="n">dn</span><span class="p">:</span> <span class="n">olcDatabase</span><span class="o">=</span><span class="n">hdb</span><span class="p">,</span><span class="n">cn</span><span class="o">=</span><span class="n">config</span>
+<span class="n">objectClass</span><span class="p">:</span> <span class="n">olcDatabaseConfig</span>
+<span class="n">objectClass</span><span class="p">:</span> <span class="n">olcHdbConfig</span>
+<span class="n">olcDatabase</span><span class="p">:</span> <span class="p">{</span><span class="mi">1</span><span class="p">}</span><span class="n">hdb</span>
+<span class="n">olcSuffix</span><span class="p">:</span> <span class="n">dc</span><span class="o">=</span><span class="n">example</span><span class="p">,</span><span class="n">dc</span><span class="o">=</span><span class="n">com</span>
+<span class="n">olcDbDirectory</span><span class="p">:</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">ldap</span>
+<span class="n">olcRootDN</span><span class="p">:</span> <span class="n">cn</span><span class="o">=</span><span class="n">admin</span><span class="p">,</span><span class="n">dc</span><span class="o">=</span><span class="n">example</span><span class="p">,</span><span class="n">dc</span><span class="o">=</span><span class="n">com</span>
+<span class="n">olcRootPW</span><span class="p">:</span> <span class="n">aaa</span>
+<span class="n">olcDbConfig</span><span class="p">:</span> <span class="n">set_cachesize</span> <span class="mi">0</span> <span class="mi">2097152</span> <span class="mi">0</span>
+<span class="n">olcDbConfig</span><span class="p">:</span> <span class="n">set_lk_max_objects</span> <span class="mi">1500</span>
+<span class="n">olcDbConfig</span><span class="p">:</span> <span class="n">set_lk_max_locks</span> <span class="mi">1500</span>
+<span class="n">olcDbConfig</span><span class="p">:</span> <span class="n">set_lk_max_lockers</span> <span class="mi">1500</span>
+<span class="n">olcDbIndex</span><span class="p">:</span> <span class="n">objectClass</span> <span class="n">eq</span>
+<span class="n">olcLastMod</span><span class="p">:</span> <span class="n">TRUE</span>
+<span class="n">olcDbCheckpoint</span><span class="p">:</span> <span class="mi">512</span> <span class="mi">30</span>
+<span class="n">olcAccess</span><span class="p">:</span> <span class="n">to</span> <span class="n">attrs</span><span class="o">=</span><span class="n">userPassword</span> <span class="n">by</span> <span class="n">dn</span><span class="o">=</span><span class="s2">&quot;cn=admin,dc=example,dc=com&quot;</span> <span class="n">write</span> <span class="n">by</span> <span class="n">anonymous</span> <span class="n">auth</span> <span class="n">by</span> <span class="bp">self</span> <span class="n">write</span> <span class="n">by</span> <span class="o">*</span> <span class="n">none</span>
+<span class="n">olcAccess</span><span class="p">:</span> <span class="n">to</span> <span class="n">attrs</span><span class="o">=</span><span class="n">shadowLastChange</span> <span class="n">by</span> <span class="bp">self</span> <span class="n">write</span> <span class="n">by</span> <span class="o">*</span> <span class="n">read</span>
+<span class="n">olcAccess</span><span class="p">:</span> <span class="n">to</span> <span class="n">dn</span><span class="o">.</span><span class="n">base</span><span class="o">=</span><span class="s2">&quot;&quot;</span> <span class="n">by</span> <span class="o">*</span> <span class="n">read</span>
+<span class="n">olcAccess</span><span class="p">:</span> <span class="n">to</span> <span class="o">*</span> <span class="n">by</span> <span class="n">dn</span><span class="o">=</span><span class="s2">&quot;cn=admin,dc=example,dc=com&quot;</span> <span class="n">write</span> <span class="n">by</span> <span class="o">*</span> <span class="n">read</span>
+<span class="n">EOF</span>
+</pre></div>
+</div>
+</div><p>Add LDIF file to the LDAP.</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ldapadd</span> <span class="o">-</span><span class="n">Y</span> <span class="n">EXTERNAL</span> <span class="o">-</span><span class="n">H</span> <span class="n">ldapi</span><span class="p">:</span><span class="o">///</span> <span class="o">-</span><span class="n">f</span> <span class="n">backend</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">com</span><span class="o">.</span><span class="n">ldif</span>
+</pre></div>
+</div>
+</div></div>
+<div class="section" id="defining-server-front-end">
+<h2>Defining server front-end<a class="headerlink" href="#defining-server-front-end" title="Permalink to this headline">¶</a></h2>
+<p>This LDIF file populates LDAP server with users <em>admin</em> and <em>John</em> and
+also add group <em>example</em>. Again - please note the attributes setting
+passwords.</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cat</span> <span class="o">&lt;&lt;</span><span class="n">EOF</span> <span class="o">&gt;</span><span class="n">frontend</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">com</span><span class="o">.</span><span class="n">ldif</span>
+<span class="c1"># Create top-level object in domain</span>
+<span class="n">dn</span><span class="p">:</span> <span class="n">dc</span><span class="o">=</span><span class="n">example</span><span class="p">,</span><span class="n">dc</span><span class="o">=</span><span class="n">com</span>
+<span class="n">objectClass</span><span class="p">:</span> <span class="n">top</span>
+<span class="n">objectClass</span><span class="p">:</span> <span class="n">dcObject</span>
+<span class="n">objectclass</span><span class="p">:</span> <span class="n">organization</span>
+<span class="n">o</span><span class="p">:</span> <span class="n">Example</span> <span class="n">Organization</span>
+<span class="n">dc</span><span class="p">:</span> <span class="n">Example</span>
+<span class="n">description</span><span class="p">:</span> <span class="n">LDAP</span> <span class="n">Example</span>
+
+<span class="c1"># Admin user.</span>
+<span class="n">dn</span><span class="p">:</span> <span class="n">cn</span><span class="o">=</span><span class="n">admin</span><span class="p">,</span><span class="n">dc</span><span class="o">=</span><span class="n">example</span><span class="p">,</span><span class="n">dc</span><span class="o">=</span><span class="n">com</span>
+<span class="n">objectClass</span><span class="p">:</span> <span class="n">simpleSecurityObject</span>
+<span class="n">objectClass</span><span class="p">:</span> <span class="n">organizationalRole</span>
+<span class="n">cn</span><span class="p">:</span> <span class="n">admin</span>
+<span class="n">description</span><span class="p">:</span> <span class="n">LDAP</span> <span class="n">administrator</span>
+<span class="n">userPassword</span><span class="p">:</span> <span class="n">aaa</span>
+
+<span class="n">dn</span><span class="p">:</span> <span class="n">ou</span><span class="o">=</span><span class="n">people</span><span class="p">,</span><span class="n">dc</span><span class="o">=</span><span class="n">example</span><span class="p">,</span><span class="n">dc</span><span class="o">=</span><span class="n">com</span>
+<span class="n">objectClass</span><span class="p">:</span> <span class="n">organizationalUnit</span>
+<span class="n">ou</span><span class="p">:</span> <span class="n">people</span>
+
+<span class="n">dn</span><span class="p">:</span> <span class="n">ou</span><span class="o">=</span><span class="n">groups</span><span class="p">,</span><span class="n">dc</span><span class="o">=</span><span class="n">example</span><span class="p">,</span><span class="n">dc</span><span class="o">=</span><span class="n">com</span>
+<span class="n">objectClass</span><span class="p">:</span> <span class="n">organizationalUnit</span>
+<span class="n">ou</span><span class="p">:</span> <span class="n">groups</span>
+
+<span class="n">dn</span><span class="p">:</span> <span class="n">uid</span><span class="o">=</span><span class="n">john</span><span class="p">,</span><span class="n">ou</span><span class="o">=</span><span class="n">people</span><span class="p">,</span><span class="n">dc</span><span class="o">=</span><span class="n">example</span><span class="p">,</span><span class="n">dc</span><span class="o">=</span><span class="n">com</span>
+<span class="n">objectClass</span><span class="p">:</span> <span class="n">inetOrgPerson</span>
+<span class="n">objectClass</span><span class="p">:</span> <span class="n">posixAccount</span>
+<span class="n">objectClass</span><span class="p">:</span> <span class="n">shadowAccount</span>
+<span class="n">uid</span><span class="p">:</span> <span class="n">john</span>
+<span class="n">sn</span><span class="p">:</span> <span class="n">Doe</span>
+<span class="n">givenName</span><span class="p">:</span> <span class="n">John</span>
+<span class="n">cn</span><span class="p">:</span> <span class="n">John</span> <span class="n">Doe</span>
+<span class="n">displayName</span><span class="p">:</span> <span class="n">John</span> <span class="n">Doe</span>
+<span class="n">uidNumber</span><span class="p">:</span> <span class="mi">1000</span>
+<span class="n">gidNumber</span><span class="p">:</span> <span class="mi">10000</span>
+<span class="n">userPassword</span><span class="p">:</span> <span class="n">password</span>
+<span class="n">gecos</span><span class="p">:</span> <span class="n">John</span> <span class="n">Doe</span>
+<span class="n">loginShell</span><span class="p">:</span> <span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">bash</span>
+<span class="n">homeDirectory</span><span class="p">:</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">john</span>
+<span class="n">shadowExpire</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span>
+<span class="n">shadowFlag</span><span class="p">:</span> <span class="mi">0</span>
+<span class="n">shadowWarning</span><span class="p">:</span> <span class="mi">7</span>
+<span class="n">shadowMin</span><span class="p">:</span> <span class="mi">8</span>
+<span class="n">shadowMax</span><span class="p">:</span> <span class="mi">999999</span>
+<span class="n">shadowLastChange</span><span class="p">:</span> <span class="mi">10877</span>
+<span class="n">mail</span><span class="p">:</span> <span class="n">john</span><span class="o">.</span><span class="n">doe</span><span class="nd">@example</span><span class="o">.</span><span class="n">com</span>
+<span class="n">postalCode</span><span class="p">:</span> <span class="mi">31000</span>
+<span class="n">l</span><span class="p">:</span> <span class="n">Toulouse</span>
+<span class="n">o</span><span class="p">:</span> <span class="n">Example</span>
+<span class="n">mobile</span><span class="p">:</span> <span class="o">+</span><span class="mi">33</span> <span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="mi">6</span> <span class="n">xx</span> <span class="n">xx</span> <span class="n">xx</span> <span class="n">xx</span>
+<span class="n">homePhone</span><span class="p">:</span> <span class="o">+</span><span class="mi">33</span> <span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="mi">5</span> <span class="n">xx</span> <span class="n">xx</span> <span class="n">xx</span> <span class="n">xx</span>
+<span class="n">title</span><span class="p">:</span> <span class="n">System</span> <span class="n">Administrator</span>
+<span class="n">postalAddress</span><span class="p">:</span>
+<span class="n">initials</span><span class="p">:</span> <span class="n">JD</span>
+
+<span class="n">dn</span><span class="p">:</span> <span class="n">cn</span><span class="o">=</span><span class="n">example</span><span class="p">,</span><span class="n">ou</span><span class="o">=</span><span class="n">groups</span><span class="p">,</span><span class="n">dc</span><span class="o">=</span><span class="n">example</span><span class="p">,</span><span class="n">dc</span><span class="o">=</span><span class="n">com</span>
+<span class="n">objectClass</span><span class="p">:</span> <span class="n">posixGroup</span>
+<span class="n">cn</span><span class="p">:</span> <span class="n">example</span>
+<span class="n">gidNumber</span><span class="p">:</span> <span class="mi">10000</span>
+<span class="n">EOF</span>
+</pre></div>
+</div>
+</div><p>Add LDIF file to the LDAP.</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ldapadd</span> <span class="o">-</span><span class="n">x</span> <span class="o">-</span><span class="n">D</span> <span class="n">cn</span><span class="o">=</span><span class="n">admin</span><span class="p">,</span><span class="n">dc</span><span class="o">=</span><span class="n">example</span><span class="p">,</span><span class="n">dc</span><span class="o">=</span><span class="n">com</span> <span class="o">-</span><span class="n">W</span> <span class="o">-</span><span class="n">f</span> <span class="n">frontend</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">com</span><span class="o">.</span><span class="n">ldif</span>
+</pre></div>
+</div>
+</div></div>
+<div class="section" id="quick-test">
+<h2>Quick test<a class="headerlink" href="#quick-test" title="Permalink to this headline">¶</a></h2>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ldapsearch</span> <span class="o">-</span><span class="n">xLLL</span> <span class="o">-</span><span class="n">b</span> <span class="s2">&quot;dc=example,dc=com&quot;</span> <span class="n">uid</span><span class="o">=</span><span class="n">john</span> <span class="n">sn</span> <span class="n">givenName</span> <span class="n">cn</span>
+</pre></div>
+</div>
+</div></div>
+</div>
+<div class="section" id="pasword-policy-ppolicy">
+<h1>Pasword policy (ppolicy)<a class="headerlink" href="#pasword-policy-ppolicy" title="Permalink to this headline">¶</a></h1>
+<p>This section heavily draws from this how-to
+<a class="reference external" href="http://www.flagword.net/2013/02/openldap-with-tls-ppolicy-and-master-master-replication-on-rhel6-3/comment-page-1/">​ppolicy</a>.</p>
+<div class="section" id="loading-ppolicy-schema">
+<h2>Loading ppolicy schema<a class="headerlink" href="#loading-ppolicy-schema" title="Permalink to this headline">¶</a></h2>
+<p>Load schema describing ppolicy attributes.</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ldapadd</span> <span class="o">-</span><span class="n">Y</span> <span class="n">EXTERNAL</span> <span class="o">-</span><span class="n">H</span> <span class="n">ldapi</span><span class="p">:</span><span class="o">///</span> <span class="o">-</span><span class="n">f</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openldap</span><span class="o">/</span><span class="n">schema</span><span class="o">/</span><span class="n">ppolicy</span><span class="o">.</span><span class="n">ldif</span>
+</pre></div>
+</div>
+</div></div>
+<div class="section" id="loading-ppolicy-module">
+<h2>Loading ppolicy module<a class="headerlink" href="#loading-ppolicy-module" title="Permalink to this headline">¶</a></h2>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1">#load ppolicy module</span>
+<span class="n">cat</span> <span class="o">&lt;&lt;</span><span class="n">EOF</span> <span class="o">&gt;</span><span class="n">ppolicy_module</span><span class="o">.</span><span class="n">ldif</span>
+<span class="n">dn</span><span class="p">:</span> <span class="n">cn</span><span class="o">=</span><span class="n">module</span><span class="p">,</span><span class="n">cn</span><span class="o">=</span><span class="n">config</span>
+<span class="n">objectClass</span><span class="p">:</span> <span class="n">olcModuleList</span>
+<span class="n">cn</span><span class="p">:</span> <span class="n">module</span>
+<span class="n">olcModuleLoad</span><span class="p">:</span> <span class="n">ppolicy</span><span class="o">.</span><span class="n">la</span>
+<span class="n">olcModulePath</span><span class="p">:</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib64</span><span class="o">/</span><span class="n">openldap</span>
+<span class="n">EOF</span>
+</pre></div>
+</div>
+</div><p>Add LDIF file.</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ldapadd</span> <span class="o">-</span><span class="n">Y</span> <span class="n">EXTERNAL</span> <span class="o">-</span><span class="n">H</span> <span class="n">ldapi</span><span class="p">:</span><span class="o">///</span> <span class="o">-</span><span class="n">f</span> <span class="n">ppolicy_module</span><span class="o">.</span><span class="n">ldif</span>
+</pre></div>
+</div>
+</div><p>Restart LDAP server.</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1">#restart ldap</span>
+<span class="n">systemctl</span> <span class="n">restart</span> <span class="n">slapd</span>
+</pre></div>
+</div>
+</div></div>
+<div class="section" id="loading-ppolicy-overlay">
+<h2>Loading ppolicy overlay<a class="headerlink" href="#loading-ppolicy-overlay" title="Permalink to this headline">¶</a></h2>
+<p>Please note the <em>olcPPolicyDefault</em> attribute which holds a DN to a
+default ppolicy entry.</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1">#Add PPolicy Overlay:</span>
+<span class="n">cat</span> <span class="o">&lt;&lt;</span><span class="n">EOF</span> <span class="o">&gt;</span><span class="n">ppolicy</span><span class="o">-</span><span class="n">overlay</span><span class="o">.</span><span class="n">ldif</span>
+<span class="n">dn</span><span class="p">:</span> <span class="n">olcOverlay</span><span class="o">=</span><span class="n">ppolicy</span><span class="p">,</span><span class="n">olcDatabase</span><span class="o">=</span><span class="p">{</span><span class="mi">3</span><span class="p">}</span><span class="n">hdb</span><span class="p">,</span><span class="n">cn</span><span class="o">=</span><span class="n">config</span>
+<span class="n">objectClass</span><span class="p">:</span> <span class="n">olcPPolicyConfig</span>
+<span class="n">olcOverlay</span><span class="p">:</span> <span class="n">ppolicy</span>
+<span class="n">olcPPolicyDefault</span><span class="p">:</span> <span class="n">cn</span><span class="o">=</span><span class="n">ppolicy</span><span class="p">,</span><span class="n">ou</span><span class="o">=</span><span class="n">policies</span><span class="p">,</span><span class="n">dc</span><span class="o">=</span><span class="n">example</span><span class="p">,</span><span class="n">dc</span><span class="o">=</span><span class="n">com</span>
+<span class="n">olcPPolicyUseLockout</span><span class="p">:</span> <span class="n">TRUE</span>
+<span class="n">olcPPolicyHashCleartext</span><span class="p">:</span> <span class="n">TRUE</span>
+<span class="n">EOF</span>
+</pre></div>
+</div>
+</div><p>Add LDIF file.</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ldapadd</span> <span class="o">-</span><span class="n">Y</span> <span class="n">EXTERNAL</span> <span class="o">-</span><span class="n">H</span> <span class="n">ldapi</span><span class="p">:</span><span class="o">///</span> <span class="o">-</span><span class="n">f</span> <span class="o">./</span><span class="n">ppolicy</span><span class="o">-</span><span class="n">overlay</span><span class="o">.</span><span class="n">ldif</span>
+</pre></div>
+</div>
+</div></div>
+<div class="section" id="setting-default-ppolicy-settings">
+<h2>Setting default ppolicy settings<a class="headerlink" href="#setting-default-ppolicy-settings" title="Permalink to this headline">¶</a></h2>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># create default policy</span>
+<span class="n">cat</span> <span class="o">&lt;&lt;</span><span class="n">EOF</span> <span class="o">&gt;</span><span class="n">default_ppolicy</span><span class="o">.</span><span class="n">ldif</span>
+<span class="n">dn</span><span class="p">:</span> <span class="n">ou</span><span class="o">=</span><span class="n">policies</span><span class="p">,</span><span class="n">dc</span><span class="o">=</span><span class="n">example</span><span class="p">,</span><span class="n">dc</span><span class="o">=</span><span class="n">com</span>
+<span class="n">objectClass</span><span class="p">:</span> <span class="n">top</span>
+<span class="n">objectClass</span><span class="p">:</span> <span class="n">organizationalUnit</span>
+<span class="n">ou</span><span class="p">:</span> <span class="n">policies</span>
+
+<span class="n">dn</span><span class="p">:</span> <span class="n">cn</span><span class="o">=</span><span class="n">ppolicy</span><span class="p">,</span><span class="n">ou</span><span class="o">=</span><span class="n">policies</span><span class="p">,</span><span class="n">dc</span><span class="o">=</span><span class="n">example</span><span class="p">,</span><span class="n">dc</span><span class="o">=</span><span class="n">com</span>
+<span class="n">objectClass</span><span class="p">:</span> <span class="n">top</span>
+<span class="n">objectClass</span><span class="p">:</span> <span class="n">device</span>
+<span class="n">objectClass</span><span class="p">:</span> <span class="n">pwdPolicyChecker</span>
+<span class="n">objectClass</span><span class="p">:</span> <span class="n">pwdPolicy</span>
+<span class="n">cn</span><span class="p">:</span> <span class="n">ppolicy</span>
+<span class="n">pwdAttribute</span><span class="p">:</span> <span class="n">userPassword</span>
+<span class="n">pwdInHistory</span><span class="p">:</span> <span class="mi">8</span>
+<span class="n">pwdMinLength</span><span class="p">:</span> <span class="mi">8</span>
+<span class="n">pwdMaxFailure</span><span class="p">:</span> <span class="mi">3</span>
+<span class="n">pwdFailureCountInterval</span><span class="p">:</span> <span class="mi">1800</span>
+<span class="n">pwdCheckQuality</span><span class="p">:</span> <span class="mi">0</span>
+<span class="n">pwdMustChange</span><span class="p">:</span> <span class="n">TRUE</span>
+<span class="n">pwdGraceAuthNLimit</span><span class="p">:</span> <span class="mi">0</span>
+<span class="n">pwdMaxAge</span><span class="p">:</span> <span class="mi">7776000</span>
+<span class="n">pwdExpireWarning</span><span class="p">:</span> <span class="mi">1209600</span>
+<span class="n">pwdLockoutDuration</span><span class="p">:</span> <span class="mi">900</span>
+<span class="n">pwdLockout</span><span class="p">:</span> <span class="n">TRUE</span>
+<span class="n">EOF</span>
+</pre></div>
+</div>
+</div><p>Add LDIF file.</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ldapadd</span> <span class="o">-</span><span class="n">x</span> <span class="o">-</span><span class="n">D</span> <span class="s1">&#39;cn=admin,dc=example,dc=com&#39;</span> <span class="o">-</span><span class="n">W</span> <span class="o">-</span><span class="n">H</span> <span class="n">ldapi</span><span class="p">:</span><span class="o">///</span> <span class="o">-</span><span class="n">f</span> <span class="o">./</span><span class="n">default_ppolicy</span><span class="o">.</span><span class="n">ldif</span>
+</pre></div>
+</div>
+</div></div>
+</div>
+<div class="section" id="ssh-keys-in-openldap">
+<h1>SSH keys in openldap<a class="headerlink" href="#ssh-keys-in-openldap" title="Permalink to this headline">¶</a></h1>
+<p>This section describes how to add SSH keys to user entries. LDIF listing
+bellow is a converted schema file that can be found at
+<a class="reference external" href="https://code.google.com/p/openssh-lpk/">​openssh-lpk</a>.</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span>cat &lt;&lt;EOF &gt;/etc/openldap/schema/openssh-lpk_openldap.ldif
+# AUTO-GENERATED FILE - DO NOT EDIT!! Use ldapmodify.
+# CRC32 42a543d1
+dn: cn=openssh-lpk_openldap,cn=schema,cn=config
+objectClass: olcSchemaConfig
+cn: openssh-lpk_openldap
+olcAttributeTypes: {0}( 1.3.6.1.4.1.24552.500.1.1.1.13 NAME &#39;sshPublicKey&#39; DES
+ C &#39;MANDATORY: OpenSSH Public key&#39; EQUALITY octetStringMatch SYNTAX 1.3.6.1.4.
+ 1.1466.115.121.1.40 )
+olcObjectClasses: {0}( 1.3.6.1.4.1.24552.500.1.1.2.0 NAME &#39;ldapPublicKey&#39; DESC
+  &#39;MANDATORY: OpenSSH LPK objectclass&#39; SUP top AUXILIARY MAY ( sshPublicKey $
+ uid ) )
+EOF
+</pre></div>
+</div>
+</div><p>Add schema file.</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ldapadd</span> <span class="o">-</span><span class="n">Y</span> <span class="n">EXTERNAL</span> <span class="o">-</span><span class="n">H</span> <span class="n">ldapi</span><span class="p">:</span><span class="o">///</span> <span class="o">-</span><span class="n">f</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openldap</span><span class="o">/</span><span class="n">schema</span><span class="o">/</span><span class="n">openssh</span><span class="o">-</span><span class="n">lpk_openldap</span><span class="o">.</span><span class="n">ldif</span>
+</pre></div>
+</div>
+</div></div>
+<div class="section" id="misc">
+<h1>MISC<a class="headerlink" href="#misc" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="permanently-lock-user-account">
+<h2>Permanently lock user account<a class="headerlink" href="#permanently-lock-user-account" title="Permalink to this headline">¶</a></h2>
+<p>LDIF file which set John&#8217;s account to be permanently locked.</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cat</span> <span class="o">&lt;&lt;</span><span class="n">EOF</span> <span class="o">&gt;</span><span class="n">permlock</span><span class="o">.</span><span class="n">ldif</span>
+<span class="n">dn</span><span class="p">:</span> <span class="n">uid</span><span class="o">=</span><span class="n">john</span><span class="p">,</span><span class="n">ou</span><span class="o">=</span><span class="n">People</span><span class="p">,</span><span class="n">dc</span><span class="o">=</span><span class="n">example</span><span class="p">,</span><span class="n">dc</span><span class="o">=</span><span class="n">com</span>
+<span class="n">replace</span><span class="p">:</span> <span class="n">pwdAccountLockedTime</span>
+<span class="n">pwdAccountLockedTime</span><span class="p">:</span> <span class="mi">000001010000</span><span class="n">Z</span>
+</pre></div>
+</div>
+</div><p>Modify John&#8217;s account.</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ldapmodify</span> <span class="o">-</span><span class="n">x</span> <span class="o">-</span><span class="n">D</span> <span class="s1">&#39;cn=admin,dc=example,dc=com&#39;</span> <span class="o">-</span><span class="n">W</span> <span class="o">-</span><span class="n">H</span> <span class="n">ldapi</span><span class="p">:</span><span class="o">///</span> <span class="o">-</span><span class="n">f</span> <span class="n">permlock</span><span class="o">.</span><span class="n">ldif</span>
+<span class="n">Enter</span> <span class="n">LDAP</span> <span class="n">Password</span><span class="p">:</span>
+<span class="n">modifying</span> <span class="n">entry</span> <span class="s2">&quot;uid=john,ou=People,dc=example,dc=com&quot;</span>
+</pre></div>
+</div>
+</div></div>
+</div>
+<div class="section" id="sources">
+<h1>Sources<a class="headerlink" href="#sources" title="Permalink to this headline">¶</a></h1>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="94%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>OpenLDAP</td>
+<td><a class="reference external" href="https://help.ubuntu.com/10.04/serverguide/openldap-server.html">​https://help.ubuntu.com/10.04/serverguide/openldap-server.html</a></td>
+</tr>
+<tr class="row-even"><td>ppolicy</td>
+<td><a class="reference external" href="http://www.flagword.net/2013/02/openldap-with-tls-ppolicy-and-master-master-replication-on-rhel6-3/comment-page-1/">​http://www.flagword.net/2013/02/openldap-with-tls-ppolicy-and-master-master-replication-on-rhel6-3/comment-page-1/</a></td>
+</tr>
+<tr class="row-odd"><td>openssh-lpk</td>
+<td><a class="reference external" href="https://code.google.com/p/openssh-lpk/">​https://code.google.com/p/openssh-lpk/</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Synopsis</a></li>
+<li><a class="reference internal" href="#setting-openldap">Setting OpenLDAP</a><ul>
+<li><a class="reference internal" href="#installing-openldap-packages">Installing OpenLDAP packages</a></li>
+<li><a class="reference internal" href="#start-ldap-server-calling">Start LDAP server calling</a></li>
+<li><a class="reference internal" href="#load-some-basis-schemas">Load some basis schemas</a></li>
+<li><a class="reference internal" href="#defining-server-back-end">Defining server back-end</a></li>
+<li><a class="reference internal" href="#defining-server-front-end">Defining server front-end</a></li>
+<li><a class="reference internal" href="#quick-test">Quick test</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pasword-policy-ppolicy">Pasword policy (ppolicy)</a><ul>
+<li><a class="reference internal" href="#loading-ppolicy-schema">Loading ppolicy schema</a></li>
+<li><a class="reference internal" href="#loading-ppolicy-module">Loading ppolicy module</a></li>
+<li><a class="reference internal" href="#loading-ppolicy-overlay">Loading ppolicy overlay</a></li>
+<li><a class="reference internal" href="#setting-default-ppolicy-settings">Setting default ppolicy settings</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ssh-keys-in-openldap">SSH keys in openldap</a></li>
+<li><a class="reference internal" href="#misc">MISC</a><ul>
+<li><a class="reference internal" href="#permanently-lock-user-account">Permanently lock user account</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sources">Sources</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/openldap_ppolicy.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/openldap_ppolicy.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

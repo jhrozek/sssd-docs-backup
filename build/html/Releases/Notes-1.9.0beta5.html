@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#Highlights">Highlights</a></li>
+<li><a class="reference external" href="#TicketsFixed">Tickets Fixed</a></li>
+<li><a class="reference external" href="#DetailedChangelog">Detailed Changelog</a></li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Many fixes for the support for setting default SELinux user context
+from FreeIPA, most notably fixed the specificity evaluation</li>
+<li>Fixed an incorrect default in the krb5_canonicalize option of the AD
+provider which was preventing password change operation</li>
+<li>The shadowLastChange attribute value is now correctly updated with
+the number of days since the Epoch, not seconds</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/1360">#1360</a></dt>
+<dd>format of file for pam_selinux is incorrect</dd>
+<dt><a class="reference external" href="/sssd/ticket/1379">#1379</a></dt>
+<dd>Possible use of uninitialized values</dd>
+<dt><a class="reference external" href="/sssd/ticket/1395">#1395</a></dt>
+<dd>SELinux rule matching ignores specificity requirement</dd>
+<dt><a class="reference external" href="/sssd/ticket/1417">#1417</a></dt>
+<dd>Several unowned directories</dd>
+<dt><a class="reference external" href="/sssd/ticket/1419">#1419</a></dt>
+<dd>sssd incorrectly sets shadowLastChange in seconds not days</dd>
+<dt><a class="reference external" href="/sssd/ticket/1421">#1421</a></dt>
+<dd>selinux rules are never deleted from sysdb</dd>
+<dt><a class="reference external" href="/sssd/ticket/1422">#1422</a></dt>
+<dd>When ldap_sasl_minssf is assigned large values, appropriate error
+message should be logged sssd_DOMAIN log</dd>
+<dt><a class="reference external" href="/sssd/ticket/1431">#1431</a></dt>
+<dd>Set &#8220;krb5_canonicalize = False&#8221; for password change to work</dd>
+</dl>
+</div></div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Jakub Hrozek (9):</p>
+<ul class="simple">
+<li>Bumping version to 1.9.0 beta 5</li>
+<li>Add newline to DEBUG messages</li>
+<li>RPM: Own several directories</li>
+<li>Add missing &#8220;%&#8221; to specfile</li>
+<li>IPA: Download defaults even if there are no SELinux mappings</li>
+<li>SYSDB: Delete SELinux mappings</li>
+<li>IPA: Return and save all SELinux rules in the provider</li>
+<li>PAM: Fix off-by-one-error in the SELinux session code</li>
+<li>Update translations for 1.9.0 beta 5 release</li>
+</ul>
+<p>Jan Vcelak (1):</p>
+<ul class="simple">
+<li>LDAP: Properly cast type for MINSSF value</li>
+</ul>
+<p>Jan Zeleny (3):</p>
+<ul class="simple">
+<li>Fixed wrong number in shadowLastChange</li>
+<li>Add function sysdb_attrs_copy_values()</li>
+<li>Modify priority evaluation in SELinux user maps</li>
+</ul>
+<p>Michal Zidek (2):</p>
+<ul class="simple">
+<li>Fixed: Unchecked return value from dp_opt_set_int.</li>
+<li>Fixed: Uninitialized value in krb5_child-test if ccname was
+specified.</li>
+</ul>
+<p>Nick Guay (1):</p>
+<ul class="simple">
+<li>Fix uninitialized values</li>
+</ul>
+<p>Pavel Březina (2):</p>
+<ul class="simple">
+<li>resolv_gethostbyname_send: strdup hostname to work properly when
+hostname is allocated on stack</li>
+<li>sudo test client: avoid SIGSEGV when run without arguments</li>
+</ul>
+<p>Stephen Gallagher (2):</p>
+<ul class="simple">
+<li>AD: Add missing DP option terminator</li>
+<li>AD: Fix defaults for krb5_canonicalize</li>
+</ul>
+<p>Yuri Chornoivan (1):</p>
+<ul class="simple">
+<li>Fix typo: exhasution-&gt;exhaustion.</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.9.0beta5.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.9.0beta5.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

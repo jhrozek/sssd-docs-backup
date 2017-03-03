@@ -1,0 +1,455 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Tracd &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="tracd">
+<h1>Tracd<a class="headerlink" href="#tracd" title="Permalink to this headline">¶</a></h1>
+<p>Tracd is a lightweight standalone Trac web server. It can be used in a
+variety of situations, from a test or development server to a
+multiprocess setup behind another web server used as a load balancer.</p>
+<div class="section" id="pros">
+<h2>Pros<a class="headerlink" href="#pros" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Fewer dependencies: You don&#8217;t need to install apache or any other
+web-server.</li>
+<li>Fast: Should be almost as fast as the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracModPython.html">mod_python</a>
+version (and much faster than the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracCgi.html">CGI</a>), even more
+so since version 0.12 where the HTTP/1.1 version of the protocol is
+enabled by default</li>
+<li>Automatic reloading: For development, Tracd can be used in
+<em>auto_reload</em> mode, which will automatically restart the server
+whenever you make a change to the code (in Trac itself or in a
+plugin).</li>
+</ul>
+</div>
+<div class="section" id="cons">
+<h2>Cons<a class="headerlink" href="#cons" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Fewer features: Tracd implements a very simple web-server and is not
+as configurable or as scalable as Apache httpd.</li>
+<li>No native HTTPS support: <a class="reference external" href="http://www.rickk.com/sslwrap/">​sslwrap</a>
+can be used instead, or <a class="reference external" href="http://trac.edgewall.org/wiki/STunnelTracd">​stunnel &#8211; a tutorial on how to use stunnel
+with tracd</a> or Apache
+with mod_proxy.</li>
+</ul>
+</div>
+<div class="section" id="usage-examples">
+<h2>Usage examples<a class="headerlink" href="#usage-examples" title="Permalink to this headline">¶</a></h2>
+<p>A single project on port 8080.
+(<a class="reference external" href="http://localhost:8080/">​http://localhost:8080/</a>)</p>
+<p>Stricly speaking this will make your Trac accessible to everybody from
+your network rather than <em>localhost only</em>. To truly limit it use
+<em>&#8211;hostname</em> option.</p>
+<p>With more than one project.
+(<a class="reference external" href="http://localhost:8080/project1/">​http://localhost:8080/project1/</a>
+and
+<a class="reference external" href="http://localhost:8080/project2/">​http://localhost:8080/project2/</a>)</p>
+<p>You can&#8217;t have the last portion of the path identical between the
+projects since Trac uses that name to keep the URLs of the different
+projects unique. So if you use <code class="docutils literal"><span class="pre">/project1/path/to</span></code> and
+<code class="docutils literal"><span class="pre">/project2/path/to</span></code>, you will only see the second project.</p>
+<p>An alternative way to serve multiple projects is to specify a parent
+directory in which each subdirectory is a Trac project, using the <code class="docutils literal"><span class="pre">-e</span></code>
+option. The example above could be rewritten:</p>
+<p>To exit the server on Windows, be sure to use <code class="docutils literal"><span class="pre">CTRL-BREAK</span></code> &#8211; using
+<code class="docutils literal"><span class="pre">CTRL-C</span></code> will leave a Python process running in the background.</p>
+</div>
+<div class="section" id="installing-as-a-windows-service">
+<h2>Installing as a Windows Service<a class="headerlink" href="#installing-as-a-windows-service" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="option-1">
+<h3>Option 1<a class="headerlink" href="#option-1" title="Permalink to this headline">¶</a></h3>
+<p>To install as a Windows service, get the
+<a class="reference external" href="http://www.google.com/search?q=srvany.exe">​SRVANY</a> utility and run:</p>
+<p><strong>DO NOT</strong> use <code class="docutils literal"><span class="pre">tracd.exe</span></code>. Instead register <code class="docutils literal"><span class="pre">python.exe</span></code> directly
+with <code class="docutils literal"><span class="pre">tracd-script.py</span></code> as a parameter. If you use <code class="docutils literal"><span class="pre">tracd.exe</span></code>, it
+will spawn the python process without SRVANY&#8217;s knowledge. This python
+process will survive a <code class="docutils literal"><span class="pre">net</span> <span class="pre">stop</span> <span class="pre">tracd</span></code>.</p>
+<p>If you want tracd to start automatically when you boot Windows, do:</p>
+<p>The spacing here is important.</p>
+<div class="wikipage"><div class="line-block">
+<div class="line">Once the service is installed, it might be simpler to run the Registry
+Editor rather than use the <code class="docutils literal"><span class="pre">reg</span> <span class="pre">add</span></code> command documented above.
+Navigate to:</div>
+<div class="line"><code class="docutils literal"><span class="pre">HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\tracd\Parameters</span></code></div>
+</div>
+<p>Three (string) parameters are provided:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>AppDirectory</td>
+<td>C:\Python26\</td>
+</tr>
+<tr class="row-even"><td>Application</td>
+<td>python.exe</td>
+</tr>
+<tr class="row-odd"><td>AppParameters</td>
+<td>scripts\tracd-script.py -p 8080 ...</td>
+</tr>
+</tbody>
+</table>
+<p>Note that, if the AppDirectory is set as above, the paths of the
+executable <em>and</em> of the script name and parameter values are relative to
+the directory. This makes updating Python a little simpler because the
+change can be limited, here, to a single point. (This is true for the
+path to the .htpasswd file, as well, despite the documentation calling
+out the /full/path/to/htpasswd; however, you may not wish to store that
+file under the Python directory.)</p>
+</div><p>For Windows 7 User, srvany.exe may not be an option, so you can use
+<a class="reference external" href="http://www.google.com/search?q=winserv.exe">​WINSERV</a> utility and
+run:</p>
+</div>
+<div class="section" id="option-2">
+<h3>Option 2<a class="headerlink" href="#option-2" title="Permalink to this headline">¶</a></h3>
+<p>Use
+<a class="reference external" href="http://trac-hacks.org/wiki/WindowsServiceScript">​WindowsServiceScript</a>,
+available at <a class="reference external" href="http://trac-hacks.org/">​Trac Hacks</a>. Installs,
+removes, starts, stops, etc. your Trac service.</p>
+</div>
+<div class="section" id="option-3">
+<h3>Option 3<a class="headerlink" href="#option-3" title="Permalink to this headline">¶</a></h3>
+<p>also cygwin&#8217;s cygrunsrv.exe can be used:</p>
+</div>
+</div>
+<div class="section" id="using-authentication">
+<h2>Using Authentication<a class="headerlink" href="#using-authentication" title="Permalink to this headline">¶</a></h2>
+<p>Tracd provides support for both Basic and Digest authentication. Digest
+is considered more secure. The examples below use Digest; to use Basic
+authentication, replace <code class="docutils literal"><span class="pre">--auth</span></code> with <code class="docutils literal"><span class="pre">--basic-auth</span></code> in the command
+line.</p>
+<p>The general format for using authentication is:</p>
+<p>where:</p>
+<ul>
+<li><p class="first"><strong>base_project_dir</strong>: the base directory of the project specified
+as follows:</p>
+<ul class="simple">
+<li>when serving multiple projects: <em>relative</em> to the <code class="docutils literal"><span class="pre">project_path</span></code></li>
+<li>when serving only a single project (<code class="docutils literal"><span class="pre">-s</span></code>): the name of the
+project directory</li>
+</ul>
+<blockquote>
+<div><p>Don&#8217;t use an absolute path here as this won&#8217;t work. <em>Note:</em> This
+parameter is case-sensitive even for environments on Windows.</p>
+</div></blockquote>
+</li>
+<li><p class="first"><strong>password_file_path</strong>: path to the password file</p>
+</li>
+<li><p class="first"><strong>realm</strong>: the realm name (can be anything)</p>
+</li>
+<li><p class="first"><strong>project_path</strong>: path of the project</p>
+</li>
+<li><p class="first"><strong>``&#8211;auth``</strong> in the above means use Digest authentication, replace
+<code class="docutils literal"><span class="pre">--auth</span></code> with <code class="docutils literal"><span class="pre">--basic-auth</span></code> if you want to use Basic auth.
+Although Basic authentication does not require a &#8220;realm&#8221;, the command
+parser does, so the second comma is required, followed directly by
+the closing quote for an empty realm name.</p>
+</li>
+</ul>
+<p>Examples:</p>
+<p>Of course, the password file can be be shared so that it is used for
+more than one project:</p>
+<p>Another way to share the password file is to specify &#8220;*&#8221; for the
+project name:</p>
+<div class="section" id="basic-authorization-using-a-htpasswd-password-file">
+<h3>Basic Authorization: Using a htpasswd password file<a class="headerlink" href="#basic-authorization-using-a-htpasswd-password-file" title="Permalink to this headline">¶</a></h3>
+<p>This section describes how to use <code class="docutils literal"><span class="pre">tracd</span></code> with Apache .htpasswd files.</p>
+<blockquote>
+<div>Note: It is necessary (at least with Python 2.6) to install the
+fcrypt package in order to decode the htpasswd format. Trac source
+code attempt an <code class="docutils literal"><span class="pre">import</span> <span class="pre">crypt</span></code> first, but there is no such package
+for Python 2.6.</div></blockquote>
+<p>To create a .htpasswd file use Apache&#8217;s <code class="docutils literal"><span class="pre">htpasswd</span></code> command (see
+<a class="reference external" href="https://fedorahosted.org/sssd#GeneratingPasswordsWithoutApache">below</a>
+for a method to create these files without using Apache):</p>
+<p>then for additional users:</p>
+<p>Then to start <code class="docutils literal"><span class="pre">tracd</span></code> run something like this:</p>
+<p>For example:</p>
+<p><em>Note:</em> You might need to pass &#8220;-m&#8221; as a parameter to htpasswd on some
+platforms (OpenBSD).</p>
+</div>
+<div class="section" id="digest-authentication-using-a-htdigest-password-file">
+<h3>Digest authentication: Using a htdigest password file<a class="headerlink" href="#digest-authentication-using-a-htdigest-password-file" title="Permalink to this headline">¶</a></h3>
+<p>If you have Apache available, you can use the htdigest command to
+generate the password file. Type &#8216;htdigest&#8217; to get some usage
+instructions, or read <a class="reference external" href="http://httpd.apache.org/docs/2.0/programs/htdigest.html">​this
+page</a> from
+the Apache manual to get precise instructions. You&#8217;ll be prompted for a
+password to enter for each user that you create. For the name of the
+password file, you can use whatever you like, but if you use something
+like <code class="docutils literal"><span class="pre">users.htdigest</span></code> it will remind you what the file contains. As a
+suggestion, put it in your &lt;projectname&gt;/conf folder along with the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">trac.ini</a> file.</p>
+<p>Note that you can start tracd without the &#8211;auth argument, but if you
+click on the <em>Login</em> link you will get an error.</p>
+</div>
+<div class="section" id="generating-passwords-without-apache">
+<h3>Generating Passwords Without Apache<a class="headerlink" href="#generating-passwords-without-apache" title="Permalink to this headline">¶</a></h3>
+<p>Basic Authorization can be accomplished via this <a class="reference external" href="http://aspirine.org/htpasswd_en.html">​online HTTP Password
+generator</a>. Copy the generated
+password-hash line to the .htpasswd file on your system. Note that
+Windows Python lacks the &#8220;crypt&#8221; module that is the default hash type
+for htpasswd ; Windows Python can grok MD5 password hashes just fine and
+you should use MD5.</p>
+<p>You can use this simple Python script to generate a <strong>digest</strong> password
+file:</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">optparse</span> <span class="k">import</span> <span class="n">OptionParser</span>
+<span class="c1"># The md5 module is deprecated in Python 2.5</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">hashlib</span> <span class="k">import</span> <span class="n">md5</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">md5</span> <span class="k">import</span> <span class="n">md5</span>
+<span class="n">realm</span> <span class="o">=</span> <span class="s1">&#39;trac&#39;</span>
+
+<span class="c1"># build the options</span>
+<span class="n">usage</span> <span class="o">=</span> <span class="s2">&quot;usage: %prog [options]&quot;</span>
+<span class="n">parser</span> <span class="o">=</span> <span class="n">OptionParser</span><span class="p">(</span><span class="n">usage</span><span class="o">=</span><span class="n">usage</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;-u&quot;</span><span class="p">,</span> <span class="s2">&quot;--username&quot;</span><span class="p">,</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                  <span class="n">help</span><span class="o">=</span><span class="s2">&quot;the username for whom to generate a password&quot;</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;-p&quot;</span><span class="p">,</span> <span class="s2">&quot;--password&quot;</span><span class="p">,</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;password&quot;</span><span class="p">,</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                  <span class="n">help</span><span class="o">=</span><span class="s2">&quot;the password to use&quot;</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;-r&quot;</span><span class="p">,</span> <span class="s2">&quot;--realm&quot;</span><span class="p">,</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;realm&quot;</span><span class="p">,</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                  <span class="n">help</span><span class="o">=</span><span class="s2">&quot;the realm in which to create the digest&quot;</span><span class="p">)</span>
+<span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+<span class="c1"># check options</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">username</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">password</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+   <span class="n">parser</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;You must supply both the username and password&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">realm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+   <span class="n">realm</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">realm</span>
+
+<span class="c1"># Generate the string to enter into the htdigest file</span>
+<span class="n">kd</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">md5</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+<span class="nb">print</span> <span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">options</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">realm</span><span class="p">,</span> <span class="n">kd</span><span class="p">([</span><span class="n">options</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">realm</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">password</span><span class="p">])))</span>
+</pre></div>
+</div>
+</div><p>Note: If you use the above script you must set the realm in the
+<code class="docutils literal"><span class="pre">--auth</span></code> argument to <strong>``trac``</strong>. Example usage (assuming you saved
+the script as trac-digest.py):</p>
+<div class="section" id="using-md5sum">
+<h4>Using <code class="docutils literal"><span class="pre">md5sum</span></code><a class="headerlink" href="#using-md5sum" title="Permalink to this headline">¶</a></h4>
+<p>It is possible to use <code class="docutils literal"><span class="pre">md5sum</span></code> utility to generate digest-password
+file:</p>
+</div>
+</div>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<p>Here&#8217;s the online help, as a reminder (<code class="docutils literal"><span class="pre">tracd</span> <span class="pre">--help</span></code>):</p>
+<p>Use the -d option so that tracd doesn&#8217;t hang if you close the terminal
+window where tracd was started.</p>
+</div>
+<div class="section" id="tips">
+<h2>Tips<a class="headerlink" href="#tips" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="serving-static-content">
+<h3>Serving static content<a class="headerlink" href="#serving-static-content" title="Permalink to this headline">¶</a></h3>
+<p>If <code class="docutils literal"><span class="pre">tracd</span></code> is the only web server used for the project, it can also be
+used to distribute static content (tarballs, Doxygen documentation,
+etc.)</p>
+<p>This static content should be put in the <code class="docutils literal"><span class="pre">$TRAC_ENV/htdocs</span></code> folder,
+and is accessed by URLs like <code class="docutils literal"><span class="pre">&lt;project_URL&gt;/chrome/site/...</span></code>.</p>
+<p>Example: given a <code class="docutils literal"><span class="pre">$TRAC_ENV/htdocs/software-0.1.tar.gz</span></code> file, the
+corresponding relative URL would be
+<code class="docutils literal"><span class="pre">/&lt;project_name&gt;/chrome/site/software-0.1.tar.gz</span></code>, which in turn can
+be written as <code class="docutils literal"><span class="pre">htdocs:software-0.1.tar.gz</span></code>
+(<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracLinks.html">TracLinks</a>
+syntax) or <code class="docutils literal"><span class="pre">[/&lt;project_name&gt;/chrome/site/software-0.1.tar.gz]</span></code>
+(relative link syntax).</p>
+<blockquote>
+<div><em>Support for ``htdocs:``
+`TracLinks &lt;https://docs.pagure.org/sssd-test2/TracLinks.html&gt;`__
+syntax was added in version 0.10</em></div></blockquote>
+</div>
+<div class="section" id="using-tracd-behind-a-proxy">
+<h3>Using tracd behind a proxy<a class="headerlink" href="#using-tracd-behind-a-proxy" title="Permalink to this headline">¶</a></h3>
+<p>In some situations when you choose to use tracd behind Apache or another
+web server.</p>
+<p>In this situation, you might experience issues with redirects, like
+being redirected to URLs with the wrong host or protocol. In this case
+(and only in this case), setting the
+<code class="docutils literal"><span class="pre">[trac]</span> <span class="pre">use_base_url_for_redirect</span></code> to <code class="docutils literal"><span class="pre">true</span></code> can help, as this will
+force Trac to use the value of <code class="docutils literal"><span class="pre">[trac]</span> <span class="pre">base_url</span></code> for doing the
+redirects.</p>
+<p>If you&#8217;re using the AJP protocol to connect with <code class="docutils literal"><span class="pre">tracd</span></code> (which is
+possible if you have flup installed), then you might experience problems
+with double quoting. Consider adding the <code class="docutils literal"><span class="pre">--unquote</span></code> parameter.</p>
+<p>See also
+<a class="reference external" href="http://trac.edgewall.org/intertrac/TracOnWindowsIisAjp">​TracOnWindowsIisAjp</a>,
+<a class="reference external" href="http://trac.edgewall.org/intertrac/TracNginxRecipe">​TracNginxRecipe</a>.</p>
+</div>
+<div class="section" id="authentication-for-tracd-behind-a-proxy">
+<h3>Authentication for tracd behind a proxy<a class="headerlink" href="#authentication-for-tracd-behind-a-proxy" title="Permalink to this headline">¶</a></h3>
+<p>It is convenient to provide central external authentication to your
+tracd instances, instead of using <code class="docutils literal"><span class="pre">--basic-auth</span></code>. There is some
+discussion about this in #9206.</p>
+<p>Below is example configuration based on Apache 2.2, mod_proxy,
+mod_authnz_ldap.</p>
+<p>First we bring tracd into Apache&#8217;s location namespace.</p>
+<p>Then we need a single file plugin to recognize HTTP_REMOTE_USER header
+as valid authentication source. HTTP headers like <strong>HTTP_FOO_BAR</strong>
+will get converted to <strong>Foo-Bar</strong> during processing. Name it something
+like <strong>remote-user-auth.py</strong> and drop it into <strong>proxified/plugins</strong>
+directory:</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">trac.core</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">trac.config</span> <span class="k">import</span> <span class="n">BoolOption</span>
+<span class="kn">from</span> <span class="nn">trac.web.api</span> <span class="k">import</span> <span class="n">IAuthenticator</span>
+
+<span class="k">class</span> <span class="nc">MyRemoteUserAuthenticator</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+
+    <span class="n">implements</span><span class="p">(</span><span class="n">IAuthenticator</span><span class="p">)</span>
+
+    <span class="n">obey_remote_user_header</span> <span class="o">=</span> <span class="n">BoolOption</span><span class="p">(</span><span class="s1">&#39;trac&#39;</span><span class="p">,</span> <span class="s1">&#39;obey_remote_user_header&#39;</span><span class="p">,</span> <span class="s1">&#39;false&#39;</span><span class="p">,</span>
+               <span class="sd">&quot;&quot;&quot;Whether the &#39;Remote-User:&#39; HTTP header is to be trusted for user logins</span>
+<span class="sd">                (&#39;&#39;since ??.??&#39;).&quot;&quot;&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">authenticate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">obey_remote_user_header</span> <span class="ow">and</span> <span class="n">req</span><span class="o">.</span><span class="n">get_header</span><span class="p">(</span><span class="s1">&#39;Remote-User&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">req</span><span class="o">.</span><span class="n">get_header</span><span class="p">(</span><span class="s1">&#39;Remote-User&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</div><p>Add this new parameter to your
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">TracIni</a>:</p>
+<p>Run tracd:</p>
+</div>
+<div class="section" id="serving-a-different-base-path-than">
+<h3>Serving a different base path than /<a class="headerlink" href="#serving-a-different-base-path-than" title="Permalink to this headline">¶</a></h3>
+<p>Tracd supports serving projects with different base urls than
+/&lt;project&gt;. The parameter name to change this is</p>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracInstall.html">TracInstall</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracCgi.html">TracCgi</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracModPython.html">TracModPython</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracGuide.html">TracGuide</a>,
+<a class="reference external" href="http://trac.edgewall.org/intertrac/TracOnWindowsStandalone%23RunningTracdasservice">​Running tracd.exe as a Windows
+service</a></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Tracd</a><ul>
+<li><a class="reference internal" href="#pros">Pros</a></li>
+<li><a class="reference internal" href="#cons">Cons</a></li>
+<li><a class="reference internal" href="#usage-examples">Usage examples</a></li>
+<li><a class="reference internal" href="#installing-as-a-windows-service">Installing as a Windows Service</a><ul>
+<li><a class="reference internal" href="#option-1">Option 1</a></li>
+<li><a class="reference internal" href="#option-2">Option 2</a></li>
+<li><a class="reference internal" href="#option-3">Option 3</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-authentication">Using Authentication</a><ul>
+<li><a class="reference internal" href="#basic-authorization-using-a-htpasswd-password-file">Basic Authorization: Using a htpasswd password file</a></li>
+<li><a class="reference internal" href="#digest-authentication-using-a-htdigest-password-file">Digest authentication: Using a htdigest password file</a></li>
+<li><a class="reference internal" href="#generating-passwords-without-apache">Generating Passwords Without Apache</a><ul>
+<li><a class="reference internal" href="#using-md5sum">Using <code class="docutils literal"><span class="pre">md5sum</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#reference">Reference</a></li>
+<li><a class="reference internal" href="#tips">Tips</a><ul>
+<li><a class="reference internal" href="#serving-static-content">Serving static content</a></li>
+<li><a class="reference internal" href="#using-tracd-behind-a-proxy">Using tracd behind a proxy</a></li>
+<li><a class="reference internal" href="#authentication-for-tracd-behind-a-proxy">Authentication for tracd behind a proxy</a></li>
+<li><a class="reference internal" href="#serving-a-different-base-path-than">Serving a different base path than /</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracStandalone.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracStandalone.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

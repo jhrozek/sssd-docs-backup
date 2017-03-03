@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#Highlights">Highlights</a></li>
+<li><a class="reference external" href="#TicketsFixed">Tickets Fixed</a></li>
+<li><a class="reference external" href="#DetailedChangelog">Detailed Changelog</a></li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Numerous manpage and translation updates</li>
+<li>LDAP: Handle situations where the RootDSE isn&#8217;t available anonymously</li>
+<li>LDAP: Fix regression for users using non-standard LDAP attributes for
+user information</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/1183">#1183</a></dt>
+<dd>sssd.conf man page does not list autofs in the list of known
+services</dd>
+<dt><a class="reference external" href="/sssd/ticket/1219">#1219</a></dt>
+<dd>Warn on &#8216;make update-po&#8217; if there are manpages not listed in
+po4a.cfg</dd>
+<dt><a class="reference external" href="/sssd/ticket/1249">#1249</a></dt>
+<dd>Unable to lookup user aliases with proxy provider.</dd>
+<dt><a class="reference external" href="/sssd/ticket/1258">#1258</a></dt>
+<dd>SSSD should attempt to get the RootDSE after binding</dd>
+<dt><a class="reference external" href="/sssd/ticket/1265">#1265</a></dt>
+<dd>document the possible performance gains of disabling referral
+chasing</dd>
+<dt><a class="reference external" href="/sssd/ticket/1278">#1278</a></dt>
+<dd>Inadequate info in man page for &#8220;ldap_disable_paging&#8221; feature</dd>
+<dt><a class="reference external" href="/sssd/ticket/1290">#1290</a></dt>
+<dd>No info in sssd manpages for &#8220;ldap_sasl_minssf&#8221;</dd>
+<dt><a class="reference external" href="/sssd/ticket/1295">#1295</a></dt>
+<dd>Fix erronous reference to the &#8216;allow&#8217; access_provider</dd>
+<dt><a class="reference external" href="/sssd/ticket/1300">#1300</a></dt>
+<dd>autofs: maximum key name must be PATH_MAX</dd>
+<dt><a class="reference external" href="/sssd/ticket/1307">#1307</a></dt>
+<dd>sdap_check_aliases must not error when detects the same user</dd>
+<dt><a class="reference external" href="/sssd/ticket/1312">#1312</a></dt>
+<dd>group members are now lowercased in case insensitive domains</dd>
+<dt><a class="reference external" href="/sssd/ticket/1315">#1315</a></dt>
+<dd>New SSSD does not fetch renewable tickets</dd>
+<dt><a class="reference external" href="/sssd/ticket/1320">#1320</a></dt>
+<dd>Auth fails for user with non-default attribute names</dd>
+</dl>
+</div></div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Jakub Hrozek (14):</p>
+<ul class="simple">
+<li>man: document that referral chasing might bring performance penalty</li>
+<li>pam_sss: improve error handling in SELinux code</li>
+<li>Remove the &#8220;command&#8221; option from documentation</li>
+<li>autofs: Raise the maximum key length to PATH_MAX</li>
+<li>MAN: timeout can be specified for services, too</li>
+<li>MAN: document the hostid and autofs providers</li>
+<li>proxy: Canonicalize user and group names</li>
+<li>proxy: new option proxy_fast_alias</li>
+<li>sdap_check_aliases must not error when detects the same user</li>
+<li>Document sss_tools better</li>
+<li>Get the RootDSE after binding if not successfull before</li>
+<li>confdb_get_bool needs a TALLOC_CTX in sssd-1.8</li>
+<li>Lowercase group members in case-insensitive domains</li>
+<li>Read sysdb attribute name, not LDAP attribute map name</li>
+</ul>
+<p>Marco Pizzoli (1):</p>
+<ul class="simple">
+<li>Two manual pages fixes</li>
+</ul>
+<p>Pavel Březina (1):</p>
+<ul class="simple">
+<li>sudo api: check sss_status instead of errnop in
+sss_sudo_send_recv_generic()</li>
+</ul>
+<p>Stef Walter (1):</p>
+<ul class="simple">
+<li>Fix erronous reference to the &#8216;allow&#8217; access_provider</li>
+</ul>
+<p>Stephen Gallagher (6):</p>
+<ul class="simple">
+<li>Bumping version to 1.8.3</li>
+<li>MAN: Improve ldap_disable_paging documentation</li>
+<li>MAN: Add ldap_sasl_minssf to the manpage</li>
+<li>Update translation files</li>
+<li>Fix typo in translation file</li>
+<li>Update translations for 1.8.3 release</li>
+</ul>
+<p>Yuri Chornoivan (1):</p>
+<ul class="simple">
+<li>Fix typo: retreiving-&gt;retrieving</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.8.3.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.8.3.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

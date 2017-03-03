@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>OpenLMI provider design &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="openlmi-provider-design">
+<h1>OpenLMI provider design<a class="headerlink" href="#openlmi-provider-design" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="problem-statement">
+<h2>Problem Statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>SSSD provider for OpenLMI will allow administrators to retrieve
+information from SSSD and modify the configuration through OpemLMI
+tools.</p>
+</div>
+<div class="section" id="first-iteration">
+<h2>First iteration<a class="headerlink" href="#first-iteration" title="Permalink to this headline">¶</a></h2>
+<p>The first iteration will implement the following features:</p>
+<ul class="simple">
+<li>provide basic information about domains</li>
+<li>provide methods for changing debug level</li>
+<li>provide methods for enable/disable services</li>
+<li>provide methods for enable/disable domains</li>
+</ul>
+</div>
+</div>
+<div class="section" id="implementation-design">
+<h1>Implementation design<a class="headerlink" href="#implementation-design" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The OpenLMI provide will use <a class="reference external" href="https://docs.pagure.org/sssd-test2/DesignDocs/DBusResponder.html">​D-Bus
+responder</a>
+for communication with SSSD. The provider will implement <a class="reference external" href="https://docs.pagure.org/sssd-test2/DesignDocs/OpenLMIProvider.html#CIMschema">​SSSD CIM
+schema</a>,
+which describes the objects and their properties and methods. The schema
+should define a low level model of SSSD architecture. To simplify the
+most common tasks, we will also implement several <a class="reference external" href="https://docs.pagure.org/sssd-test2/DesignDocs/OpenLMIProvider.html#LMIscriptsdesign">​python
+scripts</a>
+that will follow the OpenLMI scripts interface. That will allow to run
+these scripts as single command from the command line via <em>lmi</em> tool.</p>
+</div>
+<div class="section" id="lmi-scripts-design">
+<h2>LMI scripts design<a class="headerlink" href="#lmi-scripts-design" title="Permalink to this headline">¶</a></h2>
+<p>The LMI scripts are python scripts that should provide a high level
+approach to the most common task of the LMI provider. These scripts are
+executed from command line using <em>lmi</em> tool with <em>lmi command subcommand
+&#8211;arg</em> syntax.</p>
+<ul class="simple">
+<li><strong>lmi sssd</strong></li>
+<li><strong>lmi sssd-domain</strong> command will provide information about SSSD
+domains</li>
+<li><strong>lmi sssd-service</strong> command will provide information about SSSD
+services</li>
+</ul>
+</div>
+<div class="section" id="cim-schema">
+<h2>CIM schema<a class="headerlink" href="#cim-schema" title="Permalink to this headline">¶</a></h2>
+<p>The CIM schema described the interface of OpenLMI SSSD provider. It
+defines a low level conceptual model that follows SSSD architecture.</p>
+<div class="section" id="uml-diagram">
+<h3>UML diagram<a class="headerlink" href="#uml-diagram" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://fedorahosted.org/sssd/attachment/wiki/DesignDocs/OpenLMIProvider/uml.png"><img alt="image0" src="https://fedorahosted.org/sssd/raw-attachment/wiki/DesignDocs/OpenLMIProvider/uml.png" /></a></p>
+</div>
+<div class="section" id="mof">
+<h3>MOF<a class="headerlink" href="#mof" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Pavel Březina &lt;<a class="reference external" href="mailto:pbrezina&#37;&#52;&#48;redhat&#46;com">​pbrezina<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">OpenLMI provider design</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem Statement</a></li>
+<li><a class="reference internal" href="#first-iteration">First iteration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementation-design">Implementation design</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#lmi-scripts-design">LMI scripts design</a></li>
+<li><a class="reference internal" href="#cim-schema">CIM schema</a><ul>
+<li><a class="reference internal" href="#uml-diagram">UML diagram</a></li>
+<li><a class="reference internal" href="#mof">MOF</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/OpenLMIProvider.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/OpenLMIProvider.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

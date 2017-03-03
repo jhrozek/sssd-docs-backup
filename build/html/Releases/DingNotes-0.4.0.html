@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="libini-config">
+<h2>libini_config<a class="headerlink" href="#libini-config" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Ability to convert input INI file from UTF 16/32 to UTF8 during
+parsing</li>
+<li>Support C style comments in INI file parsing</li>
+<li>Ability to read configuration data from a memory buffer</li>
+<li>Fixed processing of multi-valued strings</li>
+<li>Fixed parsing of line with multiple tokens</li>
+</ul>
+</div>
+</div>
+<div class="section" id="note-for-distribution-packagers">
+<h1>Note for distribution packagers<a class="headerlink" href="#note-for-distribution-packagers" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>This release bumps the soname of subpackages (libcollection,
+libini_config)</li>
+<li>A new version script was added (for more detailed information please
+see <a class="reference external" href="https://fedorahosted.org/sssd/ticket/2193">#2193</a>)</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/2106">#2106</a></dt>
+<dd>[RFE] Add ability to convert input ini file from UTF 16/32 to UTF8
+during parsing</dd>
+<dt><a class="reference external" href="/sssd/ticket/2107">#2107</a></dt>
+<dd>Description of the parse flags use is missing in header file</dd>
+<dt><a class="reference external" href="/sssd/ticket/2108">#2108</a></dt>
+<dd>[RFE] Support C/C++ style comments in INI file parsing</dd>
+<dt><a class="reference external" href="/sssd/ticket/2110">#2110</a></dt>
+<dd>Processing miltivalue strings does not return last token</dd>
+<dt><a class="reference external" href="/sssd/ticket/2119">#2119</a></dt>
+<dd>Double parsing failes for a complex file</dd>
+<dt><a class="reference external" href="/sssd/ticket/2192">#2192</a></dt>
+<dd>refactor the UTF-8 conversion function</dd>
+<dt><a class="reference external" href="/sssd/ticket/2193">#2193</a></dt>
+<dd>Use version script file for libraries from ding-libs</dd>
+</dl>
+</div></div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Dmitri Pal (20):</p>
+<ul class="simple">
+<li>Trim trailing spaces</li>
+<li>Adding missing argument to docs</li>
+<li>Fix for ini_get_string_config_array</li>
+<li>Do not check validity of comments</li>
+<li>Extend error set and add parsing error</li>
+<li>Process c-style comments</li>
+<li>Test files for unit test</li>
+<li>Unit test for c-style comments</li>
+<li>Expose buffer context as void</li>
+<li>Extend internal file handle</li>
+<li>Convert files to UTF</li>
+<li>Updated unit test for UTF8 conversion</li>
+<li>Fix typo in trace message</li>
+<li>Fix processing of the white space at the end of the line</li>
+<li>Unit test for space trimming in multiline values</li>
+<li>Adding more unit tests</li>
+<li>Refactor conversion function</li>
+<li>New entry to read data from mem</li>
+<li>Prevent tight loop</li>
+<li>Unit test for the new interface</li>
+</ul>
+<p>Jakub Hrozek (2):</p>
+<ul class="simple">
+<li>libiniconfig_devel must require libref_array-devel and
+libbasicobjects-devel</li>
+<li>rpm: Include the right filename of libini_config</li>
+</ul>
+<p>Jan Engelhardt (1):</p>
+<ul class="simple">
+<li>build: add missing Requires to pkgconfig file</li>
+</ul>
+<p>Lukas Slebodnik (19):</p>
+<ul class="simple">
+<li>Fix warning format string is not a string literal.</li>
+<li>Fix linking of tests on debian</li>
+<li>DHASH: Remove dead code.</li>
+<li>AUTOTOOLS: fix warning: macro xyz not found in library</li>
+<li>DOC: Fix problems in documentation comments.</li>
+<li>SPEC: path-utils unit test requires libcheck</li>
+<li>INI: run also negative_test</li>
+<li>Collection: Fix typo in function declarations</li>
+<li>INI: Use static modifier for non public functions</li>
+<li>Use static modifier for unit test functions</li>
+<li>INI: Fix warning missing-prototypes for some functions.</li>
+<li>INI: Include missing header file with declarations</li>
+<li>REFARRAY: Move declaration of ref_array_debug to public header file</li>
+<li>DHASH: Use ifdef for testing DEBUG macro</li>
+<li>Enable extra compiler warning flags</li>
+<li>Add version symbol files</li>
+<li>AUTOMAKE: Do not treat warnings as errors</li>
+<li>Bump version-info</li>
+<li>Bump versions for 0.4.0 release</li>
+</ul>
+<p>Ondrej Kos (8):</p>
+<ul class="simple">
+<li>COLLECTION: Fix comparision</li>
+<li>DHASH: Check before dereferencing</li>
+<li>PATH_UTILS: check against character representation of NULL</li>
+<li>INI: Remove dead code</li>
+<li>DHASH: Don&#8217;t use backward jumps</li>
+<li>DHASH: minor fixes</li>
+<li>INI: Bump version-info</li>
+<li>DOXY: Don&#8217;t generate timestamp</li>
+</ul>
+<p>Peter Robinson (1):</p>
+<ul class="simple">
+<li>Fix build with automake 1.14</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a><ul>
+<li><a class="reference internal" href="#libini-config">libini_config</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#note-for-distribution-packagers">Note for distribution packagers</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/DingNotes-0.4.0.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/DingNotes-0.4.0.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

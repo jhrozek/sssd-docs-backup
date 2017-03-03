@@ -1,0 +1,389 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>reStructuredText Support in Trac &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="restructuredtext-support-in-trac">
+<h1>reStructuredText Support in Trac<a class="headerlink" href="#restructuredtext-support-in-trac" title="Permalink to this headline">¶</a></h1>
+<p>Trac supports using <em>reStructuredText</em> (RST) as an alternative to wiki
+markup in any context
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html">WikiFormatting</a>
+is used.</p>
+<p>From the reStucturedText webpage:</p>
+<blockquote>
+<div>&#8220;<em>reStructuredText is an easy-to-read, what-you-see-is-what-you-get
+plaintext markup syntax and parser system. It is useful for in-line
+program documentation (such as Python docstrings), for quickly
+creating simple web pages, and for standalone documents.
+reStructuredText is designed for extensibility for specific
+application domains.</em> &#8220;</div></blockquote>
+<p>If you want a file from your Subversion repository be displayed as
+reStructuredText in Trac&#8217;s source browser, set <code class="docutils literal"><span class="pre">text/x-rst</span></code> as value
+for the Subversion property <code class="docutils literal"><span class="pre">svn:mime-type</span></code>. See <a class="reference external" href="http://trac.edgewall.org/intertrac/source%3A/trunk/INSTALL">​this
+example</a>.</p>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<p>Note that to activate RST support in Trac, the python docutils package
+must be installed. If not already available on your operating system,
+you can download it at the <a class="reference external" href="http://docutils.sourceforge.net/rst.html">​RST
+Website</a>.</p>
+<p>Install docutils using <code class="docutils literal"><span class="pre">easy_install</span> <span class="pre">docutils</span></code>. Do not use the package
+manager of your OS (e.g. <code class="docutils literal"><span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">python-docutils</span></code>), because
+Trac will not find docutils then.</p>
+</div>
+<div class="section" id="more-information-on-rst">
+<h2>More information on RST<a class="headerlink" href="#more-information-on-rst" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>reStructuredText Website &#8211;
+<a class="reference external" href="http://docutils.sourceforge.net/rst.html">​http://docutils.sourceforge.net/rst.html</a></li>
+<li>RST Quick Reference &#8211;
+<a class="reference external" href="http://docutils.sourceforge.net/docs/rst/quickref.html">​http://docutils.sourceforge.net/docs/rst/quickref.html</a></li>
+</ul>
+<hr class="docutils" />
+<div class="section" id="using-rst-in-trac">
+<h3>Using RST in Trac<a class="headerlink" href="#using-rst-in-trac" title="Permalink to this headline">¶</a></h3>
+<p>To specify that a block of text should be parsed using RST, use the
+<em>rst</em> processor.</p>
+</div>
+</div>
+<div class="section" id="traclinks-in-restructuredtext">
+<h2><a class="reference external" href="https://docs.pagure.org/sssd-test2/TracLinks.html">TracLinks</a> in reStructuredText<a class="headerlink" href="#traclinks-in-restructuredtext" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Trac provides a custom RST directive <code class="docutils literal"><span class="pre">trac::</span></code> to allow
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracLinks.html">TracLinks</a>
+from within RST text.</li>
+</ul>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first line-block">
+<div class="line"><br /></div>
+</div>
+<blockquote class="last">
+<div>}}}</div></blockquote>
+</td>
+<td><div class="first"><div class="document"></div><p>This is a reference to
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/42">#42</a></p>
+<div class="last"></div></div></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li>Trac allows an even easier way of creating
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracLinks.html">TracLinks</a> in
+RST, using the custom <code class="docutils literal"><span class="pre">:trac:</span></code> role.</li>
+</ul>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><p class="first">12`:trac:</p>
+<blockquote>
+<div>To learn how to use Trac, see <a href="#id1"><span class="problematic" id="id2">`</span></a>T</div></blockquote>
+<dl class="last docutils">
+<dt>racGuide`:trac:</dt>
+<dd>}}}</dd>
+</dl>
+</td>
+<td><div class="first"><div class="document"></div><p>This is a reference to ticket
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/12">#12</a></p>
+<p>To learn how to use Trac, see
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracGuide.html">TracGuide</a></p>
+<div class="last"></div></div></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div>For a complete example of all uses of the <code class="docutils literal"><span class="pre">:trac:</span></code> role, please
+see
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiRestructuredTextLinks.html">WikiRestructuredTextLinks</a>.</div></blockquote>
+</div>
+<div class="section" id="syntax-highlighting-in-restructuredtext">
+<h2>Syntax highlighting in reStructuredText<a class="headerlink" href="#syntax-highlighting-in-restructuredtext" title="Permalink to this headline">¶</a></h2>
+<p>There is a directive for doing
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracSyntaxColoring.html">TracSyntaxColoring</a>
+in RST as well. The directive is called code-block</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&nbsp;</td>
+<td><div class="first"><div class="document"></div><div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Test</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">TestFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+</pre></div>
+</div>
+</div><div class="last"></div></div></td>
+</tr>
+</tbody>
+</table>
+<p>Note the need to indent the code at least one character after the
+<code class="docutils literal"><span class="pre">..</span> <span class="pre">code-block</span></code> directive.</p>
+</div>
+<div class="section" id="wiki-macros-in-restructuredtext">
+<h2>Wiki Macros in reStructuredText<a class="headerlink" href="#wiki-macros-in-restructuredtext" title="Permalink to this headline">¶</a></h2>
+<p>For doing <a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiMacros.html">Wiki
+Macros</a> in RST
+you use the same directive as for syntax highlighting i.e code-block.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&nbsp;</td>
+<td><div class="first"><div class="document"></div><div><p class="rubric" id="section">06/08/15</p>
+<ul class="simple">
+<li><a href="#id3"><span class="problematic" id="id4">`</span></a>TracUpgrade &lt;<a class="reference external" href="https://docs.pagure">https://docs.pagure</a></li>
+</ul>
+<dl class="docutils">
+<dt>.org/sssd-test2/TracUpgrade.html&gt;`__</dt>
+<dd>(<a href="#id5"><span class="problematic" id="id6">`</span></a>diff &lt;<a class="reference external" href="https://docs.pagure.org/s">https://docs.pagure.org/s</a></dd>
+</dl>
+<p>ssd-test2/TracUpgrade?action=diff&amp;ve
+rsion=3.html&gt;`__)
+-  <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracRoadmap.html">TracRoadmap</a></p>
+<blockquote>
+<div>(<a href="#id7"><span class="problematic" id="id8">`</span></a>diff &lt;<a class="reference external" href="https://docs.pagure.org/s">https://docs.pagure.org/s</a></div></blockquote>
+<p>ssd-test2/TracRoadmap?action=diff&amp;ve
+rsion=3.html&gt;`__)
+-  <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTickets.html">TracTickets</a></p>
+<blockquote>
+<div>(<a href="#id9"><span class="problematic" id="id10">`</span></a>diff &lt;<a class="reference external" href="https://docs.pagure.org/s">https://docs.pagure.org/s</a></div></blockquote>
+<p>ssd-test2/TracTickets?action=diff&amp;ve
+rsion=3.html&gt;`__)</p>
+</div><div class="last"></div></div></td>
+</tr>
+</tbody>
+</table>
+<p>Or a more concise Wiki Macro like syntax is also available, using the
+<code class="docutils literal"><span class="pre">:code-block:</span></code> role:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><dl class="first last docutils">
+<dt>3`</dt>
+<dd>}}}</dd>
+</dl>
+</td>
+<td><div class="first"><div class="document"></div><div><p class="rubric" id="section-1">06/08/15</p>
+<ul class="simple">
+<li><a href="#id11"><span class="problematic" id="id12">`</span></a>TracUpgrade &lt;<a class="reference external" href="https://docs.pagure">https://docs.pagure</a></li>
+</ul>
+<dl class="docutils">
+<dt>.org/sssd-test2/TracUpgrade.html&gt;`__</dt>
+<dd>(<a href="#id13"><span class="problematic" id="id14">`</span></a>diff &lt;<a class="reference external" href="https://docs.pagure.org/s">https://docs.pagure.org/s</a></dd>
+</dl>
+<p>ssd-test2/TracUpgrade?action=diff&amp;ve
+rsion=3.html&gt;`__)
+-  <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracRoadmap.html">TracRoadmap</a></p>
+<blockquote>
+<div>(<a href="#id15"><span class="problematic" id="id16">`</span></a>diff &lt;<a class="reference external" href="https://docs.pagure.org/s">https://docs.pagure.org/s</a></div></blockquote>
+<p>ssd-test2/TracRoadmap?action=diff&amp;ve
+rsion=3.html&gt;`__)
+-  <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTickets.html">TracTickets</a></p>
+<blockquote>
+<div>(<a href="#id17"><span class="problematic" id="id18">`</span></a>diff &lt;<a class="reference external" href="https://docs.pagure.org/s">https://docs.pagure.org/s</a></div></blockquote>
+<p>ssd-test2/TracTickets?action=diff&amp;ve
+rsion=3.html&gt;`__)</p>
+</div><div class="last"></div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="bigger-rst-example">
+<h2>Bigger RST Example<a class="headerlink" href="#bigger-rst-example" title="Permalink to this headline">¶</a></h2>
+<p>The example below should be mostly self-explanatory:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><dl class="first last docutils">
+<dt>rceforge.net/rst.html</dt>
+<dd>}}}</dd>
+</dl>
+</td>
+<td><div class="first"><div id="foobar-header"
+class="document"></div><p>reStructuredText is <strong>nice</strong>. It has
+its own
+<a class="reference external" href="http://docutils.sourceforge.net/rst.html">webpage</a>.</p>
+<p>A table:</p>
+<p>Inputs
+Output
+A
+B
+A or B
+False
+False
+False
+True
+False
+True
+False
+True
+True
+True
+True
+True</p>
+<div id="rst-traclinks"
+class="section"><p class="rubric" id="rst-traclinks">RST TracLinks</p>
+<p>See also ticket
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/42">#42</a>.</p>
+</div><div class="last"></div></div></td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiRestructuredTextLinks.html">WikiRestructuredTextLinks</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiProcessors.html">WikiProcessors</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html">WikiFormatting</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">reStructuredText Support in Trac</a><ul>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+<li><a class="reference internal" href="#more-information-on-rst">More information on RST</a><ul>
+<li><a class="reference internal" href="#using-rst-in-trac">Using RST in Trac</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#traclinks-in-restructuredtext">TracLinks in reStructuredText</a></li>
+<li><a class="reference internal" href="#syntax-highlighting-in-restructuredtext">Syntax highlighting in reStructuredText</a></li>
+<li><a class="reference internal" href="#wiki-macros-in-restructuredtext">Wiki Macros in reStructuredText</a></li>
+<li><a class="reference internal" href="#bigger-rst-example">Bigger RST Example</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/WikiRestructuredText.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/WikiRestructuredText.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

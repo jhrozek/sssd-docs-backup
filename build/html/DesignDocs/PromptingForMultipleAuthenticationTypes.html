@@ -1,0 +1,328 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Prompting For Multiple Authentication Types &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="prompting-for-multiple-authentication-types">
+<h1>Prompting For Multiple Authentication Types<a class="headerlink" href="#prompting-for-multiple-authentication-types" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2988">​https://fedorahosted.org/sssd/ticket/2988</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>Currently FreeIPA only allows one authentication type at a given time
+for a user. Even if both authentication types &#8216;password&#8217; and &#8216;otp&#8217; were
+configured for the user only &#8216;otp&#8217; was allowed in that case. Because of
+this SSSD only had to prompt for either &#8216;Password&#8217; or &#8216;First factor&#8217; and
+&#8216;Second factor&#8217;.</p>
+<p>New version of FreeIPA will allow that the sue can authentication with
+different authentication types at the same time
+(<a class="reference external" href="https://fedorahosted.org/freeipa/ticket/433">​https://fedorahosted.org/freeipa/ticket/433</a>).
+SSSD now must prompt the user differently to make clear which
+authentication types are available for the user ideally without making
+the login process more complicated.</p>
+</div>
+<div class="section" id="use-cases">
+<h2>Use cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+<p>(taken from
+<a class="reference external" href="http://www.freeipa.org/page/V4/Authentication_Indicators">​http://www.freeipa.org/page/V4/Authentication_Indicators</a>)</p>
+<div class="section" id="strong-authentication-on-selected-system">
+<h3>Strong Authentication on Selected System<a class="headerlink" href="#strong-authentication-on-selected-system" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="user-story">
+<h4>User story<a class="headerlink" href="#user-story" title="Permalink to this headline">¶</a></h4>
+<p>As an Administrator, I want to setup authentication to a critical system
+in my infrastructure (gateway VPN, accounting system) to only allow IdM
+users authenticated via strong authentication methods (2FA). I do not
+want to require strong authentication on other systems.</p>
+</div>
+<div class="section" id="description">
+<h4>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h4>
+<p>A realm has two servers configured for ssh which use the following
+principals configured with authentication indicators:</p>
+<p>When the administrator logs in using both his password and an OTP token,
+he can access both systems via ssh. However, when the administrator logs
+in using just a password, he can only access lowsecurity.example.com.</p>
+</div>
+</div>
+</div>
+<div class="section" id="overview-of-the-solution">
+<h2>Overview of the solution<a class="headerlink" href="#overview-of-the-solution" title="Permalink to this headline">¶</a></h2>
+<p>Depending on the available authentication types SSSD will show different
+login prompts:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="71%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Authentication types</th>
+<th class="head">Login Prompt</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>password</td>
+<td>Password:</td>
+</tr>
+<tr class="row-odd"><td>otp</td>
+<td>First factor:
+Second factor:</td>
+</tr>
+<tr class="row-even"><td>password + otp</td>
+<td>First factor or password:
+Second factor, press return for Password authentication:</td>
+</tr>
+</tbody>
+</table>
+<p>If Smartcard authentication is enabled (<em>pam_cert_auth = True</em>) and a
+Smartcard is inserted in a reader with a certificate matching the user
+who wants to login the login prompt will ask for the Smartcard PIN for
+local authentication
+(<a class="reference external" href="https://docs.pagure.org/sssd-test2/SmartcardAuthenticationStep1.html">wiki:SmartcardAuthenticationStep1?</a>).
+Upcoming support for pkinit might lead to another extension of the
+prompting scheme.</p>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<p>First it has to be noted that this feature is related to Kerberos
+authentication because here the available authentication types are
+indicated by the server during the authentication request. Other
+authentication schemes like e.g. LDAP bind based authentication do
+support multiple different methods as well, e.g. you can bind to the
+FreeIPA LDAP server with password and 2FA authentication if the user is
+configured accordingly. But here the client either has to try which
+authentication might work or figure out possible authentication methods
+by other means which might be unreliable.</p>
+<p>Kerberos indicates the available authentication methods via the
+available pre-authentication methods listed in the &#8216;Additional
+pre-authentication required&#8217; response. The different pre-authentication
+methods are implemented as plugins and there are two ways for the
+plugins to interact with a user. The first one is a prompter callback
+which can be given as argument to e.g.
+krb5_get_init_creds_password(). The second, newer and more advanced
+method, are responders which can be set with
+krb5_get_init_creds_opt_set_responder() which is available since
+version 1.11 of MIT Kerberos.</p>
+<p>For older versions of Kerberos where
+krb5_get_init_creds_opt_set_responder() is not available nothing
+changes because those versions do not support OTP either, so only
+password authentication will be available here.</p>
+<p>For builds with a newer version of MIT Kerberos all authentication
+decision will be moved to the responder. This means that calls like
+krb5_get_init_creds_password() will not get the password as an
+argument anymore but the password is set inside of the responder if
+password based authentication is chosen.</p>
+<p>The responder will check which authentication types are available by
+calling krb5_responder_list_questions(). If password authentication
+is available, indicated by the value of
+KRB5_RESPONDER_QUESTION_PASSWORD and the provided authentication
+token is of type password as well the password is set as answer to the
+password authentication and no further methods are considered.</p>
+<p>If password authentication is not available or the provided
+authentication token is of type SSS_AUTHTOK_TYPE_2FA the existing OTP
+responder component is called.</p>
+<p>During the SSSD pre-authentication request a new pam response is added
+which indicate that password authentication is available. Based on this
+and the OTP related response the pam_sss PAM modules can choose the
+right set of prompts.</p>
+</div>
+<div class="section" id="configuration-changes">
+<h2>Configuration changes<a class="headerlink" href="#configuration-changes" title="Permalink to this headline">¶</a></h2>
+<p>No configuration changes are needed on the client the available
+authentication types are determined based the the responses of the
+server.</p>
+</div>
+<div class="section" id="how-to-test">
+<h2>How To Test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<p>First create an IPA user and assign an OTP token to the user, see
+<a class="reference external" href="http://www.freeipa.org/page/V4/OTP#How_to_Test">​http://www.freeipa.org/page/V4/OTP#How_to_Test</a>
+for details. Additionally two services with different authentication
+indicator requirements are useful to test the returned credentials but
+are not necessary to test the prompting.</p>
+<p>(the keytab files are not needed for further testing).</p>
+<p>To test plain password authentication call</p>
+<p>and then as an un-privileged user</p>
+<p>after login you can test by calling</p>
+<p>that only a ticket for the ANY service can be requested but not for the
+OTP service because only the password was used for authentication.</p>
+<p>Entering
+Password+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TokenValue.html">TokenValue?</a>
+in a single string at the <em>Password:</em> prompt will cause an
+authentication failure.</p>
+<p>The second test is for OTP only authentication</p>
+<p>and then as an un-privileged user call</p>
+<p>after login you can test by calling</p>
+<p>that tickets for both services can be request successfully because now
+2-Factor authentication was used to log in.</p>
+<p>Entering
+Password+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TokenValue.html">TokenValue?</a>
+in a single string at the <em>First Factor:</em> prompt will authenticate the
+user successfully as well but features like off-line authentication or
+unlocking of the user&#8217;s keyring might not be availble.</p>
+<p>Finally both authentication methods are enabled on the server:</p>
+<p>If now call <em>su</em> as an un-privileged user</p>
+<p>you can either just enter the password and press enter at the second
+prompt or enter the password and the OTP token value at the respective
+prompt. In the first case only a ticket for the ANY service can be
+requested:</p>
+<p>If both factor are given tickets for both services can be requested
+successfully:</p>
+<p>Entering
+Password+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TokenValue.html">TokenValue?</a>
+in a single string at the <em>First Factor or Password:</em> prompt will cause
+an authentication failure.</p>
+</div>
+<div class="section" id="how-to-debug">
+<h2>How To Debug<a class="headerlink" href="#how-to-debug" title="Permalink to this headline">¶</a></h2>
+<p>If password authentication is not working when both password and OTP
+authentication are enabled you might hit
+<a class="reference external" href="https://bugzilla.redhat.com//show_bug.cgi?id=1340304">​https://bugzilla.redhat.com//show_bug.cgi?id=1340304</a>
+and should update the Kerbeors packages.</p>
+<div class="section" id="inspecting-log-files">
+<h3>Inspecting log files<a class="headerlink" href="#inspecting-log-files" title="Permalink to this headline">¶</a></h3>
+<p>Setting <em>debug_level = 9</em> in the <em>[domain/...]</em> section of <em>sssd.conf</em>
+will add libkrb5 trace messages to the krb5_child.log file which e.g.
+will show the pre-authentication methods offered by the KDC. Based on
+this SSSD will determine which authentication methods are available. In
+the <em>Processing preauth types:</em> line of the trace output <em>141</em>
+represents the OTP authentication while <em>2</em> (without FAST) or <em>138</em>
+(with FAST) stand for password authentication.</p>
+</div>
+<div class="section" id="manual-testing-with-kinit">
+<h3>Manual testing with kinit<a class="headerlink" href="#manual-testing-with-kinit" title="Permalink to this headline">¶</a></h3>
+<p>If only password authentication or password and OTP authentication are
+configured for a user kinit should ask for the password:</p>
+<p>OTP authentication is only available if FAST is enabled. The needed
+armor credential cache must be requested with kinit as well:</p>
+<p>which will use the default keytab (/etc/krb5.keytab) which is accessible
+only by root to get a TGT. For easier testing you can create a special
+service and give suitable permissions to the service keytab. To use it
+with kinit use the -t option</p>
+<p>Now you can call</p>
+<p>If OTP is not enable for the user you should see the password prompt.</p>
+<p>As usual, setting <em>KRB5_TRACE=/dev/stdout</em> before calling <em>kinit</em> or
+<em>kvno</em> will produce some extra output which might be useful.</p>
+</div>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Sumit Bose &lt;<a class="reference external" href="mailto:sbose&#37;&#52;&#48;redhat&#46;com">​sbose<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Prompting For Multiple Authentication Types</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem statement</a></li>
+<li><a class="reference internal" href="#use-cases">Use cases</a><ul>
+<li><a class="reference internal" href="#strong-authentication-on-selected-system">Strong Authentication on Selected System</a><ul>
+<li><a class="reference internal" href="#user-story">User story</a></li>
+<li><a class="reference internal" href="#description">Description</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#overview-of-the-solution">Overview of the solution</a></li>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a></li>
+<li><a class="reference internal" href="#configuration-changes">Configuration changes</a></li>
+<li><a class="reference internal" href="#how-to-test">How To Test</a></li>
+<li><a class="reference internal" href="#how-to-debug">How To Debug</a><ul>
+<li><a class="reference internal" href="#inspecting-log-files">Inspecting log files</a></li>
+<li><a class="reference internal" href="#manual-testing-with-kinit">Manual testing with kinit</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/PromptingForMultipleAuthenticationTypes.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/PromptingForMultipleAuthenticationTypes.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

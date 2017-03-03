@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Addresses CVE-2010-4341 - DoS in sssd PAM responder can prevent
+logins</li>
+<li>Vast performance improvements when <code class="docutils literal"><span class="pre">enumerate</span> <span class="pre">=</span> <span class="pre">true</span></code></li>
+<li>All PAM actions will now perform a forced initgroups lookup instead
+of just a user information lookup<ul>
+<li>This guarantees that all group information is available to other
+providers, such as the simple provider.</li>
+</ul>
+</li>
+<li>For backwards-compatibility, DNS lookups will also fall back to
+trying the SSSD domain name as a DNS discovery domain.</li>
+<li>Support for more password expiration policies in LDAP<ul>
+<li>389 Directory Server</li>
+<li>FreeIPA</li>
+<li>ActiveDirectory</li>
+</ul>
+</li>
+<li>Support for ldap_tls_{cert,key,cipher_suite} config options<ul>
+<li>Provided by community member Tyson Whitehead</li>
+</ul>
+</li>
+<li>Assorted bugfixes</li>
+</ul>
+</div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Jakub Hrozek (1):</p>
+<ul class="simple">
+<li>NSS obfuscation code cleanup</li>
+</ul>
+<p>Piotr Drąg (2):</p>
+<ul class="simple">
+<li>Updating pl translation</li>
+<li>Updating pl translation</li>
+</ul>
+<p>Stephen Gallagher (27):</p>
+<ul class="simple">
+<li>Bumping version to 1.5.1</li>
+<li>Remove unnecessary po4a BuildRequires</li>
+<li>Fix boolean comparison against string</li>
+<li>Work around libldb bug</li>
+<li>Add missing sysdb transaction to group enumerations</li>
+<li>Do not throw a DP error when a netgroup is not found</li>
+<li>Fix missing hash table bug</li>
+<li>Regenerate manpage po[t] files</li>
+<li>Update manpage translations for ldap_enumeration_search_timeout</li>
+<li>Fix usability of sss_obfuscate command</li>
+<li>Do not force a default for debug_level</li>
+<li>Clarify nscd warning</li>
+<li>Remove support for pre-1.1 netlink</li>
+<li>Don&#8217;t double-sanitize member DNs</li>
+<li>Fix incorrect example file</li>
+<li>Add the user&#8217;s primary group to the initgroups lookup</li>
+<li>Perform initgroups lookup for PAM</li>
+<li>Add missing include file to sdap_async_accounts.c</li>
+<li>Allow fallback to SSSD domain</li>
+<li>Rename dns_domain to discovery domain for fo_add_srv_server()</li>
+<li>Delete attributes that are removed from LDAP</li>
+<li>Updating translation files for string freeze</li>
+<li>Update translation files for string freeze</li>
+<li>Add uk translation to specfile</li>
+<li>Add missing gettext BuildRequires</li>
+<li>Update man.stamp when the potfile or po4a.cfg is updated</li>
+<li>Add option to disable TLS for LDAP auth</li>
+</ul>
+<p>Sumit Bose (22):</p>
+<ul class="simple">
+<li>Build and install translated man pages by default</li>
+<li>Use the right status when resetting service discovery</li>
+<li>Rename SRV_NOT_RESOLVED to SRV_RESOLVE_ERROR</li>
+<li>Return groups and users from all domains during enumeration</li>
+<li>Post enumeration tevent request if needed</li>
+<li>Remove unused enumeration cache timeout checks</li>
+<li>Convert obfuscated password once at startup</li>
+<li>Add syslog message to shadow access check</li>
+<li>Add syslog messages to authorized service access check</li>
+<li>Validate user supplied size of data items</li>
+<li>Add overflow check to SAFEALIGN_COPY_*_CHECK macros</li>
+<li>Add timeout parameter to sdap_get_generic_send()</li>
+<li>Add ldap_search_enumeration_timeout config option</li>
+<li>Add LDAP expire policy based on AD attributes</li>
+<li>Add LDAP expire policy base RHDS/IPA attribute</li>
+<li>Add ipa_hbac_search_base config option</li>
+<li>Add pam_pwd_expiration_warning config option</li>
+<li>Use DEFAULT_PAM_VERBOSITY if config value cannot be retrieved</li>
+<li>Fix return value check</li>
+<li>Fix uninitialized value error</li>
+<li>Fix nested group handling during enumeration</li>
+<li>Do not fail if attributes are empty</li>
+</ul>
+<p>Tyson Whitehead (1):</p>
+<ul class="simple">
+<li>Add ldap_tls_{cert,key,cipher_suite} config options</li>
+</ul>
+<p>Yuri Chornoivan (6):</p>
+<ul class="simple">
+<li>Updating uk translation</li>
+<li>Add uk translation for manpages</li>
+<li>Fix manpage typos</li>
+<li>Updating uk manpage translation</li>
+<li>Updating uk translation</li>
+<li>Updating uk translation</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.5.1.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.5.1.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

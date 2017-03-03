@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>New LDAP access provider allows for filtering user access by LDAP
+attribute</li>
+<li>Reduced default timeout for detecting offline status with LDAP<ul>
+<li>For <code class="docutils literal"><span class="pre">enumerate=False</span></code>, reduced to five seconds</li>
+<li>For <code class="docutils literal"><span class="pre">enumerate=True</span></code>, reduced to thirty seconds</li>
+</ul>
+</li>
+<li>GSSAPI ticket lifetime made configurable<ul>
+<li>New default is 24 hours (or server maximum, whichever is lower)</li>
+</ul>
+</li>
+<li>Better offline-&gt;online transition support in Kerberos</li>
+</ul>
+</div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Petter Reinholdtsen (1):</p>
+<ul class="simple">
+<li>Allow
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Debian/Ubuntu.html">Debian/Ubuntu?</a>
+build to pass &#8211;install-layout=deb to setup.py</li>
+</ul>
+<p>Piotr Drąg (1):</p>
+<ul class="simple">
+<li>Update pl translation</li>
+</ul>
+<p>Stephen Gallagher (6):</p>
+<ul class="simple">
+<li>Add ldap_access_filter option</li>
+<li>Don&#8217;t report a fatal error for an HBAC denial</li>
+<li>Add ldap_access_filter option</li>
+<li>Remove unused ldap_offline_timeout option</li>
+<li>Set ldap_search_timeout default to 5 seconds</li>
+<li>Update version to 1.1.92</li>
+</ul>
+<p>Sumit Bose (11):</p>
+<ul class="simple">
+<li>Add ldap_krb5_ticket_lifetime option</li>
+<li>Revert &#8220;Create kdcinfo and kpasswdinfo file at startup&#8221;</li>
+<li>Refactor data provider callbacks</li>
+<li>Add offline callbacks</li>
+<li>Refactor krb5_finalize()</li>
+<li>Add run_callbacks flag</li>
+<li>Add callback to remove krb5 info files when going offline</li>
+<li>Krb5 locator plugin returns KRB5_PLUGIN_NO_HANDLE</li>
+<li>Refactor krb5 SIGTERM handler installation</li>
+<li>Add krb5 SIGTERM handler to ipa auth provider</li>
+<li>Add offline callback to disconnect global SDAP handle</li>
+</ul>
+<p>Yuri Chornoivan (1):</p>
+<ul class="simple">
+<li>Update uk translation</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.1.92.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.1.92.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

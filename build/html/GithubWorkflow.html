@@ -1,0 +1,200 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>SSSD github workflow &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="sssd-github-workflow">
+<h1>SSSD github workflow<a class="headerlink" href="#sssd-github-workflow" title="Permalink to this headline">¶</a></h1>
+<p>This page describes how to submit, review and push pull requests from
+github.</p>
+<div class="section" id="a-quick-overwiew">
+<h2>A quick overwiew<a class="headerlink" href="#a-quick-overwiew" title="Permalink to this headline">¶</a></h2>
+<p>Github pull requests are the preferred way of handling code submissions
+to SSSD. If, for some reason you prefer to not use github, you can also
+e-mail your patch as an attachment to the
+<a class="reference external" href="https://lists.fedorahosted.org/archives/list/sssd-devel%40lists.fedorahosted.org/">​sssd-devel</a>
+mailing list.</p>
+<p>However, we still keep our code in the fedorahosted repository and we
+never merge pull requests, but push them directly to the fedorahosted
+repo in order to keep our history linear. The fedorahosted repo is
+automatically mirrored to github after every push using a
+fedorahosted.org plugin.</p>
+<p>All pull request activity also generates an e-mail notification to the
+sssd-devel mailing list so that we keep the development history outside
+github.</p>
+</div>
+<div class="section" id="tip-the-hub-command-line-tool">
+<h2>Tip: the <code class="docutils literal"><span class="pre">hub</span></code> command-line tool<a class="headerlink" href="#tip-the-hub-command-line-tool" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference external" href="https://github.com/github/hub">​hub</a> tool provides a nice way of
+interacting with github from the command line. You can even alias
+<code class="docutils literal"><span class="pre">hub</span></code> as <code class="docutils literal"><span class="pre">git</span></code> and use the same commands locally and against github.</p>
+</div>
+<div class="section" id="submitting-a-pull-request">
+<h2>Submitting a pull-request<a class="headerlink" href="#submitting-a-pull-request" title="Permalink to this headline">¶</a></h2>
+<p>To submit a pull request, create a fork of the <a class="reference external" href="https://github.com/SSSD/sssd">​sssd
+repository</a> on github. Once you have
+that, add your repository as a remote locally:</p>
+<p>It&#8217;s a good idea to add the SSSD github repo as a remote, especially if
+you plan on using <code class="docutils literal"><span class="pre">hub</span></code>:</p>
+<p>Using <code class="docutils literal"><span class="pre">https://</span></code> will ensure you don&#8217;t push to sssd&#8217;s github repo by
+mistake.</p>
+<p>Once you&#8217;re done working on your patches, push them to a feature branch
+on github:</p>
+<p>You can then open a pull request either from the <a class="reference external" href="https://help.github.com/articles/creating-a-pull-request/">​web
+ui</a> or
+using the hub tool:</p>
+</div>
+<div class="section" id="reviewing-a-pull-requests">
+<h2>Reviewing a pull requests<a class="headerlink" href="#reviewing-a-pull-requests" title="Permalink to this headline">¶</a></h2>
+<p>The list of open pull requests can be found at
+<a class="reference external" href="https://github.com/SSSD/sssd/pulls">​https://github.com/SSSD/sssd/pulls</a>.
+If you want to formally review a pull request, please assign the pull
+request to yourself. This indicates that you&#8217;ll be working with the
+submitter on pushing their pull requests upstream. You don&#8217;t need to
+assign the pull request if you just want to add a one-time comment. The
+pull-request assignee(s) will be added as <code class="docutils literal"><span class="pre">Reviewed-By</span></code> tags when
+pushing to the <code class="docutils literal"><span class="pre">fedorahosted.org</span></code> repository.</p>
+<p>To comment on the code, you can use either add a comment to the github
+text field, or click on the individual commit links and add comments
+inline to the diff.</p>
+<p>If there is an issue in the code that you feel warrants a patch respin,
+add the <code class="docutils literal"><span class="pre">nack</span></code> label to the pull request.</p>
+<p>Once you agree with the pull request, add the <code class="docutils literal"><span class="pre">ack</span></code> label to the pull
+request. One of the gatekeepers will then push the pull request to the
+sssd repository manually.</p>
+<p>If a pull-request is submitted by someone from outside the core team,
+the CI tests won&#8217;t run to make sure some potentially malicious code is
+not ran on the CI nodes. To allow the code to be tested, one of the core
+developers must add:</p>
+<p>as a comment to the pull request. An example of one such pull request
+can be found <a class="reference external" href="https://github.com/SSSD/sssd/pull/35">​here</a>.</p>
+<p>Any github user can comment on an open github issue. However, only
+collaboratos can self-assign the pull requests and add labels. If you
+would like to be added as a collaborator, please send a mail to
+<a class="reference external" href="https://lists.fedorahosted.org/archives/list/sssd-devel%40lists.fedorahosted.org/">​sssd-devel</a>
+and ask to be added.</p>
+<p><strong>Pro-tips:</strong></p>
+<ul class="simple">
+<li>Pressing <code class="docutils literal"><span class="pre">l</span></code> on the gihub request allows to set labels without
+reaching for the mouse. You can also set assignee by pressing <code class="docutils literal"><span class="pre">a</span></code>.</li>
+<li>You can add pull requests as refs and add check them out as branches
+locally. To do that, add another <code class="docutils literal"><span class="pre">fetch</span></code> directive to your github
+remote definition using <code class="docutils literal"><span class="pre">git</span> <span class="pre">config</span></code>.</li>
+</ul>
+<p>Then you can fetch and checkout the pull requests with git:</p>
+</div>
+<div class="section" id="pushing-a-pull-request">
+<h2>Pushing a pull request<a class="headerlink" href="#pushing-a-pull-request" title="Permalink to this headline">¶</a></h2>
+<p>Only pull requests with an <code class="docutils literal"><span class="pre">ack</span></code> label can be pushed.</p>
+<p>To push a patch, first apply it, for example:</p>
+<p>Don&#8217;t forget to add the <code class="docutils literal"><span class="pre">Reviewed-By</span></code> tags, based on the pull request
+assignee. It&#8217;s recommended to use the pre-push hook from
+<code class="docutils literal"><span class="pre">contrib/git/pre-push</span></code> that rejects any pushes without a
+<code class="docutils literal"><span class="pre">Reviewed-By</span></code> tag.</p>
+<p>Then check again what patches would be pushed:</p>
+<p>And if the hashes look OK, finally push the patches:</p>
+<p>Finally, add the commit hashes to the pull request page, add the label
+<code class="docutils literal"><span class="pre">pushed</span></code> and close the pull request.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">SSSD github workflow</a><ul>
+<li><a class="reference internal" href="#a-quick-overwiew">A quick overwiew</a></li>
+<li><a class="reference internal" href="#tip-the-hub-command-line-tool">Tip: the <code class="docutils literal"><span class="pre">hub</span></code> command-line tool</a></li>
+<li><a class="reference internal" href="#submitting-a-pull-request">Submitting a pull-request</a></li>
+<li><a class="reference internal" href="#reviewing-a-pull-requests">Reviewing a pull requests</a></li>
+<li><a class="reference internal" href="#pushing-a-pull-request">Pushing a pull request</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/GithubWorkflow.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/GithubWorkflow.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

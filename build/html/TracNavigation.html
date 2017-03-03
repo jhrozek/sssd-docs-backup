@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Trac Navigation &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="trac-navigation">
+<h1>Trac Navigation<a class="headerlink" href="#trac-navigation" title="Permalink to this headline">¶</a></h1>
+<p>Starting with Trac 0.11, it is now possible to customize the main and
+meta navigation entries in some basic ways.</p>
+<p>The new <code class="docutils literal"><span class="pre">[mainnav]</span></code> and <code class="docutils literal"><span class="pre">[metanav]</span></code> configuration sections can now
+be used to customize the text and link used for the navigation items, or
+even to disable them. The <code class="docutils literal"><span class="pre">mainnav</span></code> and <code class="docutils literal"><span class="pre">metanav</span></code> options in the
+<code class="docutils literal"><span class="pre">[trac]</span></code> configuration section can also be used to change the order.</p>
+<div class="section" id="mainnav">
+<h2><code class="docutils literal"><span class="pre">[mainnav]</span></code><a class="headerlink" href="#mainnav" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">[mainnav]</span></code> corresponds to the <strong>main navigation bar</strong>, the one
+containing entries such as <em>Wiki</em>, <em>Timeline</em>, <em>Roadmap</em>, <em>Browse
+Source</em> and so on. This navigation bar is meant to access the default
+page of the main modules enabled in Trac that are accessible for the
+current user.</p>
+<p><strong>Example</strong></p>
+<p>In the following example, we rename the link to the Wiki start &#8220;Home&#8221;,
+and make the &#8220;View Tickets&#8221; entry link to a specific report. The second
+example (below) also hides the &#8220;Help/Guide&#8221; link.</p>
+<p>Relevant excerpt from the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">TracIni</a>:</p>
+</div>
+<div class="section" id="metanav">
+<h2><code class="docutils literal"><span class="pre">[metanav]</span></code><a class="headerlink" href="#metanav" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">[metanav]</span></code> corresponds to the <strong>meta navigation bar</strong>, by default
+positioned above the main navigation bar and below the <em>Search</em> box. It
+contains the <em>Log in</em>, <em>Logout</em>, <em>Help/Guide</em> etc. entries. This
+navigation bar is meant to access some global information about the Trac
+project and the current user.</p>
+<p>There is one special entry in the <code class="docutils literal"><span class="pre">[metanav]</span></code> section:
+<code class="docutils literal"><span class="pre">logout.redirect</span></code> is the page the user sees after hitting the logout
+button.</p>
+<p><strong>Example</strong></p>
+</div>
+<div class="section" id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<p>Possible URL formats (for <code class="docutils literal"><span class="pre">.href</span></code> or <code class="docutils literal"><span class="pre">.redirect</span></code>):</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="42%" />
+<col width="58%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>config</strong></td>
+<td><strong>redirect to</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">wiki/Logout</span></code></td>
+<td><code class="docutils literal"><span class="pre">/projects/env/wiki/Logout</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">http://hostname/</span></code></td>
+<td><code class="docutils literal"><span class="pre">http://hostname/</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">/projects</span></code></td>
+<td><code class="docutils literal"><span class="pre">/projects</span></code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="trac">
+<h2><code class="docutils literal"><span class="pre">[trac]</span></code><a class="headerlink" href="#trac" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal"><span class="pre">mainnav</span></code> and <code class="docutils literal"><span class="pre">metanav</span></code> options in the <code class="docutils literal"><span class="pre">[trac]</span></code> configuration
+section control the order in which the navigation items are displayed
+(left to right). This can be useful with plugins that add navigation
+items.</p>
+<p><strong>Example</strong></p>
+<p>In the following example, we change the order to prioritise the ticket
+related items further left.</p>
+<p>Relevant excerpt from the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">TracIni</a>:</p>
+<p>The default order and item names can be found in the source, which at
+the time of writing <a class="reference external" href="https://fedorahosted.org/sssd/browser/trunk/trac/web/chrome.py?rev=10883&amp;marks=397%2C402-403#L396">is
+here</a></p>
+</div>
+<div class="section" id="context-navigation">
+<h2>Context Navigation<a class="headerlink" href="#context-navigation" title="Permalink to this headline">¶</a></h2>
+<p>Note that it is still not possible to customize the <strong>contextual
+navigation bar</strong>, i.e. the one usually placed below the main navigation
+bar.</p>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracInterfaceCustomization.html">TracInterfaceCustomization</a>,
+and the
+<a class="reference external" href="http://trac-hacks.org/wiki/NavAddPlugin">​TracHacks:NavAddPlugin</a> or
+<a class="reference external" href="http://trac-hacks.org/wiki/MenusPlugin">​TracHacks:MenusPlugin</a>
+(still needed for adding entries)</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Trac Navigation</a><ul>
+<li><a class="reference internal" href="#mainnav"><code class="docutils literal"><span class="pre">[mainnav]</span></code></a></li>
+<li><a class="reference internal" href="#metanav"><code class="docutils literal"><span class="pre">[metanav]</span></code></a></li>
+<li><a class="reference internal" href="#notes">Notes</a></li>
+<li><a class="reference internal" href="#trac"><code class="docutils literal"><span class="pre">[trac]</span></code></a></li>
+<li><a class="reference internal" href="#context-navigation">Context Navigation</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracNavigation.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracNavigation.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

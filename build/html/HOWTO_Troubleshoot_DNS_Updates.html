@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Troubleshooting DNS update issues &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="troubleshooting-dns-update-issues">
+<h1>Troubleshooting DNS update issues<a class="headerlink" href="#troubleshooting-dns-update-issues" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="check-sssd-configuration">
+<h2>Check SSSD configuration<a class="headerlink" href="#check-sssd-configuration" title="Permalink to this headline">¶</a></h2>
+<p>First of all, check if options <code class="docutils literal"><span class="pre">dyndns_update</span></code>,
+<code class="docutils literal"><span class="pre">dyndns_refresh_interval</span></code>, <code class="docutils literal"><span class="pre">dyndns_update_ptr</span></code>, and <code class="docutils literal"><span class="pre">dyndns_ttl</span></code>
+have desired values in <code class="docutils literal"><span class="pre">/etc/sssd/sssd.conf</span></code>.</p>
+<p>Default values depend on selected provider. For Active directory see
+<code class="docutils literal"><span class="pre">man</span> <span class="pre">5</span> <span class="pre">sssd-ad</span></code>, for FreeIPA see <code class="docutils literal"><span class="pre">man</span> <span class="pre">5</span> <span class="pre">sssd-ipa</span></code> etc. For further
+information please see <code class="docutils literal"><span class="pre">man</span> <span class="pre">5</span> <span class="pre">sssd.conf</span></code>.</p>
+</div>
+<div class="section" id="make-sssd-logs-useful">
+<h2>Make SSSD logs useful<a class="headerlink" href="#make-sssd-logs-useful" title="Permalink to this headline">¶</a></h2>
+<p>Set <code class="docutils literal"><span class="pre">debug_level=8</span></code> (or higher) so the log shows exact messages from
+<code class="docutils literal"><span class="pre">nsupdate</span></code> tool.</p>
+<p>In the logs, look for trailer <code class="docutils literal"><span class="pre">--</span> <span class="pre">Begin</span> <span class="pre">nsupdate</span> <span class="pre">message</span> <span class="pre">--</span></code> and
+messages beneath it. This is the interesing part.</p>
+</div>
+<div class="section" id="try-nsupdate-yourself">
+<h2>Try nsupdate yourself<a class="headerlink" href="#try-nsupdate-yourself" title="Permalink to this headline">¶</a></h2>
+<p>For easier debugging you can run <code class="docutils literal"><span class="pre">nsupdate</span></code> yourself. Copy&amp;paste input
+for <code class="docutils literal"><span class="pre">nsupdate</span></code> from logs to a separate file and play with it (e.g. add
+<code class="docutils literal"><span class="pre">debug</span></code> statement to the input).</p>
+<ol class="arabic simple">
+<li>Obtain machine ticket: <code class="docutils literal"><span class="pre">$</span> <span class="pre">kinit</span> <span class="pre">-kt</span></code></li>
+<li>Run nsupdate: <code class="docutils literal"><span class="pre">$</span> <span class="pre">nsupdate</span> <span class="pre">-g</span> <span class="pre">/tmp/commands_copied_from_log_file</span></code></li>
+</ol>
+</div>
+<div class="section" id="verify-dns-configuration">
+<h2>Verify DNS configuration<a class="headerlink" href="#verify-dns-configuration" title="Permalink to this headline">¶</a></h2>
+<p>As a first step, <code class="docutils literal"><span class="pre">nsupdate</span></code> auto-detects DNS zone name and server
+responsible for the DNS zone. This information is printed out if
+<code class="docutils literal"><span class="pre">debug</span></code> statement is present in nsupdate&#8217;s input.</p>
+<p>It looks like this:</p>
+<p>Check that:</p>
+<ul class="simple">
+<li>The <code class="docutils literal"><span class="pre">Found</span> <span class="pre">zone</span> <span class="pre">name</span></code> must match zone name configured on DNS
+servers.</li>
+<li><code class="docutils literal"><span class="pre">The</span> <span class="pre">master</span> <span class="pre">is</span></code> must contain name of Primary Master DNS server
+which accepts DNS updates. This value is taken from <code class="docutils literal"><span class="pre">MNAME</span></code> field
+in the <code class="docutils literal"><span class="pre">SOA</span></code> record.</li>
+<li>Message <code class="docutils literal"><span class="pre">Sending</span> <span class="pre">update</span> <span class="pre">to</span></code> contains correct IP address of the
+Primary Master DNS server.</li>
+</ul>
+<p>If any of the above is not correct the problem is likely not caused by
+SSSD but by DNS configuration:</p>
+<ul class="simple">
+<li>Double-check SOA record for particular zone in DNS.</li>
+<li>Make sure that servers listed in <code class="docutils literal"><span class="pre">/etc/resolv.conf</span></code> return correct
+answers.</li>
+</ul>
+</div>
+<div class="section" id="check-dns-server-s-logs">
+<h2>Check DNS server&#8217;s logs<a class="headerlink" href="#check-dns-server-s-logs" title="Permalink to this headline">¶</a></h2>
+<p>The DNS server can reply with multiple various error codes. Look for
+trailer <code class="docutils literal"><span class="pre">Reply</span> <span class="pre">from</span> <span class="pre">update</span> <span class="pre">query:</span></code> (it might appear multiple times)
+and check all <code class="docutils literal"><span class="pre">status</span></code> codes:</p>
+<p>In this case server replied with error <code class="docutils literal"><span class="pre">REFUSED</span></code>. Most likely, the
+access controls on the DNS server do not allow this particular client to
+issue DNS updates for given DNS name/type/etc. Check logs at Primary
+Master DNS server and see what information got logged there.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Troubleshooting DNS update issues</a><ul>
+<li><a class="reference internal" href="#check-sssd-configuration">Check SSSD configuration</a></li>
+<li><a class="reference internal" href="#make-sssd-logs-useful">Make SSSD logs useful</a></li>
+<li><a class="reference internal" href="#try-nsupdate-yourself">Try nsupdate yourself</a></li>
+<li><a class="reference internal" href="#verify-dns-configuration">Verify DNS configuration</a></li>
+<li><a class="reference internal" href="#check-dns-server-s-logs">Check DNS server&#8217;s logs</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/HOWTO_Troubleshoot_DNS_Updates.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/HOWTO_Troubleshoot_DNS_Updates.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

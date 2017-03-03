@@ -1,0 +1,346 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>SSSD and automounter integration &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="sssd-and-automounter-integration">
+<h1>SSSD and automounter integration<a class="headerlink" href="#sssd-and-automounter-integration" title="Permalink to this headline">¶</a></h1>
+<p>This design page describes integration of autofs and SSSD in a more
+centralized manner. The discussion started on SSSD mailing list and then
+in <a class="reference external" href="https://bugzilla.redhat.com/show_bug.cgi?id=683523">​Red Hat
+Bugzilla</a>. This
+page summarizes the discussions and design.</p>
+<p>Autofs is able to look up maps stored in LDAP. However, autofs does all
+the lookups on its own. Even though autofs uses the <code class="docutils literal"><span class="pre">nsswitch.conf</span></code>
+configuration file, there is no glibc interface such as those for
+retreiving users and groups and by extension no nscd caching.</p>
+<p>The benefits of the integration would be:</p>
+<ul class="simple">
+<li>unified configuration of LDAP servers, timeout parameters, DNS SRV
+lookups, ...</li>
+<li>only one connection to the LDAP server open</li>
+<li>caching of the data</li>
+<li>offline access - even though if the client cannot connect to the LDAP
+server chances are that the NFS server is unreachable as well</li>
+<li>back end abstraction - data may be stored in NIS or other databases
+and accessed by the automounter transparently</li>
+</ul>
+<p>The solution we selected is to provide a new automounter lookup module
+that would communicate with SSSD.</p>
+<div class="section" id="autofs-lookup-modules">
+<h2>autofs lookup modules<a class="headerlink" href="#autofs-lookup-modules" title="Permalink to this headline">¶</a></h2>
+<p>There are several internal interfaces within autofs implemented as
+shared libraries, one is the lookup module.</p>
+<p>A lookup module is implemented for each information source and they each
+have a fixed interface. Upon loading, automount will get the library
+entry points via dlopen(). There are several entry points such as:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">lookup_init()</span></code> and <code class="docutils literal"><span class="pre">lookup_done()</span></code> are called when the module is
+first used and when the module is no longer needed.</li>
+<li><code class="docutils literal"><span class="pre">lookup_read_master()</span></code> is called at program start to read the
+master map.</li>
+<li><code class="docutils literal"><span class="pre">lookup_read_map()</span></code> reads the entire map.</li>
+<li><code class="docutils literal"><span class="pre">lookup_mount()</span></code> looks up an automount map key.</li>
+</ul>
+<p>The lookup module is passed autofs internal data structures and must
+handle all the corner cases there can be - so the lookup module
+shouldn&#8217;t be exposed outside autofs and should be developed as part of
+autofs.</p>
+<p>The lookup modules are named <code class="docutils literal"><span class="pre">&lt;autofs</span> <span class="pre">library</span> <span class="pre">dir&gt;/lookup_&lt;source&gt;.so</span></code>
+where <code class="docutils literal"><span class="pre">&lt;source&gt;</span></code> is the source name from the &#8220;automount:&#8221; line of
+<code class="docutils literal"><span class="pre">/etc/nssswitch.conf</span></code>. So the SSSD lookup module would be named
+<code class="docutils literal"><span class="pre">lookup_sss.so</span></code> and selected in nsswitch.conf with the directive
+<code class="docutils literal"><span class="pre">automount:</span> <span class="pre">files</span> <span class="pre">sss</span></code> (to allow for local client overrides) or just
+<code class="docutils literal"><span class="pre">automount:</span> <span class="pre">sss</span></code>.</p>
+<p>In particular, the lookup module calls an iterator to walk through the
+&lt;key, value&gt; pairs in a map or lookup a key by name in a map.</p>
+<p>The lookup_sss module needs to connect to SSSD and request the data
+from SSSD somehow. This would be done by adding a couple of functions
+into the libnss_sss.so module. The lookup_sss.so module would dlopen()
+libnss_sss.so and dlsym() the functions needed.</p>
+</div>
+<div class="section" id="the-api-provided-by-sssd">
+<h2>The API provided by SSSD<a class="headerlink" href="#the-api-provided-by-sssd" title="Permalink to this headline">¶</a></h2>
+<p>The SSSD API would live in libnsss_sss.so. That means polluting the
+library a little with functions that are not strictly
+name-service-switch related, but would allow us to reuse a fair amount
+of code and talk to the NSS responder socket easily.</p>
+<p>The API itself would define the following functions:</p>
+<ul>
+<li><p class="first">iterator start that would allocate the private struct automtent and
+pass it out as context</p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">errno_t</span> <span class="pre">_sss_setautomntent(const</span> <span class="pre">char</span> <span class="pre">*mapname,</span> <span class="pre">void</span> <span class="pre">**context);</span></code></p>
+</div></blockquote>
+</li>
+<li><p class="first">iterator end that would free the private struct automtent</p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">errno_t</span> <span class="pre">_sss_endautomntent(void</span> <span class="pre">**context);</span></code></p>
+</div></blockquote>
+</li>
+<li><p class="first">function that returns the next (key,value) pair given a context</p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">errno_t</span> <span class="pre">_sss_getautomntent_r(const</span> <span class="pre">char</span> <span class="pre">**key,</span> <span class="pre">const</span> <span class="pre">char</span> <span class="pre">**value,</span> <span class="pre">void</span> <span class="pre">*context);</span></code></p>
+<p>The <code class="docutils literal"><span class="pre">key</span></code> and <code class="docutils literal"><span class="pre">value</span></code> strings are allocated with
+<code class="docutils literal"><span class="pre">malloc()</span></code> and must be freed by the caller</p>
+</div></blockquote>
+</li>
+<li><p class="first">function that looks up data for a given key</p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">errno_t</span> <span class="pre">_sss_getautomntbyname_r(const</span> <span class="pre">char</span> <span class="pre">*key,</span> <span class="pre">const</span> <span class="pre">char</span> <span class="pre">**value,</span> <span class="pre">void</span> <span class="pre">*context);</span></code></p>
+<p>The <code class="docutils literal"><span class="pre">value</span></code> string is allocated with <code class="docutils literal"><span class="pre">malloc()</span></code> and must be
+freed by the caller</p>
+</div></blockquote>
+</li>
+</ul>
+<p>The context parameter is a private structure defined in the libnss_sss
+library that would keep track of the iterator:</p>
+<p>The iterator is passed as the last parameter of the functions which may
+seem a bit odd, but it is an autofs convention. Because the sole
+consumer of this interface would be autofs itself, I decided to keep it
+the autofs way.</p>
+<p>When the API functions are called, SSSD would send a request through the
+NSS pipe to the responder, which would consult the back end similar to
+how other name service switch requests are handled.</p>
+<div class="section" id="storing-the-data-in-sssd-cache">
+<h3>Storing the data in SSSD cache<a class="headerlink" href="#storing-the-data-in-sssd-cache" title="Permalink to this headline">¶</a></h3>
+<p>In the first version, SSSD should just schedule a periodic task to
+download automounter data similar to how user/group enumeration task is
+scheduled. The automounter maps can potentially be huge, so we might
+need to optimize the download task in later versions. One idea for
+future enhancement is to use entryUSN number in deployments that support
+it.</p>
+</div>
+<div class="section" id="the-ldap-schema-used-by-autofs">
+<h3>The LDAP schema used by autofs<a class="headerlink" href="#the-ldap-schema-used-by-autofs" title="Permalink to this headline">¶</a></h3>
+<p>There are three schemas that can be used for storing autofs data in
+LDAP. They do not differ in semantics the way RFC2307 and RFC2307bis
+schemas differ in the member/memberuid attribute. The difference in
+schemas is mostly attribute and objectclasses naming and how the DNs are
+constructed. The DNs are also not used by the client. SSSD should
+convert the data into a cache-specific schema. The cache specific schema
+will be based on the RFC2307bis automounter schema, which is by far the
+most widely used schema.</p>
+<p>Each of the schemas define objectclass names for map and entry and
+attribute names for map name (used by map) and key and value attribute
+names (used by map entry).</p>
+<div class="document"><table border="1" class="docutils">
+<colgroup>
+<col width="28%" />
+<col width="28%" />
+<col width="15%" />
+<col width="28%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><em>attribute</em></th>
+<th class="head"><em>RFC2307bis</em></th>
+<th class="head"><em>NIS</em></th>
+<th class="head"><em>RFC2307 extension</em></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><em>map objectclass</em></td>
+<td>automountMap</td>
+<td>nisMap</td>
+<td>automountMap</td>
+</tr>
+<tr class="row-odd"><td><em>entry objectclass</em></td>
+<td>automount</td>
+<td>nisObject</td>
+<td>automount</td>
+</tr>
+<tr class="row-even"><td><em>map attribute</em></td>
+<td>automountMapName</td>
+<td>nisMapName</td>
+<td>ou</td>
+</tr>
+<tr class="row-odd"><td><em>entry attribute</em></td>
+<td>automountKey</td>
+<td>cn</td>
+<td>cn</td>
+</tr>
+<tr class="row-even"><td><em>value attribute</em></td>
+<td>automountInformation</td>
+<td>nisMapEntr
+y</td>
+<td>automountInformation</td>
+</tr>
+</tbody>
+</table>
+</div><p>An example of the RFC2307bis schema showing an entry for /home/foo
+included in the master map:</p>
+<p>Most, if not all, of the autofs documentation out there describes the
+naming schema as per RFC2307bis, but it is technically possible to use
+autofs objects created according to RFC2307bis and user/group objects
+created according to plain RFC2307 in the same tree. Because the schemas
+differ in attribute naming only, not semantically, it is trivial to
+override the schema in the config file. We just need to pick the right
+defaults and adjust according to user feedback.</p>
+<p>One difference between filesystem entries and entries in LDAP is that
+the &#8220;cn&#8221; attribute is case-insensitive, unlike key names which are
+essentially directory names. This seems to be one of the reasons the
+RFC2307bis schema was adopted.</p>
+</div>
+<div class="section" id="sssd-configuration">
+<h3>SSSD Configuration<a class="headerlink" href="#sssd-configuration" title="Permalink to this headline">¶</a></h3>
+<p>The autofs support would be turned on by specifying
+<code class="docutils literal"><span class="pre">autofs_provider</span> <span class="pre">=</span> <span class="pre">ldap</span></code> in a domain section. A new search base
+<code class="docutils literal"><span class="pre">ldap_autofs_search_base</span></code> option will be introduced as well. The
+periodic download task will default to <code class="docutils literal"><span class="pre">ldap_search_base</span></code>.</p>
+<p>SSSD will also include new attribute overrides for the new autofs map in
+order to support all the schemas users might have been using.</p>
+<p>This work is targeted at the same SSSD milestone as separating the cache
+timeout parameters, so we might also need to include a new autofs cache
+timeout.</p>
+<p>We also need to create a migration document for users of the native
+autofs LDAP support.</p>
+<div class="section" id="fully-qualified-names">
+<h4>Fully Qualified Names<a class="headerlink" href="#fully-qualified-names" title="Permalink to this headline">¶</a></h4>
+<p>With user/group lookups, the domain can be specified by using a
+&#8220;fully-qualified-name&#8221;, for example getent passwd
+<a class="reference external" href="mailto:jhrozek&#37;&#52;&#48;redhat&#46;com">​jhrozek<span>&#64;</span>redhat<span>&#46;</span>com</a>. We should support
+something similar with autofs. However, maps can include any characters
+that are valid for filesystem path names, including &#8216;&#64;&#8217;, so there&#8217;s a
+potential conflict.</p>
+<ul class="simple">
+<li>if there are more LDAP domains with autofs on, they are searched
+sequentially until a match is found. This is how user searches work,
+too</li>
+<li>FQDN requests will be allowed by default, but not required unless
+<code class="docutils literal"><span class="pre">use_fully_qualified_names</span></code> is set to TRUE</li>
+<li>The FQDN name-domain separator is &#64; by default, but SSSD allows it to
+be configurable even in the current using the <code class="docutils literal"><span class="pre">re_expression</span></code>
+parameter.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="future-and-miscellanous-work">
+<h3>Future and miscellanous work<a class="headerlink" href="#future-and-miscellanous-work" title="Permalink to this headline">¶</a></h3>
+<p>The first iteration will aim at providing a working autofs integration
+for generic LDAP servers. There is a number of tasks that might not make
+the first iteration but should be tracked and done in the future.</p>
+<ol class="arabic simple">
+<li>Native IPA automount schema<ul>
+<li>autofs client does not know the concept of &#8220;locations&#8221; but that
+doesn&#8217;t really matter. The locations objects in LDAP are of the
+&#8220;nscontainer&#8221; class and are only part of the DN. The client does
+not care about DNs, so we are safe storing the locations in cache
+as-is.</li>
+</ul>
+</li>
+<li>A migration script<ul>
+<li>this can be lower priority with the migration documentation in
+place</li>
+</ul>
+</li>
+</ol>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">SSSD and automounter integration</a><ul>
+<li><a class="reference internal" href="#autofs-lookup-modules">autofs lookup modules</a></li>
+<li><a class="reference internal" href="#the-api-provided-by-sssd">The API provided by SSSD</a><ul>
+<li><a class="reference internal" href="#storing-the-data-in-sssd-cache">Storing the data in SSSD cache</a></li>
+<li><a class="reference internal" href="#the-ldap-schema-used-by-autofs">The LDAP schema used by autofs</a></li>
+<li><a class="reference internal" href="#sssd-configuration">SSSD Configuration</a><ul>
+<li><a class="reference internal" href="#fully-qualified-names">Fully Qualified Names</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#future-and-miscellanous-work">Future and miscellanous work</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/AutofsIntegration.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/AutofsIntegration.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

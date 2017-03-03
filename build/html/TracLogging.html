@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Trac Logging &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="trac-logging">
+<h1>Trac Logging<a class="headerlink" href="#trac-logging" title="Permalink to this headline">¶</a></h1>
+<div class="system-message"><p><strong>Error: Macro TracGuideToc(None) failed</strong></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;NoneType&#39;</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span> <span class="s1">&#39;find&#39;</span>
+</pre></div>
+</div>
+</div><p>Trac supports logging of system messages using the standard <a class="reference external" href="http://docs.python.org/lib/module-logging.html">​logging
+module</a> that comes
+with Python.</p>
+<p>Logging is configured in the <code class="docutils literal"><span class="pre">[logging]</span></code> section in
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#logging-section">trac.ini</a>.</p>
+<div class="section" id="supported-logging-methods">
+<h2>Supported Logging Methods<a class="headerlink" href="#supported-logging-methods" title="Permalink to this headline">¶</a></h2>
+<p>The log method is set using the <code class="docutils literal"><span class="pre">log_type</span></code> option in
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#logging-section">trac.ini</a>,
+which takes any of the following values:</p>
+<dl class="docutils">
+<dt><strong>none**</strong></dt>
+<dd>Suppress all log messages.</dd>
+<dt><strong>file</strong></dt>
+<dd>Log messages to a file, specified with the <code class="docutils literal"><span class="pre">log_file</span></code> option in
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#logging-section">trac.ini</a>.
+Relative paths in <code class="docutils literal"><span class="pre">log_file</span></code> are resolved relative to the <code class="docutils literal"><span class="pre">log</span></code>
+directory of the environment.</dd>
+<dt><strong>stderr</strong></dt>
+<dd>Output all log entries to console
+(<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracStandalone.html">tracd</a>
+only).</dd>
+<dt><strong>syslog</strong></dt>
+<dd>(UNIX) Send all log messages to the local syslogd via named pipe
+<code class="docutils literal"><span class="pre">/dev/log</span></code>. By default, syslog will write them to the file
+/var/log/messages.</dd>
+<dt><strong>eventlog</strong></dt>
+<dd>(Windows) Use the system&#8217;s NT Event Log for Trac logging.</dd>
+</dl>
+</div>
+<div class="section" id="log-levels">
+<h2>Log Levels<a class="headerlink" href="#log-levels" title="Permalink to this headline">¶</a></h2>
+<p>The verbosity level of logged messages can be set using the
+<code class="docutils literal"><span class="pre">log_level</span></code> option in
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#logging-section">trac.ini</a>.
+The log level defines the minimum level of urgency required for a
+message to be logged, and those levels are:</p>
+<dl class="docutils">
+<dt><strong>CRITICAL</strong></dt>
+<dd>Log only the most critical (typically fatal) errors.</dd>
+<dt><strong>ERROR</strong></dt>
+<dd>Log failures, bugs and errors.</dd>
+<dt><strong>WARN</strong></dt>
+<dd>Log warnings, non-interrupting events.</dd>
+<dt><strong>INFO</strong></dt>
+<dd>Diagnostic information, log information about all processing.</dd>
+<dt><strong>DEBUG</strong></dt>
+<dd>Trace messages, profiling, etc.</dd>
+</dl>
+<p>Note that starting with Trac 0.11.5 you can in addition enable logging
+of SQL statements, at debug level. This is turned off by default, as
+it&#8217;s very verbose (set <code class="docutils literal"><span class="pre">[trac]</span> <span class="pre">debug_sql</span> <span class="pre">=</span> <span class="pre">yes</span></code> in
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">TracIni</a> to
+activate).</p>
+</div>
+<div class="section" id="log-format">
+<h2>Log Format<a class="headerlink" href="#log-format" title="Permalink to this headline">¶</a></h2>
+<p>Starting with Trac 0.10.4 (see
+<a class="reference external" href="http://trac.edgewall.org/intertrac/%232844">​#2844</a>), it is possible
+to set the output format for log entries. This can be done through the
+<code class="docutils literal"><span class="pre">log_format</span></code> option in
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#logging-section">trac.ini</a>.
+The format is a string which can contain any of the <a class="reference external" href="http://docs.python.org/lib/node422.html">​Python logging
+Formatter variables</a>.
+Additonally, the following Trac-specific variables can be used:</p>
+<dl class="docutils">
+<dt><strong>$(basename)s</strong></dt>
+<dd>The last path component of the current environment.</dd>
+<dt><strong>$(path)s</strong></dt>
+<dd>The absolute path for the current environment.</dd>
+<dt><strong>$(project)s</strong></dt>
+<dd>The originating project&#8217;s name.</dd>
+</dl>
+<p>Note that variables are identified using a dollar sign (<code class="docutils literal"><span class="pre">$(...)s</span></code>)
+instead of percent sign (<code class="docutils literal"><span class="pre">%(...)s</span></code>).</p>
+<p>The default format is:</p>
+<p>In a multi-project environment where all logs are sent to the same place
+(e.g. <code class="docutils literal"><span class="pre">syslog</span></code>), it makes sense to add the project name. In this
+example we use <code class="docutils literal"><span class="pre">basename</span></code> since that can generally be used to identify
+a project:</p>
+<hr class="docutils" />
+<p>See also: <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">TracIni</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracGuide.html">TracGuide</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracEnvironment.html">TracEnvironment</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Trac Logging</a><ul>
+<li><a class="reference internal" href="#supported-logging-methods">Supported Logging Methods</a></li>
+<li><a class="reference internal" href="#log-levels">Log Levels</a></li>
+<li><a class="reference internal" href="#log-format">Log Format</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracLogging.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracLogging.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

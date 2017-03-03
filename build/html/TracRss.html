@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using RSS with Trac &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="using-rss-with-trac">
+<h1>Using RSS with Trac<a class="headerlink" href="#using-rss-with-trac" title="Permalink to this headline">¶</a></h1>
+<div class="system-message"><p><strong>Error: Macro TracGuideToc(None) failed</strong></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;NoneType&#39;</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span> <span class="s1">&#39;find&#39;</span>
+</pre></div>
+</div>
+</div><p>Several of the Trac modules support content syndication using the RSS
+(Really Simple Syndication) XML format. Using the RSS subscription
+feature in Trac, you can easily monitor progress of the project, a set
+of issues or even changes to a single file.</p>
+<p>Trac supports RSS feeds in:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTimeline.html">TracTimeline</a>
+— Use the RSS feed to <strong>subscribe to project events</strong>.
+Monitor overall project progress in your favorite RSS reader.</li>
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTickets.html">TracTickets</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracReports.html">TracReports</a>,
+and <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracQuery.html">TracQuery</a>
+— Allows syndication of report and ticket query results.
+Be notified about important and relevant issue tickets.</li>
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/TracBrowser.html">TracBrowser</a>
+and
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracRevisionLog.html">TracRevisionLog</a>
+— Syndication of file changes.
+Stay up to date with changes to a specific file or directory.</li>
+</ul>
+<div class="section" id="how-to-access-rss-data">
+<h2>How to access RSS data<a class="headerlink" href="#how-to-access-rss-data" title="Permalink to this headline">¶</a></h2>
+<p>Anywhere in Trac where RSS is available, you should find a small orange
+<strong>XML</strong> icon, typically placed at the bottom of the page. Clicking the
+icon will access the RSS feed for that specific resource.</p>
+<p><strong>Note:</strong> Different modules provide different data in their RSS feeds.
+Usually, the syndicated information corresponds to the current view. For
+example, if you click the RSS link on a report page, the feed will be
+based on that report. It might be explained by thinking of the RSS feeds
+as an <em>alternate view of the data currently displayed</em>.</p>
+</div>
+<div class="section" id="links">
+<h2>Links<a class="headerlink" href="#links" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><em>Specifications:</em><ul>
+<li><a class="reference external" href="http://blogs.law.harvard.edu/tech/rss">​http://blogs.law.harvard.edu/tech/rss</a>
+— RSS 2.0 Specification</li>
+</ul>
+</li>
+<li><em>Multi-platform RSS readers:</em><ul>
+<li><a class="reference external" href="http://www.rssowl.org/">​http://www.rssowl.org/</a> — Open
+source, Eclipse-based, RSS reader for Linux, Mac and Windows
+systems that supports https and authenticated feeds.</li>
+</ul>
+</li>
+<li><em>Linux/BSD/*n*x systems:</em><ul>
+<li><a class="reference external" href="http://liferea.sourceforge.net/">​http://liferea.sourceforge.net/</a>
+— Open source GTK2 RSS Reader for Linux</li>
+<li><a class="reference external" href="http://akregator.sourceforge.net/">​Akregator</a> — Open source
+KDE RSS Reader (part of KDE-PIM)</li>
+</ul>
+</li>
+<li><em>Mac OS X systems:</em><ul>
+<li><a class="reference external" href="http://ranchero.com/netnewswire/">​http://ranchero.com/netnewswire/</a>
+— An excellent RSS reader for Mac OS X (has both free and pay
+versions)</li>
+<li><a class="reference external" href="http://www.utsire.com/shrook/">​http://www.utsire.com/shrook/</a>
+— An RSS reader for Max OS X that supports https (even with self
+signed certificates) and authenticated feeds.</li>
+<li><a class="reference external" href="http://vienna-rss.sourceforge.net/">​http://vienna-rss.sourceforge.net/</a>
+— Open source Feed Reader for Mac OS X with smart folders support</li>
+<li><a class="reference external" href="http://www.mesadynamics.com/Tickershock.html">​http://www.mesadynamics.com/Tickershock.html</a>
+— Non-intrusive &#8220;news ticker&#8221; style RSS reader for Mac OS X</li>
+</ul>
+</li>
+<li><em>Windows systems:</em><ul>
+<li><a class="reference external" href="http://www.rssreader.com/">​http://www.rssreader.com/</a> — Free
+and powerful RSS Reader for Windows</li>
+<li><a class="reference external" href="http://www.sharpreader.net/">​http://www.sharpreader.net/</a> — A
+free RSS Reader written in .NET for Windows</li>
+</ul>
+</li>
+<li><em>Firefox:</em><ul>
+<li><a class="reference external" href="http://www.mozilla.org/products/firefox/">​http://www.mozilla.org/products/firefox/</a>
+— Mozilla Firefox features plenty
+<a class="reference external" href="https://addons.mozilla.org/en-US/firefox/search/?q=rss&amp;appver=&amp;platform=">​add-ons</a>
+for supporting RSS</li>
+</ul>
+</li>
+</ul>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracGuide.html">TracGuide</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTimeline.html">TracTimeline</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracReports.html">TracReports</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracBrowser.html">TracBrowser</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Using RSS with Trac</a><ul>
+<li><a class="reference internal" href="#how-to-access-rss-data">How to access RSS data</a></li>
+<li><a class="reference internal" href="#links">Links</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracRss.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracRss.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

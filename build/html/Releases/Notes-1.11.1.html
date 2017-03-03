@@ -1,0 +1,333 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>This release contains mainly bug fixes in the Active Directory
+provider and setups where the SSSD is running on an IPA server
+instance. In particular:<ul>
+<li>Several cases where offline authentication did not work correctly
+for users from Active Directory domains were fixed</li>
+<li>Fixed a resolver bug that caused the SSSD to only look up AAAA
+records for trusted Active Directory servers</li>
+<li>SSSD is now able to resolve users from trusted AD domains using
+their POSIX attributes</li>
+</ul>
+</li>
+<li>The simple access provider now allows the administrator to specify
+users or groups from trusted domains in the access or deny lists</li>
+<li>Handling of Kerberos credential caches was made simpler and more
+robust</li>
+</ul>
+</div>
+<div class="section" id="packaging-changes">
+<h1>Packaging Changes<a class="headerlink" href="#packaging-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>A new subpackage sssd-common-pac was added to work around a packaging
+bug. Previous SSSD versions would own the PAC responder by both the
+IPA and AD providers, which is not permitted by the Fedora packaging
+guidelines.</li>
+<li>The configure.ac changes need <code class="docutils literal"><span class="pre">libltdl-dev</span></code> installed as an
+additional build dependency on Ubuntu and Debian systems in order to
+make the <code class="docutils literal"><span class="pre">LT_LIB_DLLOAD</span></code> macro available</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/1945">#1945</a></dt>
+<dd>Enable printf format string checking in function debug_fn</dd>
+<dt><a class="reference external" href="/sssd/ticket/2001">#2001</a></dt>
+<dd>Implement heuristics to use Global Catalog servers from local DNS
+domain first</dd>
+<dt><a class="reference external" href="/sssd/ticket/2007">#2007</a></dt>
+<dd>sss_debuglevel did not increase verbosity in sssd_pac.log</dd>
+<dt><a class="reference external" href="/sssd/ticket/2034">#2034</a></dt>
+<dd>[RFE] simple access provider: support subdomain users and groups</dd>
+<dt><a class="reference external" href="/sssd/ticket/2060">#2060</a></dt>
+<dd>Cached credentials aren&#8217;t working with sssd-ad UPN logins</dd>
+<dt><a class="reference external" href="/sssd/ticket/2063">#2063</a></dt>
+<dd>sssd-ad unable to resolve names in other domains possibly UPN
+related</dd>
+<dt><a class="reference external" href="/sssd/ticket/2066">#2066</a></dt>
+<dd>ad: invalid handling of Domain Users group for subdomain user</dd>
+<dt><a class="reference external" href="/sssd/ticket/2067">#2067</a></dt>
+<dd>Carry on if detecting the flat name fails</dd>
+<dt><a class="reference external" href="/sssd/ticket/2068">#2068</a></dt>
+<dd>Initial enumeration in the AD provider does not work</dd>
+<dt><a class="reference external" href="/sssd/ticket/2070">#2070</a></dt>
+<dd>The present sssd-ad is unable to pull RFC2307 attributes from all
+domains in a forest</dd>
+<dt><a class="reference external" href="/sssd/ticket/2075">#2075</a></dt>
+<dd>sssd fails to retrieve netgroups with multiple CN attributes</dd>
+<dt><a class="reference external" href="/sssd/ticket/2076">#2076</a></dt>
+<dd>Fix expand_ccname_template libkrb5 style expansion and add tests</dd>
+<dt><a class="reference external" href="/sssd/ticket/2079">#2079</a></dt>
+<dd>SSSD subdomains provider does not resolve SRV records correctly when
+DNS name of the server is different from domain/realm name of IPA
+install in IPA server mode</dd>
+<dt><a class="reference external" href="/sssd/ticket/2080">#2080</a></dt>
+<dd>When in IPA server mode, SSSD should map trusted forest subdomains
+to root domain realm</dd>
+<dt><a class="reference external" href="/sssd/ticket/2085">#2085</a></dt>
+<dd>man sssd-sudo: improve description of necessary configuration</dd>
+<dt><a class="reference external" href="/sssd/ticket/2087">#2087</a></dt>
+<dd>The multicast check is wrong in the sudo source code getting the
+host info</dd>
+<dt><a class="reference external" href="/sssd/ticket/2090">#2090</a></dt>
+<dd>getpwuid and getgrgid do not use the negative cache</dd>
+<dt><a class="reference external" href="/sssd/ticket/2091">#2091</a></dt>
+<dd>Document that server side password policies always takes precedence</dd>
+<dt><a class="reference external" href="/sssd/ticket/2093">#2093</a></dt>
+<dd>sssd should write capaths for IPA trusted forests&#8217; subdomains</dd>
+</dl>
+</div></div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Jakub Hrozek (24):</p>
+<ul class="simple">
+<li>Updating the version for 1.11.1 release</li>
+<li>PROXY: Handle empty GECOS</li>
+<li>MAN: Document that sss_cache should be run after changing the cache
+timeout</li>
+<li>AD: Rename parametrized #define</li>
+<li>LDAP: Store cleanup timestamp after initial cleanup</li>
+<li>Remove unused code</li>
+<li>TESTS: Remove unused variable</li>
+<li>KRB5: Call umask before mkstemp in the krb5 child code</li>
+<li>AD: async request to retrieve master domain info</li>
+<li>LDAP: sdap_id_setup_tasks accepts a custom enum request</li>
+<li>AD: Download master domain info when enumerating</li>
+<li>AD: Failure to get flat name is not fatal</li>
+<li>Convert IN_MULTICAST parameter to host order</li>
+<li>NSS: Set UID and GID to negative cache after searching all domains</li>
+<li>NSS: Failure to store entry negative cache should not be fatal</li>
+<li>KRB5: Fix bad comparison</li>
+<li>IPA: Ignore dns_discovery_domain in server mode</li>
+<li>KRB5: Return ERR_NETWORK_IO when trusted AD server can&#8217;t be
+resolved</li>
+<li>KRB5: Use the correct domain when authenticating with cached password</li>
+<li>LDAP: Require ID numbers when ID mapping is off</li>
+<li>LDAP: Allow searching subdomain during RFC2307bis initgroups</li>
+<li>AD: talk to GC first even for local domain objects</li>
+<li>MAN: Document that POSIX attributes must be replicated to GC</li>
+<li>Updating the translations for the 1.11.1 release</li>
+</ul>
+<p>Lukas Slebodnik (38):</p>
+<ul class="simple">
+<li>AUTOMAKE: Add missing escaped newline</li>
+<li>Include sys/types.h for types id_t and uid_t</li>
+<li>UTIL: Use standard maximum value of type size_t</li>
+<li>KRB5: Fix warning declaration shadows global declaration</li>
+<li>Fix warning missing arguments</li>
+<li>mmap_cache: Do not remove record from chain twice</li>
+<li>AUTOTOOLS: Add -LLIBDIR to PYTHON_LIBS</li>
+<li>AUTOTOOLS: Add missing AC_MSG_RESULT</li>
+<li>AUTOMAKE: Use portable way to link with dlopen</li>
+<li>AUTOMAKE: Use portable way to link with gettext</li>
+<li>AUTOTOOLS: Add directories for searching ldap headers and libs</li>
+<li>AUTOTOOLS: Refactor unicode library detection</li>
+<li>AUTOTOOLS: add check for type intptr_t</li>
+<li>AUTOTOOLS: Use pkg-config to detect libraries.</li>
+<li>AUTOTOOLS: More robust detection of inotify.</li>
+<li>krb5: Fix warning sometimes uninitialized</li>
+<li>Fix formating of variables with type: long</li>
+<li>Fix formating of variables with type: unsigned long</li>
+<li>Fix formating of variables with type: int</li>
+<li>Fix pointer formatting</li>
+<li>Use the same variable type like in struct ldb_message_element</li>
+<li>Fix formating of variables with type: ssize_t</li>
+<li>Fix formating of variables with type: size_t</li>
+<li>Adding new header for printf formating macros</li>
+<li>Fix formating of variables with type: key_serial_t</li>
+<li>Fix formating of variables with type: rlim_t</li>
+<li>Fix formating of variables with type defined in stdint.h</li>
+<li>Fix formating of variables with type: time_t</li>
+<li>Fix formating of variables with ber_ type</li>
+<li>Fix warning: data argument not used by format string</li>
+<li>Use right formating to print string</li>
+<li>Fix formating of variables with type: id_t</li>
+<li>Fix formating of variables with type: uid_t</li>
+<li>Fix formating of variables with type: gid_t</li>
+<li>Enable printf format string checking</li>
+<li>KRB: Remove unused memory context</li>
+<li>KRB: Remove unused function parameters</li>
+<li>LDAP: Use primary cn to search netgroup</li>
+</ul>
+<p>Michal Zidek (4):</p>
+<ul class="simple">
+<li>Rename SAFEALIGN macros</li>
+<li>Rename _SSS_MC_SPECIAL</li>
+<li>man sssd: Add note about SSS_NSS_USE_MEMCACHE</li>
+<li>Check slot validity before MC_SLOT_TO_PTR.</li>
+</ul>
+<p>Nikolai Kondrashov (1):</p>
+<ul class="simple">
+<li>Fix reference to sssd-krb5 man page</li>
+</ul>
+<p>Ondrej Kos (2):</p>
+<ul class="simple">
+<li>DB: Add user/group lookup by SID</li>
+<li>DB: Rise search functions debug levels</li>
+</ul>
+<p>Pavel Březina (22):</p>
+<ul class="simple">
+<li>Fix czech specific character in my name</li>
+<li>krb5_utils tests: fix some typos</li>
+<li>resolv_sort_srv_reply: remove unnecessary mem_ctx</li>
+<li>fo srv: add priority to fo_server_info</li>
+<li>utils: add is_host_in_domain()</li>
+<li>ad srv: prefer servers that are in the same domain as client</li>
+<li>sysdb_search_group_by_gid: obtain gid instead of uid</li>
+<li>is_dn(): free dn</li>
+<li>util: add sss_idmap_talloc[_free]</li>
+<li>simple access tests: fix typos</li>
+<li>simple provider: support subdomain users</li>
+<li>util: add find_subdomain_by_sid()</li>
+<li>util: add find_subdomain_by_object_name()</li>
+<li>simple provider: support subdomain groups</li>
+<li>simple access test: initialize be_ctx for all tests</li>
+<li>simple provider: obey case sensitivity for subdomain users and groups</li>
+<li>man: improve sssd-sudo manual page</li>
+<li>man: server side password policies always takes precedence</li>
+<li>util: add get_domains_head()</li>
+<li>sysdb: get_sysdb_grouplist() can return either names or dn</li>
+<li>sysdb: sysdb_update_members can take either name or dn</li>
+<li>ad: store group in correct tree on initgroups via tokenGroups</li>
+</ul>
+<p>Simo Sorce (18):</p>
+<ul class="simple">
+<li>Makefile: Fix sssd_be targets</li>
+<li>krb5: Ingnore unknown expansion sequences</li>
+<li>tests: Add dlopen test to make sure modules works</li>
+<li>krb5: Add calls to change and restore credentials</li>
+<li>krb5: Add helper to destroy ccache as user</li>
+<li>krb5: Use krb5_cc_destroy to remove old ccaches</li>
+<li>krb5: Replace type-specific ccache/principal check</li>
+<li>krb5: Move determination of user being active</li>
+<li>krb5: move template check to initializzation</li>
+<li>krb5: Make check_for_valid_tgt() static</li>
+<li>krb5: Use new function to validate ccaches</li>
+<li>krb5: Unify function to create ccache files</li>
+<li>krb5: Remove unused ccache backend infrastructure</li>
+<li>krb5: Remove unused function</li>
+<li>krb5: Add file/dir path precheck</li>
+<li>krb5_child: Simplify ccache creation</li>
+<li>krb5: Remove unused helper functions</li>
+<li>krb5: Be more lenient on failures for old ccache</li>
+</ul>
+<p>Stephen Gallagher (1):</p>
+<ul class="simple">
+<li>RPM: Add new subpackage for PAC responder</li>
+</ul>
+<p>Sumit Bose (7):</p>
+<ul class="simple">
+<li>dyndns: do not modify global family_order</li>
+<li>sdap_domain_add: remove too strict consistency check</li>
+<li>krb5: save canonical upn to sysdb</li>
+<li>krb5: do not expand enterprise principals is offline</li>
+<li>IPA: store forest name for forest member domains</li>
+<li>ipa_server_mode: write capaths to krb5 include file</li>
+<li>Do not return DP_ERR_FATAL in case of success</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#packaging-changes">Packaging Changes</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.11.1.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.11.1.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

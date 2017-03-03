@@ -1,0 +1,502 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Trac Ticket Queries &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="trac-ticket-queries">
+<h1>Trac Ticket Queries<a class="headerlink" href="#trac-ticket-queries" title="Permalink to this headline">¶</a></h1>
+<div class="system-message"><p><strong>Error: Macro TracGuideToc(None) failed</strong></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;NoneType&#39;</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span> <span class="s1">&#39;find&#39;</span>
+</pre></div>
+</div>
+</div><p>In addition to
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracReports.html">reports</a>, Trac
+provides support for <em>custom ticket queries</em>, used to display lists of
+tickets meeting a specified set of criteria.</p>
+<p>To configure and execute a custom query, switch to the <em>View Tickets</em>
+module from the navigation bar, and select the <em>Custom Query</em> link.</p>
+<div class="section" id="filters">
+<h2>Filters<a class="headerlink" href="#filters" title="Permalink to this headline">¶</a></h2>
+<p>When you first go to the query page the default filter will display
+tickets relevant to you:</p>
+<ul class="simple">
+<li>If logged in then all open tickets it will display open tickets
+assigned to you.</li>
+<li>If not logged in but you have specified a name or email address in
+the preferences then it will display all open tickets where your
+email (or name if email not defined) is in the CC list.</li>
+<li>If not logged and no name/email defined in the preferences then all
+open issues are displayed.</li>
+</ul>
+<p>Current filters can be removed by clicking the button to the left with
+the minus sign on the label. New filters are added from the pulldown
+lists at the bottom corners of the filters box (&#8216;And&#8217; conditions on the
+left, &#8216;Or&#8217; conditions on the right). Filters with either a text box or a
+pulldown menu of options can be added multiple times to perform an <em>or</em>
+of the criteria.</p>
+<p>You can use the fields just below the filters box to group the results
+based on a field, or display the full description for each ticket.</p>
+<p>Once you&#8217;ve edited your filters click the <em>Update</em> button to refresh
+your results.</p>
+</div>
+<div class="section" id="navigating-tickets">
+<h2>Navigating Tickets<a class="headerlink" href="#navigating-tickets" title="Permalink to this headline">¶</a></h2>
+<p>Clicking on one of the query results will take you to that ticket. You
+can navigate through the results by clicking the <em>Next Ticket</em> or
+<em>Previous Ticket</em> links just below the main menu bar, or click the <em>Back
+to Query</em> link to return to the query page.</p>
+<p>You can safely edit any of the tickets and continue to navigate through
+the results using the <em>Next/Previous/Back to Query</em> links after saving
+your results. When you return to the query <em>any tickets which were
+edited</em> will be displayed with italicized text. If one of the tickets
+was edited such that it no longer matches the query criteria the text
+will also be greyed. Lastly, if <strong>a new ticket matching the query
+criteria has been created</strong>, it will be shown in bold.</p>
+<p>The query results can be refreshed and cleared of these status
+indicators by clicking the <em>Update</em> button again.</p>
+</div>
+<div class="section" id="saving-queries">
+<h2>Saving Queries<a class="headerlink" href="#saving-queries" title="Permalink to this headline">¶</a></h2>
+<p>Trac allows you to save the query as a named query accessible from the
+reports module. To save a query ensure that you have <em>Updated</em> the view
+and then click the <em>Save query</em> button displayed beneath the results.
+You can also save references to queries in Wiki content, as described
+below.</p>
+<p><em>Note:</em> one way to easily build queries like the ones below, you can
+build and test the queries in the Custom report module and when ready -
+click <em>Save query</em>. This will build the query string for you. All you
+need to do is remove the extra line breaks.</p>
+<p><em>Note:</em> you must have the <strong>REPORT_CREATE</strong> permission in order to save
+queries to the list of default reports. The <em>Save query</em> button will
+only appear if you are logged in as a user that has been granted this
+permission. If your account does not have permission to create reports,
+you can still use the methods below to save a query.</p>
+<div class="section" id="using-traclinks">
+<h3>Using <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracLinks.html">TracLinks</a><a class="headerlink" href="#using-traclinks" title="Permalink to this headline">¶</a></h3>
+<p>You may want to save some queries so that you can come back to them
+later. You can do this by making a link to the query from any Wiki page.</p>
+<p>Which is displayed as:</p>
+<blockquote>
+<div><a class="reference external" href="https://fedorahosted.org/sssd/query?status=new&amp;status=assigned&amp;status=reopened&amp;version=1.0&amp;order=priority">Active tickets against
+1.0</a></div></blockquote>
+<p>This uses a very simple query language to specify the criteria (see
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracQuery.html#QueryLanguage">Query
+Language</a>).</p>
+<p>Alternatively, you can copy the query string of a query and paste that
+into the Wiki link, including the leading <code class="docutils literal"><span class="pre">?</span></code> character:</p>
+<p>Which is displayed as:</p>
+<blockquote>
+<div><a class="reference external" href="https://fedorahosted.org/sssd/query?status=new&amp;status=assigned&amp;status=reopened&amp;group=owner">Assigned tickets by
+owner</a></div></blockquote>
+</div>
+<div class="section" id="using-the-ticketquery-macro">
+<h3>Using the <code class="docutils literal"><span class="pre">[[TicketQuery]]</span></code> Macro<a class="headerlink" href="#using-the-ticketquery-macro" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference external" href="http://trac.edgewall.org/intertrac/TicketQuery">​TicketQuery</a>
+macro lets you display lists of tickets matching certain criteria
+anywhere you can use
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html">WikiFormatting</a>.</p>
+<p>Example:</p>
+<p>This is displayed as:</p>
+<blockquote>
+<div>No results</div></blockquote>
+<p>Just like the <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracQuery.html#UsingTracLinks">query: wiki
+links</a>,
+the parameter of this macro expects a query string formatted according
+to the rules of the simple <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracQuery.html#QueryLanguage">ticket query
+language</a>.
+This also allows displaying the link and description of a single ticket:</p>
+<p>This is displayed as:</p>
+<blockquote>
+<div><div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/123">#123</a></dt>
+<dd>SSSD requirement on gettext 0.17 breaks RHEL5 build (and is
+unnecessary)</dd>
+</dl>
+</div></div></blockquote>
+<p>A more compact representation without the ticket summaries is also
+available:</p>
+<p>This is displayed as:</p>
+<blockquote>
+<div>No results</div></blockquote>
+<p>Finally, if you wish to receive only the number of defects that match
+the query, use the <a href="#id1"><span class="problematic" id="id2">``</span></a><code class="docutils literal"><span class="pre">\</span> <span class="pre">count\</span> <span class="pre">``</span></code> parameter.</p>
+<p>This is displayed as:</p>
+<blockquote>
+<div>0</div></blockquote>
+</div>
+<div class="section" id="customizing-the-table-format">
+<h3>Customizing the <em>table</em> format<a class="headerlink" href="#customizing-the-table-format" title="Permalink to this headline">¶</a></h3>
+<p>You can also customize the columns displayed in the table format
+(<em>format=table</em>) by using <em>col=&lt;field&gt;</em> - you can specify multiple
+fields and what order they are displayed by placing pipes (<code class="docutils literal"><span class="pre">|</span></code>)
+between the columns like below:</p>
+<p>This is displayed as:</p>
+<div xmlns="http://www.w3.org/1999/xhtml"><p class="report-result rubric" id="results-1-3-of-2745">Results (1 - 3 of 2745)</p>
+  <div class="paging">
+
+1<p><a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=2&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id">2</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=3&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id">3</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=4&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id">4</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=5&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id">5</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=6&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id">6</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=7&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id">7</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=8&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id">8</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=9&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id">9</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=10&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id">10</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=11&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id">11</a>
+<a class="reference external" href="/sssd/query?status=closed&amp;max=3&amp;page=2&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id">→</a></p>
+</div><table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="21%" />
+<col width="20%" />
+<col width="19%" />
+<col width="20%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;order=id">Ticket</a></th>
+<th class="head"><a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;order=resolution">Resolution</a></th>
+<th class="head"><a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;order=summary">Summary</a></th>
+<th class="head"><a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;order=owner">Owner</a></th>
+<th class="head"><a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;order=reporter">Reporter</a></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><a class="reference external" href="/sssd/ticket/3309">#3309</a></td>
+<td>fixed</td>
+<td><a class="reference external" href="/sssd/ticket/3309">Coverity warns about an unused value in IPA sudo code</a></td>
+<td>pcech</td>
+<td>jhrozek</td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="/sssd/ticket/3301">#3301</a></td>
+<td>fixed</td>
+<td><a class="reference external" href="/sssd/ticket/3301">storing a sudo rule with sudoRule attribute values that only differ by case fails</a></td>
+<td>somebody</td>
+<td>jhrozek</td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="/sssd/ticket/3299">#3299</a></td>
+<td>fixed</td>
+<td><a class="reference external" href="/sssd/ticket/3299">SSSD does not start if using only the local provider and services line is empty</a></td>
+<td>fidencio</td>
+<td>fidencio</td>
+</tr>
+</tbody>
+</table>
+  <div class="paging">
+
+1<p><a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=2&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id">2</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=3&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id">3</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=4&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id">4</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=5&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id">5</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=6&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id">6</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=7&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id">7</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=8&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id">8</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=9&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id">9</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=10&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id">10</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=11&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id">11</a>
+<a class="reference external" href="/sssd/query?status=closed&amp;max=3&amp;page=2&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id">→</a></p>
+</div></div><div class="section" id="full-rows">
+<h4>Full rows<a class="headerlink" href="#full-rows" title="Permalink to this headline">¶</a></h4>
+<p>In <em>table</em> format you can also have full rows by using <em>rows=&lt;field&gt;</em>
+like below:</p>
+<p>This is displayed as:</p>
+<div xmlns="http://www.w3.org/1999/xhtml"><p class="report-result rubric" id="results-1-3-of-2745-1">Results (1 - 3 of 2745)</p>
+  <div class="paging">
+
+1<p><a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=2&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id&amp;row=description">2</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=3&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id&amp;row=description">3</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=4&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id&amp;row=description">4</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=5&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id&amp;row=description">5</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=6&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id&amp;row=description">6</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=7&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id&amp;row=description">7</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=8&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id&amp;row=description">8</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=9&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id&amp;row=description">9</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=10&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id&amp;row=description">10</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=11&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id&amp;row=description">11</a>
+<a class="reference external" href="/sssd/query?status=closed&amp;max=3&amp;page=2&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id">→</a></p>
+</div><p><a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;order=id&amp;row=description">Ticket</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;order=resolution&amp;row=description">Resolution</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;order=summary&amp;row=description">Summary</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;order=owner&amp;row=description">Owner</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;order=reporter&amp;row=description">Reporter</a>
+<a class="reference external" href="/sssd/ticket/3309">#3309</a>
+fixed
+<a class="reference external" href="/sssd/ticket/3309">Coverity warns about an unused value in IPA sudo
+code</a>
+pcech
+jhrozek
+Description
+.. code:: wiki</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>943    for (i = 0; table[i].ipa != NULL; i++) {</dt>
+<dd>value_overwrite: Overwriting previous write to ret with value from sysdb_attrs_get_string_array(rule-&gt;attrs, table[i].ipa, tmp_ctx, &amp;values).</dd>
+</dl>
+<p>944        ret = sysdb_attrs_get_string_array(rule-&gt;attrs, table[i].ipa,
+945                                           tmp_ctx, &amp;values);
+946        if (ret == ENOENT) {
+947            continue;
+948        } else if (ret != EOK) {
+949            DEBUG(SSSDBG_CRIT_FAILURE, &#8220;Unable to read attribute &#8221;
+950                  &#8220;%s [%d]: %sn&#8221;, table[i].ipa, ret, sss_strerror(ret));
+951            goto done;
+952        }
+953
+954        for (j = 0; values[j] != NULL; j++) {
+955            if (table[i].conv_fn != NULL) {
+956                value = table[i].conv_fn(tmp_ctx, conv, values[j], &amp;skip_entry);
+957                if (value == NULL) {
+958                    if (skip_entry) {</p>
+<blockquote>
+<div>CID 14791 (#1 of 1): Unused value (UNUSED_VALUE)assigned_value: Assigning value 2 to ret here, but that stored value is overwritten before it can be used.</div></blockquote>
+<p>959                        ret = ENOENT;
+960                        continue;
+961                    } else {</p>
+<blockquote>
+<div>value_overwrite: Overwriting previous write to ret with value 12.</div></blockquote>
+<p>962                        ret = ENOMEM;
+963                        goto done;
+964                    }
+965                }
+966            } else {
+967                value = values[j];
+968            }
+969</p>
+<blockquote>
+<div>value_overwrite: Overwriting previous write to ret with value from sysdb_attrs_add_string_safe(attrs, table[i].sudo, value).</div></blockquote>
+</div></blockquote>
+<p><a class="reference external" href="/sssd/ticket/3301">#3301</a>
+fixed
+<a class="reference external" href="/sssd/ticket/3301">storing a sudo rule with sudoRule attribute values that only differ by
+case fails</a>
+somebody
+jhrozek
+Description
+Consider the following sudo rule where two values of the sudoUser
+attribute only differ by case:</p>
+<p>With the current master, storing the rule fails with EEXIST. We should
+gracefully store the rule, adding the lowercase attribute value only
+once.</p>
+<p><a class="reference external" href="/sssd/ticket/3299">#3299</a>
+fixed
+<a class="reference external" href="/sssd/ticket/3299">SSSD does not start if using only the local provider and services line
+is empty</a>
+fidencio
+fidencio
+Description
+SSSD hits a timeout while being started in case the only configured
+domain is the local one and the services&#8217; line is empty.</p>
+<p>sssd.conf:</p>
+  <div class="paging">
+
+1<p><a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=2&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id&amp;row=description">2</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=3&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id&amp;row=description">3</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=4&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id&amp;row=description">4</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=5&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id&amp;row=description">5</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=6&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id&amp;row=description">6</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=7&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id&amp;row=description">7</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=8&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id&amp;row=description">8</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=9&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id&amp;row=description">9</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=10&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id&amp;row=description">10</a>
+<a class="reference external" href="https://fedorahosted.org/sssd/query?status=closed&amp;max=3&amp;page=11&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id&amp;row=description">11</a>
+<a class="reference external" href="/sssd/query?status=closed&amp;max=3&amp;page=2&amp;col=id&amp;col=resolution&amp;col=summary&amp;col=owner&amp;col=reporter&amp;desc=1&amp;order=id">→</a></p>
+</div></div></div>
+</div>
+<div class="section" id="query-language">
+<h3>Query Language<a class="headerlink" href="#query-language" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">query:</span></code>
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracLinks.html">TracLinks</a> and
+the <code class="docutils literal"><span class="pre">[[TicketQuery]]</span></code> macro both use a mini “query language” for
+specifying query filters. Basically, the filters are separated by
+ampersands (<code class="docutils literal"><span class="pre">&amp;</span></code>). Each filter then consists of the ticket field name,
+an operator, and one or more values. More than one value are separated
+by a pipe (<code class="docutils literal"><span class="pre">|</span></code>), meaning that the filter matches any of the values. To
+include a literal <code class="docutils literal"><span class="pre">&amp;</span></code> or <code class="docutils literal"><span class="pre">|</span></code> in a value, escape the character with a
+backslash (<code class="docutils literal"><span class="pre">\</span></code>).</p>
+<p>The available operators are:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="80%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>``=``</strong></td>
+<td>the field content exactly matches one of the values</td>
+</tr>
+<tr class="row-even"><td><strong>``~=``</strong></td>
+<td>the field content contains one or more of the values</td>
+</tr>
+<tr class="row-odd"><td><strong>``^=``</strong></td>
+<td>the field content starts with one of the values</td>
+</tr>
+<tr class="row-even"><td><strong>``$=``</strong></td>
+<td>the field content ends with one of the values</td>
+</tr>
+</tbody>
+</table>
+<p>All of these operators can also be negated:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="80%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>``!=``</strong></td>
+<td>the field content matches none of the values</td>
+</tr>
+<tr class="row-even"><td><strong>``!~=``</strong></td>
+<td>the field content does not contain any of the values</td>
+</tr>
+<tr class="row-odd"><td><strong>``!^=``</strong></td>
+<td>the field content does not start with any of the values</td>
+</tr>
+<tr class="row-even"><td><strong>``!$=``</strong></td>
+<td>the field content does not end with any of the values</td>
+</tr>
+</tbody>
+</table>
+<p>The date fields <code class="docutils literal"><span class="pre">created</span></code> and <code class="docutils literal"><span class="pre">modified</span></code> can be constrained by using
+the <code class="docutils literal"><span class="pre">=</span></code> operator and specifying a value containing two dates separated
+by two dots (<code class="docutils literal"><span class="pre">..</span></code>). Either end of the date range can be left empty,
+meaning that the corresponding end of the range is open. The date parser
+understands a few natural date specifications like &#8220;3 weeks ago&#8221;, &#8220;last
+month&#8221; and &#8220;now&#8221;, as well as Bugzilla-style date specifications like
+&#8220;1d&#8221;, &#8220;2w&#8221;, &#8220;3m&#8221; or &#8220;4y&#8221; for 1 day, 2 weeks, 3 months and 4 years,
+respectively. Spaces in date specifications can be left out to avoid
+having to quote the query string.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="40%" />
+<col width="60%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>``created=2007-01-01..2008-01-01``</strong></td>
+<td>query tickets created in 2007</td>
+</tr>
+<tr class="row-even"><td><strong>``created=lastmonth..thismonth``</strong></td>
+<td>query tickets created during the previous month</td>
+</tr>
+<tr class="row-odd"><td><strong>``modified=1weekago..``</strong></td>
+<td>query tickets that have been modified in the last week</td>
+</tr>
+<tr class="row-even"><td><strong>``modified=..30daysago``</strong></td>
+<td>query tickets that have been inactive for the last 30 days</td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTickets.html">TracTickets</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracReports.html">TracReports</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracGuide.html">TracGuide</a></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Trac Ticket Queries</a><ul>
+<li><a class="reference internal" href="#filters">Filters</a></li>
+<li><a class="reference internal" href="#navigating-tickets">Navigating Tickets</a></li>
+<li><a class="reference internal" href="#saving-queries">Saving Queries</a><ul>
+<li><a class="reference internal" href="#using-traclinks">Using TracLinks</a></li>
+<li><a class="reference internal" href="#using-the-ticketquery-macro">Using the <code class="docutils literal"><span class="pre">[[TicketQuery]]</span></code> Macro</a></li>
+<li><a class="reference internal" href="#customizing-the-table-format">Customizing the <em>table</em> format</a><ul>
+<li><a class="reference internal" href="#full-rows">Full rows</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#query-language">Query Language</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracQuery.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracQuery.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

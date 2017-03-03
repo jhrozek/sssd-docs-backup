@@ -1,0 +1,255 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Merging Configuration Snippets Installed in Different Locations &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="merging-configuration-snippets-installed-in-different-locations">
+<h1>Merging Configuration Snippets Installed in Different Locations<a class="headerlink" href="#merging-configuration-snippets-installed-in-different-locations" title="Permalink to this headline">¶</a></h1>
+<p>This page covers the design for ticket
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/2247">​https://fedorahosted.org/sssd/ticket/2247</a></p>
+<p>In many situations the main configuration file provided by the
+application (SSSD or GSS proxy for example) can be or should be extended
+or augmented by other applications and packages installed later. It is
+hard and some times not desirable to modify the main configuration file.
+Also applications might not have privileges to change the main
+configuration file.</p>
+<p>On this design page we are going to try to define a common interface
+that can be provided by ding-libs INI for any application that uses
+libini_config library for its configuration. To be able to provide such
+interface we need to define the use cases and usage scenarios first.</p>
+</div>
+<div class="section" id="general-use-case">
+<h1>General Use Case<a class="headerlink" href="#general-use-case" title="Permalink to this headline">¶</a></h1>
+<p>There have been several enhancements requests to allow configuration
+files to be augmented by other applications. Right now libini_config
+library allows reading a configuration file and then reading other
+configuration file and merging them together as calling application
+prefers. The requirement is to provide a more convenient function or set
+of functions to allow augmentation of the main configuration file.
+Augmentation can really happen in two ways: 1) The configuration file is
+extended by adding additional keys or sections 2) Values for existing
+keys or sections are overwritten. In SSSD case the example of the
+extension can be that a new provider or domain is added to the
+configuration. The overwrite use case is related to giving power to
+local administrator to overwrite some of the sections of a centrally
+managed configuration file. Imagine a situation when sssd.conf is
+centrally managed with puppet and thus any modification to it would be
+automatically restored. Allowing local administrator to overwrite
+sections or values of the configuration file will allow a better control
+over the application configuration.</p>
+</div>
+<div class="section" id="what-to-merge">
+<h1>What to merge?<a class="headerlink" href="#what-to-merge" title="Permalink to this headline">¶</a></h1>
+<p>As mentioned above one can merge individual <strong>keys</strong> or <strong>sections</strong>. It
+is much harder to formalize the rules about merging individual keys so
+after some evaluation we decided to focus on merging sections only.</p>
+</div>
+<div class="section" id="the-rules">
+<h1>The rules<a class="headerlink" href="#the-rules" title="Permalink to this headline">¶</a></h1>
+<p>The convenience augmentation function that the API will provide assumes
+the following:</p>
+<ol class="arabic simple">
+<li>The main configuration file has been read by existing functions. The
+read configuration will be passed to the new function as an argument.</li>
+<li>All augmenting configuration files will be read from a directory of
+application&#8217;s choice. The path to that directory will be passed as an
+argument to the new function. Internally the function would
+automatically expand the path to the absolute path so caller can use
+relative path if desired.</li>
+<li>The provided directory would be scanned for augmenting configuration
+files using a list of regular expressions provided by the caller. If
+the list is empty all files in the provided directory will be
+considered for merge.</li>
+<li>The identified files will be checked against a provided access check
+filter. If filter is not provided all files with all permissions and
+ownership will be considered.</li>
+<li>The list of file names would then be sorted in the lexical order.</li>
+<li>The files then will be parsed in that order. The function to read and
+parse the configuration snippets would accept same arguments to
+control the parsing of the snippets as the main parsing function of
+the interface. It would allow consistent parsing expectations while
+parsing the main file and the snippets that will be merged.</li>
+<li>Each augmenting configuration file will be treated as an independent
+file that can have multiple sections or no sections at all. If there
+is no sections the section with name &#8220;default&#8221; will be assumed in the
+same way how it is done with the parsing of the main configuration
+file.</li>
+<li>Once the file is parsed its section list will be validated against
+the list of regular expressions provided as an argument for the
+augmentation function. This is done to prevent merging snippets that
+try to overwrite sections that should not be overwritten. If the
+snippet contains any section that does not match any of the provided
+regular expressions the snippet will be ignored. If the list of
+regular expressions is empty all snippets would match.</li>
+<li>Finally valid snippets will be merged using the merge function that
+was previously implemented. The caller of the augmentation function
+will have control over merge flags that are passed down to the merge
+operation.</li>
+<li>The function would return two lists in the form of the refarray
+string arrays. The first list would contain any parsing and
+validation errors that were detected while parsing the snippets and
+would have the information and justification why this or that file
+was rejected. It is expected tha tcalling application will dump this
+to the log. The second list will contain the ref array of strings of
+the fully qualified names of the snippet files that were merged.</li>
+</ol>
+<p>For regular expressions the POSIX regex library will be used. After the
+evaluation we decided not to use PCRE as it will create an external
+dependency for a light weight library with no apparent benefit. If the
+calling application needs to do processing of different sets of snippets
+following different rules, for example at first augment the
+configuration without overwriting it and then merge in some overwrites,
+the application would need to call the function twice with different
+merge and potentially parsing flags and regex filters.</p>
+</div>
+<div class="section" id="limitations">
+<h1>Limitations<a class="headerlink" href="#limitations" title="Permalink to this headline">¶</a></h1>
+<ol class="arabic simple">
+<li>Merge function will not merge values. SSSD would have to be changed
+to deal with dropped in domains or providers.</li>
+<li>Merge function will not process more than one directory. To process
+multiple directories the function would need to be called several
+times.</li>
+</ol>
+</div>
+<div class="section" id="error-processing">
+<h1>Error processing<a class="headerlink" href="#error-processing" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>It is assumed that augmentation is not a critical operation. This
+means that if something went wrong the application should not fail to
+start. It should proceed to start with the main configuration file it
+already read.</li>
+<li>Merge errors will not be critical unless it is a memory allocation
+issue or something similar that affects the application as a whole.</li>
+<li>The refarray of errors will be returned by the merge function and can
+be printed by the application into the corresponding log. If the list
+is empty this would indicate that no errors have been encountered.</li>
+<li>If the refarray is not empty it needs to be freed after sending it to
+the corresponding log. See the unit test for example on how to do it.</li>
+</ul>
+</div>
+<div class="section" id="permissions">
+<h1>Permissions<a class="headerlink" href="#permissions" title="Permalink to this headline">¶</a></h1>
+<p>Application might elect to not trust files that have wrong permissions
+or ownership. Function will accept an argument that would define what
+permissions and ownership are acceptable. This argument will be a
+pointer to structure that effectively holds the arguments to the <strong>*int
+ini_config_access_check()*</strong> function that will be called internally
+for every file. If argument is NULL the function will not be called. If
+it is not NULL the function will be called and only those files that
+match the specified criteria would be considered for merge. Files that
+do not pass the criteria will be skipped. The fact that file did not
+pass the access test will be recoreded as an error.</p>
+</div>
+<div class="section" id="api-function">
+<h1>API Function<a class="headerlink" href="#api-function" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="unit-testing">
+<h2>Unit testing<a class="headerlink" href="#unit-testing" title="Permalink to this headline">¶</a></h2>
+<p>Current unit test will be extended with a new test module
+ini_augment_ut that would cover the new functionality.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Merging Configuration Snippets Installed in Different Locations</a></li>
+<li><a class="reference internal" href="#general-use-case">General Use Case</a></li>
+<li><a class="reference internal" href="#what-to-merge">What to merge?</a></li>
+<li><a class="reference internal" href="#the-rules">The rules</a></li>
+<li><a class="reference internal" href="#limitations">Limitations</a></li>
+<li><a class="reference internal" href="#error-processing">Error processing</a></li>
+<li><a class="reference internal" href="#permissions">Permissions</a></li>
+<li><a class="reference internal" href="#api-function">API Function</a><ul>
+<li><a class="reference internal" href="#unit-testing">Unit testing</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/DesignDocs/ding-libs/INIConfigMerge.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../../_sources/DesignDocs/ding-libs/INIConfigMerge.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

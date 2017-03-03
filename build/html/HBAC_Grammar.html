@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Time Rules &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#TimeRules">Time Rules</a><ol class="arabic">
+<li><a class="reference external" href="#RelatedAttributes">Related Attributes</a></li>
+<li><a class="reference external" href="#GrammarDefinition">Grammar Definition</a></li>
+<li><a class="reference external" href="#Terminology">Terminology</a></li>
+<li><a class="reference external" href="#Examples">Examples</a><ol class="arabic">
+<li><a class="reference external" href="#Standardshift">Standard shift</a></li>
+<li><a class="reference external" href="#SecondShift">Second Shift</a></li>
+<li><a class="reference external" href="#RegularlyScheduledMaintenanceWindow">Regularly Scheduled Maintenance
+Window</a></li>
+<li><a class="reference external" href="#ThelastSaturdayofthemonth">The last Saturday of the
+month</a></li>
+<li><a class="reference external" href="#One-timeMaintenanceWindow">One-time Maintenance Window</a></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="time-rules">
+<h1>Time Rules<a class="headerlink" href="#time-rules" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="related-attributes">
+<h2>Related Attributes<a class="headerlink" href="#related-attributes" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>accessTime</dt>
+<dd>Grammar describing time that a user is allowed (or denied) access
+startTime: Date and time after which the HBAC rule will be valid
+endTime: Date and time after which the HBAC rule will no longer be
+valid</dd>
+</dl>
+</div>
+<div class="section" id="grammar-definition">
+<h2>Grammar Definition<a class="headerlink" href="#grammar-definition" title="Permalink to this headline">¶</a></h2>
+<p>This grammar describes the time period for which the HBAC rule will be
+valid</p>
+</div>
+<div class="section" id="terminology">
+<h2>Terminology<a class="headerlink" href="#terminology" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>WSP</dt>
+<dd>Whitespace - one or more whitespace characters</dd>
+<dt>day-of-the-month</dt>
+<dd>Positive numbers refer to exact days, negative one (-1) starts at
+the end of the month and counts back. Day 31 == Day -1 for a 31-day
+month</dd>
+</dl>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="standard-shift">
+<h3>Standard shift<a class="headerlink" href="#standard-shift" title="Permalink to this headline">¶</a></h3>
+<p>Monday through Friday, 09:00 until 17:00 each day.</p>
+</div>
+<div class="section" id="second-shift">
+<h3>Second Shift<a class="headerlink" href="#second-shift" title="Permalink to this headline">¶</a></h3>
+<p>Monday Evening through Saturday Morning, 17:00 until 01:00 the following
+day</p>
+</div>
+<div class="section" id="regularly-scheduled-maintenance-window">
+<h3>Regularly Scheduled Maintenance Window<a class="headerlink" href="#regularly-scheduled-maintenance-window" title="Permalink to this headline">¶</a></h3>
+<p>The second Tuesday of every month, all day</p>
+</div>
+<div class="section" id="the-last-saturday-of-the-month">
+<h3>The last Saturday of the month<a class="headerlink" href="#the-last-saturday-of-the-month" title="Permalink to this headline">¶</a></h3>
+<p>The last Saturday of the month, all day</p>
+</div>
+<div class="section" id="one-time-maintenance-window">
+<h3>One-time Maintenance Window<a class="headerlink" href="#one-time-maintenance-window" title="Permalink to this headline">¶</a></h3>
+<p>Saturday, Nov 20 2010 from 02:00 until 06:00</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Time Rules</a><ul>
+<li><a class="reference internal" href="#related-attributes">Related Attributes</a></li>
+<li><a class="reference internal" href="#grammar-definition">Grammar Definition</a></li>
+<li><a class="reference internal" href="#terminology">Terminology</a></li>
+<li><a class="reference internal" href="#examples">Examples</a><ul>
+<li><a class="reference internal" href="#standard-shift">Standard shift</a></li>
+<li><a class="reference internal" href="#second-shift">Second Shift</a></li>
+<li><a class="reference internal" href="#regularly-scheduled-maintenance-window">Regularly Scheduled Maintenance Window</a></li>
+<li><a class="reference internal" href="#the-last-saturday-of-the-month">The last Saturday of the month</a></li>
+<li><a class="reference internal" href="#one-time-maintenance-window">One-time Maintenance Window</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/HBAC_Grammar.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/HBAC_Grammar.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

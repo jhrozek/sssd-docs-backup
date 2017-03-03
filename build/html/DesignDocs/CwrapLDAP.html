@@ -1,0 +1,239 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>LDAP provider integration tests &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="ldap-provider-integration-tests">
+<h1>LDAP provider integration tests<a class="headerlink" href="#ldap-provider-integration-tests" title="Permalink to this headline">¶</a></h1>
+<p>Related tickets:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2541">#2541</a></li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2545">#2545</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>We&#8217;d like to run some sssd/LDAP integration tests during day-to-day
+development. They should be low-overhead, completing in under 5 minutes,
+and run as part of &#8220;make check&#8221; and &#8220;contrib/ci/run&#8221;, under a
+non-privileged user. They may require special configure options to be
+executable, and be skipped if the options are not provided.</p>
+</div>
+<div class="section" id="use-cases">
+<h2>Use cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+<p>A developer modifies a part of LDAP-involved data path and wishes to
+quickly check sanity of the change. He/she then runs &#8220;make check&#8221; or
+&#8220;contrib/ci/run&#8221;, which include the LDAP integration tests.</p>
+<p>A developer submits a change (possibly) affecting the LDAP-involved data
+paths and a reviewer wishes to check the sanity of the change before
+ACK&#8217;ing it. The reviewer then requests a CI job run, which includes the
+LDAP integration tests.</p>
+</div>
+<div class="section" id="overview-of-the-solution">
+<h2>Overview of the solution<a class="headerlink" href="#overview-of-the-solution" title="Permalink to this headline">¶</a></h2>
+<p>The suite should use pytest test framework.</p>
+<p>Tests are executed as part of &#8220;make check&#8221;, which is also included into
+&#8220;contrib/ci/run&#8221;. As our Makefiles use Automake&#8217;s parallel test
+execution harness and sssd data and socket directories are compiled-in
+currently and cannot be shared, there can only be one Automake-level
+integration test suite. Any possible parallelization should be
+implemented within.</p>
+<p>Because &#8220;make check&#8221; and &#8220;contrib/ci/run&#8221; are supposed to be executable
+in largely arbitrary environments and under regular users, the sssd
+needs to be tricked into believing it is running under a root account
+and tests need to be tricked into using libnss_sss and pam_sss from
+the build instead of the NSS and PAM services specified for the system.
+The first two can be done with the help of &#8220;cwrap&#8221; wrappers. The latter
+would require cwrap support for the PAM library, which isn&#8217;t implemented
+yet, but might be in the future. As of now, only libnss_sss can be
+tested.</p>
+<p>Because default, compiled-in sssd data and socket locations are not
+accessible to regular users, and there is currently no way to change
+them after the build, running the tests will require configuring the
+build with user-writeable locations. Otherwise the tests will be skipped
+during the &#8220;make check&#8221; run and Automake will report them as such. It is
+possible that in the future a way to change them after the build will be
+implemented and this requirement will be lifted.</p>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<p>All tests are invoked with src/tests/cwrap/cwrap_test_setup.sh sourced
+into the shell, which sets up NSS and UID wrappers to make tests assume
+they&#8217;re running under root and use libnss_sss from the build tree.</p>
+<p>At the moment, running the tests requires configuring the build to have
+data and sockets located in user-writeable directories. The specific
+locations might be communicated to the test suite via a
+configure-generated Python or Bash module, or a C program outputting
+them when invoked. If at least one of these locations is non-writeable,
+the test suite will exit to Automake with code 77, indicating SKIPPED
+status.</p>
+<p>However, a way to change these at startup time might be implemented
+later, removing this requirement. E.g. data and socket directories might
+be specified in the configuration file for the sssd daemons, and the
+socket location might be specified to libnss_sss and pam_sss via an
+environment variable. See
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/2545">#2545</a>.</p>
+<p>The OpenLDAP server can be executed with configuration and databases
+located under arbitrary (temporary) directories which will be created
+during testing. It is unknown yet how to make 389-ds do the same.</p>
+<p>The communication with the LDAP server can be left unencrypted at least
+for the start, simplifying setup and debugging.</p>
+<p>The LDAP server setup/teardown (for either of the servers) will be done
+in Bash to simplify initial development and later possibly converted to
+(a bit more robust) Python, when all the details are clear. The
+setup/teardown scripts will be executed from a pytest fixture
+setup/teardown.</p>
+<p>The pytest suite will do further setup itself according to specific test
+requirements, including: directory population/cleanup, generating sssd
+configuration, starting/stopping sssd.</p>
+<p>The tests themselves might include listing/retrieving rfc2307(bis) user
+and group information, including nested groups, perhaps using the
+standard &#8220;pwd&#8221; and &#8220;grp&#8221; modules. Some of the tests that can be
+implemented initially follow, most useful first.</p>
+<div class="section" id="sanity">
+<h3>Sanity<a class="headerlink" href="#sanity" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="cache">
+<h3>Cache<a class="headerlink" href="#cache" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="filter-users-groups">
+<h3>Filter users/groups<a class="headerlink" href="#filter-users-groups" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="override-homedir">
+<h3>Override homedir<a class="headerlink" href="#override-homedir" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="fallback-homedir">
+<h3>Fallback homedir<a class="headerlink" href="#fallback-homedir" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="override-shell">
+<h3>Override shell<a class="headerlink" href="#override-shell" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="vetoed-shells-shell-fallback">
+<h3>Vetoed shells / shell fallback<a class="headerlink" href="#vetoed-shells-shell-fallback" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="default-shell">
+<h3>Default shell<a class="headerlink" href="#default-shell" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="configuration-changes">
+<h2>Configuration changes<a class="headerlink" href="#configuration-changes" title="Permalink to this headline">¶</a></h2>
+<p>Sssd, libnss_sss and pam_sss might require changes allowing
+configuration of data and socket locations.</p>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<p>Nikolai Kondrashov with help from Martin Kosek, Jakub Hrozek, Lukas
+Slebodnik and Simo Sorce.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">LDAP provider integration tests</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem statement</a></li>
+<li><a class="reference internal" href="#use-cases">Use cases</a></li>
+<li><a class="reference internal" href="#overview-of-the-solution">Overview of the solution</a></li>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a><ul>
+<li><a class="reference internal" href="#sanity">Sanity</a></li>
+<li><a class="reference internal" href="#cache">Cache</a></li>
+<li><a class="reference internal" href="#filter-users-groups">Filter users/groups</a></li>
+<li><a class="reference internal" href="#override-homedir">Override homedir</a></li>
+<li><a class="reference internal" href="#fallback-homedir">Fallback homedir</a></li>
+<li><a class="reference internal" href="#override-shell">Override shell</a></li>
+<li><a class="reference internal" href="#vetoed-shells-shell-fallback">Vetoed shells / shell fallback</a></li>
+<li><a class="reference internal" href="#default-shell">Default shell</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuration-changes">Configuration changes</a></li>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/CwrapLDAP.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/CwrapLDAP.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

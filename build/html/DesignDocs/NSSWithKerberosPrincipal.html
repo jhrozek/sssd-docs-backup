@@ -1,0 +1,268 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Allow Kerberos Principals in getpwnam() calls &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="allow-kerberos-principals-in-getpwnam-calls">
+<h1>Allow Kerberos Principals in getpwnam() calls<a class="headerlink" href="#allow-kerberos-principals-in-getpwnam-calls" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1835">​RFE Implement localauth plugin for MIT krb5
+1.12</a></li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1749">​RFE Allow email-address in
+ldap_user_principal</a></li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2473">​RFE: Add a configuration option to specify where a snippet with
+sssd_krb5_localauth_plugin.so is
+generated</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem Statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>When using Kerberos/GSSAPI authentication for a service running on a
+Linux host strictly speaking not a POSIX user of the Linux system is
+authenticated but a Kerberos principal. I.e. authentication is
+successful for every Kerberos principal with a valid ticket for the
+service running on the Linux host. This is done intentional to keep
+Kerberos independent of the operating system of the host. But it creates
+the problem of mapping Kerberos principals to POSIX users.</p>
+<p>Basic mappings are integrated in the MIT Kerberos library. By default
+the realm part of the Kerberos principal is stripped off and what
+remains is considered as a POSIX user name. The administrator can
+enhance this by adding some minimal regular-expression operations in
+/etc/krb5.conf. Addionally the user can create a .k5login file in his
+home directory and add all Kerberos principals which should be allowed
+to log in with his identity. All those methods do not scale in
+environments with multiple realm and cross-realm trust.</p>
+<p>To allow more advance mapping schemes a plugin interface was introduced
+in MIT Kerberos version 1.12.</p>
+<p>If the Kerberos principal is available SSSD will store it in its cache
+in the related user object. The Kerberos principal can be retrieved by
+looking it up in the central IdM system (LDAP/IPA/AD). If the Kerberos
+principal is not available but Kerberos authentication is configured
+SSSD will guess it by adding the configured realm or domain name to the
+POSIX user name. If authentication is successful with this principal it
+is stored in the cache as well.</p>
+<p>A plugin which looks up the Kerberos principal in SSSD and gets the
+POSIX user entry back would provide a reliable mapping and scale across
+multiple realms and trusts because SSSD supports it.</p>
+</div>
+<div class="section" id="use-case">
+<h2>Use case<a class="headerlink" href="#use-case" title="Permalink to this headline">¶</a></h2>
+<p>In Windows environments, the user typically logs in using his UPN.
+Implementing this feature would reach parity with how Windows users are
+used to log in.</p>
+<p>Implementing the localauth plugin will not only help the feature of
+looking up UPNs but will make it easier for administrator to configure
+client machines in a trust scenario as mapping will be done inside sssd
+instead of the <code class="docutils literal"><span class="pre">auth_to_local</span></code> rule in <code class="docutils literal"><span class="pre">krb5.conf</span></code> or a <code class="docutils literal"><span class="pre">.k5login</span></code>
+file.</p>
+</div>
+</div>
+<div class="section" id="overview-of-the-solution">
+<h1>Overview of the Solution<a class="headerlink" href="#overview-of-the-solution" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<p>Currently the NSS responder expects that the argument of the getpwnam()
+call is a user name, either fully qualified or the short version without
+a domain name. The name is evaluated with the help of regular expression
+and split into a user and a domain component. By default the &#8216;&#64;&#8217;
+character is one of the characters to separate the user and the domain
+component in a fully qualified user name. This collides with the usage
+of the &#8216;&#64;&#8217; character in Kerberos principals, because here it is used to
+separate the user and the realm component.</p>
+<p>One way to solve this is to introduce a special prefix tag, e.g.
+&#8216;:princ:&#8217; to indicate that the remainder of the string should be
+considered as a Kerberos principal and not be split as fully qualified
+user names. While this would work for the localauth plugin use-case
+there are other potential use-cases where this would not be possible.
+E.g if SSSD should allow AD user to use their UPN (see
+<a class="reference external" href="http://technet.microsoft.com/en-us/library/cc739093(v=WS.10).aspx">​http://technet.microsoft.com/en-us/library/cc739093(v=WS.10).aspx</a>
+for details). This UPN is build by joining the user logon name and a UPN
+suffix with an &#8216;&#64;&#8217; character. I think it cannot be expected from the AD
+users to add a prefix to this name and pam_sss cannot do it either
+because it does not know it is a fully qualified name or a UPN.</p>
+<p>Especially with the second use-case, we should process the argument of
+getpwnam() like a fully qualified user name first. If no matching user
+was found during this pass SSSD can take the orginal input, check if it
+contains an &#8216;&#64;&#8217; character and search the configured backends for a
+matching Kerberos principal or UPN. It has to be noted that in theory
+there might be a user with the fully qualified name <code class="docutils literal"><span class="pre">abc&#64;domain.name</span></code>
+and the Kerberos principal <code class="docutils literal"><span class="pre">def&#64;domain.com</span></code> and a user with the fully
+qualified name <code class="docutils literal"><span class="pre">def&#64;domain.name</span></code> and the Kerberos principal
+<code class="docutils literal"><span class="pre">abc&#64;domain.name</span></code>. In this case getpwnam(&#8220;<code class="docutils literal"><span class="pre">abc&#64;domain.name</span></code>&#8221;) will
+always return the entry for the user with the fully qualified name
+<code class="docutils literal"><span class="pre">abc&#64;domain.name</span></code> even if the input was meant as Kerberos principal.
+This is even possible with Active Directory, i.e. the pre-Windows 2000
+name and the user logon name of different users can be the same. I would
+say that those cases are rare and can be considered as broken
+configuration.</p>
+<p>If the NSS responder decides that the given argument should be
+considered as a Kerberos principal and was not able to find a matching
+principal in the cache it can iterate over the configured backends and
+send a GETACCOUNTINFO request for a user with a new filter type, e.g.
+BE_FILTER_PRINCIPAL. The LDAP based ID backend which wants to support
+this new filter type can process it like a any user request but have to
+use an appropriate search filter.</p>
+<p>The localauth plugin will be implemented according to <a class="reference external" href="http://k5wiki.kerberos.org/wiki/Projects/Plugin_support_improvements">​the Kerberos
+documentation</a>.
+The plugin can be enabled manually by the admin, but it&#8217;s more
+user-friendly to enable the plugin automatically. To this end, SSSD will
+gain a new option, tentatively called <code class="docutils literal"><span class="pre">krb5_localauth_snippet_path</span></code>.
+When this option is enabled, a configuration snippet similar to the
+following is generated into a <code class="docutils literal"><span class="pre">/var/lib/sss/pubconf/krb5.include.d</span></code>
+directory that is already sourced by krb5.conf:</p>
+</div>
+<div class="section" id="additional-notes">
+<h2>Additional notes<a class="headerlink" href="#additional-notes" title="Permalink to this headline">¶</a></h2>
+<p>The SSSD cache knows two attributes for principals &#8220;userPrincipalName&#8221;
+and &#8220;canonicalUserPrincipalName&#8221;. The first is used to save the data
+read from the LDAP server. The second is used if the TGT contains a
+different principal than the one used to request the TGT, i.e. if the
+original principal was an alias. While searching principals in the cache
+both should be respected. Currently &#8220;userPrincipalName&#8221; is already
+declared CASE_INSENSITIVE for searched in the cache.
+&#8220;canonicalUserPrincipalName&#8221; should be declared the same way to make
+searches consistent.</p>
+</div>
+<div class="section" id="configuration-changes">
+<h2>Configuration Changes<a class="headerlink" href="#configuration-changes" title="Permalink to this headline">¶</a></h2>
+<p>A new option, tentatively called <code class="docutils literal"><span class="pre">krb5_localauth_snippet_path</span></code> will be
+added to sssd&#8217;s Kerberos provider. When this option is set (mostly via
+SSSD default values, not administrator&#8217;s change), then SSSD will
+generate a file that will be automatically included in krb5.conf and the
+localauth plugin will be enabled.</p>
+</div>
+<div class="section" id="how-to-test">
+<h2>How to test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<p>To make sure that a <code class="docutils literal"><span class="pre">getent</span> <span class="pre">passwd</span> <span class="pre">user&#64;domain.name</span></code> search for the
+Kerberos principal <code class="docutils literal"><span class="pre">user&#64;domain.name</span></code> and not for a fully qualified
+name the domain name in sssd.conf should differ from the realm name in
+the principal. Probably the easiest configuration is to use the ldap ID
+provider and make sure the targeted LDAP server has a Kerberos principal
+attribute set for the users and the ldap_user_principal option points
+to the corresponding attribute name.</p>
+<p>Now the fully qualified names end with <a class="reference external" href="mailto:'&#37;&#52;&#48;default">'<span>&#64;</span>default</a>&#8216; while the Kerberos
+principal are defined by the LDAP entries. E.g. if there is a user
+&#8216;testabc&#8217; with the principal <code class="docutils literal"><span class="pre">testabc&#64;MY.REALM</span></code> the command
+<code class="docutils literal"><span class="pre">getent</span> <span class="pre">passwd</span> <span class="pre">testabc&#64;default</span></code> will return the POSIX user entry
+searched with the fully qualified name.
+<code class="docutils literal"><span class="pre">getent</span> <span class="pre">passwd</span> <span class="pre">testabc&#64;MY.REALM</span></code> will return the same entry but now
+search with the Kerberos principal.</p>
+<p>Additionaly, logging in as a Windows user using GSSAPI should succeed
+without requiring password with stock krb5.conf on an IPA client when
+IPA-AD trust is established, as the following sequence illustrates:</p>
+<p>Previously, this required either a <code class="docutils literal"><span class="pre">.k5login</span></code> file or an elaborate
+<code class="docutils literal"><span class="pre">auth_to_local</span></code> rule.</p>
+<div class="section" id="author-s">
+<h3>Author(s)<a class="headerlink" href="#author-s" title="Permalink to this headline">¶</a></h3>
+<p>Sumit Bose &lt;<a class="reference external" href="mailto:sbose&#37;&#52;&#48;redhat&#46;com">​sbose<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Allow Kerberos Principals in getpwnam() calls</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem Statement</a></li>
+<li><a class="reference internal" href="#use-case">Use case</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#overview-of-the-solution">Overview of the Solution</a><ul>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a></li>
+<li><a class="reference internal" href="#additional-notes">Additional notes</a></li>
+<li><a class="reference internal" href="#configuration-changes">Configuration Changes</a></li>
+<li><a class="reference internal" href="#how-to-test">How to test</a><ul>
+<li><a class="reference internal" href="#author-s">Author(s)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/NSSWithKerberosPrincipal.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/NSSWithKerberosPrincipal.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

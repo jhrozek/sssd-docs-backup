@@ -1,0 +1,243 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Lookup Users by Certificate - Active Directory &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="lookup-users-by-certificate-active-directory">
+<h1>Lookup Users by Certificate - Active Directory<a class="headerlink" href="#lookup-users-by-certificate-active-directory" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2897">​https://fedorahosted.org/sssd/ticket/2897</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>So far the main focus of the SSSD certificate and Smartcard
+authentication support in SSSD was on FreeIPA. Although it is possible
+to use it with the AD provider as well (see
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/DesignDocs/SmartcardAuthenticationTestingWithAD.html">​SmartcardAuthenticationTestingWithAD</a>
+for details) it requires some manual configuration.</p>
+<p>On this page we describe the enhanced support for certificates in AD and
+in override data for the direct (AD provider) and indirect (IPA with
+trust to AD) integration.</p>
+</div>
+<div class="section" id="use-cases">
+<h2>Use cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="apache">
+<h3>Apache<a class="headerlink" href="#apache" title="Permalink to this headline">¶</a></h3>
+<p>Apache is using <em>mod_lookup_identity</em> to look up a user who used
+certificate based authentication with the help of the certificate.
+Currently, without additional configuration, only IPA users were
+supported. Now users from AD which have the certificate stored in the
+user entry as supported as well for both direct and indirect
+integration. Additionally certificates can be stored in local overrides
+for the direct integration and in IPA server-side overrides for the
+indirect integration.</p>
+</div>
+<div class="section" id="smartcard-authentication">
+<h3>Smartcard authentication<a class="headerlink" href="#smartcard-authentication" title="Permalink to this headline">¶</a></h3>
+<p>If the certificate of the user is stored in the user&#8217;s entry in AD or in
+a IPA or local override the user can authenticate with a Smartcard which
+holds the certificate and the matching private key.</p>
+<p>Since both use-case rely in the same common code only the user lookup is
+discussed later on because it is easier to test and validate.</p>
+</div>
+</div>
+<div class="section" id="overview-of-the-solution">
+<h2>Overview of the solution<a class="headerlink" href="#overview-of-the-solution" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="general">
+<h3>General<a class="headerlink" href="#general" title="Permalink to this headline">¶</a></h3>
+<p>The common override lookup code must be enhanced to allow lookups by
+certificates as well.</p>
+</div>
+<div class="section" id="ad-provider-direct-integration">
+<h3>AD provider (direct integration)<a class="headerlink" href="#ad-provider-direct-integration" title="Permalink to this headline">¶</a></h3>
+<p>To support the direct integration</p>
+<ul class="simple">
+<li>the attribute containing the certificate must be read by default</li>
+<li>sss_override must be enhanced to store certificates in local
+overrides as well</li>
+</ul>
+</div>
+<div class="section" id="ipa-provider-indirect-integration">
+<h3>IPA provider (indirect integration)<a class="headerlink" href="#ipa-provider-indirect-integration" title="Permalink to this headline">¶</a></h3>
+<p>To support the indirect integration</p>
+<ul class="simple">
+<li>the IPA override lookup code must be enhanced to read certificate
+overrides from the server and store them in the cache</li>
+<li>the IPA client code to look up AD users via the extdom plugin must be
+enhanced to allow lookups by certificates</li>
+</ul>
+</div>
+<div class="section" id="support-for-the-ipa-extdom-plugin">
+<h3>Support for the IPA extdom plugin<a class="headerlink" href="#support-for-the-ipa-extdom-plugin" title="Permalink to this headline">¶</a></h3>
+<p>Currently it is only possible to look up users by certificate with the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InfoPipe.html">InfoPipe?</a> which
+uses DBus. To avoid to add a DBus requirement to the extdom plugin and
+the directory server a call similar to sss_nss_getnamebysid() should
+be added to allow easy lookups by certificate via the NSS responder.</p>
+</div>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<p>Most of the changes are related to adding the new attribute to the
+various lookup requests.</p>
+</div>
+<div class="section" id="configuration-changes">
+<h2>Configuration changes<a class="headerlink" href="#configuration-changes" title="Permalink to this headline">¶</a></h2>
+<p>For the AD provider the currently unset option <em>ldap_user_certificate</em>
+will be set to <em>userCertificate;binary</em>. This means that is a
+certificate is available in the user entry it will be downloaded and
+written to the cache by default. To avoid this <em>ldap_user_certificate</em>
+must be set to a non-existing attribute name like e.g.</p>
+<p>The <em>sss_override user-add</em> utility has a new option <em>&#8211;certificate</em>
+(<em>-x</em>) which expects the base64-endode certificate as an argument.</p>
+</div>
+<div class="section" id="how-to-test">
+<h2>How To Test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<p>Testing can be done with <em>dbus-send</em> as described in
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/LookupUsersByCertificate.html">LookupUsersByCertificate?</a>.
+Instead of storing the certificate in the user object of an IPA user it
+should be now stored in the user object of an AD user as e.g. described
+in
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/DesignDocs/SmartcardAuthenticationTestingWithAD.html#WritingthecertificatetoAD">​WritingthecertificatetoAD</a>.
+Additionally certificates overrides can be written with the
+<em>sss_override</em> utility for the direct integration or the <em>ipa
+idoverrideuser_add_cert</em> command for the indirect integration.</p>
+<p>If multiple certificate are added it should be noted that a user my have
+multiple different certificates but a single certificate should be only
+assigned to a single user. If a certificate is assigned to multiple
+users no matter if in the user object or in the override the lookup will
+fail sooner or later.</p>
+<p>For the indirect integration the different lookups should be tested
+independently on the IPA master and an IPA client because different code
+paths are used since SSSD is running in the ipa-server-mode on the
+master.</p>
+</div>
+<div class="section" id="how-to-debug">
+<h2>How To Debug<a class="headerlink" href="#how-to-debug" title="Permalink to this headline">¶</a></h2>
+<p>Explain how to debug this feature if something goes wrong. This section
+might include examples of additional commands the user might run (such
+as keytab or certificate sanity checks) or explain what message to look
+for.</p>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Sumit Bose &lt;<a class="reference external" href="mailto:sbose&#37;&#52;&#48;redhat&#46;com">​sbose<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Lookup Users by Certificate - Active Directory</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem statement</a></li>
+<li><a class="reference internal" href="#use-cases">Use cases</a><ul>
+<li><a class="reference internal" href="#apache">Apache</a></li>
+<li><a class="reference internal" href="#smartcard-authentication">Smartcard authentication</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#overview-of-the-solution">Overview of the solution</a><ul>
+<li><a class="reference internal" href="#general">General</a></li>
+<li><a class="reference internal" href="#ad-provider-direct-integration">AD provider (direct integration)</a></li>
+<li><a class="reference internal" href="#ipa-provider-indirect-integration">IPA provider (indirect integration)</a></li>
+<li><a class="reference internal" href="#support-for-the-ipa-extdom-plugin">Support for the IPA extdom plugin</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a></li>
+<li><a class="reference internal" href="#configuration-changes">Configuration changes</a></li>
+<li><a class="reference internal" href="#how-to-test">How To Test</a></li>
+<li><a class="reference internal" href="#how-to-debug">How To Debug</a></li>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/LookupUsersByCertificatePart2.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/LookupUsersByCertificatePart2.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

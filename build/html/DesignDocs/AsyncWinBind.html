@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>General Approach &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <p>The <a class="reference external" href="https://docs.pagure.org/sssd-test2/WinBind.html">WinBind?</a>
+provider uses <em>libwbclient</em> library for communication with
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WinBind.html">WinBind?</a> to
+satisfy NSS and PAM requests. However this library doesn&#8217;t provide an
+asynchronous interface. We had a choice between creating this interface
+or use synchronous calls in auxiliary processes running in parallel to
+the main provider process.</p>
+<div class="section" id="general-approach">
+<h1>General Approach<a class="headerlink" href="#general-approach" title="Permalink to this headline">¶</a></h1>
+<p>There should always be at least one auxiliary process running. This
+process will receive requests from the main provider process, handle
+them as they come in and send back responses. The communication protocol
+used should be DBus as it is used in other providers and therefor
+doesn&#8217;t require any extra dependencies or writing additional code. DBus
+should also take care of request buffering.</p>
+</div>
+<div class="section" id="splitting-the-load">
+<h1>Splitting the load<a class="headerlink" href="#splitting-the-load" title="Permalink to this headline">¶</a></h1>
+<p>If the host needs to process a huge amount of NSS and PAM requests in
+short periods of time, it should be possible to setup more than one
+auxiliary process to handle them. One should always be available before
+hand, because starting it just before it&#8217;s required adds extra overhead
+and delay. A maximum (and maybe a minimum too) number of auxiliary
+process should be configurable along with a threshold expressing when a
+new process should be created or a spare process killed. The main
+provider process need to keep track of this and send it&#8217;s requests to
+the least busy auxiliary process.</p>
+</div>
+<div class="section" id="implementation-steps">
+<h1>Implementation steps<a class="headerlink" href="#implementation-steps" title="Permalink to this headline">¶</a></h1>
+<ol class="arabic simple">
+<li>Have one auxiliary process started when the provider starts. It will
+handle all requests.</li>
+</ol>
+<ol class="arabic simple" start="2">
+<li>Add the possibility to have a pre-configured number of processes
+(maximum=minimum) and split requests between them.</li>
+<li>Add the ability to spawn/kill processes based on load.*</li>
+</ol>
+<ul class="simple">
+<li>This needs more thinking: e.g. how long do we keep a spare process
+alive? how is the threshold going to work?</li>
+</ul>
+</div>
+<div class="section" id="update">
+<h1>Update<a class="headerlink" href="#update" title="Permalink to this headline">¶</a></h1>
+<p>Here are some diagrams that show how the solution is going to be
+implemented. Inspiration has been taken from Apache process pool as
+Jakub suggested in ticket discussion.</p>
+<p>Sorry for the poor quality of diagrams, but Dia just sucks. :-/</p>
+<p>The main process of the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WinBind.html">WinBind?</a> provider
+will send requests to spare processes in the pool. These processes will
+be allocated automatically based on the number of spare processes
+available at any given time.</p>
+<p>Requests from NSS and PAM will be forwarded to spare processes in the
+pool if there are any available. If not, a new process will be created
+unless the maximum number of processes has been reached. After the
+request has been forwarded, the number of available spare processes is
+checked and a new process is created if there are not enough. Note that
+the pool is first populated with a minimum number of processes (spare or
+not) when the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WinBind.html">WinBind?</a> provider
+starts.</p>
+<p>In other words, there will be 3 settings:</p>
+<p><strong>Mimimum</strong> number of worker processes <strong>running</strong>.</p>
+<p><strong>Maximum</strong> number of worker processes <strong>running</strong>.</p>
+<p><strong>Minimum</strong> number of <strong>spare</strong> worker processes <strong>running</strong>.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">General Approach</a></li>
+<li><a class="reference internal" href="#splitting-the-load">Splitting the load</a></li>
+<li><a class="reference internal" href="#implementation-steps">Implementation steps</a></li>
+<li><a class="reference internal" href="#update">Update</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/AsyncWinBind.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/AsyncWinBind.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

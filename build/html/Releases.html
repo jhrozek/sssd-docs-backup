@@ -1,0 +1,754 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>SSSD Releases &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#SSSDReleases">SSSD Releases</a><ol class="arabic">
+<li><a class="reference external" href="#a1.15.xSeries">1.15.x Series</a></li>
+<li><a class="reference external" href="#a1.14.xSeries">1.14.x Series</a></li>
+<li><a class="reference external" href="#a1.13.xSeriesLTM">1.13.x Series (LTM)</a></li>
+<li><a class="reference external" href="#a1.12.xSeries">1.12.x Series</a></li>
+<li><a class="reference external" href="#a1.11.xSeries">1.11.x Series</a></li>
+<li><a class="reference external" href="#a1.10.xSeries">1.10.x Series</a></li>
+<li><a class="reference external" href="#a1.9.xSeriesPreviousLTM">1.9.x Series (Previous LTM)</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#DING-LIBSReleases">DING-LIBS Releases</a></li>
+<li><a class="reference external" href="#EOLReleases">EOL Releases</a></li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="sssd-releases">
+<h1>SSSD Releases<a class="headerlink" href="#sssd-releases" title="Permalink to this headline">¶</a></h1>
+<blockquote>
+<div>Versions in italics contain security fixes. These builds should be
+imported into distributions as soon as possible. Releases designated
+as LTM are long-term maintenance releases and will see bugfixes and
+security patches for a longer time than other releases.</div></blockquote>
+<div class="section" id="x-series">
+<h2>1.15.x Series<a class="headerlink" href="#x-series" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="24%" />
+<col width="15%" />
+<col width="22%" />
+<col width="17%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.15.0.tar.gz">​sssd-1.15.0.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.15.0.tar.gz.asc">​sssd-1.15.0.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">0c9fc62c1b9bcdca649223d9f673b9a73f273e56</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">0c151a045e5292fece1e991b665d525c</span></code></td>
+<td>Date: 2017-01-25
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.15.0.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.15.0/man/">​Manpages</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id1">
+<h2>1.14.x Series<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="25%" />
+<col width="14%" />
+<col width="22%" />
+<col width="17%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.14.2.tar.gz">​sssd-1.14.2.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.14.2.tar.gz.asc">​sssd-1.14.2.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">167b2216c536035175ff041d0449e0a874c68601</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">8ddcc386b539c1adb6de85e6b290f572</span></code></td>
+<td>Date: 2016-10-19
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.14.2.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.14.2/man/">​Manpages</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.14.1.tar.gz">​sssd-1.14.1.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.14.1.tar.gz.asc">​sssd-1.14.1.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">0f2d50942d0bcc93b23a30946d4dd18b8be05b1c</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">9440b6a5e46d46c4e8d4531c4043fa5d</span></code></td>
+<td>Date: 2016-08-19
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.14.1.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.14.1/man/">​Manpages</a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.14.0.tar.gz">​sssd-1.14.0.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.14.0.tar.gz.asc">​sssd-1.14.0.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">4ddb4403b07125f413181c43d8d2208c3128924d</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">2e1e5176d87ee829e3f92bb4f538789e</span></code></td>
+<td>Date: 2016-07-07
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.14.0.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.14.0/man/">​Manpages</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.14.0beta1.tar.gz">​sssd-1.14.0beta1.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.14.0beta1.tar.gz.asc">​sssd-1.14.0beta1.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">0f2d50942d0bcc93b23a30946d4dd18b8be05b1c</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">9440b6a5e46d46c4e8d4531c4043fa5d</span></code></td>
+<td>Date: 2016-06-29
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.14.0beta.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.13.91/man/">​Manpages</a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.14.0alpha.tar.gz">​sssd-1.14.0alpha.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.14.0alpha.tar.gz.asc">​sssd-1.14.0alpha.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">9d5413fbb951a437d9373a53def73b17cba93d9e</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">11b107740e84918ea652e3b82a0cfe4f</span></code></td>
+<td>Date: 2016-06-20
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.14.0alpha.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.13.90/man/">​Manpages</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="x-series-ltm">
+<h2>1.13.x Series (LTM)<a class="headerlink" href="#x-series-ltm" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="25%" />
+<col width="14%" />
+<col width="22%" />
+<col width="17%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.13.4.tar.gz">​sssd-1.13.4.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.13.4.tar.gz.asc">​sssd-1.13.4.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">8332501d752ab82f994170d11d31d5d15912b2e9</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">d147e0a4f4719d993693c6a99370b350</span></code></td>
+<td>Date: 2016-04-13
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.13.4.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.13.4/man/">​Manpages</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.13.3.tar.gz">​sssd-1.13.3.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.13.3.tar.gz.asc">​sssd-1.13.3.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">333bccc6c037f6153dcfea9f7ebfefa9fd853512</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">38bbb24ea9139508cc1d6e402e253244</span></code></td>
+<td>Date: 2015-12-15
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.13.3.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.13.3/man/">​Manpages</a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.13.2.tar.gz">​sssd-1.13.2.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.13.2.tar.gz.asc">​sssd-1.13.2.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">30bfc03448140983ee49fa7ef363612bd31a156f</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">e3c72e6585492f194f38e6e48b3ddae1</span></code></td>
+<td>Date: 2015-11-19
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.13.2.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.13.2/man/">​Manpages</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.13.1.tar.gz">​sssd-1.13.1.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.13.1.tar.gz.asc">​sssd-1.13.1.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">ae2b202abe9d62c24294f4d174717638dc24bce2</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">56623de935ab1c8e7a2535528f4b95b2</span></code></td>
+<td>Date: 2015-09-30
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.13.1.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.13.1/man/">​Manpages</a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.13.0.tar.gz">​sssd-1.13.0.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.13.0.tar.gz.asc">​sssd-1.13.0.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">f9c57cfb91d8e0e35d565a1d5b165e8f669989d2</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">2c3f3e6b2cd875879e6a55f49f13d8db</span></code></td>
+<td>Date: 2015-07-06
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.13.0.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.13.0/man/">​Manpages</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.13.0alpha.tar.gz">​sssd-1.13.0alpha.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.13.0alpha.tar.gz.asc">​sssd-1.13.0alpha.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">303034cb13a8c925f443656fba48fc0b7aaba205</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">0ffa8d3b8d7d22acb9200e11b1f641dd</span></code></td>
+<td>Date: 2015-06-22
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.13.0alpha.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.12.90/man/">​Manpages</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id2">
+<h2>1.12.x Series<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="25%" />
+<col width="14%" />
+<col width="22%" />
+<col width="17%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.12.5.tar.gz">​sssd-1.12.5.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.12.5.tar.gz.asc">​sssd-1.12.5.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">2e3fdabbf49d7031ac9b72bbbf9e364909c638ab</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">4439852e76e221c9bcd60a8586c136e2</span></code></td>
+<td>Date: 2015-06-12
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.12.5.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.12.5/man/">​Manpages</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.12.4.tar.gz">​sssd-1.12.4.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.12.4.tar.gz.asc">​sssd-1.12.4.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">dd34530f26e0109a67109013c582bd833d1ca8d7</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">a1781ad23a6e14196639127088bce785</span></code></td>
+<td>Date: 2015-02-18
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.12.4.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.12.4/man/">​Manpages</a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.12.3.tar.gz">​sssd-1.12.3.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.12.3.tar.gz.asc">​sssd-1.12.3.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">ce2511c37bccac68691b170ee8171294a27549f6</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">b891c263819a1dde062d7065448a4d58</span></code></td>
+<td>Date: 2015-01-08
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.12.3.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.12.3/man/">​Manpages</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.12.2.tar.gz">​sssd-1.12.2.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.12.2.tar.gz.asc">​sssd-1.12.2.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">c7969eeb880fdd79cead88504c313fa042ca524a</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">46d445ac060782027098eb6d572e4f13</span></code></td>
+<td>Date: 2014-10-20
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.12.2.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.12.2/man/">​Manpages</a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.12.1.tar.gz">​sssd-1.12.1.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.12.1.tar.gz.asc">​sssd-1.12.1.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">c2ecc9642eafe80937f66aaaded47a834ab4b9c4</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">7db892e4cf72979f69f1ab9a07c7b3ef</span></code></td>
+<td>Date: 2014-09-08
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.12.1.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.12.1/man/">​Manpages</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.12.0.tar.gz">​sssd-1.12.0.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.12.0.tar.gz.asc">​sssd-1.12.0.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">482d126430b52e00b49b9ba10276a8f6ed2d8408</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">f313613db186d478e9b40e10506c8838</span></code></td>
+<td>Date: 2014-07-09
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.12.0.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.12.0/man/">​Manpages</a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.12.0beta2.tar.gz">​sssd-1.12.0beta2.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.12.0beta2.tar.gz.asc">​sssd-1.12.0beta2.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">7cee2b01358446fa032f91f61416b798b71dc0fc</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">2c4765059b607c2518a88081c38cfa65</span></code></td>
+<td>Date: 2014-06-04
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.12.0beta2.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.11.91/man/">​Manpages</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.12.0beta1.tar.gz">​sssd-1.12.0beta1.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.12.0beta1.tar.gz.asc">​sssd-1.12.0beta1.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">2e7386c15309041d5d366dbf13c21552249285f3</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">d3a23b2192c7ea9454efc09592fa462a</span></code></td>
+<td>Date: 2014-05-30
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.12.0beta1.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.11.90/man/">​Manpages</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id3">
+<h2>1.11.x Series<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="25%" />
+<col width="14%" />
+<col width="21%" />
+<col width="17%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.11.8.tar.gz">​sssd-1.11.8.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.11.8.tar.gz.asc">​sssd-1.11.8.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">983e0bcef2c04aba95390bbc7de984f5d118027c</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">919ba7be1bc49751e5daba4d3d77ac30</span></code></td>
+<td>Date: 2016-02-17
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.11.8.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.11.8/man/">​Manpages</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.11.7.tar.gz">​sssd-1.11.7.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.11.7.tar.gz.asc">​sssd-1.11.7.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">92fb5c8fd5a6bfd7520d7271d84b695177332f49</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">2277cb3cb17449c5765f4d0b6627826d</span></code></td>
+<td>Date: 2014-09-17
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.11.7.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.11.7/man/">​Manpages</a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.11.6.tar.gz">​sssd-1.11.6.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.11.6.tar.gz.asc">​sssd-1.11.6.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">ce1d38f89a567178e0b6a41b6bb70b11d290d4ac</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">e4684e81171a8799fe4839b697c7e740</span></code></td>
+<td>Date: 2014-06-03
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.11.6.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.11.6/man/">​Manpages</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.11.5.1.tar.gz">​sssd-1.11.5.1.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.11.5.1.tar.gz.asc">​sssd-1.11.5.1.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">da8dea9f3b8963be0175ff356bf9e5f46364ceba</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">1aa92011bf08adaf66199c28a2973c9a</span></code></td>
+<td>Date: 2014-04-11
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.11.5.1.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.11.5.1/man/">​Manpages</a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.11.5.tar.gz">​sssd-1.11.5.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.11.5.tar.gz.asc">​sssd-1.11.5.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">6054c3f8a8f392c5b81a571275c8d815b6ebe3cc</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">c460389f1a2f23bffc93a99413a7ff95</span></code></td>
+<td>Date: 2014-04-08
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.11.5.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.11.5/man/">​Manpages</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.11.4.tar.gz">​sssd-1.11.4.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.11.4.tar.gz.asc">​sssd-1.11.4.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">d7a9acd8a793c24b8c620511d6cd6bac6150e769</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">6b52a62fd6f6b170553d032deb7b0bc8</span></code></td>
+<td>Date: 2014-02-17
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.11.4.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.11.4/man/">​Manpages</a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.11.3.tar.gz">​sssd-1.11.3.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.11.3.tar.gz.asc">​sssd-1.11.3.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">c88c0bcfd9078615f17f0784a142d2770ecf3982</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">46af96f609768a88ef8e5868e9526ab8</span></code></td>
+<td>Date: 2013-12-19
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.11.3.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.11.3/man/">​Manpages</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.11.2.tar.gz">​sssd-1.11.2.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.11.2.tar.gz.asc">​sssd-1.11.2.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">c1a747f6b8cb5fd37bec8e759eb5ef033b067973</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">b22b43cfab8e52961e1e8b2f6d9c403b</span></code></td>
+<td>Date: 2013-10-30
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.11.2.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.11.2/man/">​Manpages</a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.11.1.tar.gz">​sssd-1.11.1.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.11.1.tar.gz.asc">​sssd-1.11.1.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">9eb2de4949395f1bff407dba26be4161bed14a63</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">507a6b8dd5e18b3b604989fe26ce19b0</span></code></td>
+<td>Date: 2013-09-27
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.11.1.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.11.1/man/">​Manpages</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.11.0.tar.gz">​sssd-1.11.0.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.11.0.tar.gz.asc">​sssd-1.11.0.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">c52f7a37649a5eda1cd58c0ebe8d42e42bf9528c</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">6d2133b8bab79edb7c48c4dbc5d461ba</span></code></td>
+<td>Date: 2013-08-28
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.11.0.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.11.0/man/">​Manpages</a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.11.0beta2.tar.gz">​sssd-1.11.0beta2.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.11.0beta2.tar.gz.asc">​sssd-1.11.0beta2.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">e00e9acb878c643785dd7c62715bd3a85222393b</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">cbdb06a79021f96ef2bfba3d9603ec44</span></code></td>
+<td>Date: 2013-07-24
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.11.0beta2.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.10.92/man/">​Manpages</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.11.0beta1.tar.gz">​sssd-1.11.0beta1.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.11.0beta1.tar.gz.asc">​sssd-1.11.0beta1.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">c0c12612deb558b49da82a3ce4f16589b7430393</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">98de5c9a183a0bfdcac619053da04d78</span></code></td>
+<td>Date: 2013-06-28
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.11.0beta1.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.10.90/man/">​Manpages</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id4">
+<h2>1.10.x Series<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="25%" />
+<col width="14%" />
+<col width="22%" />
+<col width="16%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.10.1.tar.gz">​sssd-1.10.1.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.10.1.tar.gz.asc">​sssd-1.10.1.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">03b29c25b0222c28c0551a4c81bb6c65ad627531</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">a7aca360064f134fb1febc58d85c981d</span></code></td>
+<td>Date: 2013-07-18
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.10.1.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.10.1/man/">​Manpages</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.10.0.tar.gz">​sssd-1.10.0.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.10.0.tar.gz.asc">​sssd-1.10.0.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">0dc4e93350194f8c1a0aed9a8277cfaa9acbc43f</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">dd25a02a3dd26f2f4b30b5f45fa53567</span></code></td>
+<td>Date: 2013-06-27
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.10.0.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.10.0/man/">​Manpages</a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.10.0beta2.tar.gz">​sssd-1.10.0beta2.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.10.0beta2.tar.gz.asc">​sssd-1.10.0beta2.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">e8a1508358246ed4c4b797a604943412fffe265b</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">f0abc8589009fa0f265852df29beeaa7</span></code></td>
+<td>Date: 2013-06-11
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.10.0beta2.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.9.93/man/">​Manpages</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.10.0beta1.tar.gz">​sssd-1.10.0beta1.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.10.0beta1.tar.gz.asc">​sssd-1.10.0beta1.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">879e6fadaade72f4dcad125b974c7960c0999da1</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">7df7667fb8e544e9f766cef4379b5059</span></code></td>
+<td>Date: 2013-05-03
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.10.0beta1.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.9.92/man/">​Manpages</a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.10.0alpha1.tar.gz">​sssd-1.10.0alpha1.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.10.0alpha1.tar.gz.asc">​sssd-1.10.0alpha1.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">2a4b0d921493eadea24616d7b11c3b3b6cbadc96</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">e7d5b4f2abff70cc280bb16b3fca215a</span></code></td>
+<td>Date: 2013-04-02
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.10.0alpha1.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.9.91/man/">​Manpages</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="x-series-previous-ltm">
+<h2>1.9.x Series (Previous LTM)<a class="headerlink" href="#x-series-previous-ltm" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="25%" />
+<col width="14%" />
+<col width="22%" />
+<col width="17%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.7.tar.gz">​sssd-1.9.7.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.7.tar.gz.asc">​sssd-1.9.7.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">941c5f479664a50a8611a4d1bcec7226f25f7add</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">d35149f567a7c158715b55c93c8d91cb</span></code></td>
+<td>Date: 2014-12-05
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.9.7.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.9.7/man/">​Manpages</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.6.tar.gz">​sssd-1.9.6.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.6.tar.gz.asc">​sssd-1.9.6.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">c71e65c2eb660a5272f304d77740271307123ed7</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">284cbe3d70812d8c5cae0694aa55bf90</span></code></td>
+<td>Date: 2013-11-06
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.9.6.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.9.6/man/">​Manpages</a></td>
+</tr>
+<tr class="row-odd"><td><em>`​sssd-1.9.5.tar.gz &lt;https://releases.pagure.org/sssd-test2/sssd-1.9.5.tar.gz&gt;`__</em></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.5.tar.gz.asc">​sssd-1.9.5.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">3324d58afae6c546b3d3b028c5e2a689260dc30a</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">b2c31d92a18037d1ab5151ea920c8881</span></code></td>
+<td>Date: 2013-04-23
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.9.5.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.9.5/man/">​Manpages</a></td>
+</tr>
+<tr class="row-even"><td><em>`​sssd-1.9.4.tar.gz &lt;https://releases.pagure.org/sssd-test2/sssd-1.9.4.tar.gz&gt;`__</em></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.4.tar.gz.asc">​sssd-1.9.4.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">17ffd64d0bb2a06f1975530829bc3d2f2783b415</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">a72cda079a287e62a4beaa4d4f48fa89</span></code></td>
+<td>Date: 2013-01-28
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.9.4.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.9.4/man/">​Manpages</a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.3.tar.gz">​sssd-1.9.3.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.3.tar.gz.asc">​sssd-1.9.3.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">a91c973153fb30a1f0f3180797eca4bd5138a7bd</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">220b68c6bcd8dab8f3b002852d509217</span></code></td>
+<td>Date: 2012-12-06
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.9.3.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.9.3/man/">​Manpages</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.2.tar.gz">​sssd-1.9.2.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.2.tar.gz.asc">​sssd-1.9.2.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">871ff9d20dc5784cf475a028d71d8af058dcd4e8</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">2033df8c1b7a3bae27347e5683e49f27</span></code></td>
+<td>Date: 2012-10-12
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.9.2.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.9.2/man/">​Manpages</a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.1.tar.gz">​sssd-1.9.1.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.1.tar.gz.asc">​sssd-1.9.1.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">551f767fe78b8f9582cc4d5be46cace9e402ea22</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">17799a310d7077b07e0bd0a681d483f0</span></code></td>
+<td>Date: 2012-10-05
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.9.1.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.9.1/man/">​Manpages</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.0.tar.gz">​sssd-1.9.0.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.0.tar.gz.asc">​sssd-1.9.0.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">91b989201f3cd4cfa1ed3c6b9a6f77691e8562c5</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">e0b811f2ed59c3d004b4f0f41f9818f9</span></code></td>
+<td>Date: 2012-09-24
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.9.0.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.9.0/man/">​Manpages</a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.0rc1.tar.gz">​sssd-1.9.0rc1.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.0rc1.tar.gz.asc">​sssd-1.9.0rc1.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">37822b7faa6fc627d6df400531edb1c23af0226f</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">24c40663bad101c58335618b2abb064f</span></code></td>
+<td>Date: 2012-09-13
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.9.0rc1.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.8.98/man/">​Manpages</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.0beta7.tar.gz">​sssd-1.9.0beta7.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.0beta7.tar.gz.asc">​sssd-1.9.0beta7.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">de5dc49105956b561b846e1fa5737d98f47c381a</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">6ac3b4a29f5f8f154133583ed4644aab</span></code></td>
+<td>Date: 2012-09-05
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.9.0beta7.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.8.97/man/">​Manpages</a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.0beta6.tar.gz">​sssd-1.9.0beta6.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.0beta6.tar.gz.asc">​sssd-1.9.0beta6.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">08dd17f2c37563d1e2605b2a6c2586df028e2de1</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">eb2e5b0847899568b076163f4837a7dd</span></code></td>
+<td>Date: 2012-08-01
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.9.0beta6.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.8.96/man/">​Manpages</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.0beta5.tar.gz">​sssd-1.9.0beta5.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.0beta5.tar.gz.asc">​sssd-1.9.0beta5.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">8688a8188dfb3d118197f15598cd4953e40429da</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">076e28e34b1077783facfe3fb7a55baf</span></code></td>
+<td>Date: 2012-07-18
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.9.0beta5.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.8.95/man/">​Manpages</a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.0beta4.tar.gz">​sssd-1.9.0beta4.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.0beta4.tar.gz.asc">​sssd-1.9.0beta4.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">e3abe8aa1ba754501f1d356e51f739de048d5472</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">7326aab9bddf80f50835862d092cdbb3</span></code></td>
+<td>Date: 2012-07-10
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.9.0beta4.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.8.94/man/">​Manpages</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.0beta3.tar.gz">​sssd-1.9.0beta3.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.0beta3.tar.gz.asc">​sssd-1.9.0beta3.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">c55dd8b6f45a921cfdc28a1f5368f82b356271f4</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">3fab7090b965d9debc389274d5ab7a09</span></code></td>
+<td>Date: 2012-06-25
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.9.0beta3.html">Release Notes</a></td>
+<td><a class="reference external" href="http://sgallagh.fedorapeople.org/sssd/1.8.93/man/">​Manpages</a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.0beta2.tar.gz">​sssd-1.9.0beta2.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.0beta2.tar.gz.asc">​sssd-1.9.0beta2.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">2f024a6492dedd053f0cd57be9469535f80240df</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">76063afcf4994ec45319c6d053544153</span></code></td>
+<td>Date: 2012-06-15
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.9.0beta2.html">Release Notes</a></td>
+<td><a class="reference external" href="http://sgallagh.fedorapeople.org/sssd/1.8.92/man/">​Manpages</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.0beta1.tar.gz">​sssd-1.9.0beta1.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.0beta1.tar.gz.asc">​sssd-1.9.0beta1.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">bc57d6ad4f5d942d3356664934df8b8d1b221595</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">829ecc6544f76185581d5feb788edae4</span></code></td>
+<td>Date: 2012-05-11
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.9.0beta1.html">Release Notes</a></td>
+<td><a class="reference external" href="http://sgallagh.fedorapeople.org/sssd/1.8.91/man/">​Manpages</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="ding-libs-releases">
+<h1>DING-LIBS Releases<a class="headerlink" href="#ding-libs-releases" title="Permalink to this headline">¶</a></h1>
+<p>DING-LIBS (DING Is Not Glib) are a set of small, useful libraries that
+SSSD uses and makes available to other projects. They provide:</p>
+<ul class="simple">
+<li>dhash - A dynamic hash table</li>
+<li>ini_config - A library for parsing and managing INI files</li>
+<li>path_utils - Manage UNIX paths and subsets of paths</li>
+<li>collection - A generic, hierarchical grouping mechanism for complex
+data sets</li>
+<li>ref_array - A dynamically-growing, reference-counted array</li>
+<li>libbasicobjects - A set of fundamental object types for C</li>
+</ul>
+<table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="31%" />
+<col width="16%" />
+<col width="25%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference external" href="https://fedorahosted.org/released/ding-libs/ding-libs-0.6.0.tar.gz">​ding-libs-0.6.0.tar.gz</a></td>
+<td><a class="reference external" href="https://fedorahosted.org/released/ding-libs/ding-libs-0.6.0.tar.gz.asc">​ding-libs-0.6.0.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">c8ec86cb93a26e013a13b12a7b0b3fbc1bca16c1</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">0dd0a95f2f8d65b84d3cb9568494109a</span></code></td>
+<td>Date: 2016-06-22
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/DingNotes-0.6.0.html">Release Notes</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://fedorahosted.org/released/ding-libs/ding-libs-0.5.0.tar.gz">​ding-libs-0.5.0.tar.gz</a></td>
+<td><a class="reference external" href="https://fedorahosted.org/released/ding-libs/ding-libs-0.5.0.tar.gz.asc">​ding-libs-0.5.0.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">da27caf664d696b011924a799117fb39ef357653</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">786f2880d30136a61df02e5d740ddc6e</span></code></td>
+<td>Date: 2015-06-23
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/DingNotes-0.5.0.html">Release Notes</a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="https://fedorahosted.org/released/ding-libs/ding-libs-0.4.0.tar.gz">​ding-libs-0.4.0.tar.gz</a></td>
+<td><a class="reference external" href="https://fedorahosted.org/released/ding-libs/ding-libs-0.4.0.tar.gz.asc">​ding-libs-0.4.0.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">38d9ebb0e44dfb7a8d97c2f650a586260c8909f9</span></code>
+MD5SUM: <a href="#id5"><span class="problematic" id="id6">``</span></a>8da087a535b66968797f337ce2c44a4e ``</td>
+<td>Date: 2014-05-28
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/DingNotes-0.4.0.html">Release Notes</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://fedorahosted.org/released/ding-libs/ding-libs-0.3.0.1.tar.gz">​ding-libs-0.3.0.1.tar.gz</a></td>
+<td><a class="reference external" href="https://fedorahosted.org/released/ding-libs/ding-libs-0.3.0.1.tar.gz.asc">​ding-libs-0.3.0.1.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">9bdbec963a29490f16fc87abffaf7437cc5a5121</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">87d53a1f26e172a66f419915ccfa5661</span></code></td>
+<td>Date: 2013-03-29
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/DingNotes-0.3.0.1.html">Release Notes</a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="https://fedorahosted.org/released/ding-libs/ding-libs-0.3.0.tar.gz">​ding-libs-0.3.0.tar.gz</a></td>
+<td><a class="reference external" href="https://fedorahosted.org/released/ding-libs/ding-libs-0.3.0.tar.gz.asc">​ding-libs-0.3.0.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">54e1b9d8f9970a8c660ffc5f2cddb6e4e8a57ac4</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">14c8957e65ec7c62dbbdf7d184102c80</span></code></td>
+<td>Date: 2013-03-28
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/DingNotes-0.3.0.html">Release Notes</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://fedorahosted.org/released/ding-libs/ding-libs-0.2.91.tar.gz">​ding-libs-0.2.91.tar.gz</a></td>
+<td><a class="reference external" href="https://fedorahosted.org/released/ding-libs/ding-libs-0.2.91.tar.gz.asc">​ding-libs-0.2.91.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">6464850eecb678d3f8afe9be9891f113bd47fe00</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">7d9306ea4f0c2d6ef657c772abd2a8fd</span></code></td>
+<td>Date: 2012-05-15
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/DingNotes-0.2.91.html">Release Notes</a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="https://fedorahosted.org/released/ding-libs/ding-libs-0.1.3.tar.gz">​ding-libs-0.1.3.tar.gz</a></td>
+<td><a class="reference external" href="https://fedorahosted.org/released/ding-libs/ding-libs-0.1.3.tar.gz.asc">​ding-libs-0.1.3.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">d59f118b8d657cbf027a67502af98ecc61a6739f</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">b4f5e03b0b1bd0ab765902a7a466f749</span></code></td>
+<td>Date: 2011-09-15
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/DingNotes-0.1.3.html">Release Notes</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://fedorahosted.org/released/ding-libs/ding-libs-0.1.2.tar.gz">​ding-libs-0.1.2.tar.gz</a></td>
+<td><a class="reference external" href="https://fedorahosted.org/released/ding-libs/ding-libs-0.1.2.tar.gz.asc">​ding-libs-0.1.2.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">343bc95aa2ee5477f6b217674b635a1a7b973a4b</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">c445fcf7415a15a94c4af0d1a7e2647c</span></code></td>
+<td>Date: 2010-10-12</td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="https://fedorahosted.org/released/ding-libs/ding-libs-0.1.1.tar.gz">​ding-libs-0.1.1.tar.gz</a></td>
+<td><a class="reference external" href="https://fedorahosted.org/released/ding-libs/ding-libs-0.1.1.tar.gz.asc">​ding-libs-0.1.1.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">fefbf08018c58d93a271cf661cf7c8c7a70a2193</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">0debd2f6b3281678c3788b0af60ec25a</span></code></td>
+<td>Date: 2010-09-23</td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="https://fedorahosted.org/released/ding-libs/ding-libs-0.1.0.tar.gz">​ding-libs-0.1.0.tar.gz</a></td>
+<td><a class="reference external" href="https://fedorahosted.org/released/ding-libs/ding-libs-0.1.0.tar.gz.asc">​ding-libs-0.1.0.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">7769974883cea0b66711a334bc919f4fdd0aff3f</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">78cd2f04ae61264d78b44d21a0ee220f</span></code></td>
+<td>Date: 2010-09-22</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="eol-releases">
+<h1>EOL Releases<a class="headerlink" href="#eol-releases" title="Permalink to this headline">¶</a></h1>
+<p>For posterity, some older versions of SSSD and ding-libs are retained
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/EOLReleases.html">here</a>. You
+should not be using these for any reason.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">SSSD Releases</a><ul>
+<li><a class="reference internal" href="#x-series">1.15.x Series</a></li>
+<li><a class="reference internal" href="#id1">1.14.x Series</a></li>
+<li><a class="reference internal" href="#x-series-ltm">1.13.x Series (LTM)</a></li>
+<li><a class="reference internal" href="#id2">1.12.x Series</a></li>
+<li><a class="reference internal" href="#id3">1.11.x Series</a></li>
+<li><a class="reference internal" href="#id4">1.10.x Series</a></li>
+<li><a class="reference internal" href="#x-series-previous-ltm">1.9.x Series (Previous LTM)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ding-libs-releases">DING-LIBS Releases</a></li>
+<li><a class="reference internal" href="#eol-releases">EOL Releases</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Releases.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/Releases.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

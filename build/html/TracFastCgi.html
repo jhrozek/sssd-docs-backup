@@ -1,0 +1,395 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Trac with FastCGI &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><a class="reference external" href="#TracwithFastCGI">Trac with FastCGI</a><ol class="arabic">
+<li><a class="reference external" href="#SimpleApacheconfiguration">Simple Apache configuration</a><ol class="arabic">
+<li><cite>Set up with ``mod_fastcgi`</cite> &lt;#Setupwithmod_fastcgi&gt;`__</li>
+<li><cite>Set up with ``mod_fcgid`</cite> &lt;#Setupwithmod_fcgid&gt;`__</li>
+<li><a class="reference external" href="#alternativeenvironmentsetup">alternative environment
+setup</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#SimpleCherokeeConfiguration">Simple Cherokee Configuration</a></li>
+<li><a class="reference external" href="#SimpleLighttpdConfiguration">Simple Lighttpd Configuration</a></li>
+<li><a class="reference external" href="#SimpleLiteSpeedConfiguration">Simple LiteSpeed Configuration</a></li>
+<li><a class="reference external" href="#SimpleNginxConfiguration">Simple Nginx Configuration</a></li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="trac-with-fastcgi">
+<h1>Trac with FastCGI<a class="headerlink" href="#trac-with-fastcgi" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="http://www.fastcgi.com/">​FastCGI</a> interface allows Trac to remain
+resident much like with
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracModPython.html">mod_python</a>
+or <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracModWSGI.html">mod_wsgi</a>.
+It is faster than external CGI interfaces which must start a new process
+for each request. Additionally, it is supported by much wider variety of
+web servers.</p>
+<p>Note that unlike mod_python, FastCGI supports <a class="reference external" href="http://httpd.apache.org/docs/suexec.html">​Apache
+SuEXEC</a>, i.e. run with
+different permissions than web server running with (<code class="docutils literal"><span class="pre">mod_wsgi</span></code>
+supports the <code class="docutils literal"><span class="pre">WSGIDaemonProcess</span></code> with user / group parameters to
+achieve the same effect).</p>
+<p><strong>Note for Windows:</strong> Trac&#8217;s FastCGI does not run under Windows, as
+Windows does not implement <code class="docutils literal"><span class="pre">Socket.fromfd</span></code>, which is used by
+<code class="docutils literal"><span class="pre">_fcgi.py</span></code>. If you want to connect to IIS, you may want to try
+<a class="reference external" href="http://trac.edgewall.org/intertrac/TracOnWindowsIisAjp">​AJP</a>/<a class="reference external" href="http://trac.edgewall.org/intertrac/TracOnWindowsIisAjp">​ISAPI</a>.</p>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><a class="reference external" href="#SimpleApacheconfiguration">Simple Apache configuration</a><ol class="arabic">
+<li><cite>Set up with ``mod_fastcgi`</cite> &lt;#Setupwithmod_fastcgi&gt;`__</li>
+<li><cite>Set up with ``mod_fcgid`</cite> &lt;#Setupwithmod_fcgid&gt;`__</li>
+<li><a class="reference external" href="#alternativeenvironmentsetup">alternative environment setup</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#SimpleCherokeeConfiguration">Simple Cherokee Configuration</a></li>
+<li><a class="reference external" href="#SimpleLighttpdConfiguration">Simple Lighttpd Configuration</a></li>
+<li><a class="reference external" href="#SimpleLiteSpeedConfiguration">Simple LiteSpeed Configuration</a></li>
+<li><a class="reference external" href="#SimpleNginxConfiguration">Simple Nginx Configuration</a></li>
+</ol>
+<div class="section" id="simple-apache-configuration">
+<h3>Simple Apache configuration<a class="headerlink" href="#simple-apache-configuration" title="Permalink to this headline">¶</a></h3>
+<p>There are two FastCGI modules commonly available for Apache:
+<code class="docutils literal"><span class="pre">mod_fastcgi</span></code> and <code class="docutils literal"><span class="pre">mod_fcgid</span></code> (preferred). The latter is more
+up-to-date.</p>
+<p>The following sections focus on the FCGI specific setup, see also
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracModWSGI.html#ConfiguringAuthentication">TracModWSGI</a>
+for configuring the authentication in Apache.</p>
+<p>Regardless of which cgi module is used, be sure the web server has
+executable permissions on the cgi-bin folder. While FastCGI will throw
+specific permissions errors, mod_fcgid will throw an ambiguous error if
+this has not been done. (Connection reset by peer: mod_fcgid: error
+reading data from FastCGI server)</p>
+<div class="section" id="set-up-with-mod-fastcgi">
+<h4>Set up with <code class="docutils literal"><span class="pre">mod_fastcgi</span></code><a class="headerlink" href="#set-up-with-mod-fastcgi" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal"><span class="pre">mod_fastcgi</span></code> uses <code class="docutils literal"><span class="pre">FastCgiIpcDir</span></code> and <code class="docutils literal"><span class="pre">FastCgiConfig</span></code> directives
+that should be added to an appropriate Apache configuration file:</p>
+<p>Setting <code class="docutils literal"><span class="pre">FastCgiIpcDir</span></code> is optional if the default is suitable. Note
+that the <code class="docutils literal"><span class="pre">LoadModule</span></code> line must be after the <code class="docutils literal"><span class="pre">IfModule</span></code> group.</p>
+<p>Configure <code class="docutils literal"><span class="pre">ScriptAlias</span></code> or similar options as described in
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracCgi.html">TracCgi</a>, but
+calling <code class="docutils literal"><span class="pre">trac.fcgi</span></code> instead of <code class="docutils literal"><span class="pre">trac.cgi</span></code>.</p>
+<p>Add the following to the Apache configuration file (below the
+<code class="docutils literal"><span class="pre">FastCgiIpcDir</span></code> line) if you intend to set up the <code class="docutils literal"><span class="pre">TRAC_ENV</span></code> as an
+overall default:</p>
+<p>Alternatively, you can serve multiple Trac projects in a directory by
+adding this:</p>
+</div>
+<div class="section" id="set-up-with-mod-fcgid">
+<h4>Set up with <code class="docutils literal"><span class="pre">mod_fcgid</span></code><a class="headerlink" href="#set-up-with-mod-fcgid" title="Permalink to this headline">¶</a></h4>
+<p>Configure <code class="docutils literal"><span class="pre">ScriptAlias</span></code> (see
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracCgi.html">TracCgi</a> for
+details), but call <code class="docutils literal"><span class="pre">trac.fcgi</span></code> instead of <code class="docutils literal"><span class="pre">trac.cgi</span></code>. Note that
+slash at the end - it is important.</p>
+<p>To set up Trac environment for <code class="docutils literal"><span class="pre">mod_fcgid</span></code> it is necessary to use
+<code class="docutils literal"><span class="pre">DefaultInitEnv</span></code> directive. It cannot be used in <code class="docutils literal"><span class="pre">Directory</span></code> or
+<code class="docutils literal"><span class="pre">Location</span></code> context, so if you need to support multiple projects, try
+alternative environment setup below.</p>
+</div>
+<div class="section" id="alternative-environment-setup">
+<h4>alternative environment setup<a class="headerlink" href="#alternative-environment-setup" title="Permalink to this headline">¶</a></h4>
+<p>A better method to specify path to Trac environment is to embed the path
+into <code class="docutils literal"><span class="pre">trac.fcgi</span></code> script itself. That doesn&#8217;t require configuration of
+server environment variables, works for both
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/FastCgi.html">FastCgi?</a> modules
+(and for <a class="reference external" href="http://www.lighttpd.net/">​lighttpd</a> and CGI as well):</p>
+<p>or</p>
+<p>With this method different projects can be supported by using different
+<code class="docutils literal"><span class="pre">.fcgi</span></code> scripts with different <code class="docutils literal"><span class="pre">ScriptAliases</span></code>.</p>
+<p>See <a class="reference external" href="https://coderanger.net/~coderanger/httpd/fcgi_example.conf">​this fcgid example
+config</a>
+which uses a ScriptAlias directive with trac.fcgi with a trailing / like
+this:</p>
+</div>
+</div>
+<div class="section" id="simple-cherokee-configuration">
+<h3>Simple Cherokee Configuration<a class="headerlink" href="#simple-cherokee-configuration" title="Permalink to this headline">¶</a></h3>
+<p>The configuration on Cherokee&#8217;s side is quite simple. You will only need
+to know that you can spawn Trac as an SCGI process. You can either start
+it manually, or better yet, automatically by letting Cherokee spawn the
+server whenever it is down. First set up an information source in
+cherokee-admin with a local interpreter.</p>
+<p>If the port was not reachable, the interpreter command would be
+launched. Note that, in the definition of the information source, you
+will have to manually launch the spawner if you use a <em>Remote host</em> as
+<em>Information source</em> instead of a <em>Local interpreter</em>.</p>
+<p>After doing this, we will just have to create a new rule managed by the
+SCGI handler to access Trac. It can be created in a new virtual server,
+trac.example.net for instance, and will only need two rules. The
+<strong>default</strong> one will use the SCGI handler associated to the previously
+created information source. The second rule will be there to serve the
+few static files needed to correctly display the Trac interface. Create
+it as <em>Directory rule</em> for <em>/common</em> and just set it to the <em>Static
+files</em> handler and with a <em>Document root</em> that points to the appropriate
+files: <em>$TRAC_LOCAL/htdocs/</em> (where $TRAC_LOCAL is a directory defined
+by the user or the system administrator to place local trac resources).</p>
+<div class="line-block">
+<div class="line">Note:</div>
+<div class="line">If the tracd process fails to start up, and cherokee displays a 503
+error page, you might be missing the
+<a class="reference external" href="http://trac.saddi.com/flup">​python-flup</a> package.</div>
+<div class="line">Python-flup is a dependency which provides trac with SCGI capability.
+You can install it on debian based systems with:</div>
+</div>
+</div>
+<div class="section" id="simple-lighttpd-configuration">
+<h3>Simple Lighttpd Configuration<a class="headerlink" href="#simple-lighttpd-configuration" title="Permalink to this headline">¶</a></h3>
+<p>The FastCGI front-end was developed primarily for use with alternative
+webservers, such as <a class="reference external" href="http://www.lighttpd.net/">​lighttpd</a>.</p>
+<p>lighttpd is a secure, fast, compliant and very flexible web-server that
+has been optimized for high-performance environments. It has a very low
+memory footprint compared to other web servers and takes care of CPU
+load.</p>
+<p>For using <code class="docutils literal"><span class="pre">trac.fcgi</span></code>(prior to 0.11) / fcgi_frontend.py (0.11) with
+lighttpd add the following to your lighttpd.conf:</p>
+<p>Note that you will need to add a new entry to <code class="docutils literal"><span class="pre">fastcgi.server</span></code> for
+each separate Trac instance that you wish to run. Alternatively, you may
+use the <code class="docutils literal"><span class="pre">TRAC_ENV_PARENT_DIR</span></code> variable instead of <code class="docutils literal"><span class="pre">TRAC_ENV</span></code> as
+described above, and you may set one of the two in <code class="docutils literal"><span class="pre">trac.fcgi</span></code> instead
+of in <code class="docutils literal"><span class="pre">lighttpd.conf</span></code> using <code class="docutils literal"><span class="pre">bin-environment</span></code> (as in the section
+above on Apache configuration).</p>
+<p>Note that lighttpd has a bug related to &#8216;SCRIPT_NAME&#8217; and &#8216;PATH_INFO&#8217;
+when the uri of fastcgi.server is &#8216;/&#8217; instead of &#8216;/trac&#8217; in this example
+(see <a class="reference external" href="http://trac.edgewall.org/intertrac/%232418">​#2418</a>). This
+should be fixed since lighttpd 1.4.23, and you may need to add
+<code class="docutils literal"><span class="pre">&quot;fix-root-scriptname&quot;</span> <span class="pre">=&gt;</span> <span class="pre">&quot;enable&quot;</span></code> as parameter of fastcgi.server.</p>
+<p>For using two projects with lighttpd add the following to your
+<code class="docutils literal"><span class="pre">lighttpd.conf</span></code>:</p>
+<p>Note that field values are different. If you prefer setting the
+environment variables in the <code class="docutils literal"><span class="pre">.fcgi</span></code> scripts, then copy/rename
+<code class="docutils literal"><span class="pre">trac.fcgi</span></code>, e.g., to <code class="docutils literal"><span class="pre">first.fcgi</span></code> and <code class="docutils literal"><span class="pre">second.fcgi</span></code>, and
+reference them in the above settings. Note that the above will result in
+different processes in any event, even if both are running from the same
+<code class="docutils literal"><span class="pre">trac.fcgi</span></code> script.</p>
+<div class="important"><p><strong>Note</strong> It&#8217;s very important the order on which server.modules are
+loaded, if mod_auth is not loaded <strong>BEFORE</strong> mod_fastcgi, then the
+server will fail to authenticate the user.</p>
+</div><p>For authentication you should enable mod_auth in lighttpd.conf
+&#8216;server.modules&#8217;, select auth.backend and auth rules:</p>
+<p>Note that lighttpd (I use version 1.4.3) stopped if password file
+doesn&#8217;t exist.</p>
+<p>Note that lighttpd doesn&#8217;t support &#8216;valid-user&#8217; in versions prior to
+1.3.16.</p>
+<p>Conditional configuration is also useful for mapping static resources,
+i.e. serving out images and CSS directly instead of through FastCGI:</p>
+<p>The technique can be easily adapted for use with multiple projects by
+creating aliases for each of them, and wrapping the fastcgi.server
+declarations inside conditional configuration blocks. Also there is
+another way to handle multiple projects and it&#8217;s to use
+TRAC_ENV_PARENT_DIR instead of TRAC_ENV and use global auth, let&#8217;s
+see an example:</p>
+<p>Changing date/time format also supported by lighttpd over environment
+variable LC_TIME</p>
+<p>For details about languages specification see
+<a class="reference external" href="http://trac.edgewall.org/intertrac/TracFaq">​TracFaq</a> question 2.13.</p>
+<p>Other important information like the <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracInstall.html#MappingStaticResources">mapping static resources
+advices</a>
+are useful for non-fastcgi specific installation aspects. ]</p>
+<p>Relaunch lighttpd, and browse to <code class="docutils literal"><span class="pre">http://yourhost.example.org/trac</span></code> to
+access Trac.</p>
+<p>Note about running lighttpd with reduced permissions:</p>
+<p>If nothing else helps and trac.fcgi doesn&#8217;t start with lighttpd settings
+<code class="docutils literal"><span class="pre">server.username</span> <span class="pre">=</span> <span class="pre">&quot;www-data&quot;</span></code>, <code class="docutils literal"><span class="pre">server.groupname</span> <span class="pre">=</span> <span class="pre">&quot;www-data&quot;</span></code>,
+then in the <code class="docutils literal"><span class="pre">bin-environment</span></code> section set <code class="docutils literal"><span class="pre">PYTHON_EGG_CACHE</span></code> to the
+home directory of <code class="docutils literal"><span class="pre">www-data</span></code> or some other directory accessible to
+this account for writing.</p>
+</div>
+<div class="section" id="simple-litespeed-configuration">
+<h3>Simple LiteSpeed Configuration<a class="headerlink" href="#simple-litespeed-configuration" title="Permalink to this headline">¶</a></h3>
+<p>The FastCGI front-end was developed primarily for use with alternative
+webservers, such as <a class="reference external" href="http://www.litespeedtech.com/">​LiteSpeed</a>.</p>
+<p>LiteSpeed web server is an event-driven asynchronous Apache replacement
+designed from the ground-up to be secure, scalable, and operate with
+minimal resources. LiteSpeed can operate directly from an Apache config
+file and is targeted for business-critical environments.</p>
+<ol class="arabic simple">
+<li>Please make sure you have first have a working install of a Trac
+project. Test install with “tracd” first.</li>
+</ol>
+<ol class="arabic simple" start="2">
+<li>Create a Virtual Host for this setup. From now on we will refer to
+this vhost as TracVhost. For this tutorial we will be assuming that
+your trac project will be accessible via:</li>
+</ol>
+<ol class="arabic simple" start="3">
+<li>Go “TracVhost → External Apps” tab and create a new “External
+Application”.</li>
+</ol>
+<ol class="arabic simple" start="4">
+<li>Optional. If you need to use htpasswd based authentication. Go to
+“TracVhost → Security” tab and create a new security “Realm”.</li>
+</ol>
+<p>If you don’t have a htpasswd file or don’t know how to create the
+entries within one, go to
+<a class="reference external" href="http://sherylcanter.com/encrypt.php">​http://sherylcanter.com/encrypt.php</a>,
+to generate the user:password combos.</p>
+<ol class="arabic simple" start="5">
+<li>Go to “PythonVhost → Contexts” and create a new “FCGI Context”.</li>
+</ol>
+<ol class="arabic simple" start="6">
+<li>Modify <code class="docutils literal"><span class="pre">/fullpathto/mytracproject/conf/trac.ini</span></code></li>
+</ol>
+<ol class="arabic simple" start="7">
+<li>Restart LiteSpeed, “lswsctrl restart”, and access your new Trac
+project at:</li>
+</ol>
+</div>
+<div class="section" id="simple-nginx-configuration">
+<h3>Simple Nginx Configuration<a class="headerlink" href="#simple-nginx-configuration" title="Permalink to this headline">¶</a></h3>
+<p>Nginx is able to communicate with FastCGI processes, but can not spawn
+them. So you need to start FastCGI server for Trac separately.</p>
+<ol class="arabic simple">
+<li>Nginx configuration with basic authentication handled by Nginx -
+confirmed to work on 0.6.32</li>
+</ol>
+<ol class="arabic simple" start="2">
+<li>Modified trac.fcgi:</li>
+</ol>
+<ol class="arabic simple" start="3">
+<li>reload nginx and launch trac.fcgi like that:</li>
+</ol>
+<p>The above assumes that:</p>
+<ul class="simple">
+<li>There is a user named &#8216;trac&#8217; for running trac instances and keeping
+trac environments in its home directory.</li>
+<li><code class="docutils literal"><span class="pre">/home/trac/instance</span></code> contains a trac environment</li>
+<li><code class="docutils literal"><span class="pre">/home/trac/htpasswd</span></code> contains authentication information</li>
+<li><code class="docutils literal"><span class="pre">/home/trac/run</span></code> is owned by the same group the nginx runs under<ul>
+<li>and if your system is Linux the <code class="docutils literal"><span class="pre">/home/trac/run</span></code> has setgid bit
+set (<code class="docutils literal"><span class="pre">chmod</span> <span class="pre">g+s</span> <span class="pre">run</span></code>)</li>
+<li>and patch from ticket #T7239 is applied, or you&#8217;ll have to fix the
+socket file permissions every time</li>
+</ul>
+</li>
+</ul>
+<p>Unfortunately nginx does not support variable expansion in fastcgi_pass
+directive. Thus it is not possible to serve multiple trac instances from
+one server block.</p>
+<p>If you worry enough about security, run trac instances under separate
+users.</p>
+<p>Another way to run trac as a FCGI external application is offered in
+ticket #T6224</p>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracGuide.html">TracGuide</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracInstall.html">TracInstall</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracModWSGI.html">ModWSGI</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracCgi.html">CGI</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracModPython.html">ModPython</a>,
+<a class="reference external" href="http://trac.edgewall.org/intertrac/TracNginxRecipe">​TracNginxRecipe</a></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Trac with FastCGI</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a><ul>
+<li><a class="reference internal" href="#simple-apache-configuration">Simple Apache configuration</a><ul>
+<li><a class="reference internal" href="#set-up-with-mod-fastcgi">Set up with <code class="docutils literal"><span class="pre">mod_fastcgi</span></code></a></li>
+<li><a class="reference internal" href="#set-up-with-mod-fcgid">Set up with <code class="docutils literal"><span class="pre">mod_fcgid</span></code></a></li>
+<li><a class="reference internal" href="#alternative-environment-setup">alternative environment setup</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simple-cherokee-configuration">Simple Cherokee Configuration</a></li>
+<li><a class="reference internal" href="#simple-lighttpd-configuration">Simple Lighttpd Configuration</a></li>
+<li><a class="reference internal" href="#simple-litespeed-configuration">Simple LiteSpeed Configuration</a></li>
+<li><a class="reference internal" href="#simple-nginx-configuration">Simple Nginx Configuration</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracFastCgi.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracFastCgi.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

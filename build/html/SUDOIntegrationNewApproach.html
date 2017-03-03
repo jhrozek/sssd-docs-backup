@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Cache format of SUDO rules &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <p><a class="reference external" href="https://fedorahosted.org/sssd/attachment/wiki/DesignDocs/SUDOIntegrationNewApproach/sudo_highlevel_v2.png"><img alt="image0" src="https://fedorahosted.org/sssd/raw-attachment/wiki/DesignDocs/SUDOIntegrationNewApproach/sudo_highlevel_v2.png" /></a></p>
+<div class="section" id="cache-format-of-sudo-rules">
+<h1>Cache format of SUDO rules<a class="headerlink" href="#cache-format-of-sudo-rules" title="Permalink to this headline">¶</a></h1>
+<p>We have decided to use the current schema used by SUDO. The schema is
+described
+<a class="reference external" href="http://www.gratisoft.us/sudo/man/1.8.2/sudoers.ldap.man.html">​here</a>.</p>
+<p>All rules are store under <strong>cn=sudorules,cn=custom,cn=$domain,cn=sysdb</strong>
+subtree.</p>
+</div>
+<div class="section" id="communication-protocols">
+<h1>Communication protocols<a class="headerlink" href="#communication-protocols" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="sudo-responder">
+<h2>SUDO -&gt; Responder<a class="headerlink" href="#sudo-responder" title="Permalink to this headline">¶</a></h2>
+<p>SUDO calls <strong>SSS_SUDO_GET_SUDORULES</strong> command, providing a user name
+of the requesting user.</p>
+</div>
+<div class="section" id="responder-sudo">
+<h2>Responder -&gt; SUDO<a class="headerlink" href="#responder-sudo" title="Permalink to this headline">¶</a></h2>
+<p>Sends all sudo rules entries that contains keyword ALL or matches
+requested user name, his groups or netgroups.</p>
+<p>All strings are terminated with zero character.</p>
+<p>If &lt;error_code&gt; signals an error (i.e. it does not equal to
+<em>SSS_SUDO_ERROR_OK</em>), the remaining fields are omitted.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Cache format of SUDO rules</a></li>
+<li><a class="reference internal" href="#communication-protocols">Communication protocols</a><ul>
+<li><a class="reference internal" href="#sudo-responder">SUDO -&gt; Responder</a></li>
+<li><a class="reference internal" href="#responder-sudo">Responder -&gt; SUDO</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/SUDOIntegrationNewApproach.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/SUDOIntegrationNewApproach.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

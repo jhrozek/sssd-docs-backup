@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>SUDO plugin API &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="sudo-plugin-api">
+<h1>SUDO plugin API<a class="headerlink" href="#sudo-plugin-api" title="Permalink to this headline">¶</a></h1>
+<p>Since version 1.8 SUDO supports replacing standard policy behaviour
+usign plugins.</p>
+<p>Referral plugin API documentation can be found here:
+<a class="reference external" href="http://www.gratisoft.us/sudo/man/1.8.2/sudo_plugin.man.html">​http://www.gratisoft.us/sudo/man/1.8.2/sudo_plugin.man.html</a></p>
+<p>Basically to create a policy plugin, one must define a policy_plugin
+structure:</p>
+<p>To use the plugin, just edit /etc/sudo.conf:</p>
+<p>Only one policy plugin may be configured.</p>
+<p>The most important functions are open(), close() and check_policy().</p>
+<div class="section" id="open">
+<h2>open()<a class="headerlink" href="#open" title="Permalink to this headline">¶</a></h2>
+<p>Initializes plugin with data passed by SUDO as arguments of this
+function.</p>
+</div>
+<div class="section" id="close">
+<h2>close()<a class="headerlink" href="#close" title="Permalink to this headline">¶</a></h2>
+<p>Does a data clean up and checks a return code of the command.</p>
+</div>
+<div class="section" id="check-policy">
+<h2>check_policy()<a class="headerlink" href="#check-policy" title="Permalink to this headline">¶</a></h2>
+<p>Determines whether the user can run the command or not.</p>
+</div>
+</div>
+<div class="section" id="integration-in-sssd">
+<h1>Integration in SSSD<a class="headerlink" href="#integration-in-sssd" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://fedorahosted.org/sssd/attachment/wiki/DesignDocs/SUDOIntegration/sudo_highlevel.jpeg"><img alt="High level view of integration" src="https://fedorahosted.org/sssd/raw-attachment/wiki/DesignDocs/SUDOIntegration/sudo_highlevel.jpeg" /></a></p>
+</div>
+<div class="section" id="sssd-sudo-plugin">
+<h1>SSSD SUDO plugin<a class="headerlink" href="#sssd-sudo-plugin" title="Permalink to this headline">¶</a></h1>
+<p>All decision logic is done by responder and therefore this plugin should
+be as light weight as possible.</p>
+<p>Communication with responder is done by SSS CLI sockets interface.</p>
+<p><a class="reference external" href="https://fedorahosted.org/sssd/attachment/wiki/DesignDocs/SUDOIntegration/sudo_plugin.png"><img alt="SSSD SUDO plugin" src="https://fedorahosted.org/sssd/raw-attachment/wiki/DesignDocs/SUDOIntegration/sudo_plugin.png" /></a></p>
+</div>
+<div class="section" id="sssd-sudo-responder">
+<h1>SSSD SUDO responder<a class="headerlink" href="#sssd-sudo-responder" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="plugin-responder-protocol">
+<h1>Plugin &lt;=&gt; responder protocol<a class="headerlink" href="#plugin-responder-protocol" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="query">
+<h2>Query<a class="headerlink" href="#query" title="Permalink to this headline">¶</a></h2>
+<p>Byte array with format:</p>
+<p>where env_add, user_env, settings and user_info are in the form of
+NAME=VALUE pairs.</p>
+<p>All fields are interpreted as char*.</p>
+<p><strong>qualified_command_path</strong> is a full name of executed command
+(/bin/ls, ./my-program)</p>
+<p><strong>argv[]</strong> arguments passed to executed programs</p>
+<p><strong>env_add</strong> environment variables that user wants to add</p>
+<p><strong>user_env</strong> current environment variables (provided in open() function
+by SUDO)</p>
+<p><strong>settings</strong> provided in open() function by SUDO (see plugin API open())</p>
+<p><strong>user_info</strong> provided in open() function by SUDO (see plugin API
+open())</p>
+</div>
+<div class="section" id="reponse">
+<h2>Reponse<a class="headerlink" href="#reponse" title="Permalink to this headline">¶</a></h2>
+<p>Byte array with format:</p>
+<p>where command_info and user_env are in the form of NAME=VALUE pairs.</p>
+<p>All fields except result are interpreted as char*.</p>
+<p><strong>result</strong> interpreted as an integer value</p>
+<p><strong>argv[]</strong> arguments passed to executed programs</p>
+<p><strong>command_info</strong> information about the command (see plugin API
+check_policy())</p>
+<p><strong>user_env</strong> environment variables that should be kept / added.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">SUDO plugin API</a><ul>
+<li><a class="reference internal" href="#open">open()</a></li>
+<li><a class="reference internal" href="#close">close()</a></li>
+<li><a class="reference internal" href="#check-policy">check_policy()</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#integration-in-sssd">Integration in SSSD</a></li>
+<li><a class="reference internal" href="#sssd-sudo-plugin">SSSD SUDO plugin</a></li>
+<li><a class="reference internal" href="#sssd-sudo-responder">SSSD SUDO responder</a></li>
+<li><a class="reference internal" href="#plugin-responder-protocol">Plugin &lt;=&gt; responder protocol</a><ul>
+<li><a class="reference internal" href="#query">Query</a></li>
+<li><a class="reference internal" href="#reponse">Reponse</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/SUDOIntegration.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/SUDOIntegration.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

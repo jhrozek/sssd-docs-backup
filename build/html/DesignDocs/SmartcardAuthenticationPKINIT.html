@@ -1,0 +1,330 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Smartcard Authentication - PKINIT &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="smartcard-authentication-pkinit">
+<h1>Smartcard Authentication - PKINIT<a class="headerlink" href="#smartcard-authentication-pkinit" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/3270">​https://fedorahosted.org/sssd/ticket/3270</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>Currently Smartcard Authentication is only used to authenticate against
+the local system. PKINIT would provide a method to use Kerberos for
+authentication and get a Kerberos Ticket Granting Ticket (TGT) during
+the authentication so that network resources can be accessed with
+Kerberos/GSSAPI.</p>
+</div>
+<div class="section" id="use-cases">
+<h2>Use cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+<p>Client systems which joined to Kerberos based domains like Active
+Directory (AD) or FreeIPA can use Smartcard authentication to replace
+password based authentication and still get full single-sign-on (SSO)
+access to the resources of the domain.</p>
+</div>
+<div class="section" id="overview-of-the-solution">
+<h2>Overview of the solution<a class="headerlink" href="#overview-of-the-solution" title="Permalink to this headline">¶</a></h2>
+<p>SSSD&#8217;s KRB5 provider will detect the presence of the PKINIT
+pre-authentication method using the responder interface of recent MIT
+Kerberos version. This is similar to the current detection of password
+authentication (single-factor authentication, 1FA) and two-factor
+authentication (2FA). Based on the available pre-authentication methods
+and if a Smartcard with a suitable certificate is currently accessible
+by SSSD the user will be prompted differently about what credentials
+should be entered for authentication.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="17%" />
+<col width="61%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Available pre-authentication types</td>
+<td>suitable Smartcard present</td>
+<td>User prompting</td>
+</tr>
+<tr class="row-even"><td>pkinit</td>
+<td>no</td>
+<td>Ask to insert Smartcard and enter PIN</td>
+</tr>
+<tr class="row-odd"><td>pkinit</td>
+<td>yes</td>
+<td>Ask for PIN</td>
+</tr>
+<tr class="row-even"><td>1FA, pkinit</td>
+<td>no</td>
+<td>Ask for password</td>
+</tr>
+<tr class="row-odd"><td>1FA, pkinit</td>
+<td>yes</td>
+<td>Ask for PIN, fallback to password if no PIN is given</td>
+</tr>
+<tr class="row-even"><td>2FA, pkinit</td>
+<td>no</td>
+<td>Ask for first and second factor</td>
+</tr>
+<tr class="row-odd"><td>2FA, pkinit</td>
+<td>yes</td>
+<td>Ask for PIN, fallback to first and second factor if no PIN is given</td>
+</tr>
+<tr class="row-even"><td>1FA, 2FA, pkinit</td>
+<td>no</td>
+<td>Ask for first and optional second factor</td>
+</tr>
+<tr class="row-odd"><td>1FA, 2FA, pkinit</td>
+<td>yes</td>
+<td>Ask for PIN, fallback to first and optional second factor if no PIN is given</td>
+</tr>
+<tr class="row-even"><td>1FA</td>
+<td>no</td>
+<td>Ask for password</td>
+</tr>
+<tr class="row-odd"><td>1FA</td>
+<td>yes</td>
+<td>Ask for PIN (for local authentication), fallback to password if no PIN is given</td>
+</tr>
+<tr class="row-even"><td>2FA</td>
+<td>no</td>
+<td>Ask for first and second factor</td>
+</tr>
+<tr class="row-odd"><td>2FA</td>
+<td>yes</td>
+<td>Ask for PIN (for local authentication), fallback to first and second factor if no PIN is given</td>
+</tr>
+<tr class="row-even"><td>1FA, 2FA</td>
+<td>no</td>
+<td>Ask for first and optional second factor</td>
+</tr>
+<tr class="row-odd"><td>1FA, 2FA</td>
+<td>yes</td>
+<td>Ask for PIN (for local authentication), fallback to first and optional second factor if no PIN is given</td>
+</tr>
+</tbody>
+</table>
+<p>Ideally the prompting will be configurable so that it can be adopted for
+other non-IPA/non-AD use cases but the primary goal is to have sensible
+defaults which work well for IPA and AD.</p>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<p>The responder interface indicates the availability of PKINIT if there is
+KRB5_RESPONDER_QUESTION_PKINIT in the
+krb5_responder_question_list(). During the SSSD pre-auth run this can
+be used to signal the availability to the client. During authentication
+it should be used to set the answer if the Smartcard authentication
+credentials including the PIN and other details are available.</p>
+<p>Since it is possible that there are multiple certificates on the
+Smartcard and even that multiple Smartcards are accessible at the same
+time the MIT Kerberos PKINIT plugin must be called in a way to make sure
+that only the right certificate is used. The right certificate here is
+the one that was previously selected either by SSSD&#8217;s PAM responder or
+the user.</p>
+<p>To select a certificate MIT Kerberos provides the &#8220;X509_user_identity&#8221;
+option which can be set with krb5_get_init_creds_opt_set_pa().
+This is the same option which can be set with the -X option of the kinit
+command. For PKCS<a class="reference external" href="https://fedorahosted.org/sssd/ticket/11">#11</a> the
+syntax of the identify string is</p>
+<p>From the krb5.conf man page: &#8220;All keyword/values are optional. modname
+specifies the location of a library implementing
+PKCS<a class="reference external" href="https://fedorahosted.org/sssd/ticket/11">#11</a>. If a value is
+encountered with no keyword, it is assumed to be the modname. If no
+module-name is specified, the default is opensc-pkcs11.so. slotid=
+and/or token= may be specified to force the use of a particular smard
+card reader or token if there is more than one available. certid= and/or
+certlabel= may be specified to force the selection of a particular
+certificate on the device. See the pkinit_cert_match configuration
+option for more ways to select a particular certificate to use for
+PKINIT.&#8221;</p>
+<p>Sending the &#8216;modname&#8217;, &#8216;token-label&#8217; and &#8216;certid&#8217; would be sufficient to
+select the certificate on the
+PKCS<a class="reference external" href="https://fedorahosted.org/sssd/ticket/11">#11</a> level. But
+unfortunate this does not contain any detail of the certificate itself.
+It is recommended that &#8216;certid&#8217; which maps to CKA_ID
+PKCS<a class="reference external" href="https://fedorahosted.org/sssd/ticket/11">#11</a> attribute is the
+SHA1 value of the modulus of the RSA key but this is not enforced at any
+place. To make sure that the PKINIT plugin really users the certificate
+we expect it to use pkinit_cert_match must be used. Unfortunately
+there is no direct library call to set it the plugin will read it
+directly from the profile of the krb5_context. This means that SSSD
+must modify the profile can create a new krb5_context with
+krb5_init_context_profile(). While looking for a value for
+pkinit_cert_match the PKINIT plugin first checks if the option can be
+found a realm sub-section in the [libdefaults] section where the realm
+must match the realm of the client principal, i.e. the principal which
+tries to authenticate.</p>
+<p>As matching string
+&#8220;&lt;ISSUER&gt;certificateIssuer&lt;SUBJECT&gt;certificateSubject&#8221; can be used.
+Although there is a NSS implementation for the PKINIT plugin available
+in the MIT Kerberos source code it is neither used in recent Fedora or
+RHEL versions but the OpenSSL implementation is used. To avoid when
+translating the ASN.1 representation of the issuer and subject from the
+certificate to a DN string krb5_child should use OpenSSL
+unconditionally for this translation independent of the setting of the
+&#8216;&#8211;with-crypto&#8217; configure option.</p>
+<p>With &#8220;X509_user_identity&#8221; and &#8220;pkinit_cert_match&#8221; set the available
+choices for the PKINIT plugin should be sufficiently restricted so that
+not accidentally a wrong certificate is selected. It should even prevent
+the scenario where an attacker replaces the Smartcard between mapping
+the Smartcard to a system user and doing the PKINIT based
+authentication.</p>
+</div>
+<div class="section" id="configuration-changes">
+<h2>Configuration changes<a class="headerlink" href="#configuration-changes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="etc-krb5-conf">
+<h3>/etc/krb5.conf<a class="headerlink" href="#etc-krb5-conf" title="Permalink to this headline">¶</a></h3>
+<p>Besides &#8216;pkinit_anchor&#8217; there are two krb5.conf options which might
+need to be set on the client to make PKINIT work,
+&#8216;pkinit_eku_checking&#8217; and &#8216;pkinit_kdc_hostname&#8217;.</p>
+<p>By default the PKINIT plugin of MIT Kerberos expects that the KDC
+certificate contains the id-pkinit-KPKdc EKU as defined in RFC 4556 and
+has the kdc&#8217;s hostname in id-pkinit-san as defined in RFC4556 as well.</p>
+<p>If id-pkinit-san is missing &#8216;pkinit_kdc_hostname&#8217; can be set to the
+hostname of the kdc as stored in the dNSName in the SAN of the
+certificate. If the dNSName SAN is missing as well, PKINIT won&#8217;t work.</p>
+<p>If the id-pkinit-KPKdc EKU is not set &#8216;pkinit_eku_checking&#8217; can be set
+to &#8216;kpServerAuth&#8217; is the certificate of the kdc at least contains the
+id-kp-serverAuth EKU. If this is missing as well &#8216;pkinit_eku_checking&#8217;
+can be set to &#8216;none&#8217;, but this is not recommended.</p>
+<p>See the krb5.conf man page for details about the options.</p>
+<p>In theory it would be possible that SSSD sets this options automatically
+to make PKINIT work without adding options to krb5.conf manually. One
+way would be to inspect the certificate presented by the KDC and set to
+options according to the certificate content. But since SSSD does not
+have any knowledge what content would be expected it might unknowingly
+lower the security by receiving a spoofed ticket. It would be possible
+to add now options for SSSD but then it would be more easy to add the
+options directly to /etc/krb5.conf. With the recently introduced
+/etc/krb5.conf.d/ drop-in directory for config snippets a suitable
+snippets must be only created once and added to /etc/krb5.conf.d/ on the
+clients.</p>
+</div>
+</div>
+<div class="section" id="how-to-test">
+<h2>How To Test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<p>This section should explain to a person with admin-level of SSSD
+understanding how this change affects run time behaviour of SSSD and how
+can an SSSD user test this change. If the feature is internal-only,
+please list what areas of SSSD are affected so that testers know where
+to focus.</p>
+</div>
+<div class="section" id="how-to-debug">
+<h2>How To Debug<a class="headerlink" href="#how-to-debug" title="Permalink to this headline">¶</a></h2>
+<p>Explain how to debug this feature if something goes wrong. This section
+might include examples of additional commands the user might run (such
+as keytab or certificate sanity checks) or explain what message to look
+for.</p>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<p>Give credit to authors of the design in this section.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Smartcard Authentication - PKINIT</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem statement</a></li>
+<li><a class="reference internal" href="#use-cases">Use cases</a></li>
+<li><a class="reference internal" href="#overview-of-the-solution">Overview of the solution</a></li>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a></li>
+<li><a class="reference internal" href="#configuration-changes">Configuration changes</a><ul>
+<li><a class="reference internal" href="#etc-krb5-conf">/etc/krb5.conf</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-test">How To Test</a></li>
+<li><a class="reference internal" href="#how-to-debug">How To Debug</a></li>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/SmartcardAuthenticationPKINIT.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/SmartcardAuthenticationPKINIT.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

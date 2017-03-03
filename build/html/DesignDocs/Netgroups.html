@@ -1,0 +1,291 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Netgroups &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#Netgroups">Netgroups</a><ol class="arabic">
+<li><a class="reference external" href="#OverviewofNetgroups">Overview of Netgroups</a></li>
+<li><a class="reference external" href="#OverviewofNetgroupsinName-ServiceSwitch">Overview of Netgroups in Name-Service
+Switch</a></li>
+<li><a class="reference external" href="#OverviewofNetgroupsinLDAP">Overview of Netgroups in LDAP</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#SSSD">SSSD</a><ol class="arabic">
+<li><a class="reference external" href="#Overviewofapproach">Overview of approach</a><ol class="arabic">
+<li><a class="reference external" href="#Highlevel">High level</a></li>
+<li><a class="reference external" href="#Lower-level-setnetgrent">Lower-level - setnetgrent</a></li>
+<li><a class="reference external" href="#Handlingnestednetgroups">Handling nested netgroups</a></li>
+<li><a class="reference external" href="#Trackingnestinglimits">Tracking nesting limits</a></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><a class="reference external" href="#DanglingQuestions">Dangling Questions</a></li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="netgroups">
+<h1>Netgroups<a class="headerlink" href="#netgroups" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview-of-netgroups">
+<h2>Overview of Netgroups<a class="headerlink" href="#overview-of-netgroups" title="Permalink to this headline">¶</a></h2>
+<p>Netgroups define network-wide groups used for permission checking when
+fielding requests for remote mounts, remote logins, and remote shells.
+For remote mounts, the information in netgroup is used to classify
+machines; for remote logins and remote shells, it is used to classify
+users.</p>
+<p>Netgroups have a name, and contain one or more of the following members:</p>
+<ul class="simple">
+<li>The name of another netgroup (supporting nested netgroups)</li>
+<li>A three-tuple of (username,hostname,domainname) (parentheses
+included)</li>
+</ul>
+</div>
+<div class="section" id="overview-of-netgroups-in-name-service-switch">
+<h2>Overview of Netgroups in Name-Service Switch<a class="headerlink" href="#overview-of-netgroups-in-name-service-switch" title="Permalink to this headline">¶</a></h2>
+<p>The interface and behavior of netgroups in libc is a multi-step
+procedural interface as follows:</p>
+<ol class="arabic simple">
+<li>The user calls <code class="docutils literal"><span class="pre">setnetgrent(netgroupname)</span></code><ul>
+<li>This sets an internal, global iterator to the start of the list of
+members for the netgroup specified by netgroupname</li>
+</ul>
+</li>
+<li>The user calls <code class="docutils literal"><span class="pre">getnetgrent()</span></code> repeatedly until it returns failure<ul>
+<li>This returns one set of username, hostname and domainname for each
+call, until there are no more associated with the netgroupname</li>
+</ul>
+</li>
+<li>The user calls <code class="docutils literal"><span class="pre">endnetgrent()</span></code><ul>
+<li>This cleans up after itself</li>
+</ul>
+</li>
+</ol>
+<p>Internally, libraries providing netgroups in libc must unroll the nested
+netgroups so that all results are returned by <code class="docutils literal"><span class="pre">getnetgrent()</span></code> without
+additional explicit calls.</p>
+</div>
+<div class="section" id="overview-of-netgroups-in-ldap">
+<h2>Overview of Netgroups in LDAP<a class="headerlink" href="#overview-of-netgroups-in-ldap" title="Permalink to this headline">¶</a></h2>
+<p>Netgroups in LDAP are entries containing the objectClass
+<code class="docutils literal"><span class="pre">nisNetgroup</span></code>. This objectClass specifies two options:</p>
+<dl class="docutils">
+<dt>nisNetgroupTriple</dt>
+<dd>A netgroup, specified as a literal string. So it would be
+<code class="docutils literal"><span class="pre">(hostname,username,domainname)</span></code></dd>
+<dt>memberNisNetgroup</dt>
+<dd>The name of another netgroup whose contents need to be rolled into
+this entry.</dd>
+</dl>
+<p>Complete example (taken from
+<a class="reference external" href="http://directory.fedoraproject.org/wiki/Howto:Netgroups">​http://directory.fedoraproject.org/wiki/Howto:Netgroups</a>):</p>
+</div>
+</div>
+<div class="section" id="sssd">
+<h1>SSSD<a class="headerlink" href="#sssd" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview-of-approach">
+<h2>Overview of approach<a class="headerlink" href="#overview-of-approach" title="Permalink to this headline">¶</a></h2>
+<p>Netgroups will be processed similarly to how we handle enumerations in
+SSSD.</p>
+<div class="section" id="high-level">
+<h3>High level<a class="headerlink" href="#high-level" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li>When a <code class="docutils literal"><span class="pre">setnetgrent()</span></code> request arrives, we will first check the LDB
+cache and then we will go to the backends to update the cache.</li>
+<li>Once the cache is readied, we will then construct a result object
+that we can iterate through to return the result set.</li>
+<li>Once the result object is ready, we will reply to the
+<code class="docutils literal"><span class="pre">setgetgrent()</span></code> request to notify the calling application that it
+can start calling <code class="docutils literal"><span class="pre">getnetgrent()</span></code></li>
+<li>The calling application will issue <code class="docutils literal"><span class="pre">getnetgrent()</span></code> calls until
+there are no more members available.</li>
+<li>The calling application will call <code class="docutils literal"><span class="pre">endnetgrent()</span></code></li>
+</ol>
+</div>
+<div class="section" id="lower-level-setnetgrent">
+<h3>Lower-level - setnetgrent<a class="headerlink" href="#lower-level-setnetgrent" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li>Incoming requests to the SSSD will behave similarly to the user and
+group enumaration code, except that the individual result objects for
+different netgroup names will be stored in a hash table keyed on the
+netgroup name.</li>
+<li>During processing, if a netgroup contains nested netgroups, we will
+need to issue a recursive internal <code class="docutils literal"><span class="pre">setnetgrent()</span></code> request. This
+means we will need to have a nesting limit (and ideally,
+loop-detection)</li>
+<li>The response object must contain the complete unrolled results of all
+of its child netgroups, so that we do not need to maintain multiple
+iterators for reading through the children.</li>
+<li>The acknowledgement response to the initial <code class="docutils literal"><span class="pre">setnetgrent()</span></code> request
+will need to happen only after all nested netgroups have been cached.</li>
+</ol>
+</div>
+<div class="section" id="handling-nested-netgroups">
+<h3>Handling nested netgroups<a class="headerlink" href="#handling-nested-netgroups" title="Permalink to this headline">¶</a></h3>
+<p>During <code class="docutils literal"><span class="pre">setnetgrent()</span></code> processing, we will convert the results into a
+collection object (see libcollection). For each nested group, we will
+recurse into <code class="docutils literal"><span class="pre">setnetgrent()</span></code> and create a new collection object that
+can be added to the parent collection. In this way, we will be able to
+unroll the groups easily.</p>
+<p>Later, in <code class="docutils literal"><span class="pre">getnetgrent()</span></code> processing, we will construct the response
+from the stored collection object, rather than directly from the
+ldb_result object as we do with user and group enumerations.</p>
+<p>Public interfaces:</p>
+<p>Internally, the processing for <code class="docutils literal"><span class="pre">setnetgrent_send()</span></code> is expected to
+recurse into nested netgroups and add the resulting <code class="docutils literal"><span class="pre">entries</span></code> to its
+own list using the <code class="docutils literal"><span class="pre">col_add_collection_to_collection()</span></code> interface with
+the <code class="docutils literal"><span class="pre">col_add_mode_clone</span></code> mode.</p>
+</div>
+<div class="section" id="tracking-nesting-limits">
+<h3>Tracking nesting limits<a class="headerlink" href="#tracking-nesting-limits" title="Permalink to this headline">¶</a></h3>
+<p>The biggest danger in nesting is the risk of loops in the memberships.
+To resolve this, I propose that we keep track of subrequests in a dhash
+table. This would behave as follows:</p>
+<ol class="arabic simple">
+<li>In <code class="docutils literal"><span class="pre">setnetgrent_send()</span></code> we would first check whether the
+hash_count of the hash table is equal to the nesting limit. If it
+is, we will return completion immediately.</li>
+<li>Next we will check whether netgroupname already exists in the hash
+table. If it does, then we know we have looped and will simply return
+completion immediately.</li>
+<li>At this point, we will add the current netgroup name to the hash
+table (with a NULL associated value) and continue processing this
+request.</li>
+<li>In <code class="docutils literal"><span class="pre">setnetgrent_recv()</span></code> we will remove the requested netgroupname
+from the hash table and amend the result collection.</li>
+</ol>
+<p>This will allow us to protect against both loops and excessive nesting
+all at once.</p>
+</div>
+</div>
+</div>
+<div class="section" id="dangling-questions">
+<h1>Dangling Questions<a class="headerlink" href="#dangling-questions" title="Permalink to this headline">¶</a></h1>
+<ol class="arabic simple">
+<li>Is it permissible for a single client to request multiple different
+netgroups concurrently?<ul>
+<li>My reading of the documentation for [set|get|end]netgrent leads
+me to believe that this is not permitted by libc.</li>
+</ul>
+</li>
+<li>Maybe this is too low-level at this time, but is a cleanup task
+planned?<ul>
+<li>Netgroups should be handled in the same way that users and groups
+are handled, so I will probably have to extend the existing
+cleanup task to also address the netgroups entries in the cache -
+sgallagh</li>
+</ul>
+</li>
+</ol>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Netgroups</a><ul>
+<li><a class="reference internal" href="#overview-of-netgroups">Overview of Netgroups</a></li>
+<li><a class="reference internal" href="#overview-of-netgroups-in-name-service-switch">Overview of Netgroups in Name-Service Switch</a></li>
+<li><a class="reference internal" href="#overview-of-netgroups-in-ldap">Overview of Netgroups in LDAP</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sssd">SSSD</a><ul>
+<li><a class="reference internal" href="#overview-of-approach">Overview of approach</a><ul>
+<li><a class="reference internal" href="#high-level">High level</a></li>
+<li><a class="reference internal" href="#lower-level-setnetgrent">Lower-level - setnetgrent</a></li>
+<li><a class="reference internal" href="#handling-nested-netgroups">Handling nested netgroups</a></li>
+<li><a class="reference internal" href="#tracking-nesting-limits">Tracking nesting limits</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dangling-questions">Dangling Questions</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/Netgroups.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/Netgroups.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

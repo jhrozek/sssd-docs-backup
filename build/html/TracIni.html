@@ -1,0 +1,1179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>The Trac Configuration File &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="the-trac-configuration-file">
+<h1>The Trac Configuration File<a class="headerlink" href="#the-trac-configuration-file" title="Permalink to this headline">¶</a></h1>
+<div class="system-message"><p><strong>Error: Macro TracGuideToc(None) failed</strong></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;NoneType&#39;</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span> <span class="s1">&#39;find&#39;</span>
+</pre></div>
+</div>
+</div><div class="wiki-toc"><ol class="arabic simple">
+<li><a class="reference external" href="#TheTracConfigurationFile">The Trac Configuration File</a><ol class="arabic">
+<li><a class="reference external" href="#GlobalConfiguration">Global Configuration</a></li>
+<li><a class="reference external" href="#Referenceforsettings">Reference for settings</a></li>
+<li><a class="reference external" href="#Referenceforspecialsections">Reference for special sections</a><ol class="arabic">
+<li><a class="reference external" href="#components-section">[components]</a></li>
+<li><a class="reference external" href="#extra-permissions-section">[extra-permissions]</a></li>
+<li><a class="reference external" href="#milestone-groups-section">[milestone-groups]</a></li>
+<li><a class="reference external" href="#repositories-section">[repositories]</a></li>
+<li><a class="reference external" href="#svn:externals-section">[svn:externals]</a></li>
+<li><a class="reference external" href="#ticket-custom-section">[ticket-custom]</a></li>
+<li><a class="reference external" href="#ticket-workflow-section">[ticket-workflow]</a></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</div><p>Trac configuration is done by editing the <strong>``trac.ini``</strong> config file,
+located in <code class="docutils literal"><span class="pre">&lt;projectenv&gt;/conf/trac.ini</span></code>. Changes to the configuration
+are usually reflected immediately, though changes to the
+<code class="docutils literal"><span class="pre">[components]</span></code> or <code class="docutils literal"><span class="pre">[logging]</span></code> sections will require restarting the
+web server. You may also need to restart the web server after creating a
+global configuration file when none was previously present.</p>
+<p>The <code class="docutils literal"><span class="pre">trac.ini</span></code> configuration file and its parent directory should be
+writable by the web server, as Trac currently relies on the possibility
+to trigger a complete environment reload to flush its caches.</p>
+<div class="section" id="global-configuration">
+<h2>Global Configuration<a class="headerlink" href="#global-configuration" title="Permalink to this headline">¶</a></h2>
+<p>In versions prior to 0.11, the global configuration was by default
+located in <code class="docutils literal"><span class="pre">$prefix/share/trac/conf/trac.ini</span></code> or /etc/trac/trac.ini,
+depending on the distribution. If you&#8217;re upgrading, you may want to
+specify that file to inherit from. Literally, when you&#8217;re upgrading to
+0.11, you have to add an <code class="docutils literal"><span class="pre">[inherit]</span></code> section to your project&#8217;s
+<code class="docutils literal"><span class="pre">trac.ini</span></code> file. Additionally, you have to move your customized
+templates and common images from <code class="docutils literal"><span class="pre">$prefix/share/trac/...</span></code> to the new
+location.</p>
+<p>Global options will be merged with the environment-specific options,
+where local options override global options. The options file is
+specified as follows:</p>
+<p>Multiple files can be specified using a comma-separated list.</p>
+<p>Note that you can also specify a global option file when creating a new
+project, by adding the option <code class="docutils literal"><span class="pre">--inherit=/path/to/global/trac.ini</span></code> to
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracAdmin.html#initenv">trac-admin</a>&#8216;s
+<code class="docutils literal"><span class="pre">initenv</span></code> command. If you do not do this but nevertheless intend to
+use a global option file with your new environment, you will have to go
+through the newly generated <code class="docutils literal"><span class="pre">conf/trac.ini</span></code> file and delete the
+entries that will otherwise override those set in the global file.</p>
+<p>There are two more entries in the
+<a class="reference external" href="https://fedorahosted.org/sssd#inherit-section">[inherit]</a> section,
+<code class="docutils literal"><span class="pre">templates_dir</span></code> for sharing global templates and <code class="docutils literal"><span class="pre">plugins_dir</span></code>, for
+sharing plugins. Those entries can themselves be specified in the shared
+configuration file, and in fact, configuration files can even be chained
+if you specify another <code class="docutils literal"><span class="pre">[inherit]</span> <span class="pre">file</span></code> there.</p>
+<p>Note that the templates found in the <code class="docutils literal"><span class="pre">templates/</span></code> directory of the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracEnvironment.html">TracEnvironment</a>
+have precedence over those found in <code class="docutils literal"><span class="pre">[inherit]</span> <span class="pre">templates_dir</span></code>. In
+turn, the latter have precedence over the installed templates, so be
+careful about what you put there, notably if you override a default
+template be sure to refresh your modifications when you upgrade to a new
+version of Trac (the preferred way to perform
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracInterfaceCustomization.html">TracInterfaceCustomization</a>
+being still to write a custom plugin doing an appropriate
+<code class="docutils literal"><span class="pre">ITemplateStreamFilter</span></code> transformation).</p>
+</div>
+<div class="section" id="reference-for-settings">
+<h2>Reference for settings<a class="headerlink" href="#reference-for-settings" title="Permalink to this headline">¶</a></h2>
+<p>This is a brief reference of available configuration options, and their
+default settings.</p>
+<div class="tracini"><p class="rubric" id="attachment-section"><code class="docutils literal"><span class="pre">[attachment]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="93%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">max_size</span></code></td>
+<td>Maximum allowed file size (in bytes) for ticket and wiki attachments.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">render_unsafe_content</span></code></td>
+<td>Whether attachments should be rendered in the browser, or only made downloadable. Pretty much any file may be interpreted as HTML by the browser, which allows a malicious user to attach a file containing cross-site scripting attacks. For public sites where anonymous users can create attachments it is recommended to leave this option disabled (which is the default).</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="batchmod-section"><code class="docutils literal"><span class="pre">[batchmod]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="67%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">fields_as_list</span></code></td>
+<td>field names modified as a value list(separated by &#8216;,&#8217;)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">list_connector_string</span></code></td>
+<td>Connector string for &#8216;list&#8217; fields. Defaults to a space.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">list_separator_regex</span></code></td>
+<td>separator regex used for &#8216;list&#8217; fields</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="browser-section"><code class="docutils literal"><span class="pre">[browser]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="93%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">color_scale</span></code></td>
+<td>Enable colorization of the <em>age</em> column. This uses the same color scale as the source code annotation: blue is older, red is newer. (<em>since 0.11</em>)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">downloadable_paths</span></code></td>
+<td>List of repository paths that can be downloaded. Leave the option empty if you want to disable all downloads, otherwise set it to a comma-separated list of authorized paths (those paths are glob patterns, i.e. &#8220;*&#8221; can be used as a wild card) (<em>since 0.10</em>)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">hide_properties</span></code></td>
+<td>Comma-separated list of version control properties to hide from the repository browser. (<em>since 0.9</em>)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">intermediate_color</span></code></td>
+<td>(r,g,b) color triple to use for the color corresponding to the intermediate color, if two linear interpolations are used for the color scale (see <code class="docutils literal"><span class="pre">intermediate_point</span></code>). If not set, the intermediate color between <code class="docutils literal"><span class="pre">oldest_color</span></code> and <code class="docutils literal"><span class="pre">newest_color</span></code> will be used. (<em>since 0.11</em>)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">intermediate_point</span></code></td>
+<td>If set to a value between 0 and 1 (exclusive), this will be the point chosen to set the <code class="docutils literal"><span class="pre">intermediate_color</span></code> for interpolating the color value. (<em>since 0.11</em>)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">newest_color</span></code></td>
+<td>(r,g,b) color triple to use for the color corresponding to the newest color, for the color scale used in <em>blame</em> or the browser <em>age</em> column if <code class="docutils literal"><span class="pre">color_scale</span></code> is enabled. (<em>since 0.11</em>)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">oldest_color</span></code></td>
+<td>(r,g,b) color triple to use for the color corresponding to the oldest color, for the color scale used in <em>blame</em> or the browser <em>age</em> column if <code class="docutils literal"><span class="pre">color_scale</span></code> is enabled. (<em>since 0.11</em>)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">oneliner_properties</span></code></td>
+<td>Comma-separated list of version control properties to render as oneliner wiki content in the repository browser. (<em>since 0.11</em>)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">render_unsafe_content</span></code></td>
+<td>Whether raw files should be rendered in the browser, or only made downloadable. Pretty much any file may be interpreted as HTML by the browser, which allows a malicious user to create a file containing cross-site scripting attacks. For open repositories where anyone can check-in a file, it is recommended to leave this option disabled (which is the default).</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">wiki_properties</span></code></td>
+<td>Comma-separated list of version control properties to render as wiki content in the repository browser. (<em>since 0.11</em>)</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="cgit-section"><code class="docutils literal"><span class="pre">[cgit]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="79%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">cgit_redirect</span></code></td>
+<td>Redirect to cgit project page when true, embed in trac interface when false</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">cgit_url</span></code></td>
+<td>URL to cgit project page. Example: /cgit/projectName</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="changeset-section"><code class="docutils literal"><span class="pre">[changeset]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="14%" />
+<col width="86%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">max_diff_bytes</span></code></td>
+<td>Maximum total size in bytes of the modified files (their old size plus their new size) for which the changeset view will attempt to show the diffs inlined (<em>since 0.10</em>).</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">max_diff_files</span></code></td>
+<td>Maximum number of modified files for which the changeset view will attempt to show the diffs inlined (<em>since 0.10</em>).</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">wiki_format_messages</span></code></td>
+<td>Whether wiki formatting should be applied to changeset messages. If this option is disabled, changeset messages will be rendered as pre-formatted text.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="fedmsg-section"><code class="docutils literal"><span class="pre">[fedmsg]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="26%" />
+<col width="74%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">banned_fields</span></code></td>
+<td>A comma separated list of fields not to be sent to fedmsg</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="git-section"><code class="docutils literal"><span class="pre">[git]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="80%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">cached_repository</span></code></td>
+<td>wrap <code class="docutils literal"><span class="pre">GitRepository</span></code> in <code class="docutils literal"><span class="pre">CachedRepository</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">git_bin</span></code></td>
+<td>path to git executable (relative to trac project folder!)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">git_fs_encoding</span></code></td>
+<td>define charset encoding of paths within git repository</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">persistent_cache</span></code></td>
+<td>enable persistent caching of commit tree</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">shortrev_len</span></code></td>
+<td>length rev sha sums should be tried to be abbreviated to (must be &gt;= 4 and &lt;= 40)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">trac_user_rlookup</span></code></td>
+<td>enable reverse mapping of git email addresses to trac user ids</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">use_committer_id</span></code></td>
+<td>use git-committer id instead of git-author id as changeset owner</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">use_committer_time</span></code></td>
+<td>use git-committer-author timestamp instead of git-author timestamp as changeset timestamp</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">wiki_shortrev_len</span></code></td>
+<td>minimum length of hex-string for which auto-detection as sha id is performed (must be &gt;= 4 and &lt;= 40)</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="header-logo-section"><code class="docutils literal"><span class="pre">[header_logo]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="2%" />
+<col width="98%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">alt</span></code></td>
+<td>Alternative text for the header logo.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">height</span></code></td>
+<td>Height of the header logo image in pixels.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">link</span></code></td>
+<td>URL to link to, from the header logo.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">src</span></code></td>
+<td>URL of the image to use as header logo. It can be absolute, server relative or relative. If relative, it is relative to one of the <code class="docutils literal"><span class="pre">/chrome</span></code> locations: <code class="docutils literal"><span class="pre">site/your-logo.png</span></code> if <code class="docutils literal"><span class="pre">your-logo.png</span></code> is located in the <code class="docutils literal"><span class="pre">htdocs</span></code> folder within your <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracEnvironment.html">TracEnvironment</a>; <code class="docutils literal"><span class="pre">common/your-logo.png</span></code> if <code class="docutils literal"><span class="pre">your-logo.png</span></code> is located in the folder mapped to the <a class="reference external" href="https://fedorahosted.org/sssd#trac-section">htdocs_location</a> URL. Only specifying <code class="docutils literal"><span class="pre">your-logo.png</span></code> is equivalent to the latter.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">width</span></code></td>
+<td>Width of the header logo image in pixels.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="inherit-section"><code class="docutils literal"><span class="pre">[inherit]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">plugins_dir</span></code></td>
+<td>Path to the <em>shared plugins directory</em>. Plugins in that directory are loaded in addition to those in the directory of the environment <code class="docutils literal"><span class="pre">plugins</span></code>, with this one taking precedence. (<em>since 0.11</em>)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">templates_dir</span></code></td>
+<td>Path to the <em>shared templates directory</em>. Templates in that directory are loaded in addition to those in the environments <code class="docutils literal"><span class="pre">templates</span></code> directory, but the latter take precedence. (<em>since 0.11</em>)</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="iniadmin-section"><code class="docutils literal"><span class="pre">[iniadmin]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="16%" />
+<col width="84%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">excludes</span></code></td>
+<td>Excludes this options. Comma separated list as <code class="docutils literal"><span class="pre">section:name</span></code>.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">passwords</span></code></td>
+<td>Show input-type as password instead of text. Comma separated list as <code class="docutils literal"><span class="pre">section:name</span></code>.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="logging-section"><code class="docutils literal"><span class="pre">[logging]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="2%" />
+<col width="98%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">log_file</span></code></td>
+<td>If <code class="docutils literal"><span class="pre">log_type</span></code> is <code class="docutils literal"><span class="pre">file</span></code>, this should be a path to the log-file. Relative paths are resolved relative to the <code class="docutils literal"><span class="pre">log</span></code> directory of the environment.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">log_format</span></code></td>
+<td>Custom logging format. If nothing is set, the following will be used: Trac[$(module)s] $(levelname)s: $(message)s In addition to regular key names supported by the Python logger library (see <a class="reference external" href="http://docs.python.org/library/logging.html">​http://docs.python.org/library/logging.html</a>), one could use: - $(path)s the path for the current environment - $(basename)s the last path component of the current environment - $(project)s the project name Note the usage of <code class="docutils literal"><span class="pre">$(...)s</span></code> instead of <code class="docutils literal"><span class="pre">%(...)s</span></code> as the latter form would be interpreted by the <a class="reference external" href="https://docs.pagure.org/sssd-test2/ConfigParser.html">ConfigParser?</a> itself. Example: <code class="docutils literal"><span class="pre">($(thread)d)</span> <span class="pre">Trac[$(basename)s:$(module)s]</span> <span class="pre">$(levelname)s:</span> <span class="pre">$(message)s</span></code> <em>(since 0.10.5)</em></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">log_level</span></code></td>
+<td>Level of verbosity in log. Should be one of (<code class="docutils literal"><span class="pre">CRITICAL</span></code>, <code class="docutils literal"><span class="pre">ERROR</span></code>, <code class="docutils literal"><span class="pre">WARN</span></code>, <code class="docutils literal"><span class="pre">INFO</span></code>, <code class="docutils literal"><span class="pre">DEBUG</span></code>).</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">log_type</span></code></td>
+<td>Logging facility to use. Should be one of (<code class="docutils literal"><span class="pre">none</span></code>, <code class="docutils literal"><span class="pre">file</span></code>, <code class="docutils literal"><span class="pre">stderr</span></code>, <code class="docutils literal"><span class="pre">syslog</span></code>, <code class="docutils literal"><span class="pre">winlog</span></code>).</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="milestone-section"><code class="docutils literal"><span class="pre">[milestone]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="88%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">stats_provider</span></code></td>
+<td>Name of the component implementing <code class="docutils literal"><span class="pre">ITicketGroupStatsProvider</span></code>, which is used to collect statistics on groups of tickets for display in the milestone views.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="mimeviewer-section"><code class="docutils literal"><span class="pre">[mimeviewer]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="93%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">max_preview_size</span></code></td>
+<td>Maximum file size for HTML preview. (<em>since 0.9</em>)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">mime_map</span></code></td>
+<td>List of additional MIME types and keyword mappings. Mappings are comma-separated, and for each MIME type, there&#8217;s a colon (&#8221;:&#8221;) separated list of associated keywords or file extensions. (<em>since 0.10</em>)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">pygments_default_style</span></code></td>
+<td>The default style to use for Pygments syntax highlighting.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">pygments_modes</span></code></td>
+<td>List of additional MIME types known by Pygments. For each, a tuple <code class="docutils literal"><span class="pre">mimetype:mode:quality</span></code> has to be specified, where <code class="docutils literal"><span class="pre">mimetype</span></code> is the MIME type, <code class="docutils literal"><span class="pre">mode</span></code> is the corresponding Pygments mode to be used for the conversion and <code class="docutils literal"><span class="pre">quality</span></code> is the quality ratio associated to this conversion. That can also be used to override the default quality ratio used by the Pygments render.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">tab_width</span></code></td>
+<td>Displayed tab width in file preview. (<em>since 0.9</em>)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">treat_as_binary</span></code></td>
+<td>Comma-separated list of MIME types that should be treated as binary data. (<em>since 0.11.5</em>)</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="notification-section"><code class="docutils literal"><span class="pre">[notification]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="9%" />
+<col width="91%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">admit_domains</span></code></td>
+<td>Comma-separated list of domains that should be considered as valid for email addresses (such as localdomain).</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">always_notify_owner</span></code></td>
+<td>Always send notifications to the ticket owner (<em>since 0.9</em>).</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">always_notify_reporter</span></code></td>
+<td>Always send notifications to any address in the <em>reporter</em> field.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">always_notify_updater</span></code></td>
+<td>Always send notifications to the person who causes the ticket property change and to any previous updater of that ticket.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">ambiguous_char_width</span></code></td>
+<td>Which width of ambiguous characters (e.g. &#8216;single&#8217; or &#8216;double&#8217;) should be used in the table of notification mail. If &#8216;single&#8217;, the same width as characters in US-ASCII. This is expected by most users. If &#8216;double&#8217;, twice the width of US-ASCII characters. This is expected by CJK users. <em>(since 0.12.2)</em></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">email_sender</span></code></td>
+<td>Name of the component implementing <code class="docutils literal"><span class="pre">IEmailSender</span></code>. This component is used by the notification system to send emails. Trac currently provides <code class="docutils literal"><span class="pre">SmtpEmailSender</span></code> for connecting to an SMTP server, and <code class="docutils literal"><span class="pre">SendmailEmailSender</span></code> for running a <code class="docutils literal"><span class="pre">sendmail</span></code>-compatible executable. (<em>since 0.12</em>)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">ignore_domains</span></code></td>
+<td>Comma-separated list of domains that should not be considered part of email addresses (for usernames with Kerberos domains).</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">mime_encoding</span></code></td>
+<td>Specifies the MIME encoding scheme for emails. Valid options are &#8216;base64&#8217; for Base64 encoding, &#8216;qp&#8217; for Quoted-Printable, and &#8216;none&#8217; for no encoding, in which case mails will be sent as 7bit if the content is all ASCII, or 8bit otherwise. (<em>since 0.10</em>)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">sendmail_path</span></code></td>
+<td>Path to the sendmail executable. The sendmail program must accept the <code class="docutils literal"><span class="pre">-i</span></code> and <code class="docutils literal"><span class="pre">-f</span></code> options. (<em>since 0.12</em>)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">smtp_always_bcc</span></code></td>
+<td>Email address(es) to always send notifications to, addresses do not appear publicly (Bcc:). (<em>since 0.10</em>).</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">smtp_always_cc</span></code></td>
+<td>Email address(es) to always send notifications to, addresses can be seen by all recipients (Cc:).</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">smtp_default_domain</span></code></td>
+<td>Default host/domain to append to address that do not specify one.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">smtp_enabled</span></code></td>
+<td>Enable email notification.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">smtp_from</span></code></td>
+<td>Sender address to use in notification emails.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">smtp_from_name</span></code></td>
+<td>Sender name to use in notification emails.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">smtp_password</span></code></td>
+<td>Password for SMTP server. (<em>since 0.9</em>)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">smtp_port</span></code></td>
+<td>SMTP server port to use for email notification.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">smtp_replyto</span></code></td>
+<td>Reply-To address to use in notification emails.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">smtp_server</span></code></td>
+<td>SMTP server hostname to use for email notifications.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">smtp_subject_prefix</span></code></td>
+<td>Text to prepend to subject line of notification emails. If the setting is not defined, then the [$project_name] prefix. If no prefix is desired, then specifying an empty option will disable it. (<em>since 0.10.1</em>).</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">smtp_user</span></code></td>
+<td>Username for SMTP server. (<em>since 0.9</em>)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">ticket_subject_template</span></code></td>
+<td>A Genshi text template snippet used to get the notification subject. By default, the subject template is <code class="docutils literal"><span class="pre">$prefix</span> <span class="pre">#$ticket.id:</span> <span class="pre">$summary</span></code>. <code class="docutils literal"><span class="pre">$prefix</span></code> being the value of the <code class="docutils literal"><span class="pre">smtp_subject_prefix</span></code> option. <em>(since 0.11)</em></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">use_public_cc</span></code></td>
+<td>Recipients can see email addresses of other CC&#8217;ed recipients. If this option is disabled (the default), recipients are put on BCC. (<em>since 0.10</em>)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">use_short_addr</span></code></td>
+<td>Permit email address without a host/domain (i.e. username only). The SMTP server should accept those addresses, and either append a FQDN or use local delivery. (<em>since 0.10</em>)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">use_tls</span></code></td>
+<td>Use SSL/TLS to send notifications over SMTP. (<em>since 0.10</em>)</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="openid-section"><code class="docutils literal"><span class="pre">[openid]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="93%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">absolute_trust_root</span></code></td>
+<td>Whether we should use absolute trust root or by project.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">black_list</span></code></td>
+<td>Comma separated list of denied <a class="reference external" href="https://docs.pagure.org/sssd-test2/OpenId.html">OpenId?</a> addresses.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">check_list</span></code></td>
+<td>JSON service for openid check.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">check_list_key</span></code></td>
+<td>Key for openid Service.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">check_list_username</span></code></td>
+<td>Username for openid Service.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">combined_username</span></code></td>
+<td>Username will be written as username_in_remote_system &lt;openid_url&gt;.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">custom_provider_image</span></code></td>
+<td>Custom <a class="reference external" href="https://docs.pagure.org/sssd-test2/OpenId.html">OpenId?</a> provider image.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">custom_provider_label</span></code></td>
+<td>Custom <a class="reference external" href="https://docs.pagure.org/sssd-test2/OpenId.html">OpenId?</a> provider label.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">custom_provider_name</span></code></td>
+<td>Custom <a class="reference external" href="https://docs.pagure.org/sssd-test2/OpenId.html">OpenId?</a> provider name.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">custom_provider_size</span></code></td>
+<td>Custom <a class="reference external" href="https://docs.pagure.org/sssd-test2/OpenId.html">OpenId?</a> provider image size (small or large).</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">custom_provider_url</span></code></td>
+<td>Custom <a class="reference external" href="https://docs.pagure.org/sssd-test2/OpenId.html">OpenId?</a> provider URL. E.g.: <a class="reference external" href="http://claimid.com/%7Busername">​http://claimid.com/{username</a>}</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">default_openid</span></code></td>
+<td>Default OpenID provider for directed identity.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">email_white_list</span></code></td>
+<td>Comma separated list of allowed users, using the resolved SREG/AX email address. Use in combination with trusted identity patterns in white_list.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">groups_to_request</span></code></td>
+<td>Which &#8216;team names&#8217; to request via the OpenIDTeams extension. To use this option you must have python-openid-teams installed.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">lowercase_authname</span></code></td>
+<td>Whether authnames should always be lower-cased. Setting this to false generally makes more sense, however this is backwards-incompatible if you already have user sessions which you would like to preserve.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">pape_method</span></code></td>
+<td>Default PAPE method to request from OpenID provider.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">providers</span></code></td>
+<td>Explicit set of provider names to display. E.g: google, yahoo, …</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">signup</span></code></td>
+<td>Signup link</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">sreg_required</span></code></td>
+<td>Whether SREG data should be required or optional.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">strip_protocol</span></code></td>
+<td>Instead of using username beginning with <a class="reference external" href="http://">​http://</a> or <a class="reference external" href="https://">​https://</a> you can strip the beginning.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">strip_trailing_slash</span></code></td>
+<td>In case your OpenID is some sub-domain address <a class="reference external" href="https://docs.pagure.org/sssd-test2/OpenId.html">OpenId?</a> library adds trailing slash. This option strips it.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">take_default_login</span></code></td>
+<td>Set to true if /login should be handled by openid.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">timeout</span></code></td>
+<td>Specify if expiration time should act as timeout. If set, cookie lifetime will be extended to auth_cookie_lifetime on each authenticated access.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">trust_authname</span></code></td>
+<td>WARNING: Only enable this if you know what this mean! This could make identity theft very easy if you do not control the OpenID provider! Enabling this option makes the retrieved authname from the OpenID provider authorative, i.e. it trusts the authname to be the unique username of the user. Enabling this disables the collission checking, so two different OpenID urls may suddenly get the same username if they have the same authname</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">use_nickname_as_authname</span></code></td>
+<td>Whether the nickname as retrieved by SReg is used as username</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">whatis</span></code></td>
+<td>What is <a class="reference external" href="https://docs.pagure.org/sssd-test2/OpenId.html">OpenId?</a> link.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">white_list</span></code></td>
+<td>Comma separated list of allowed <a class="reference external" href="https://docs.pagure.org/sssd-test2/OpenId.html">OpenId?</a> addresses.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="privatetickets-section"><code class="docutils literal"><span class="pre">[privatetickets]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="28%" />
+<col width="72%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">group_blacklist</span></code></td>
+<td>Groups that do not affect the common membership check.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="project-section"><code class="docutils literal"><span class="pre">[project]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="9%" />
+<col width="91%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">admin</span></code></td>
+<td>E-Mail address of the project&#8217;s administrator.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">admin_trac_url</span></code></td>
+<td>Base URL of a Trac instance where errors in this Trac should be reported. This can be an absolute or relative URL, or &#8216;.&#8217; to reference this Trac instance. An empty value will disable the reporting buttons. (<em>since 0.11.3</em>)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">descr</span></code></td>
+<td>Short description of the project.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">footer</span></code></td>
+<td>Page footer text (right-aligned).</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">icon</span></code></td>
+<td>URL of the icon of the project.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">name</span></code></td>
+<td>Name of the project.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">url</span></code></td>
+<td>URL of the main project web site, usually the website in which the <code class="docutils literal"><span class="pre">base_url</span></code> resides. This is used in notification e-mails.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="query-section"><code class="docutils literal"><span class="pre">[query]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="9%" />
+<col width="91%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">default_anonymous_query</span></code></td>
+<td>The default query for anonymous users. The query is either in <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracQuery.html#QueryLanguage">query language</a> syntax, or a URL query string starting with <code class="docutils literal"><span class="pre">?</span></code> as used in <code class="docutils literal"><span class="pre">query:</span></code> <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracQuery.html#UsingTracLinks">Trac links</a>. (<em>since 0.11.2</em>)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">default_query</span></code></td>
+<td>The default query for authenticated users. The query is either in <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracQuery.html#QueryLanguage">query language</a> syntax, or a URL query string starting with <code class="docutils literal"><span class="pre">?</span></code> as used in <code class="docutils literal"><span class="pre">query:</span></code> <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracQuery.html#UsingTracLinks">Trac links</a>. (<em>since 0.11.2</em>)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">items_per_page</span></code></td>
+<td>Number of tickets displayed per page in ticket queries, by default (<em>since 0.11</em>)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">ticketlink_query</span></code></td>
+<td>The base query to be used when linkifying values of ticket fields. The query is a URL query string starting with <code class="docutils literal"><span class="pre">?</span></code> as used in <code class="docutils literal"><span class="pre">query:</span></code> <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracQuery.html#UsingTracLinks">Trac links</a>. (<em>since 0.12</em>)</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="report-section"><code class="docutils literal"><span class="pre">[report]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="77%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">items_per_page</span></code></td>
+<td>Number of tickets displayed per page in ticket reports, by default (<em>since 0.11</em>)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">items_per_page_rss</span></code></td>
+<td>Number of tickets displayed in the rss feeds for reports (<em>since 0.11</em>)</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="revisionlog-section"><code class="docutils literal"><span class="pre">[revisionlog]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="15%" />
+<col width="85%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">default_log_limit</span></code></td>
+<td>Default value for the limit argument in the <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracRevisionLog.html">TracRevisionLog</a> (<em>since 0.11</em>).</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="roadmap-section"><code class="docutils literal"><span class="pre">[roadmap]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="88%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">stats_provider</span></code></td>
+<td>Name of the component implementing <code class="docutils literal"><span class="pre">ITicketGroupStatsProvider</span></code>, which is used to collect statistics on groups of tickets for display in the roadmap views.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="search-section"><code class="docutils literal"><span class="pre">[search]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="94%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">default_disabled_filters</span></code></td>
+<td>Specifies which search filters should be disabled by default on the search page. This will also restrict the filters for the quick search function. The filter names defined by default components are: <code class="docutils literal"><span class="pre">wiki</span></code>, <code class="docutils literal"><span class="pre">ticket</span></code>, <code class="docutils literal"><span class="pre">milestone</span></code> and <code class="docutils literal"><span class="pre">changeset</span></code>. For plugins, look for their implementation of the ISearchSource interface, in the <code class="docutils literal"><span class="pre">get_search_filters()</span></code> method, the first member of returned tuple. Once disabled, search filters can still be manually enabled by the user on the search page. (since 0.12)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">min_query_length</span></code></td>
+<td>Minimum length of query string allowed when performing a search.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="sensitivetickets-section"><code class="docutils literal"><span class="pre">[sensitivetickets]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="92%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">allow_cc</span></code></td>
+<td>Whether users listed in the cc field of a sensitive ticket should have access to that ticket even if they do not have SENSITIVE_VIEW privileges</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">allow_owner</span></code></td>
+<td>Whether the owner of a sensitive ticket should have access to that ticket even if they do not have SENSITIVE_VIEW privileges</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">allow_reporter</span></code></td>
+<td>Whether the reporter of a sensitive ticket should have access to that ticket even if they do not have SENSITIVE_VIEW privileges</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">limit_sensitivity</span></code></td>
+<td>With limit_sensitivity set to true, users cannot set the sensitivity checkbox on a ticket unless they are authenticated and would otherwise be permitted to deal with the ticket if it were marked sensitive. This prevents users from marking the tickets of other users as &#8220;sensitive&#8221;.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="sqlite-section"><code class="docutils literal"><span class="pre">[sqlite]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="15%" />
+<col width="85%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">extensions</span></code></td>
+<td>Paths to sqlite extensions, relative to Trac environment&#8217;s directory or absolute. (<em>since 0.12</em>)</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="svn-section"><code class="docutils literal"><span class="pre">[svn]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="93%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">branches</span></code></td>
+<td>Comma separated list of paths categorized as branches. If a path ends with &#8216;*&#8217;, then all the directory entries found below that path will be included. Example: <code class="docutils literal"><span class="pre">/trunk,</span> <span class="pre">/branches/*,</span> <span class="pre">/projectAlpha/trunk,</span> <span class="pre">/sandbox/*</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">tags</span></code></td>
+<td>Comma separated list of paths categorized as tags. If a path ends with &#8216;*&#8217;, then all the directory entries found below that path will be included. Example: <code class="docutils literal"><span class="pre">/tags/*,</span> <span class="pre">/projectAlpha/tags/A-1.0,</span> <span class="pre">/projectAlpha/tags/A-v1.1</span></code></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="ticket-section"><code class="docutils literal"><span class="pre">[ticket]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="94%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">default_cc</span></code></td>
+<td>Default cc: list for newly created tickets.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">default_component</span></code></td>
+<td>Default component for newly created tickets.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">default_description</span></code></td>
+<td>Default description for newly created tickets.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">default_keywords</span></code></td>
+<td>Default keywords for newly created tickets.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">default_milestone</span></code></td>
+<td>Default milestone for newly created tickets.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">default_owner</span></code></td>
+<td>Default owner for newly created tickets.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">default_priority</span></code></td>
+<td>Default priority for newly created tickets.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">default_resolution</span></code></td>
+<td>Default resolution for resolving (closing) tickets (<em>since 0.11</em>).</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">default_severity</span></code></td>
+<td>Default severity for newly created tickets.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">default_summary</span></code></td>
+<td>Default summary (title) for newly created tickets.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">default_type</span></code></td>
+<td>Default type for newly created tickets (<em>since 0.9</em>).</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">default_version</span></code></td>
+<td>Default version for newly created tickets.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">max_comment_size</span></code></td>
+<td>Don&#8217;t accept tickets with a too big comment. (<em>since 0.11.2</em>)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">max_description_size</span></code></td>
+<td>Don&#8217;t accept tickets with a too big description. (<em>since 0.11</em>).</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">preserve_newlines</span></code></td>
+<td>Whether Wiki formatter should respect the new lines present in the Wiki text. If set to &#8216;default&#8217;, this is equivalent to &#8216;yes&#8217; for new environments but keeps the old behavior for upgraded environments (i.e. &#8216;no&#8217;). (<em>since 0.11</em>).</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">restrict_owner</span></code></td>
+<td>Make the owner field of tickets use a drop-down menu. Be sure to understand the performance implications before activating this option. See <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTickets.html#Assign-toasDrop-DownList">Assign-to as Drop-Down List</a>. Please note that e-mail addresses are <strong>not</strong> obfuscated in the resulting drop-down menu, so this option should not be used if e-mail addresses must remain protected. (<em>since 0.9</em>)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">workflow</span></code></td>
+<td>Ordered list of workflow controllers to use for ticket actions (<em>since 0.11</em>).</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="timeline-section"><code class="docutils literal"><span class="pre">[timeline]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="88%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">abbreviated_messages</span></code></td>
+<td>Whether wiki-formatted event messages should be truncated or not. This only affects the default rendering, and can be overriden by specific event providers, see their own documentation. (<em>Since 0.11</em>)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">changeset_collapse_events</span></code></td>
+<td>Whether consecutive changesets from the same author having exactly the same message should be presented as one event. That event will link to the range of changesets in the log view. (<em>since 0.11</em>)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">changeset_long_messages</span></code></td>
+<td>Whether wiki-formatted changeset messages should be multiline or not. If this option is not specified or is false and <code class="docutils literal"><span class="pre">wiki_format_messages</span></code> is set to true, changeset messages will be single line only, losing some formatting (bullet points, etc).</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">changeset_show_files</span></code></td>
+<td>Number of files to show (<code class="docutils literal"><span class="pre">-1</span></code> for unlimited, <code class="docutils literal"><span class="pre">0</span></code> to disable). This can also be <code class="docutils literal"><span class="pre">location</span></code>, for showing the common prefix for the changed files. (since 0.11).</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">default_daysback</span></code></td>
+<td>Default number of days displayed in the Timeline, in days. (<em>since 0.9.</em>)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">max_daysback</span></code></td>
+<td>Maximum number of days (-1 for unlimited) displayable in the Timeline. (<em>since 0.11</em>)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">newticket_formatter</span></code></td>
+<td>Which formatter flavor (e.g. &#8216;html&#8217; or &#8216;oneliner&#8217;) should be used when presenting the description for new tickets. If &#8216;oneliner&#8217;, the [timeline] abbreviated_messages option applies. (<em>since 0.11</em>).</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">ticket_show_details</span></code></td>
+<td>Enable the display of all ticket changes in the timeline, not only open / close operations (<em>since 0.9</em>).</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="trac-section"><code class="docutils literal"><span class="pre">[trac]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="94%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">authz_file</span></code></td>
+<td>The path to the Subversion <a class="reference external" href="http://svnbook.red-bean.com/en/1.5/svn.serverconfig.pathbasedauthz.html">​authorization (authz) file</a>. To enable authz permission checking, the <code class="docutils literal"><span class="pre">AuthzSourcePolicy</span></code> permission policy must be added to <code class="docutils literal"><span class="pre">[trac]</span> <span class="pre">permission_policies</span></code>.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">authz_module_name</span></code></td>
+<td>The module prefix used in the <code class="docutils literal"><span class="pre">authz_file</span></code> for the default repository. If left empty, the global section is used.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">auto_preview_timeout</span></code></td>
+<td>Inactivity timeout in seconds after which the automatic wiki preview triggers an update. This option can contain floating-point values. The lower the setting, the more requests will be made to the server. Set this to 0 to disable automatic preview. The default is 2.0 seconds. (<em>since 0.12</em>)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">auto_reload</span></code></td>
+<td>Automatically reload template files after modification.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">backup_dir</span></code></td>
+<td>Database backup location</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">base_url</span></code></td>
+<td>Reference URL for the Trac deployment. This is the base URL that will be used when producing documents that will be used outside of the web browsing context, like for example when inserting URLs pointing to Trac resources in notification e-mails.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">check_auth_ip_mask</span></code></td>
+<td>What mask should be applied to user address.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">database</span></code></td>
+<td>Database connection <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracEnvironment.html#DatabaseConnectionStrings">string</a> for this project</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">debug_sql</span></code></td>
+<td>Show the SQL queries in the Trac log, at DEBUG level. <em>(Since 0.11.5)</em></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">default_charset</span></code></td>
+<td>Charset to be used when in doubt.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">default_handler</span></code></td>
+<td>Name of the component that handles requests to the base URL. Options include <code class="docutils literal"><span class="pre">TimelineModule</span></code>, <code class="docutils literal"><span class="pre">RoadmapModule</span></code>, <code class="docutils literal"><span class="pre">BrowserModule</span></code>, <code class="docutils literal"><span class="pre">QueryModule</span></code>, <code class="docutils literal"><span class="pre">ReportModule</span></code>, <code class="docutils literal"><span class="pre">TicketModule</span></code> and <code class="docutils literal"><span class="pre">WikiModule</span></code>. The default is <code class="docutils literal"><span class="pre">WikiModule</span></code>. (<em>since 0.9</em>)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">default_language</span></code></td>
+<td>The preferred language to use if no user preference has been set. (<em>since 0.12.1</em>)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">default_timezone</span></code></td>
+<td>The default timezone to use</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">genshi_cache_size</span></code></td>
+<td>The maximum number of templates that the template loader will cache in memory. The default value is 128. You may want to choose a higher value if your site uses a larger number of templates, and you have enough memory to spare, or you can reduce it if you are short on memory.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">htdocs_location</span></code></td>
+<td>Base URL for serving the core static resources below <code class="docutils literal"><span class="pre">/chrome/common/</span></code>. It can be left empty, and Trac will simply serve those resources itself. Advanced users can use this together with <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracAdmin.html">trac-admin ... deploy &lt;deploydir&gt;</a> to allow serving the static resources for Trac directly from the web server. Note however that this only applies to the <code class="docutils literal"><span class="pre">&lt;deploydir&gt;/htdocs/common</span></code> directory, the other deployed resources (i.e. those from plugins) will not be made available this way and additional rewrite rules will be needed in the web server.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">mainnav</span></code></td>
+<td>Order of the items to display in the <code class="docutils literal"><span class="pre">mainnav</span></code> navigation bar, listed by IDs. See also <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracNavigation.html">TracNavigation</a>.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">metanav</span></code></td>
+<td>Order of the items to display in the <code class="docutils literal"><span class="pre">metanav</span></code> navigation bar, listed by IDs. See also <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracNavigation.html">TracNavigation</a>.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">mysqldump_path</span></code></td>
+<td>Location of mysqldump for MySQL database backups</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">never_obfuscate_mailto</span></code></td>
+<td>Never obfuscate <code class="docutils literal"><span class="pre">mailto:</span></code> links explicitly written in the wiki, even if <code class="docutils literal"><span class="pre">show_email_addresses</span></code> is false or the user has not the EMAIL_VIEW permission (<em>since 0.11.6</em>).</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">permission_policies</span></code></td>
+<td>List of components implementing <code class="docutils literal"><span class="pre">IPermissionPolicy</span></code>, in the order in which they will be applied. These components manage fine-grained access control to Trac resources. Defaults to the <a class="reference external" href="https://docs.pagure.org/sssd-test2/DefaultPermissionPolicy.html">DefaultPermissionPolicy?</a> (pre-0.11 behavior) and <a class="reference external" href="https://docs.pagure.org/sssd-test2/LegacyAttachmentPolicy.html">LegacyAttachmentPolicy?</a> (map ATTACHMENT_* permissions to realm specific ones)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">permission_store</span></code></td>
+<td>Name of the component implementing <code class="docutils literal"><span class="pre">IPermissionStore</span></code>, which is used for managing user and group permissions.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">pg_dump_path</span></code></td>
+<td>Location of pg_dump for Postgres database backups</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">repository_dir</span></code></td>
+<td>Path to the default repository. This can also be a relative path (<em>since 0.11</em>). This option is deprecated, and repositories should be defined in the <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#repositories-section">repositories</a> section, or using the &#8220;Repositories&#8221; admin panel. (<em>since 0.12</em>)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">repository_sync_per_request</span></code></td>
+<td>List of repositories that should be synchronized on every page request. Leave this option empty if you have set up post-commit hooks calling <code class="docutils literal"><span class="pre">trac-admin</span> <span class="pre">$ENV</span> <span class="pre">changeset</span> <span class="pre">added</span></code> on all your repositories (recommended). Otherwise, set it to a comma-separated list of repository names. Note that this will negatively affect performance, and will prevent changeset listeners from receiving events from the repositories specified here. The default is to synchronize the default repository, for backward compatibility. (<em>since 0.12</em>)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">repository_type</span></code></td>
+<td>Default repository connector type. (<em>since 0.10</em>) This is also used as the default repository type for repositories defined in <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#repositories-section%20repositories">TracIni#repositories-section repositories</a> or using the &#8220;Repositories&#8221; admin panel. (<em>since 0.12</em>)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">request_filters</span></code></td>
+<td>Ordered list of filters to apply to all requests (<em>since 0.10</em>).</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">resizable_textareas</span></code></td>
+<td>Make <code class="docutils literal"><span class="pre">&lt;textarea&gt;</span></code> fields resizable. Requires JavaScript. (<em>since 0.12</em>)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">secure_cookies</span></code></td>
+<td>Restrict cookies to HTTPS connections. When true, set the <code class="docutils literal"><span class="pre">secure</span></code> flag on all cookies so that they are only sent to the server on HTTPS connections. Use this if your Trac instance is only accessible through HTTPS. (<em>since 0.11.2</em>)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">show_email_addresses</span></code></td>
+<td>Show email addresses instead of usernames. If false, we obfuscate email addresses. (<em>since 0.11</em>)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">show_ip_addresses</span></code></td>
+<td>Show IP addresses for resource edits (e.g. wiki). (<em>since 0.11.3</em>)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">timeout</span></code></td>
+<td>Timeout value for database connection, in seconds. Use &#8216;0&#8217; to specify <em>no timeout</em>. <em>(Since 0.11)</em></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">use_base_url_for_redirect</span></code></td>
+<td>Optionally use <code class="docutils literal"><span class="pre">[trac]</span> <span class="pre">base_url</span></code> for redirects. In some configurations, usually involving running Trac behind a HTTP proxy, Trac can&#8217;t automatically reconstruct the URL that is used to access it. You may need to use this option to force Trac to use the <code class="docutils literal"><span class="pre">base_url</span></code> setting also for redirects. This introduces the obvious limitation that this environment will only be usable when accessible from that URL, as redirects are frequently used. <em>(since 0.10.5)</em></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="tracbzr-section"><code class="docutils literal"><span class="pre">[tracbzr]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="93%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">include_sideline_changes</span></code></td>
+<td>Include sideline changes in the list of changes. This option controls whether sideline changes (i.e. changes with dotted revision numbers only) are included in the list of changes as reported by the timeline view. Note that there might be other plugins using that information as well, so there might be other components beside the timeline view that get affected by this setting. Defaults to True.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">primary_branches</span></code></td>
+<td>Ordered list of primary branches. These will be listed first in the Branches macro. When viewing the timeline, each changeset will be associated with the first primary branch that contains it. The value is a comma separated list of globs, as used by the fnmatch module. An empty list element can be used to denote the branch at the root of the repository. Defaults to &#8216;trunk&#8217;.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="versioncontrol-section"><code class="docutils literal"><span class="pre">[versioncontrol]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="15%" />
+<col width="85%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">allowed_repository_dir_prefixes</span></code></td>
+<td>Comma-separated list of allowed prefixes for repository directories when adding and editing repositories in the repository admin panel. If the list is empty, all repository directories are allowed. (<em>since 0.12.1</em>)</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="watchlist-section"><code class="docutils literal"><span class="pre">[watchlist]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="39%" />
+<col width="61%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">notifications</span></code></td>
+<td>Enables notification features</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric" id="wiki-section"><code class="docutils literal"><span class="pre">[wiki]</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="92%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">ignore_missing_pages</span></code></td>
+<td>Enable/disable highlighting <a class="reference external" href="https://docs.pagure.org/sssd-test2/CamelCase.html">CamelCase</a> links to missing pages (<em>since 0.9</em>).</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">max_size</span></code></td>
+<td>Maximum allowed wiki page size in bytes. (<em>since 0.11.2</em>)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">render_unsafe_content</span></code></td>
+<td>Enable/disable the use of unsafe HTML tags such as <code class="docutils literal"><span class="pre">&lt;script&gt;</span></code> or <code class="docutils literal"><span class="pre">&lt;embed&gt;</span></code> with the HTML <a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiProcessors.html">WikiProcessor</a> (<em>since 0.10.4</em>). For public sites where anonymous users can edit the wiki it is recommended to leave this option disabled (which is the default).</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">safe_schemes</span></code></td>
+<td>List of URI schemes considered &#8220;safe&#8221;, that will be rendered as external links even if <code class="docutils literal"><span class="pre">[wiki]</span> <span class="pre">render_unsafe_content</span></code> is <code class="docutils literal"><span class="pre">false</span></code>. (<em>since 0.11.8</em>)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">split_page_names</span></code></td>
+<td>Enable/disable splitting the <a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiPageNames.html">WikiPageNames</a> with space characters (<em>since 0.10</em>).</td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<div class="section" id="reference-for-special-sections">
+<h2>Reference for special sections<a class="headerlink" href="#reference-for-special-sections" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><a class="reference external" href="#components-section">[components]</a></li>
+<li><a class="reference external" href="#extra-permissions-section">[extra-permissions]</a></li>
+<li><a class="reference external" href="#milestone-groups-section">[milestone-groups]</a></li>
+<li><a class="reference external" href="#repositories-section">[repositories]</a></li>
+<li><a class="reference external" href="#svn:externals-section">[svn:externals]</a></li>
+<li><a class="reference external" href="#ticket-custom-section">[ticket-custom]</a></li>
+<li><a class="reference external" href="#ticket-workflow-section">[ticket-workflow]</a></li>
+</ol>
+<div class="section" id="components">
+<h3>[components]<a class="headerlink" href="#components" title="Permalink to this headline">¶</a></h3>
+<p>This section is used to enable or disable components provided by
+plugins, as well as by Trac itself. The component to enable/disable is
+specified via the name of the option. Whether its enabled is determined
+by the option value; setting the value to <code class="docutils literal"><span class="pre">enabled</span></code> or <code class="docutils literal"><span class="pre">on</span></code> will
+enable the component, any other value (typically <code class="docutils literal"><span class="pre">disabled</span></code> or
+<code class="docutils literal"><span class="pre">off</span></code>) will disable the component.</p>
+<p>The option name is either the fully qualified name of the components or
+the module/package prefix of the component. The former enables/disables
+a specific component, while the latter enables/disables any component in
+the specified package/module.</p>
+<p>Consider the following configuration snippet:</p>
+<p>The first option tells Trac to disable the <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracReports.html">report
+module</a>. The
+second option instructs Trac to enable all components in the
+<code class="docutils literal"><span class="pre">webadmin</span></code> package. Note that the trailing wildcard is required for
+module/package matching.</p>
+<p>See the <em>Plugins</em> page on <em>About Trac</em> to get the list of active
+components (requires <code class="docutils literal"><span class="pre">CONFIG_VIEW</span></code>
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracPermissions.html">permissions</a>.)</p>
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracPlugins.html">TracPlugins</a></p>
+</div>
+<div class="section" id="extra-permissions">
+<h3>[extra-permissions]<a class="headerlink" href="#extra-permissions" title="Permalink to this headline">¶</a></h3>
+<p><em>(since 0.12)</em></p>
+<p>Custom additional permissions can be defined in this section when
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/ExtraPermissionsProvider.html">ExtraPermissionsProvider?</a>
+is enabled.</p>
+</div>
+<div class="section" id="milestone-groups">
+<h3>[milestone-groups]<a class="headerlink" href="#milestone-groups" title="Permalink to this headline">¶</a></h3>
+<p><em>(since 0.11)</em></p>
+<p>As the workflow for tickets is now configurable, there can be many
+ticket states, and simply displaying closed tickets vs. all the others
+is maybe not appropriate in all cases. This section enables one to
+easily create <em>groups</em> of states that will be shown in different colors
+in the milestone progress bar.</p>
+<p>Example configuration (the default only has closed and active):</p>
+<p>The definition consists in a comma-separated list of accepted status.
+Also, &#8216;*&#8217; means any status and could be used to associate all remaining
+states to one catch-all group.</p>
+<p>The CSS class can be one of: new (yellow), open (no color) or closed
+(green). New styles can easily be added using the following selector:
+<code class="docutils literal"><span class="pre">table.progress</span> <span class="pre">td.&lt;class&gt;</span></code></p>
+</div>
+<div class="section" id="repositories">
+<h3>[repositories]<a class="headerlink" href="#repositories" title="Permalink to this headline">¶</a></h3>
+<p>(<em>since 0.12</em> multirepos)</p>
+<p>One of the alternatives for registering new repositories is to populate
+the <code class="docutils literal"><span class="pre">[repositories]</span></code> section of the trac.ini.</p>
+<p>This is especially suited for setting up convenience aliases,
+short-lived repositories, or during the initial phases of an
+installation.</p>
+<p>See
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracRepositoryAdmin.html#Intrac.ini">TracRepositoryAdmin</a>
+for details about the format adopted for this section and the rest of
+that page for the other alternatives.</p>
+</div>
+<div class="section" id="svn-externals">
+<h3>[svn:externals]<a class="headerlink" href="#svn-externals" title="Permalink to this headline">¶</a></h3>
+<p><em>(since 0.11)</em></p>
+<p>The
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracBrowser.html">TracBrowser</a>
+for Subversion can interpret the <code class="docutils literal"><span class="pre">svn:externals</span></code> property of folders.
+By default, it only turns the URLs into links as Trac can&#8217;t browse
+remote repositories.</p>
+<p>However, if you have another Trac instance (or an other repository
+browser like <a class="reference external" href="http://www.viewvc.org/">​ViewVC</a>) configured to browse
+the target repository, then you can instruct Trac which other repository
+browser to use for which external URL.</p>
+<p>This mapping is done in the <code class="docutils literal"><span class="pre">[svn:externals]</span></code> section of the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">TracIni</a></p>
+<p>Example:</p>
+<p>With the above, the
+<code class="docutils literal"><span class="pre">svn://anotherserver.com/tools_repository/tags/1.1/tools</span></code> external
+will be mapped to
+<code class="docutils literal"><span class="pre">http://ourserver/tracs/tools/browser/tags/1.1/tools?rev=</span></code> (and
+<code class="docutils literal"><span class="pre">rev</span></code> will be set to the appropriate revision number if the external
+additionally specifies a revision, see the <a class="reference external" href="http://svnbook.red-bean.com/en/1.4/svn.advanced.externals.html">​SVN Book on
+externals</a>
+for more details).</p>
+<p>Note that the number used as a key in the above section is purely used
+as a place holder, as the URLs themselves can&#8217;t be used as a key due to
+various limitations in the configuration file parser.</p>
+<p>Finally, the relative URLs introduced in <a class="reference external" href="http://subversion.tigris.org/svn_1.5_releasenotes.html#externals">​Subversion
+1.5</a>
+are not yet supported.</p>
+</div>
+<div class="section" id="ticket-custom">
+<h3>[ticket-custom]<a class="headerlink" href="#ticket-custom" title="Permalink to this headline">¶</a></h3>
+<p>In this section, you can define additional fields for tickets. See
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTicketsCustomFields.html">TracTicketsCustomFields</a>
+for more details.</p>
+</div>
+<div class="section" id="ticket-workflow">
+<h3>[ticket-workflow]<a class="headerlink" href="#ticket-workflow" title="Permalink to this headline">¶</a></h3>
+<p><em>(since 0.11)</em></p>
+<p>The workflow for tickets is controlled by plugins. By default, there&#8217;s
+only a <code class="docutils literal"><span class="pre">ConfigurableTicketWorkflow</span></code> component in charge. That
+component allows the workflow to be configured via this section in the
+trac.ini file. See
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracWorkflow.html">TracWorkflow</a>
+for more details.</p>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracGuide.html">TracGuide</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracAdmin.html">TracAdmin</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracEnvironment.html">TracEnvironment</a></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">The Trac Configuration File</a><ul>
+<li><a class="reference internal" href="#global-configuration">Global Configuration</a></li>
+<li><a class="reference internal" href="#reference-for-settings">Reference for settings</a></li>
+<li><a class="reference internal" href="#reference-for-special-sections">Reference for special sections</a><ul>
+<li><a class="reference internal" href="#components">[components]</a></li>
+<li><a class="reference internal" href="#extra-permissions">[extra-permissions]</a></li>
+<li><a class="reference internal" href="#milestone-groups">[milestone-groups]</a></li>
+<li><a class="reference internal" href="#repositories">[repositories]</a></li>
+<li><a class="reference internal" href="#svn-externals">[svn:externals]</a></li>
+<li><a class="reference internal" href="#ticket-custom">[ticket-custom]</a></li>
+<li><a class="reference internal" href="#ticket-workflow">[ticket-workflow]</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracIni.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracIni.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

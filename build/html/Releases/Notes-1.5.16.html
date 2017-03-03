@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Fix for older openldap libraries that can fail setting the &#8220;no
+canonicalization&#8221; option</li>
+<li>pam_sss will now return authinfo_unavail when the SSSD daemon is
+shut down, instead of PAM_SYSTEM_ERR</li>
+<li>Fixes a regression in LDAP failover handling</li>
+<li>Adds support for using Glib to provide unicode support instead of
+libunistring<ul>
+<li>SSSD must be built with the configure flag
+<code class="docutils literal"><span class="pre">--with-unicode-lib=glib2</span></code></li>
+</ul>
+</li>
+<li>All user/group/netgroup names passed to NSS/PAM are now validated to
+be valid UTF-8 strings</li>
+</ul>
+</div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Jakub Hrozek (1):</p>
+<ul class="simple">
+<li>LDAP provider: Error while setting the nocanon option should not be
+fatal</li>
+</ul>
+<p>Jan Zeleny (2):</p>
+<ul class="simple">
+<li>Fixed an error in macro for merging double linked lists</li>
+<li>Fixed incorrect return code in PAM client</li>
+</ul>
+<p>Krzysztof Klimonda (1):</p>
+<ul class="simple">
+<li>Fix FTBFS related to -Werror=format-security</li>
+</ul>
+<p>Simo Sorce (1):</p>
+<ul class="simple">
+<li>Use neutral name for functions used by both pam and nss</li>
+</ul>
+<p>Stephen Gallagher (10):</p>
+<ul class="simple">
+<li>Bumping version to 1.5.16</li>
+<li>RESPONDER: Ensure that all input strings are valid UTF-8</li>
+<li>Add -fno-strict-aliasing</li>
+<li>LDAP: Try next failover server on any error</li>
+<li>Allow using Glib for UTF8 support</li>
+<li>Ignore NULL-terminator when checking UTF8-validity</li>
+<li>DEBUG: fix bad backport containing new DEBUG representation</li>
+<li>Ignore NULL-terminator when checking UTF8-validity for netgroups</li>
+<li>Translation update</li>
+<li>Adding new translation files</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.5.16.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.5.16.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="libini-config">
+<h2>libini_config<a class="headerlink" href="#libini-config" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>This release adds an API to create, modify and save INI files</li>
+<li>Merging configuration snippets installed in different locations is
+supported</li>
+</ul>
+</div>
+<div class="section" id="libcollection">
+<h2>libcollection<a class="headerlink" href="#libcollection" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>New functions: <code class="docutils literal"><span class="pre">col_get_dup_item</span></code>, <code class="docutils literal"><span class="pre">col_delete_item_with_cb</span></code>,
+<code class="docutils literal"><span class="pre">col_remove_item_with_cb</span></code></li>
+</ul>
+</div>
+</div>
+<div class="section" id="note-for-distribution-packagers">
+<h1>Note for distribution packagers<a class="headerlink" href="#note-for-distribution-packagers" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>New public header file <code class="docutils literal"><span class="pre">ini_configmod.h</span></code></li>
+<li>API and ABI is backward compatible with last release (0.4.0)</li>
+</ul>
+</div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Dmitri Pal (22):</p>
+<ul class="simple">
+<li>Print info when array is empty</li>
+<li>Declaring new internal access check function</li>
+<li>Refactored access control check</li>
+<li>New function to merge snippets</li>
+<li>Test file for unit test</li>
+<li>[INI] Make the merge function build</li>
+<li>Function to return one of the dups</li>
+<li>Allow to modify item name</li>
+<li>Expose delete with callback function</li>
+<li>Comment creation helper</li>
+<li>Comment can be NULL</li>
+<li>Move definition to common header</li>
+<li>Fix wrapping error</li>
+<li>New interface to modify configuration</li>
+<li>Build new interface</li>
+<li>Generate doxy doc for INI modification API</li>
+<li>Cleaning doxygen comments</li>
+<li>Change order of the headers</li>
+<li>New interface to save configuration in a file</li>
+<li>Implementation of the interface to save configuration</li>
+<li>Unit test for the save interface</li>
+<li>Build new tests for the save interface</li>
+</ul>
+<p>Lukas Slebodnik (10):</p>
+<ul class="simple">
+<li>SPEC: Use correct soname for packages lib{collection,ini_config}</li>
+<li>SPEC: Do not include compiled files into package libdhash-devel</li>
+<li>ini_config_ut: enable verbose mode with env variable</li>
+<li>collection: Add new function col_remove_item_with_cb</li>
+<li>INI: Fix memory leak with INI_VA_CLEAN</li>
+<li>COLLECTION: Return the last duplicate for big index</li>
+<li>INI: Fix adding string with INI_VA_MODADD_E and big index</li>
+<li>INI: Add check based test ini_configmod_ut_check</li>
+<li>Bump version-info</li>
+<li>Update versions before 0.5.0 release</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a><ul>
+<li><a class="reference internal" href="#libini-config">libini_config</a></li>
+<li><a class="reference internal" href="#libcollection">libcollection</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#note-for-distribution-packagers">Note for distribution packagers</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/DingNotes-0.5.0.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/DingNotes-0.5.0.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

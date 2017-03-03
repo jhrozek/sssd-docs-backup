@@ -1,0 +1,444 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Trac Permissions &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="trac-permissions">
+<h1>Trac Permissions<a class="headerlink" href="#trac-permissions" title="Permalink to this headline">¶</a></h1>
+<div class="system-message"><p><strong>Error: Macro TracGuideToc(None) failed</strong></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;NoneType&#39;</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span> <span class="s1">&#39;find&#39;</span>
+</pre></div>
+</div>
+</div><p>Trac uses a simple, case sensitive, permission system to control what
+users can and can&#8217;t access.</p>
+<p>Permission privileges are managed using the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracAdmin.html">trac-admin</a> tool
+or (new in version 0.11) the <em>General / Permissions</em> panel in the
+<em>Admin</em> tab of the web interface.</p>
+<p>In addition to the default permission policy described in this page, it
+is possible to activate additional permission policies by enabling
+plugins and listing them in the <code class="docutils literal"><span class="pre">[trac]</span> <span class="pre">permission_policies</span></code>
+configuration entry in the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">TracIni</a>. See
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracFineGrainedPermissions.html">TracFineGrainedPermissions</a>
+for more details.</p>
+<p>Non-authenticated users accessing the system are assigned the name
+&#8220;anonymous&#8221;. Assign permissions to the &#8220;anonymous&#8221; user to set
+privileges for anonymous/guest users. The parts of Trac that a user does
+not have the privileges for will not be displayed in the navigation. In
+addition to these privileges, users can be granted additional individual
+rights in effect when authenticated and logged into the system. All
+logged in users belong to the virtual group &#8220;authenticated&#8221;, which
+inherits permissions from &#8220;anonymous&#8221;.</p>
+<div class="section" id="graphical-admin-tab">
+<h2>Graphical Admin Tab<a class="headerlink" href="#graphical-admin-tab" title="Permalink to this headline">¶</a></h2>
+<p><em>This feature is new in version 0.11.</em></p>
+<p>To access this tab, a user must have one of the following permissions:
+<code class="docutils literal"><span class="pre">TRAC_ADMIN</span></code>, <code class="docutils literal"><span class="pre">PERMISSION_ADMIN</span></code>, <code class="docutils literal"><span class="pre">PERMISSION_ADD</span></code>,
+<code class="docutils literal"><span class="pre">PERMISSION_REMOVE</span></code>. The permissions can granted using the
+<code class="docutils literal"><span class="pre">trac-admin</span></code> command (more on <code class="docutils literal"><span class="pre">trac-admin</span></code> below):</p>
+<p>Then, the user <code class="docutils literal"><span class="pre">bob</span></code> will be able to see the Admin tab, and can then
+access the permissions menu. This menu will allow you to perform all the
+following actions, but from the browser without requiring root access to
+the server (just the correct permissions for your user account). <strong>Use
+at least one lowercase character in user names, as all-uppercase names
+are reserved for permissions.</strong></p>
+<ol class="arabic simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/chrome/site/../common/guide/admin.png"><img alt="admin.png" src="https://fedorahosted.org/sssd/chrome/site/../common/guide/admin.png" /></a></li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/chrome/site/../common/guide/admin-permissions.png"><img alt="admin-permissions.png" src="https://fedorahosted.org/sssd/chrome/site/../common/guide/admin-permissions.png" /></a></li>
+<li><a href="#id1"><span class="problematic" id="id2">|admin-permissions-TICKET\_ADMIN.png|</span></a></li>
+</ol>
+<p>An easy way to quickly secure a new Trac install is to run the above
+command on the anonymous user, install the
+<a class="reference external" href="http://trac-hacks.org/wiki/AccountManagerPlugin">​AccountManagerPlugin</a>,
+create a new admin account graphically and then remove the TRAC_ADMIN
+permission from the anonymous user.</p>
+</div>
+<div class="section" id="available-privileges">
+<h2>Available Privileges<a class="headerlink" href="#available-privileges" title="Permalink to this headline">¶</a></h2>
+<p>To enable all privileges for a user, use the <code class="docutils literal"><span class="pre">TRAC_ADMIN</span></code> permission.
+Having <code class="docutils literal"><span class="pre">TRAC_ADMIN</span></code> is like being <code class="docutils literal"><span class="pre">root</span></code> on a *NIX system: it will
+allow you to perform any operation.</p>
+<p>Otherwise, individual privileges can be assigned to users for the
+various different functional areas of Trac (<strong>note that the privilege
+names are case-sensitive</strong>):</p>
+<div class="section" id="repository-browser">
+<h3>Repository Browser<a class="headerlink" href="#repository-browser" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="14%" />
+<col width="86%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">BROWSER_VIEW</span></code></td>
+<td>View directory listings in the <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracBrowser.html">repository browser</a></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">LOG_VIEW</span></code></td>
+<td>View revision logs of files and directories in the <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracBrowser.html">repository browser</a></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">FILE_VIEW</span></code></td>
+<td>View files in the <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracBrowser.html">repository browser</a></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">CHANGESET_VIEW</span></code></td>
+<td>View <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracChangeset.html">repository check-ins</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="ticket-system">
+<h3>Ticket System<a class="headerlink" href="#ticket-system" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="92%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">TICKET_VIEW</span></code></td>
+<td>View existing <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTickets.html">tickets</a> and perform <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracQuery.html">ticket queries</a></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">TICKET_CREATE</span></code></td>
+<td>Create new <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTickets.html">tickets</a></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">TICKET_APPEND</span></code></td>
+<td>Add comments or attachments to <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTickets.html">tickets</a></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">TICKET_CHGPROP</span></code></td>
+<td>Modify <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTickets.html">ticket</a> properties (priority, assignment, keywords, etc.) with the following exceptions: edit description field, add/remove other users from cc field when logged in, and set email to pref</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">TICKET_MODIFY</span></code></td>
+<td>Includes both <code class="docutils literal"><span class="pre">TICKET_APPEND</span></code> and <code class="docutils literal"><span class="pre">TICKET_CHGPROP</span></code>, and in addition allows resolving <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTickets.html">tickets</a>. Tickets can be assigned to users through a <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTickets.html#Assign-toasDrop-DownList">drop-down list</a> when the list of possible owners has been restricted.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">TICKET_EDIT_CC</span></code></td>
+<td>Full modify cc field</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">TICKET_EDIT_DESCRIPTION</span></code></td>
+<td>Modify description field</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">TICKET_EDIT_COMMENT</span></code></td>
+<td>Modify comments</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">TICKET_ADMIN</span></code></td>
+<td>All <code class="docutils literal"><span class="pre">TICKET_*</span></code> permissions, plus the deletion of ticket attachments and modification of the reporter and description fields. It also allows managing ticket properties in the <a class="reference external" href="https://docs.pagure.org/sssd-test2/WebAdmin.html">WebAdmin?</a> panel.</td>
+</tr>
+</tbody>
+</table>
+<p>Attention: the &#8220;view tickets&#8221; button appears with the <code class="docutils literal"><span class="pre">REPORT_VIEW</span></code>
+permission.</p>
+</div>
+<div class="section" id="roadmap">
+<h3>Roadmap<a class="headerlink" href="#roadmap" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="11%" />
+<col width="89%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">MILESTONE_VIEW</span></code></td>
+<td>View milestones and assign tickets to milestones.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">MILESTONE_CREATE</span></code></td>
+<td>Create a new milestone</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">MILESTONE_MODIFY</span></code></td>
+<td>Modify existing milestones</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">MILESTONE_DELETE</span></code></td>
+<td>Delete milestones</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">MILESTONE_ADMIN</span></code></td>
+<td>All <code class="docutils literal"><span class="pre">MILESTONE_*</span></code> permissions</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">ROADMAP_VIEW</span></code></td>
+<td>View the <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracRoadmap.html">roadmap</a> page, is not (yet) the same as MILESTONE_VIEW, see <a class="reference external" href="http://trac.edgewall.org/intertrac/%234292">​#4292</a></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">ROADMAP_ADMIN</span></code></td>
+<td>to be removed with <a class="reference external" href="http://trac.edgewall.org/intertrac/%233022">​#3022</a>, replaced by MILESTONE_ADMIN</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="reports">
+<h3>Reports<a class="headerlink" href="#reports" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="82%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">REPORT_VIEW</span></code></td>
+<td>View <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracReports.html">reports</a>, i.e. the &#8220;view tickets&#8221; link.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">REPORT_SQL_VIEW</span></code></td>
+<td>View the underlying SQL query of a <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracReports.html">report</a></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">REPORT_CREATE</span></code></td>
+<td>Create new <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracReports.html">reports</a></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">REPORT_MODIFY</span></code></td>
+<td>Modify existing <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracReports.html">reports</a></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">REPORT_DELETE</span></code></td>
+<td>Delete <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracReports.html">reports</a></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">REPORT_ADMIN</span></code></td>
+<td>All <code class="docutils literal"><span class="pre">REPORT_*</span></code> permissions</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="wiki-system">
+<h3>Wiki System<a class="headerlink" href="#wiki-system" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="17%" />
+<col width="83%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">WIKI_VIEW</span></code></td>
+<td>View existing <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracWiki.html">wiki</a> pages</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">WIKI_CREATE</span></code></td>
+<td>Create new <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracWiki.html">wiki</a> pages</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">WIKI_MODIFY</span></code></td>
+<td>Change <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracWiki.html">wiki</a> pages</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">WIKI_RENAME</span></code></td>
+<td>Rename <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracWiki.html">wiki</a> pages</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">WIKI_DELETE</span></code></td>
+<td>Delete <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracWiki.html">wiki</a> pages and attachments</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">WIKI_ADMIN</span></code></td>
+<td>All <code class="docutils literal"><span class="pre">WIKI_*</span></code> permissions, plus the management of <em>readonly</em> pages.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="permissions">
+<h3>Permissions<a class="headerlink" href="#permissions" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="41%" />
+<col width="59%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">PERMISSION_GRANT</span></code></td>
+<td>add/grant a permission</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">PERMISSION_REVOKE</span></code></td>
+<td>remove/revoke a permission</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">PERMISSION_ADMIN</span></code></td>
+<td>All <code class="docutils literal"><span class="pre">PERMISSION_*</span></code> permissions</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="others">
+<h3>Others<a class="headerlink" href="#others" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="88%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">TIMELINE_VIEW</span></code></td>
+<td>View the <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTimeline.html">timeline</a> page</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">SEARCH_VIEW</span></code></td>
+<td>View and execute <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracSearch.html">search</a> queries</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">CONFIG_VIEW</span></code></td>
+<td>Enables additional pages on <em>About Trac</em> that show the current configuration or the list of installed plugins</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">EMAIL_VIEW</span></code></td>
+<td>Shows email addresses even if <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#trac-section">trac show_email_addresses</a> configuration option is false</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="creating-new-privileges">
+<h2>Creating New Privileges<a class="headerlink" href="#creating-new-privileges" title="Permalink to this headline">¶</a></h2>
+<p>To create custom permissions, for example to be used in a custom
+workflow, enable the optional
+<a class="reference external" href="http://trac.edgewall.org/intertrac/ExtraPermissionsProvider">​tracopt.perm.config_perm_provider.ExtraPermissionsProvider</a>
+component in the &#8220;Plugins&#8221; admin panel, and add the desired permissions
+to the <code class="docutils literal"><span class="pre">[extra-permissions]</span></code> section in your
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#extra-permissions-section">trac.ini</a>.
+For more information, please refer to the documentation of the component
+in the admin panel.</p>
+</div>
+<div class="section" id="granting-privileges">
+<h2>Granting Privileges<a class="headerlink" href="#granting-privileges" title="Permalink to this headline">¶</a></h2>
+<p>You grant privileges to users using
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracAdmin.html">trac-admin</a>. The
+current set of privileges can be listed with the following command:</p>
+<p>This command will allow the user <em>bob</em> to delete reports:</p>
+<p>The <code class="docutils literal"><span class="pre">permission</span> <span class="pre">add</span></code> command also accepts multiple privilege names:</p>
+<p>Or add all privileges:</p>
+</div>
+<div class="section" id="permission-groups">
+<h2>Permission Groups<a class="headerlink" href="#permission-groups" title="Permalink to this headline">¶</a></h2>
+<p>There are two built-in groups, &#8220;authenticated&#8221; and &#8220;anonymous&#8221;. Any user
+who has not logged in is automatically in the &#8220;anonymous&#8221; group. Any
+user who has logged in is also in the &#8220;authenticated&#8221; group. The
+&#8220;authenticated&#8221; group inherits permissions from the &#8220;anonymous&#8221; group.
+For example, if the &#8220;anonymous&#8221; group has permission WIKI_MODIFY, it is
+not necessary to add the WIKI_MODIFY permission to the &#8220;authenticated&#8221;
+group as well.</p>
+<p>Custom groups may be defined that inherit permissions from the two
+built-in groups.</p>
+<p>Permissions can be grouped together to form roles such as <em>developer</em>,
+<em>admin</em>, etc.</p>
+<p>Group membership can be checked by doing a <code class="docutils literal"><span class="pre">permission</span> <span class="pre">list</span></code> with no
+further arguments; the resulting output will include group memberships.
+<strong>Use at least one lowercase character in group names, as all-uppercase
+names are reserved for permissions</strong>.</p>
+</div>
+<div class="section" id="adding-a-new-group-and-permissions">
+<h2>Adding a New Group and Permissions<a class="headerlink" href="#adding-a-new-group-and-permissions" title="Permalink to this headline">¶</a></h2>
+<p>Permission groups can be created by assigning a user to a group you wish
+to create, then assign permissions to that group.</p>
+<p>The following will add <em>bob</em> to the new group called <em>beta_testers</em> and
+then will assign WIKI_ADMIN permissions to that group. (Thus, <em>bob</em>
+will inherit the WIKI_ADMIN permission)</p>
+</div>
+<div class="section" id="removing-permissions">
+<h2>Removing Permissions<a class="headerlink" href="#removing-permissions" title="Permalink to this headline">¶</a></h2>
+<p>Permissions can be removed using the &#8216;remove&#8217; command. For example:</p>
+<p>This command will prevent the user <em>bob</em> from deleting reports:</p>
+<p>Just like <code class="docutils literal"><span class="pre">permission</span> <span class="pre">add</span></code>, this command accepts multiple privilege
+names.</p>
+<p>You can also remove all privileges for a specific user:</p>
+<p>Or one privilege for all users:</p>
+</div>
+<div class="section" id="default-permissions">
+<h2>Default Permissions<a class="headerlink" href="#default-permissions" title="Permalink to this headline">¶</a></h2>
+<p>By default on a new Trac installation, the <code class="docutils literal"><span class="pre">anonymous</span></code> user will have
+<em>view</em> access to everything in Trac, but will not be able to create or
+modify anything. On the other hand, the <code class="docutils literal"><span class="pre">authenticated</span></code> users will
+have the permissions to <em>create and modify tickets and wiki pages</em>.</p>
+<p><strong>anonymous</strong></p>
+<p><strong>authenticated</strong></p>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracAdmin.html">TracAdmin</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracGuide.html">TracGuide</a> and
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracFineGrainedPermissions.html">TracFineGrainedPermissions</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Trac Permissions</a><ul>
+<li><a class="reference internal" href="#graphical-admin-tab">Graphical Admin Tab</a></li>
+<li><a class="reference internal" href="#available-privileges">Available Privileges</a><ul>
+<li><a class="reference internal" href="#repository-browser">Repository Browser</a></li>
+<li><a class="reference internal" href="#ticket-system">Ticket System</a></li>
+<li><a class="reference internal" href="#roadmap">Roadmap</a></li>
+<li><a class="reference internal" href="#reports">Reports</a></li>
+<li><a class="reference internal" href="#wiki-system">Wiki System</a></li>
+<li><a class="reference internal" href="#permissions">Permissions</a></li>
+<li><a class="reference internal" href="#others">Others</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#creating-new-privileges">Creating New Privileges</a></li>
+<li><a class="reference internal" href="#granting-privileges">Granting Privileges</a></li>
+<li><a class="reference internal" href="#permission-groups">Permission Groups</a></li>
+<li><a class="reference internal" href="#adding-a-new-group-and-permissions">Adding a New Group and Permissions</a></li>
+<li><a class="reference internal" href="#removing-permissions">Removing Permissions</a></li>
+<li><a class="reference internal" href="#default-permissions">Default Permissions</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracPermissions.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracPermissions.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

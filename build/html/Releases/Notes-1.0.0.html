@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>One serious security issue was resolved related to the kerberos
+provider.<ul>
+<li>Users who authenticate against Kerberos and have cached
+credentials could log in with a zero-length password</li>
+<li>The network exposure of this bug was limited, as users logged in
+this way would not have valid network credentials (by lucky
+accident).</li>
+<li>This issue was present only in the 0.99.x preview releases and not
+in any of the stable releases (0.7.1 and earlier)</li>
+</ul>
+</li>
+<li>Stability fixes since the 0.99.1 preview release</li>
+<li>Added or updated several translations</li>
+<li>Fixed long-standing &#8220;I have no name!&#8221; issue with X-based terminals</li>
+<li>SSSD now passes &#8220;make distcheck&#8221; cleanly</li>
+<li>SSSD PAM now conforms better to standards regarding
+PAM_PRELIM_CHECK</li>
+</ul>
+</div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Göran Uddeborg (2):</p>
+<ul class="simple">
+<li>Update SV translation</li>
+<li>Update SV translation</li>
+</ul>
+<p>Marina Latini (1):</p>
+<ul class="simple">
+<li>Update IT translation</li>
+</ul>
+<p>Martin Nagy (2):</p>
+<ul class="simple">
+<li>Don&#8217;t consider one address with different port numbers as the same</li>
+<li>fail over: Change the first server pick logic</li>
+</ul>
+<p>Sergei V. Kovylov (1):</p>
+<ul class="simple">
+<li>sssd.spec for SLES</li>
+</ul>
+<p>Simo Sorce (2):</p>
+<ul class="simple">
+<li>Fix upgrade bug <a class="reference external" href="https://fedorahosted.org/sssd/ticket/323">#323</a></li>
+<li>Fix ldap child memory hierarchy and other issues</li>
+</ul>
+<p>Stephen Gallagher (14):</p>
+<ul class="simple">
+<li>Properly close STDERR when daemonizing</li>
+<li>Fix tight loop in monitor</li>
+<li>Don&#8217;t set explicit default for &#8220;timeout&#8221; in domains</li>
+<li>Fix warning in server.c</li>
+<li>Raise DEBUG level of sdap_get_generic_done()</li>
+<li>Change default for enumeration to TRUE</li>
+<li>Fix tight-loop in monitor part 2</li>
+<li>Properly handle EINTR from poll()</li>
+<li>Updating ES translation</li>
+<li>Add DEBUG messages to getpwnam_callback and getpwuid_callback</li>
+<li>Clarify access_provider manpage entry</li>
+<li>Do not blindly accept zero-length passwords</li>
+<li>Fix broken password changes for local users</li>
+<li>Release SSSD 1.0</li>
+</ul>
+<p>Sumit Bose (9):</p>
+<ul class="simple">
+<li>Use sys.exit instead of exit</li>
+<li>Check for minimal version of check</li>
+<li>Build python modules in builddir</li>
+<li>Use &#8211;with-ldb-lib-dir while running make distcheck</li>
+<li>Cleanup db files after test run</li>
+<li>disable password migration code</li>
+<li>Handle chauthtok with PAM_PRELIM_CHECK separately</li>
+<li>Do not overwrite valid TGTs when offline</li>
+<li>Fix for <a class="reference external" href="https://fedorahosted.org/sssd/ticket/345">#345</a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.0.0.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.0.0.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

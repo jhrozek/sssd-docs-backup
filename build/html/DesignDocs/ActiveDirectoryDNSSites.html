@@ -1,0 +1,310 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Use Active Directory’s DNS sites &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="use-active-directory-s-dns-sites">
+<h1>Use Active Directory&#8217;s DNS sites<a class="headerlink" href="#use-active-directory-s-dns-sites" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1032">​RFE sssd should support DNS
+sites</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem Statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>In larger Active Directory environments there is typically more than one
+domain controller. Some of them are used for redundancy, others to build
+different administrative domains. But in environments with multiple
+physical locations each location often has at least one local domain
+controller to reduce latency and network load between the locations.</p>
+<p>Now clients have to find the local or nearest domain controller. For
+this the concept of sites was introduce where each physical location can
+be seen as an individual site with a unique name. The naming scheme for
+DNS service records was extended (see e.g.
+<a class="reference external" href="http://technet.microsoft.com/en-us/library/cc759550(v=ws.10).aspx">​http://technet.microsoft.com/en-us/library/cc759550(v=ws.10).aspx</a>)
+so that clients can first try to find the needed service in the local
+site and can fall back to look in the whole domain if there is no local
+service available.</p>
+<p>Additionally clients have to find out about which site they belong to.
+This must be done dynamically because clients might move from one
+location to a different one on regular basis (roaming users). For this a
+special LDAP request, the (C)LDAP ping
+(<a class="reference external" href="http://msdn.microsoft.com/en-us/library/cc223811.aspx">​http://msdn.microsoft.com/en-us/library/cc223811.aspx</a>),
+was introduced.</p>
+</div>
+<div class="section" id="overview-view-of-the-solution">
+<h2>Overview view of the solution<a class="headerlink" href="#overview-view-of-the-solution" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="general-considerations">
+<h3>General considerations<a class="headerlink" href="#general-considerations" title="Permalink to this headline">¶</a></h3>
+<p>The solution in SSSD should take into account that other types of
+domains, e.g. a FreeIPA domain, want to implement their own scheme to
+discover the nearest service of a certain type. A plugin interface where
+the configured ID provider can implement methods to determine the
+location of the client looks like the most flexible solution here.</p>
+<p>Since the currently available (AD sites) or discussed schemes
+(<a class="reference external" href="http://www.freeipa.org/page/V3/DNS_Location_Mechanism">​http://www.freeipa.org/page/V3/DNS_Location_Mechanism</a>)
+use DNS SRV lookups the plugin will be called in this code path. Since
+network lookups will be needed the plugin interface must allow
+asynchronous operations. SSSD prefers the tevent_req style for
+asynchronous operations where the plugin has to provide a *_send and a
+*_recv method. Besides a list of server names which will be handled as
+primary servers, like the servers currently returned by DNS SRV lookups,
+the *_recv method can additionally return a list of fallback servers
+to make full use of the current fallback infrastructure on SSSD.</p>
+</div>
+<div class="section" id="sites-specific-details">
+<h3>Sites specific details<a class="headerlink" href="#sites-specific-details" title="Permalink to this headline">¶</a></h3>
+<p>The plugin of the AD provider will do the following steps:</p>
+<ol class="arabic simple">
+<li>do a DNS lookup to find any DC</li>
+<li>send a CLDAP ping to the first DC returned to get the client&#8217;s site</li>
+<li>after a timeout send a CLDAP ping to the next DC on the list</li>
+<li>if after an overall timeout no response is received the CLDAP lookups
+will be terminated and the client&#8217;s site is unknown</li>
+<li>if the clients site is known a DNS SRV
+_service._protocol.site-name._sites.domain.name for primary server
+and _service._protocol.domain.name for backup server is send,
+otherwise only one with _service._protocol.domain.name is done</li>
+<li>if primary and backup server lists are available all primary servers
+are removed from the backup list</li>
+</ol>
+<p>The results of the different step should be available with one of the
+debug levels reserved for tracing to make debugging easier and to allow
+acceptance tests to validate the behavior with the help of the debug
+logs.</p>
+</div>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<p>struct resolv_ctx should get 3 new members, two function pointer to
+hold the *_send and *_recv method of the plugin and a pointer to
+private data for the plugin. Since most of the structs related to the
+fail-over and resolver code are private a setter method to add the
+pointers should be added as well. This is more flexible than adding
+additional arguments to resolv_init().</p>
+<p>Besides the the service type and protocol and domain, which are all
+available in struct srv_data, the plugin should get a tevent context
+and its private data as arguments. With this the plugin interface might
+look like:</p>
+<p>If a plugin is defined it can then be called in resolve_srv_cont()
+instead of get_srv_query(). If it is not defined either the result of
+get_srv_query() can be used or a default request with the same
+interface as the plugin can be used. I think the latter one would make
+the code flow more easy to follow.</p>
+<p>Additionally, if s backup server list is returned the results must be
+added to the server list in resolve_srv_done().</p>
+<div class="section" id="finding-a-dc-for-the-cldap-ping">
+<h3>Finding a DC for the CLDAP ping<a class="headerlink" href="#finding-a-dc-for-the-cldap-ping" title="Permalink to this headline">¶</a></h3>
+<p>To find any DC in the domain samba look for a _ldap._tcp.domain.name.
+I would suggest to use _ldap._tcp.domain.name as well for the SSSD
+implementation.</p>
+</div>
+<div class="section" id="sending-the-cldap-ping">
+<h3>Sending the CLDAP ping<a class="headerlink" href="#sending-the-cldap-ping" title="Permalink to this headline">¶</a></h3>
+<p>The CLDAP ping is a LDAP search request with a filter like</p>
+<p>and the attribute &#8220;NetLogon&#8221;. The flags given with the NtVer component
+of the search filter will be different for a domain member (AD provider)
+and an IPA server in an environment with trusts (IPA provider).</p>
+<p>A domain member will belong to a site and the following flags from
+/usr/include/samba-4.0/gen_ndr/nbt.h should be used
+&#8216;NETLOGON_NT_VERSION_5 | NETLOGON_NT_VERSION_5EX |
+NETLOGON_NT_VERSION_IP&#8217;. A trusted server does not belong to one of
+the sites of trusting domain so it can only ask for the closest site
+with &#8216;NETLOGON_NT_VERSION_5 | NETLOGON_NT_VERSION_5EX |
+NETLOGON_NT_VERSION_WITH_CLOSEST_SITE&#8217;. Maybe
+NETLOGON_NT_VERSION_WITH_CLOSEST_SITE is useful for a domain member
+as well if e.g. the services on the local site are not available.</p>
+</div>
+<div class="section" id="parsing-the-server-response">
+<h3>Parsing the server response<a class="headerlink" href="#parsing-the-server-response" title="Permalink to this headline">¶</a></h3>
+<p>The server response is a single attribute &#8220;NetLogon&#8221; which is a binary
+blob containing multiple NDR encoded values. This value can be decoded
+with ndr_pull_netlogon_samlogon_response() from the Samba library
+libndr-nbt.</p>
+</div>
+<div class="section" id="side-note-about-struct-resolv-ctx-and-the-usage-of-resolv-init">
+<h3>Side note about struct resolv_ctx and the usage of resolv_init()<a class="headerlink" href="#side-note-about-struct-resolv-ctx-and-the-usage-of-resolv-init" title="Permalink to this headline">¶</a></h3>
+<p>In previous discussions it was said that resolv_init() should be only
+called once during the initialization of a provider, preferable from the
+common responder code. This means that there is only one instance of the
+resolv_ctx for the whole provider.</p>
+<p>Currently resolv_init() is called at two other places as well, in
+ipa_dyndns.c and sdap_async_sudo_hostinfo.c. I think the only reason
+for calling resolv_init() at those two place is, that both needed to
+call some low level resolve routines which need a resolv_ctx as
+parameter and that there is no easy way to get the resolv_ctx because
+it is hidden in a private struct. Instead of adding an appropriate
+getter method which returns the current resolve_ctx resolv_init() was
+called for a second time.</p>
+<p>If the resolv_init() calls are removed from those two places with the
+help of a getter method or similar, I think the prev and next members
+can be removed from struct resolv_ctx as well. Because there will not
+be a list of resolver contexts, but only one.</p>
+</div>
+</div>
+<div class="section" id="how-to-test">
+<h2>How to test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<p>If this feature is tested the following scenarios can be considered:</p>
+<div class="section" id="ad-domain-does-only-has-a-single-site">
+<h3>AD domain does only has a single site<a class="headerlink" href="#ad-domain-does-only-has-a-single-site" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>site name might be &#8216;Default-First-Site-Name&#8217; but it can be renamed or
+localized as well</li>
+<li>SSSD should be able to discover the site, e.g.
+&#8216;Default-First-Site-Name&#8217;</li>
+<li>SSSD should connect to any DC.</li>
+</ul>
+</div>
+<div class="section" id="ad-domain-has-sites-but-the-local-site-of-the-sssd-client-has-no-domain-controller">
+<h3>AD domain has sites but the local site of the SSSD client has no domain controller<a class="headerlink" href="#ad-domain-has-sites-but-the-local-site-of-the-sssd-client-has-no-domain-controller" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>SSSD should be able to discover the local site</li>
+<li>SSSD should connect to a any DC</li>
+</ul>
+</div>
+<div class="section" id="ad-domain-has-sites-and-the-local-site-of-the-sssd-client-has-a-domain-controller">
+<h3>AD domain has sites and the local site of the SSSD client has a domain controller<a class="headerlink" href="#ad-domain-has-sites-and-the-local-site-of-the-sssd-client-has-a-domain-controller" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>SSSD should be able to discover the local site</li>
+<li>SSSD should connect to a DC from the local site</li>
+</ul>
+<p>Besides inspection the log files with a high debug level to connection
+to the domain controller can also be verified with the netstat or ss
+utilities.</p>
+</div>
+</div>
+<div class="section" id="useful-links">
+<h2>Useful links<a class="headerlink" href="#useful-links" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://technet.microsoft.com/en-us/library/cc759550(v=ws.10).aspx">​How DNS Support for Active Directory
+Works</a></li>
+<li><a class="reference external" href="http://msdn.microsoft.com/en-us/library/cc223811.aspx">​LDAP
+Ping</a></li>
+<li><a class="reference external" href="http://msdn.microsoft.com/en-us/library/cc223813.aspx">​Domain Controller Response to an LDAP
+Ping</a></li>
+<li><a class="reference external" href="http://msdn.microsoft.com/de-de/library/cc223801.aspx">​NETLOGON_NT_VERSION Options
+Bits</a></li>
+</ul>
+</div>
+<div class="section" id="author-s">
+<h2>Author(s)<a class="headerlink" href="#author-s" title="Permalink to this headline">¶</a></h2>
+<p>Sumit Bose &lt;<a class="reference external" href="mailto:sbose&#37;&#52;&#48;redhat&#46;com">​sbose<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Use Active Directory&#8217;s DNS sites</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem Statement</a></li>
+<li><a class="reference internal" href="#overview-view-of-the-solution">Overview view of the solution</a><ul>
+<li><a class="reference internal" href="#general-considerations">General considerations</a></li>
+<li><a class="reference internal" href="#sites-specific-details">Sites specific details</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a><ul>
+<li><a class="reference internal" href="#finding-a-dc-for-the-cldap-ping">Finding a DC for the CLDAP ping</a></li>
+<li><a class="reference internal" href="#sending-the-cldap-ping">Sending the CLDAP ping</a></li>
+<li><a class="reference internal" href="#parsing-the-server-response">Parsing the server response</a></li>
+<li><a class="reference internal" href="#side-note-about-struct-resolv-ctx-and-the-usage-of-resolv-init">Side note about struct resolv_ctx and the usage of resolv_init()</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-test">How to test</a><ul>
+<li><a class="reference internal" href="#ad-domain-does-only-has-a-single-site">AD domain does only has a single site</a></li>
+<li><a class="reference internal" href="#ad-domain-has-sites-but-the-local-site-of-the-sssd-client-has-no-domain-controller">AD domain has sites but the local site of the SSSD client has no domain controller</a></li>
+<li><a class="reference internal" href="#ad-domain-has-sites-and-the-local-site-of-the-sssd-client-has-a-domain-controller">AD domain has sites and the local site of the SSSD client has a domain controller</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#useful-links">Useful links</a></li>
+<li><a class="reference internal" href="#author-s">Author(s)</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/ActiveDirectoryDNSSites.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/ActiveDirectoryDNSSites.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

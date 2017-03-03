@@ -1,0 +1,255 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Custom Ticket Fields &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="custom-ticket-fields">
+<h1>Custom Ticket Fields<a class="headerlink" href="#custom-ticket-fields" title="Permalink to this headline">¶</a></h1>
+<p>Trac supports adding custom, user-defined fields to the ticket module.
+Using custom fields, you can add typed, site-specific properties to
+tickets.</p>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>Configuring custom ticket fields is done in the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">trac.ini</a> file. All
+field definitions should be under a section named <code class="docutils literal"><span class="pre">[ticket-custom]</span></code>.</p>
+<p>The syntax of each field definition is:</p>
+<p>The example below should help to explain the syntax.</p>
+<div class="section" id="available-field-types-and-options">
+<h3>Available Field Types and Options<a class="headerlink" href="#available-field-types-and-options" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><strong>text</strong>: A simple (one line) text field.<ul>
+<li>label: Descriptive label.</li>
+<li>value: Default value.</li>
+<li>order: Sort order placement. (Determines relative placement in
+forms with respect to other custom fields.)</li>
+<li>format: Either <code class="docutils literal"><span class="pre">plain</span></code> for plain text or <code class="docutils literal"><span class="pre">wiki</span></code> to interpret
+the content as
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html">WikiFormatting</a>.
+(<em>since 0.11.3</em>)</li>
+</ul>
+</li>
+<li><strong>checkbox</strong>: A boolean value check box.<ul>
+<li>label: Descriptive label.</li>
+<li>value: Default value (0 or 1).</li>
+<li>order: Sort order placement.</li>
+</ul>
+</li>
+<li><strong>select</strong>: Drop-down select box. Uses a list of values.<ul>
+<li>label: Descriptive label.</li>
+<li>options: List of values, separated by <strong>|</strong> (vertical pipe).</li>
+<li>value: Default value (one of the values from options).</li>
+<li>order: Sort order placement.</li>
+</ul>
+</li>
+<li><strong>radio</strong>: Radio buttons. Essentially the same as <strong>select</strong>.<ul>
+<li>label: Descriptive label.</li>
+<li>options: List of values, separated by <strong>|</strong> (vertical pipe).</li>
+<li>value: Default value (one of the values from options).</li>
+<li>order: Sort order placement.</li>
+</ul>
+</li>
+<li><strong>textarea</strong>: Multi-line text area.<ul>
+<li>label: Descriptive label.</li>
+<li>value: Default text.</li>
+<li>cols: Width in columns.</li>
+<li>rows: Height in lines.</li>
+<li>order: Sort order placement.</li>
+<li>format: Either <code class="docutils literal"><span class="pre">plain</span></code> for plain text or <code class="docutils literal"><span class="pre">wiki</span></code> to interpret
+the content as
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html">WikiFormatting</a>.
+(<em>since 0.11.3</em>)</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="sample-config">
+<h3>Sample Config<a class="headerlink" href="#sample-config" title="Permalink to this headline">¶</a></h3>
+<p><em>Note: To make entering an option for a ``select`` type field optional,
+specify a leading ``|`` in the ``fieldname.options`` option.</em></p>
+</div>
+<div class="section" id="reports-involving-custom-fields">
+<h3>Reports Involving Custom Fields<a class="headerlink" href="#reports-involving-custom-fields" title="Permalink to this headline">¶</a></h3>
+<p>Custom ticket fields are stored in the <code class="docutils literal"><span class="pre">ticket_custom</span></code> table, not in
+the <code class="docutils literal"><span class="pre">ticket</span></code> table. So to display the values from custom fields in a
+report, you will need a join on the 2 tables. Let&#8217;s use an example with
+a custom ticket field called <code class="docutils literal"><span class="pre">progress</span></code>.</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">p</span><span class="o">.</span><span class="n">value</span> <span class="n">AS</span> <span class="n">__color__</span><span class="p">,</span>
+   <span class="nb">id</span> <span class="n">AS</span> <span class="n">ticket</span><span class="p">,</span> <span class="n">summary</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">value</span> <span class="n">AS</span> <span class="n">progress</span>
+  <span class="n">FROM</span> <span class="n">ticket</span> <span class="n">t</span><span class="p">,</span> <span class="n">enum</span> <span class="n">p</span><span class="p">,</span> <span class="n">ticket_custom</span> <span class="n">c</span>
+  <span class="n">WHERE</span> <span class="n">status</span> <span class="n">IN</span> <span class="p">(</span><span class="s1">&#39;assigned&#39;</span><span class="p">)</span> <span class="n">AND</span> <span class="n">t</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">ticket</span> <span class="n">AND</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;progress&#39;</span>
+<span class="n">AND</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">priority</span> <span class="n">AND</span> <span class="n">p</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;priority&#39;</span>
+  <span class="n">ORDER</span> <span class="n">BY</span> <span class="n">p</span><span class="o">.</span><span class="n">value</span>
+</pre></div>
+</div>
+</div><p><strong>Note</strong> that this will only show tickets that have progress set in
+them, which is <strong>not the same as showing all tickets</strong>. If you created
+this custom ticket field <em>after</em> you have already created some tickets,
+they will not have that field defined, and thus they will never show up
+on this ticket query. If you go back and modify those tickets, the field
+will be defined, and they will appear in the query. If that&#8217;s all you
+want, you&#8217;re set.</p>
+<p>However, if you want to show all ticket entries (with progress defined
+and without), you need to use a <code class="docutils literal"><span class="pre">JOIN</span></code> for every custom field that is
+in the query.</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">p</span><span class="o">.</span><span class="n">value</span> <span class="n">AS</span> <span class="n">__color__</span><span class="p">,</span>
+   <span class="nb">id</span> <span class="n">AS</span> <span class="n">ticket</span><span class="p">,</span> <span class="n">summary</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">milestone</span><span class="p">,</span> <span class="n">severity</span><span class="p">,</span>
+   <span class="p">(</span><span class="n">CASE</span> <span class="n">status</span> <span class="n">WHEN</span> <span class="s1">&#39;assigned&#39;</span> <span class="n">THEN</span> <span class="n">owner</span><span class="o">||</span><span class="s1">&#39; *&#39;</span> <span class="n">ELSE</span> <span class="n">owner</span> <span class="n">END</span><span class="p">)</span> <span class="n">AS</span> <span class="n">owner</span><span class="p">,</span>
+   <span class="n">time</span> <span class="n">AS</span> <span class="n">created</span><span class="p">,</span>
+   <span class="n">changetime</span> <span class="n">AS</span> <span class="n">_changetime</span><span class="p">,</span> <span class="n">description</span> <span class="n">AS</span> <span class="n">_description</span><span class="p">,</span>
+   <span class="n">reporter</span> <span class="n">AS</span> <span class="n">_reporter</span><span class="p">,</span>
+  <span class="p">(</span><span class="n">CASE</span> <span class="n">WHEN</span> <span class="n">c</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span> <span class="n">THEN</span> <span class="s1">&#39;None&#39;</span> <span class="n">ELSE</span> <span class="n">c</span><span class="o">.</span><span class="n">value</span> <span class="n">END</span><span class="p">)</span> <span class="n">AS</span> <span class="n">progress</span>
+  <span class="n">FROM</span> <span class="n">ticket</span> <span class="n">t</span>
+     <span class="n">LEFT</span> <span class="n">OUTER</span> <span class="n">JOIN</span> <span class="n">ticket_custom</span> <span class="n">c</span> <span class="n">ON</span> <span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">ticket</span> <span class="n">AND</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;progress&#39;</span><span class="p">)</span>
+     <span class="n">JOIN</span> <span class="n">enum</span> <span class="n">p</span> <span class="n">ON</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">priority</span> <span class="n">AND</span> <span class="n">p</span><span class="o">.</span><span class="n">type</span><span class="o">=</span><span class="s1">&#39;priority&#39;</span>
+  <span class="n">WHERE</span> <span class="n">status</span> <span class="n">IN</span> <span class="p">(</span><span class="s1">&#39;new&#39;</span><span class="p">,</span> <span class="s1">&#39;assigned&#39;</span><span class="p">,</span> <span class="s1">&#39;reopened&#39;</span><span class="p">)</span>
+  <span class="n">ORDER</span> <span class="n">BY</span> <span class="n">p</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">milestone</span><span class="p">,</span> <span class="n">severity</span><span class="p">,</span> <span class="n">time</span>
+</pre></div>
+</div>
+</div><p>Note in particular the <code class="docutils literal"><span class="pre">LEFT</span> <span class="pre">OUTER</span> <span class="pre">JOIN</span></code> statement here.</p>
+</div>
+<div class="section" id="updating-the-database">
+<h3>Updating the database<a class="headerlink" href="#updating-the-database" title="Permalink to this headline">¶</a></h3>
+<p>As noted above, any tickets created before a custom field has been
+defined will not have a value for that field. Here&#8217;s a bit of SQL
+(tested with SQLite) that you can run directly on the Trac database to
+set an initial value for custom ticket fields. Inserts the default value
+of &#8216;None&#8217; into a custom field called &#8216;request_source&#8217; for all tickets
+that have no existing value:</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">INSERT</span> <span class="n">INTO</span> <span class="n">ticket_custom</span>
+   <span class="p">(</span><span class="n">ticket</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+   <span class="n">SELECT</span>
+      <span class="nb">id</span> <span class="n">AS</span> <span class="n">ticket</span><span class="p">,</span>
+      <span class="s1">&#39;request_source&#39;</span> <span class="n">AS</span> <span class="n">name</span><span class="p">,</span>
+      <span class="s1">&#39;None&#39;</span> <span class="n">AS</span> <span class="n">value</span>
+   <span class="n">FROM</span> <span class="n">ticket</span>
+   <span class="n">WHERE</span> <span class="nb">id</span> <span class="n">NOT</span> <span class="n">IN</span> <span class="p">(</span>
+      <span class="n">SELECT</span> <span class="n">ticket</span> <span class="n">FROM</span> <span class="n">ticket_custom</span>
+   <span class="p">);</span>
+</pre></div>
+</div>
+</div><p>If you added multiple custom fields at different points in time, you
+should be more specific in the subquery on table <code class="docutils literal"><span class="pre">ticket</span></code> by adding
+the exact custom field name to the query:</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">INSERT</span> <span class="n">INTO</span> <span class="n">ticket_custom</span>
+   <span class="p">(</span><span class="n">ticket</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+   <span class="n">SELECT</span>
+      <span class="nb">id</span> <span class="n">AS</span> <span class="n">ticket</span><span class="p">,</span>
+      <span class="s1">&#39;request_source&#39;</span> <span class="n">AS</span> <span class="n">name</span><span class="p">,</span>
+      <span class="s1">&#39;None&#39;</span> <span class="n">AS</span> <span class="n">value</span>
+   <span class="n">FROM</span> <span class="n">ticket</span>
+   <span class="n">WHERE</span> <span class="nb">id</span> <span class="n">NOT</span> <span class="n">IN</span> <span class="p">(</span>
+      <span class="n">SELECT</span> <span class="n">ticket</span> <span class="n">FROM</span> <span class="n">ticket_custom</span> <span class="n">WHERE</span> <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;request_source&#39;</span>
+   <span class="p">);</span>
+</pre></div>
+</div>
+</div><hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTickets.html">TracTickets</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">TracIni</a></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Custom Ticket Fields</a><ul>
+<li><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li><a class="reference internal" href="#available-field-types-and-options">Available Field Types and Options</a></li>
+<li><a class="reference internal" href="#sample-config">Sample Config</a></li>
+<li><a class="reference internal" href="#reports-involving-custom-fields">Reports Involving Custom Fields</a></li>
+<li><a class="reference internal" href="#updating-the-database">Updating the database</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracTicketsCustomFields.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracTicketsCustomFields.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

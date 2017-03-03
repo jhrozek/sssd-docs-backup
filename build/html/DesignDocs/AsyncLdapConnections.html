@@ -1,0 +1,216 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Asynchronous LDAP connections &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="asynchronous-ldap-connections">
+<h1>Asynchronous LDAP connections<a class="headerlink" href="#asynchronous-ldap-connections" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="problem-statement">
+<h2>Problem Statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>Currently, connecting to an LDAP server by the openldap library is
+blocking. This means that when SSSD attempts to connect to an
+unresponsive server, it can block up to 5 second (the current default
+setting of <code class="docutils literal"><span class="pre">ldap_network_timeout</span></code>). This is not ideal, as we would
+like to be able to do something else while the connection is being made.</p>
+</div>
+<div class="section" id="general-approach">
+<h2>General Approach<a class="headerlink" href="#general-approach" title="Permalink to this headline">¶</a></h2>
+<p>Recent versions of openldap have a new (and not very well documented)
+option <code class="docutils literal"><span class="pre">LDAP_OPT_CONNECT_ASYNC</span></code> that can be set by
+<code class="docutils literal"><span class="pre">ldap_set_option()</span></code>. This option will cause all ldap functions that
+create a new connection to only invoke <code class="docutils literal"><span class="pre">connect()</span></code> and not wait for
+the socket to become ready for writing. If it is not, the function will
+return <code class="docutils literal"><span class="pre">LDAP_X_CONNECTING</span></code> and it has to be executed again after the
+socket becomes ready.</p>
+</div>
+<div class="section" id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h2>
+<p>Because a lot of ldap functions can cause the creation of a new socket,
+every such function will be wrapped into a tevent_req interface. Every
+such wrapper will consist of a standard <code class="docutils literal"><span class="pre">send</span></code> and <code class="docutils literal"><span class="pre">recv</span></code> function,
+as well as a so called <code class="docutils literal"><span class="pre">try</span></code> function.</p>
+<p>The <code class="docutils literal"><span class="pre">send</span></code> function will copy all the arguments into the state data
+structure and invoke the <code class="docutils literal"><span class="pre">try</span></code> function, passing the <code class="docutils literal"><span class="pre">tevent_req</span></code> to
+it. The try function will invoke the openldap function with all the
+arguments from the state. The <code class="docutils literal"><span class="pre">try</span></code> function will then return <code class="docutils literal"><span class="pre">0</span></code> if
+<code class="docutils literal"><span class="pre">LDAP_X_CONNECTING</span></code> was returned signaling that we will have to invoke
+it one more time later. In case the connection was already available,
+<code class="docutils literal"><span class="pre">tevent_req_done()</span></code> or <code class="docutils literal"><span class="pre">tevent_req_error()</span></code> is invoked and <code class="docutils literal"><span class="pre">1</span></code> is
+returned.</p>
+<div class="section" id="callbacks">
+<h3>Callbacks<a class="headerlink" href="#callbacks" title="Permalink to this headline">¶</a></h3>
+<p>The implementation will make a heavy use of both openldap and tevent
+callbacks. Our goal is to be able to invoke the <code class="docutils literal"><span class="pre">try</span></code> function from
+the tevent callback (which will be invoked by tevent after the socket is
+ready for writing). The main problem is to make both the <code class="docutils literal"><span class="pre">try</span></code>
+function and the <code class="docutils literal"><span class="pre">tevent_req</span></code> available to this callback. The
+callbacks that we need work as follows:</p>
+<ol class="arabic simple">
+<li>Openldap callbacks are set by <code class="docutils literal"><span class="pre">ldap_set_option()</span></code> with the
+<code class="docutils literal"><span class="pre">option</span></code> argument set to <code class="docutils literal"><span class="pre">LDAP_OPT_CONNECT_CB</span></code>. Additional data
+structure (`struct ldap_cb_data`) is passed in as well. This data
+structure will always be passed to the openldap callback. This is
+currently done in <code class="docutils literal"><span class="pre">setup_ldap_connection_callbacks()</span></code>.</li>
+<li>Right after an openldap function creates a connection, it will call
+the callback passing to it (among other things) the newly created
+socket. In SSSD, this callback is
+<code class="docutils literal"><span class="pre">sdap_ldap_connect_callback_add()</span></code>.</li>
+<li>The callback will then register a tevent callback
+<code class="docutils literal"><span class="pre">sdap_ldap_result()</span></code> which is invoked when the socket is ready for
+writing and is responsible for calling <code class="docutils literal"><span class="pre">ldap_result()</span></code>.</li>
+</ol>
+<p>What we need to do is to make sure that the tevent callback is called
+not only when the socket is ready for reading, but also when it is ready
+for writing (but only once, since it will always be ready for writing
+after the connection is made). We also need to provide the tevent
+callback with the <code class="docutils literal"><span class="pre">try</span></code> function and the associated <code class="docutils literal"><span class="pre">tevent_req</span></code>
+structure. After the socket is ready for writing, we call the <code class="docutils literal"><span class="pre">try</span></code>
+function and pass it the <code class="docutils literal"><span class="pre">tevent_req</span></code> so it can call the ldap function
+again and mark the tevent request as finished.</p>
+<p>To pass the tevent request to the tevent callback, we need to take a bit
+of a detour. Every <code class="docutils literal"><span class="pre">try</span></code> function, before calling the ldap function
+has to call <code class="docutils literal"><span class="pre">set_fd_retry_cb()</span></code> passing in a pointer to itself and the
+tevent request. This function will save these to the data structure that
+is available to the ldap callback. This callback is called after the
+socket is created and in turn, the function pointer and the tevent
+request are made available to the newly registered tevent callback,
+which is what we wanted. The <code class="docutils literal"><span class="pre">try</span></code> function also has to call
+<code class="docutils literal"><span class="pre">set_fd_retry_cb()</span></code> again after the ldap function is called and set
+both the function pointer and the tevent request pointer to <code class="docutils literal"><span class="pre">NULL</span></code>. So
+now when it&#8217;s all set, after the socket is ready for writing we can call
+the <code class="docutils literal"><span class="pre">try</span></code> function from the tevent callback to finish the whole
+transaction.</p>
+</div>
+</div>
+<div class="section" id="spies">
+<h2>Spies<a class="headerlink" href="#spies" title="Permalink to this headline">¶</a></h2>
+<p>One problem with the approach described in the previous section is with
+storing the tevent request in a place out of the tevent chain. If the
+request gets freed before there is a chance to call the <code class="docutils literal"><span class="pre">try</span></code>
+function, we will be left with a dangling pointer that might eventually
+be dereferenced.</p>
+<p>To solve this problem, we create a sort of a &#8220;spy&#8221; that will free the
+<code class="docutils literal"><span class="pre">fd_event_item</span></code> associated with the tevent callback in case the
+request is freed. The spy is created in the ldap callback. The following
+diagram and code illustrate how the spy is used to make sure there are
+no dangling pointers left:</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">request_spy_destructor</span><span class="p">(</span><span class="n">struct</span> <span class="n">request_spy</span> <span class="o">*</span><span class="n">spy</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">spy</span><span class="o">-&gt;</span><span class="n">ptr</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">spy</span><span class="o">-&gt;</span><span class="n">ptr</span><span class="o">-&gt;</span><span class="n">spy</span> <span class="o">=</span> <span class="n">NULL</span><span class="p">;</span>
+        <span class="n">talloc_free</span><span class="p">(</span><span class="n">spy</span><span class="o">-&gt;</span><span class="n">ptr</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">fd_event_item_destructor</span><span class="p">(</span><span class="n">struct</span> <span class="n">fd_event_item</span> <span class="o">*</span><span class="n">fd_event_item</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">fd_event_item</span><span class="o">-&gt;</span><span class="n">spy</span><span class="p">)</span>
+        <span class="n">fd_event_item</span><span class="o">-&gt;</span><span class="n">spy</span><span class="o">-&gt;</span><span class="n">ptr</span> <span class="o">=</span> <span class="n">NULL</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div></div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Asynchronous LDAP connections</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem Statement</a></li>
+<li><a class="reference internal" href="#general-approach">General Approach</a></li>
+<li><a class="reference internal" href="#implementation">Implementation</a><ul>
+<li><a class="reference internal" href="#callbacks">Callbacks</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spies">Spies</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/AsyncLdapConnections.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/AsyncLdapConnections.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

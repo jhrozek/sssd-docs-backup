@@ -1,0 +1,282 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Importing ticket data &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="importing-ticket-data">
+<h1>Importing ticket data<a class="headerlink" href="#importing-ticket-data" title="Permalink to this headline">¶</a></h1>
+<div class="wiki-toc"><ol class="arabic simple">
+<li><a class="reference external" href="#Importingticketdata">Importing ticket data</a><ol class="arabic">
+<li><a class="reference external" href="#TicketImportPlugin">TicketImportPlugin</a></li>
+<li><a class="reference external" href="#ExportImportXlsPlugin">ExportImportXlsPlugin</a></li>
+<li><a class="reference external" href="#Bugzilla">Bugzilla</a></li>
+<li><a class="reference external" href="#Jira">Jira</a></li>
+<li><a class="reference external" href="#Mantis">Mantis</a></li>
+<li><a class="reference external" href="#PlanetForge">PlanetForge</a></li>
+<li><a class="reference external" href="#Scarab">Scarab</a></li>
+<li><a class="reference external" href="#Sourceforge">Sourceforge</a></li>
+<li><a class="reference external" href="#Other">Other</a><ol class="arabic">
+<li><a class="reference external" href="#Commadelimitedfile-CSV">Comma delimited file - CSV</a></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</div><p>By means of migrating from other issue-tracking systems, perform some
+external actions over tickets or simply synchronize different data
+bases, there are some available tools, plug-ins or scripts which lets
+you import or up-date tickets into Trac.</p>
+<p>Below, follows a collection of some of those.</p>
+<div class="section" id="ticketimportplugin">
+<h2>TicketImportPlugin<a class="headerlink" href="#ticketimportplugin" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt><a class="reference external" href="http://trac-hacks.org/wiki/TicketImportPlugin">​TicketImportPlugin</a></dt>
+<dd>mainly, but not only, this plug-in lets you import or up-date into
+Trac a series of tickets from a <strong>CSV file</strong> or (if the <a class="reference external" href="http://pypi.python.org/pypi/xlrd">​xlrd
+library</a> is installed) from an
+<strong>Excel file</strong>.</dd>
+</dl>
+</div>
+<div class="section" id="exportimportxlsplugin">
+<h2>ExportImportXlsPlugin<a class="headerlink" href="#exportimportxlsplugin" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt><a class="reference external" href="http://trac-hacks.org/wiki/ExportImportXlsPlugin">​ExportImportXlsPlugin</a></dt>
+<dd><p class="first">this plug-in add an admin panel for export and import tickets via
+<strong>XLS file</strong>.</p>
+<ul class="last simple">
+<li>It depends on the python packages xlwt/rxld.</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="bugzilla">
+<h2>Bugzilla<a class="headerlink" href="#bugzilla" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt><a class="reference external" href="http://trac-hacks.org/wiki/BugzillaIssueTrackingPlugin">​BugzillaIssueTrackingPlugin</a></dt>
+<dd>integrates Bugzilla into Trac keeping
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracLinks.html">TracLinks</a></dd>
+</dl>
+<p>Ticket data can be imported from Bugzilla using the
+<a class="reference external" href="http://trac.edgewall.org/browser/trunk/contrib/bugzilla2trac.py">​bugzilla2trac.py</a>
+script, available in the contrib/ directory of the Trac distribution.</p>
+<p>Currently, the following data is imported from Bugzilla:</p>
+<ul class="simple">
+<li>bugs</li>
+<li>bug activity (field changes)</li>
+<li>bug attachments</li>
+<li>user names and passwords (put into a htpasswd file)</li>
+</ul>
+<p>The script provides a number of features to ease the conversion, such
+as:</p>
+<ul class="simple">
+<li>PRODUCT_KEYWORDS: Trac doesn&#8217;t have the concept of products, so the
+script provides the ability to attach a ticket keyword instead.</li>
+<li>IGNORE_COMMENTS: Don&#8217;t import Bugzilla comments that match a certain
+regexp.</li>
+<li>STATUS_KEYWORDS: Attach ticket keywords for the Bugzilla statuses
+not available in Trac. By default, the &#8216;VERIFIED&#8217; and &#8216;RELEASED&#8217;
+Bugzilla statuses are translated into Trac keywords.</li>
+</ul>
+<p>For more details on the available options, see the configuration section
+at the top of the script.</p>
+</div>
+<div class="section" id="jira">
+<h2>Jira<a class="headerlink" href="#jira" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt><a class="reference external" href="http://trac-hacks.org/wiki/JiraToTracIntegration">​JiraToTracIntegration</a></dt>
+<dd><p class="first">provides tools to import Atlassian Jira backup files into Trac. The
+plug-in consists of a Python 3.1 commandline tool that:</p>
+<ul class="last simple">
+<li>Parses the Jira backup XML file</li>
+<li>Sends the imported Jira data and attachments to Trac using the
+<a class="reference external" href="http://trac-hacks.org/wiki/XmlRpcPlugin">​XmlRpcPlugin</a></li>
+<li>Generates a htpasswd file containing the imported Jira users and
+their SHA-512 base64 encoded passwords</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="mantis">
+<h2>Mantis<a class="headerlink" href="#mantis" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt><a class="reference external" href="http://trac-hacks.org/wiki/MantisImportScript">​MantisImportScript</a></dt>
+<dd><p class="first">script to import from Mantis into Trac the following data:</p>
+<ul class="last simple">
+<li>bugs</li>
+<li>bug comments</li>
+<li>bug activity (field changes)</li>
+<li>attachments (as long as the files live in the mantis db, not on
+the filesystem) .</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="planetforge">
+<h2>PlanetForge<a class="headerlink" href="#planetforge" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt><a class="reference external" href="http://trac-hacks.org/wiki/PlanetForgeImportExportPlugin">​PlanetForgeImportExportPlugin</a></dt>
+<dd>this plugin exports Trac data (wiki, tickets, compoments,
+permissions, repositories, etc.) using the open format designed by
+the COCLICO project. It extends the webadmin panel and the &#8216;trac
+admin ...&#8217; command. Still has no &#8216;import&#8217; feature.</dd>
+</dl>
+</div>
+<div class="section" id="scarab">
+<h2>Scarab<a class="headerlink" href="#scarab" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt><a class="reference external" href="http://trac-hacks.org/wiki/ScarabToTracScript">​ScarabToTracScript</a></dt>
+<dd><p class="first">script that migrates Scarab issues to Trac tickets</p>
+<ul class="last simple">
+<li>Requires
+<a class="reference external" href="http://trac-hacks.org/wiki/XmlRpcPlugin">​XmlRpcPlugin</a></li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="sourceforge">
+<h2>Sourceforge<a class="headerlink" href="#sourceforge" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt><a class="reference external" href="http://trac-hacks.org/wiki/SfnToTracScript">​SfnToTracScript</a></dt>
+<dd>importer of SourceForge&#8217;s new backup file (originated from
+#Trac3521)</dd>
+</dl>
+<p>Also, ticket data can be imported from Sourceforge using the
+<a class="reference external" href="http://trac.edgewall.org/browser/trunk/contrib/sourceforge2trac.py">​sourceforge2trac.py</a>
+script, available in the contrib/ directory of the Trac distribution.</p>
+</div>
+<div class="section" id="other">
+<h2>Other<a class="headerlink" href="#other" title="Permalink to this headline">¶</a></h2>
+<p>Since trac uses a SQL database to store the data, you can import from
+other systems by examining the database tables. Just go into
+<a class="reference external" href="http://www.sqlite.org/sqlite.html">​sqlite</a> command line to look at
+the tables and import into them from your application.</p>
+<div class="section" id="comma-delimited-file-csv">
+<h3>Comma delimited file - CSV<a class="headerlink" href="#comma-delimited-file-csv" title="Permalink to this headline">¶</a></h3>
+<p>See
+<a class="reference external" href="http://trac.edgewall.org/attachment/wiki/TracSynchronize/csv2trac.2.py">​csv2trac.2.py</a>
+for details. This approach is particularly useful if one needs to enter
+a large number of tickets by hand. (note that the ticket type type
+field, (task etc...) is also needed for this script to work with more
+recent Trac releases) Comments on script: The script has an error on
+line 168, (&#8216;Ticket&#8217; needs to be &#8216;ticket&#8217;). Also, the listed values for
+severity and priority are swapped.</p>
+<hr class="docutils" />
+<p>See also:</p>
+<ul class="simple">
+<li>to import/export wiki pages:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracAdmin.html">TracAdmin</a>,</li>
+<li>to export tickets:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTickets.html">TracTickets</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracQuery.html">TracQuery</a></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Importing ticket data</a><ul>
+<li><a class="reference internal" href="#ticketimportplugin">TicketImportPlugin</a></li>
+<li><a class="reference internal" href="#exportimportxlsplugin">ExportImportXlsPlugin</a></li>
+<li><a class="reference internal" href="#bugzilla">Bugzilla</a></li>
+<li><a class="reference internal" href="#jira">Jira</a></li>
+<li><a class="reference internal" href="#mantis">Mantis</a></li>
+<li><a class="reference internal" href="#planetforge">PlanetForge</a></li>
+<li><a class="reference internal" href="#scarab">Scarab</a></li>
+<li><a class="reference internal" href="#sourceforge">Sourceforge</a></li>
+<li><a class="reference internal" href="#other">Other</a><ul>
+<li><a class="reference internal" href="#comma-delimited-file-csv">Comma delimited file - CSV</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracImport.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracImport.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

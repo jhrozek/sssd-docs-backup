@@ -1,0 +1,590 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Trac and mod_python &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="trac-and-mod-python">
+<h1>Trac and mod_python<a class="headerlink" href="#trac-and-mod-python" title="Permalink to this headline">¶</a></h1>
+<div class="system-message"><p><strong>Error: Macro TracGuideToc(None) failed</strong></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;NoneType&#39;</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span> <span class="s1">&#39;find&#39;</span>
+</pre></div>
+</div>
+</div><p>Trac supports <a class="reference external" href="http://www.modpython.org/">​mod_python</a>, which speeds
+up Trac&#8217;s response times considerably, especially compared to
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracCgi.html">CGI</a>, and permits
+use of many Apache features not possible with
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracStandalone.html">tracd</a>/mod_proxy.</p>
+<div class="important"><p><strong>A Word of Warning</strong></p>
+<p>As of 16<sup>th</sup> June 2010, the mod_python project is officially
+dead. If you are considering using mod_python for a new installation,
+<strong>please don&#8217;t</strong>! There are known issues which will not be fixed and
+there are now better alternatives. Check out the main
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracInstall.html">TracInstall</a>
+pages for your target version for more information.</p>
+</div><p>These instructions are for Apache 2; if you are still using Apache 1.3,
+you may have some luck with
+<a class="reference external" href="http://trac.edgewall.org/intertrac/wiki%3ATracModPython2.7">​TracModPython2.7</a>,
+but you&#8217;ll be totally on your own.</p>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><a class="reference external" href="#Simpleconfiguration">Simple configuration: single project</a><ol class="arabic">
+<li><a class="reference external" href="#PythonEggCache">Python Egg Cache</a></li>
+<li><a class="reference external" href="#ConfiguringAuthentication">Configuring Authentication</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#AdvancedConfiguration">Advanced Configuration</a><ol class="arabic">
+<li><a class="reference external" href="#SettingthePythonEggCache">Setting the Python Egg Cache</a></li>
+<li><a class="reference external" href="#SettingthePythonPath">Setting the PythonPath</a></li>
+<li><a class="reference external" href="#Settingupmultipleprojects">Setting up multiple projects</a></li>
+<li><a class="reference external" href="#VirtualHostConfiguration">Virtual Host Configuration</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#Troubleshooting">Troubleshooting</a><ol class="arabic">
+<li><a class="reference external" href="#LoginNotWorking">Login Not Working</a></li>
+<li><a class="reference external" href="#expat">Expat-related segmentation faults</a></li>
+<li><a class="reference external" href="#Formsubmissionproblems">Form submission problems</a></li>
+<li><a class="reference external" href="#Problemwithvirtualhostconfiguration">Problem with virtual host
+configuration</a></li>
+<li><a class="reference external" href="#Problemwithzippedegg">Problem with zipped egg</a></li>
+<li><a class="reference external" href="#Using.htaccess">Using .htaccess</a></li>
+<li><a class="reference external" href="#Additional.htaccesshelp">Additional .htaccess help</a></li>
+<li><a class="reference external" href="#Platformspecificissues">Platform specific issues</a></li>
+<li><a class="reference external" href="#Subversionissues">Subversion issues</a></li>
+<li><a class="reference external" href="#Pagelayoutissues">Page layout issues</a></li>
+<li><a class="reference external" href="#HTTPSissues">HTTPS issues</a></li>
+<li><a class="reference external" href="#Segmentationfaultwithphp5-mhashorotherphp5modules">Segmentation fault with php5-mhash or other php5
+modules</a></li>
+</ol>
+</li>
+</ol>
+<div class="section" id="simple-configuration-single-project">
+<h3>Simple configuration: single project<a class="headerlink" href="#simple-configuration-single-project" title="Permalink to this headline">¶</a></h3>
+<p>If you just installed mod_python, you may have to add a line to load
+the module in the Apache configuration:</p>
+<p><em>Note: The exact path to the module depends on how the HTTPD
+installation is laid out.</em></p>
+<p>On Debian using apt-get</p>
+<p>(Still on Debian) after you have installed mod_python, you must enable
+the modules in apache2 (equivalent of the above Load Module directive):</p>
+<p>On Fedora use, using yum:</p>
+<p>You can test your mod_python installation by adding the following to
+your httpd.conf. You should remove this when you are done testing for
+security reasons. Note: mod_python.testhandler is only available in
+mod_python 3.2+.</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">Location</span> <span class="o">/</span><span class="n">mpinfo</span><span class="o">&gt;</span>
+   <span class="n">SetHandler</span> <span class="n">mod_python</span>
+   <span class="n">PythonInterpreter</span> <span class="n">main_interpreter</span>
+   <span class="n">PythonHandler</span> <span class="n">mod_python</span><span class="o">.</span><span class="n">testhandler</span>
+   <span class="n">Order</span> <span class="n">allow</span><span class="p">,</span><span class="n">deny</span>
+   <span class="n">Allow</span> <span class="kn">from</span> <span class="nn">all</span>
+<span class="o">&lt;/</span><span class="n">Location</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</div><p>A simple setup of Trac on mod_python looks like this:</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">Location</span> <span class="o">/</span><span class="n">projects</span><span class="o">/</span><span class="n">myproject</span><span class="o">&gt;</span>
+   <span class="n">SetHandler</span> <span class="n">mod_python</span>
+   <span class="n">PythonInterpreter</span> <span class="n">main_interpreter</span>
+   <span class="n">PythonHandler</span> <span class="n">trac</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">modpython_frontend</span>
+   <span class="n">PythonOption</span> <span class="n">TracEnv</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">trac</span><span class="o">/</span><span class="n">myproject</span>
+   <span class="n">PythonOption</span> <span class="n">TracUriRoot</span> <span class="o">/</span><span class="n">projects</span><span class="o">/</span><span class="n">myproject</span>
+   <span class="n">Order</span> <span class="n">allow</span><span class="p">,</span><span class="n">deny</span>
+   <span class="n">Allow</span> <span class="kn">from</span> <span class="nn">all</span>
+<span class="o">&lt;/</span><span class="n">Location</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</div><p>The option <strong>``TracUriRoot``</strong> may or may not be necessary in your
+setup. Try your configuration without it; if the URLs produced by Trac
+look wrong, if Trac does not seem to recognize URLs correctly, or you
+get an odd &#8220;No handler matched request to...&#8221; error, add the
+<strong>``TracUriRoot``</strong> option. You will notice that the <code class="docutils literal"><span class="pre">Location</span></code> and
+<strong>``TracUriRoot``</strong> have the same path.</p>
+<p>The options available are</p>
+<div class="section" id="python-egg-cache">
+<h4>Python Egg Cache<a class="headerlink" href="#python-egg-cache" title="Permalink to this headline">¶</a></h4>
+<p>Compressed python eggs like Genshi are normally extracted into a
+directory named <code class="docutils literal"><span class="pre">.python-eggs</span></code> in the users home directory. Since
+apache&#8217;s home usually is not writable an alternate egg cache directory
+can be specified like this:</p>
+<p>or you can uncompress the Genshi egg to resolve problems extracting from
+it.</p>
+</div>
+<div class="section" id="configuring-authentication">
+<h4>Configuring Authentication<a class="headerlink" href="#configuring-authentication" title="Permalink to this headline">¶</a></h4>
+<p>See corresponding section in the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracModWSGI.html#ConfiguringAuthentication">TracModWSGI</a>
+page.</p>
+</div>
+</div>
+<div class="section" id="advanced-configuration">
+<h3>Advanced Configuration<a class="headerlink" href="#advanced-configuration" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="setting-the-python-egg-cache">
+<h4>Setting the Python Egg Cache<a class="headerlink" href="#setting-the-python-egg-cache" title="Permalink to this headline">¶</a></h4>
+<p>If the Egg Cache isn&#8217;t writeable by your Web server, you&#8217;ll either have
+to change the permissions, or point Python to a location where Apache
+can write. This can manifest itself as a <em>500 internal server error</em>
+and/or a complaint in the syslog.</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">Location</span> <span class="o">/</span><span class="n">projects</span><span class="o">/</span><span class="n">myproject</span><span class="o">&gt;</span>
+  <span class="o">...</span>
+  <span class="n">PythonOption</span> <span class="n">PYTHON_EGG_CACHE</span> <span class="o">/</span><span class="n">tmp</span>
+  <span class="o">...</span>
+<span class="o">&lt;/</span><span class="n">Location</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</div></div>
+<div class="section" id="setting-the-pythonpath">
+<h4>Setting the PythonPath<a class="headerlink" href="#setting-the-pythonpath" title="Permalink to this headline">¶</a></h4>
+<p>If the Trac installation isn&#8217;t installed in your Python path, you&#8217;ll
+have to tell Apache where to find the Trac mod_python handler using the
+<code class="docutils literal"><span class="pre">PythonPath</span></code> directive:</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">Location</span> <span class="o">/</span><span class="n">projects</span><span class="o">/</span><span class="n">myproject</span><span class="o">&gt;</span>
+  <span class="o">...</span>
+  <span class="n">PythonPath</span> <span class="s2">&quot;sys.path + [&#39;/path/to/trac&#39;]&quot;</span>
+  <span class="o">...</span>
+<span class="o">&lt;/</span><span class="n">Location</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</div><p>Be careful about using the PythonPath directive, and <em>not</em>
+<code class="docutils literal"><span class="pre">SetEnv</span> <span class="pre">PYTHONPATH</span></code>, as the latter won&#8217;t work.</p>
+</div>
+<div class="section" id="setting-up-multiple-projects">
+<h4>Setting up multiple projects<a class="headerlink" href="#setting-up-multiple-projects" title="Permalink to this headline">¶</a></h4>
+<p>The Trac mod_python handler supports a configuration option similar to
+Subversion&#8217;s <code class="docutils literal"><span class="pre">SvnParentPath</span></code>, called <code class="docutils literal"><span class="pre">TracEnvParentDir</span></code>:</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">Location</span> <span class="o">/</span><span class="n">projects</span><span class="o">&gt;</span>
+  <span class="n">SetHandler</span> <span class="n">mod_python</span>
+  <span class="n">PythonInterpreter</span> <span class="n">main_interpreter</span>
+  <span class="n">PythonHandler</span> <span class="n">trac</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">modpython_frontend</span>
+  <span class="n">PythonOption</span> <span class="n">TracEnvParentDir</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">trac</span>
+  <span class="n">PythonOption</span> <span class="n">TracUriRoot</span> <span class="o">/</span><span class="n">projects</span>
+<span class="o">&lt;/</span><span class="n">Location</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</div><p>When you request the <code class="docutils literal"><span class="pre">/projects</span></code> URL, you will get a listing of all
+subdirectories of the directory you set as <code class="docutils literal"><span class="pre">TracEnvParentDir</span></code> that
+look like Trac environment directories. Selecting any project in the
+list will bring you to the corresponding Trac environment.</p>
+<p>If you don&#8217;t want to have the subdirectory listing as your projects home
+page you can use a</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">LocationMatch</span> <span class="s2">&quot;/.+/&quot;</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</div><p>This will instruct Apache to use mod_python for all locations different
+from root while having the possibility of placing a custom home page for
+root in your DocumentRoot folder.</p>
+<p>You can also use the same authentication realm for all of the projects
+using a <code class="docutils literal"><span class="pre">&lt;LocationMatch&gt;</span></code> directive:</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">LocationMatch</span> <span class="s2">&quot;/projects/[^/]+/login&quot;</span><span class="o">&gt;</span>
+  <span class="n">AuthType</span> <span class="n">Basic</span>
+  <span class="n">AuthName</span> <span class="s2">&quot;Trac&quot;</span>
+  <span class="n">AuthUserFile</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">trac</span><span class="o">/.</span><span class="n">htpasswd</span>
+  <span class="n">Require</span> <span class="n">valid</span><span class="o">-</span><span class="n">user</span>
+<span class="o">&lt;/</span><span class="n">LocationMatch</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</div></div>
+<div class="section" id="virtual-host-configuration">
+<h4>Virtual Host Configuration<a class="headerlink" href="#virtual-host-configuration" title="Permalink to this headline">¶</a></h4>
+<p>Below is the sample configuration required to set up your trac as a
+virtual server (i.e. when you access it at the URLs like
+<a class="reference external" href="http://trac.mycompany.com">http://trac.mycompany.com</a>):</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">VirtualHost</span> <span class="o">*</span> <span class="o">&gt;</span>
+    <span class="n">DocumentRoot</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">www</span><span class="o">/</span><span class="n">myproject</span>
+    <span class="n">ServerName</span> <span class="n">trac</span><span class="o">.</span><span class="n">mycompany</span><span class="o">.</span><span class="n">com</span>
+    <span class="o">&lt;</span><span class="n">Location</span> <span class="o">/&gt;</span>
+        <span class="n">SetHandler</span> <span class="n">mod_python</span>
+        <span class="n">PythonInterpreter</span> <span class="n">main_interpreter</span>
+        <span class="n">PythonHandler</span> <span class="n">trac</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">modpython_frontend</span>
+        <span class="n">PythonOption</span> <span class="n">TracEnv</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">trac</span><span class="o">/</span><span class="n">myproject</span>
+        <span class="n">PythonOption</span> <span class="n">TracUriRoot</span> <span class="o">/</span>
+    <span class="o">&lt;/</span><span class="n">Location</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">Location</span> <span class="o">/</span><span class="n">login</span><span class="o">&gt;</span>
+        <span class="n">AuthType</span> <span class="n">Basic</span>
+        <span class="n">AuthName</span> <span class="s2">&quot;MyCompany Trac Server&quot;</span>
+        <span class="n">AuthUserFile</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">trac</span><span class="o">/</span><span class="n">myproject</span><span class="o">/.</span><span class="n">htpasswd</span>
+        <span class="n">Require</span> <span class="n">valid</span><span class="o">-</span><span class="n">user</span>
+    <span class="o">&lt;/</span><span class="n">Location</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">VirtualHost</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</div><p>This does not seem to work in all cases. What you can do if it does not:</p>
+<ul class="simple">
+<li>Try using <code class="docutils literal"><span class="pre">&lt;LocationMatch&gt;</span></code> instead of <code class="docutils literal"><span class="pre">&lt;Location&gt;</span></code></li>
+<li>&lt;Location /&gt; may, in your server setup, refer to the complete host
+instead of simple the root of the server. This means that everything
+(including the login directory referenced below) will be sent to
+python and authentication does not work (i.e. you get the infamous
+Authentication information missing error). If this applies to you,
+try using a sub-directory for trac instead of the root (i.e. /web/
+and /web/login instead of / and /login).</li>
+<li>Depending on apache&#8217;s <code class="docutils literal"><span class="pre">NameVirtualHost</span></code> configuration, you may need
+to use <code class="docutils literal"><span class="pre">&lt;VirtualHost</span> <span class="pre">*:80&gt;</span></code> instead of <code class="docutils literal"><span class="pre">&lt;VirtualHost</span> <span class="pre">*&gt;</span></code>.</li>
+</ul>
+<p>For a virtual host that supports multiple projects replace &#8220;<code class="docutils literal"><span class="pre">TracEnv</span></code>&#8221;
+/var/trac/myproject with &#8220;<code class="docutils literal"><span class="pre">TracEnvParentDir</span></code>&#8221; /var/trac/</p>
+<p>Note: DocumentRoot should not point to your Trac project env. As Asmodai
+wrote on #trac: &#8220;suppose there&#8217;s a webserver bug that allows disclosure
+of DocumentRoot they could then leech the entire Trac environment&#8221;.</p>
+</div>
+</div>
+<div class="section" id="troubleshooting">
+<h3>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h3>
+<p>In general, if you get server error pages, you can either check the
+Apache error log, or enable the <code class="docutils literal"><span class="pre">PythonDebug</span></code> option:</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">Location</span> <span class="o">/</span><span class="n">projects</span><span class="o">/</span><span class="n">myproject</span><span class="o">&gt;</span>
+  <span class="o">...</span>
+  <span class="n">PythonDebug</span> <span class="n">on</span>
+<span class="o">&lt;/</span><span class="n">Location</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</div><p>For multiple projects, try restarting the server as well.</p>
+<div class="section" id="login-not-working">
+<h4>Login Not Working<a class="headerlink" href="#login-not-working" title="Permalink to this headline">¶</a></h4>
+<p>If you&#8217;ve used <code class="docutils literal"><span class="pre">&lt;Location</span> <span class="pre">/&gt;</span></code> directive, it will override any other
+directives, as well as <code class="docutils literal"><span class="pre">&lt;Location</span> <span class="pre">/login&gt;</span></code>. The workaround is to use
+negation expression as follows (for multi project setups):</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1">#this one for other pages</span>
+<span class="o">&lt;</span><span class="n">Location</span> <span class="o">~</span> <span class="s2">&quot;/*(?!login)&quot;</span><span class="o">&gt;</span>
+   <span class="n">SetHandler</span> <span class="n">mod_python</span>
+   <span class="n">PythonHandler</span> <span class="n">trac</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">modpython_frontend</span>
+   <span class="n">PythonOption</span> <span class="n">TracEnvParentDir</span> <span class="o">/</span><span class="n">projects</span>
+   <span class="n">PythonOption</span> <span class="n">TracUriRoot</span> <span class="o">/</span>
+
+<span class="o">&lt;/</span><span class="n">Location</span><span class="o">&gt;</span>
+<span class="c1">#this one for login page</span>
+<span class="o">&lt;</span><span class="n">Location</span> <span class="o">~</span> <span class="s2">&quot;/[^/]+/login&quot;</span><span class="o">&gt;</span>
+   <span class="n">SetHandler</span> <span class="n">mod_python</span>
+   <span class="n">PythonHandler</span> <span class="n">trac</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">modpython_frontend</span>
+   <span class="n">PythonOption</span> <span class="n">TracEnvParentDir</span> <span class="o">/</span><span class="n">projects</span>
+   <span class="n">PythonOption</span> <span class="n">TracUriRoot</span> <span class="o">/</span>
+
+   <span class="c1">#remove these if you don&#39;t want to force SSL</span>
+   <span class="n">RewriteEngine</span> <span class="n">On</span>
+   <span class="n">RewriteCond</span> <span class="o">%</span><span class="p">{</span><span class="n">HTTPS</span><span class="p">}</span> <span class="n">off</span>
+   <span class="n">RewriteRule</span> <span class="p">(</span><span class="o">.*</span><span class="p">)</span> <span class="n">https</span><span class="p">:</span><span class="o">//%</span><span class="p">{</span><span class="n">HTTP_HOST</span><span class="p">}</span><span class="o">%</span><span class="p">{</span><span class="n">REQUEST_URI</span><span class="p">}</span>
+
+   <span class="n">AuthType</span> <span class="n">Basic</span>
+   <span class="n">AuthName</span> <span class="s2">&quot;Trac&quot;</span>
+   <span class="n">AuthUserFile</span> <span class="o">/</span><span class="n">projects</span><span class="o">/.</span><span class="n">htpasswd</span>
+   <span class="n">Require</span> <span class="n">valid</span><span class="o">-</span><span class="n">user</span>
+<span class="o">&lt;/</span><span class="n">Location</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</div></div>
+<div class="section" id="expat-related-segmentation-faults">
+<h4>Expat-related segmentation faults<a class="headerlink" href="#expat-related-segmentation-faults" title="Permalink to this headline">¶</a></h4>
+<p>This problem will most certainly hit you on Unix when using Python 2.4.
+In Python 2.4, some version of Expat (an XML parser library written in
+C) is used, and if Apache is using another version, this results in
+segmentation faults. As Trac 0.11 is using Genshi, which will indirectly
+use Expat, that problem can now hit you even if everything was working
+fine before with Trac 0.10.</p>
+<p>See Graham Dumpleton&#8217;s detailed <a class="reference external" href="http://www.dscpl.com.au/wiki/ModPython/Articles/ExpatCausingApacheCrash">​explanation and
+workarounds</a>
+for the issue.</p>
+</div>
+<div class="section" id="form-submission-problems">
+<h4>Form submission problems<a class="headerlink" href="#form-submission-problems" title="Permalink to this headline">¶</a></h4>
+<p>If you&#8217;re experiencing problems submitting some of the forms in Trac (a
+common problem is that you get redirected to the start page after
+submission), check whether your <code class="docutils literal"><span class="pre">DocumentRoot</span></code> contains a folder or
+file with the same path that you mapped the mod_python handler to. For
+some reason, mod_python gets confused when it is mapped to a location
+that also matches a static resource.</p>
+</div>
+<div class="section" id="problem-with-virtual-host-configuration">
+<h4>Problem with virtual host configuration<a class="headerlink" href="#problem-with-virtual-host-configuration" title="Permalink to this headline">¶</a></h4>
+<p>If the &lt;Location /&gt; directive is used, setting the <code class="docutils literal"><span class="pre">DocumentRoot</span></code> may
+result in a <em>403 (Forbidden)</em> error. Either remove the <code class="docutils literal"><span class="pre">DocumentRoot</span></code>
+directive, or make sure that accessing the directory it points is
+allowed (in a corresponding <code class="docutils literal"><span class="pre">&lt;Directory&gt;</span></code> block).</p>
+<p>Using &lt;Location /&gt; together with <code class="docutils literal"><span class="pre">SetHandler</span></code> resulted in having
+everything handled by mod_python, which leads to not being able
+download any CSS or images/icons. I used &lt;Location /trac&gt;
+<code class="docutils literal"><span class="pre">SetHandler</span> <span class="pre">None</span></code> &lt;/Location&gt; to circumvent the problem, though I do
+not know if this is the most elegant solution.</p>
+</div>
+<div class="section" id="problem-with-zipped-egg">
+<h4>Problem with zipped egg<a class="headerlink" href="#problem-with-zipped-egg" title="Permalink to this headline">¶</a></h4>
+<p>It&#8217;s possible that your version of mod_python will not import modules
+from zipped eggs. If you encounter an
+<code class="docutils literal"><span class="pre">ImportError:</span> <span class="pre">No</span> <span class="pre">module</span> <span class="pre">named</span> <span class="pre">trac</span></code> in your Apache logs but you think
+everything is where it should be, this might be your problem. Look in
+your site-packages directory; if the Trac module appears as a <em>file</em>
+rather than a <em>directory</em>, then this might be your problem. To rectify,
+try installing Trac using the <code class="docutils literal"><span class="pre">--always-unzip</span></code> option, like this:</p>
+</div>
+<div class="section" id="using-htaccess">
+<h4>Using .htaccess<a class="headerlink" href="#using-htaccess" title="Permalink to this headline">¶</a></h4>
+<p>Although it may seem trivial to rewrite the above configuration as a
+directory in your document root with a <code class="docutils literal"><span class="pre">.htaccess</span></code> file, this does not
+work. Apache will append a &#8220;/&#8221; to any Trac URLs, which interferes with
+its correct operation.</p>
+<p>It may be possible to work around this with mod_rewrite, but I failed
+to get this working. In all, it is more hassle than it is worth. Stick
+to the provided instructions. :)</p>
+<p>A success story: For me it worked out-of-box, with following trivial
+config:</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">SetHandler</span> <span class="n">mod_python</span>
+<span class="n">PythonInterpreter</span> <span class="n">main_interpreter</span>
+<span class="n">PythonHandler</span> <span class="n">trac</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">modpython_frontend</span>
+<span class="n">PythonOption</span> <span class="n">TracEnv</span> <span class="o">/</span><span class="n">system</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">this</span><span class="o">/</span><span class="n">directory</span>
+<span class="n">PythonOption</span> <span class="n">TracUriRoot</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">on</span><span class="o">/</span><span class="n">apache</span>
+
+<span class="n">AuthType</span> <span class="n">Basic</span>
+<span class="n">AuthName</span> <span class="s2">&quot;ProjectName&quot;</span>
+<span class="n">AuthUserFile</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/.</span><span class="n">htpasswd</span>
+<span class="n">Require</span> <span class="n">valid</span><span class="o">-</span><span class="n">user</span>
+</pre></div>
+</div>
+</div><p>The <code class="docutils literal"><span class="pre">TracUriRoot</span></code> is obviously the path you need to enter to the
+browser to get to the trac (e.g. domain.tld/projects/trac)</p>
+</div>
+<div class="section" id="additional-htaccess-help">
+<h4>Additional .htaccess help<a class="headerlink" href="#additional-htaccess-help" title="Permalink to this headline">¶</a></h4>
+<p>If you are using the .htaccess method you may have additional problems
+if your trac directory is inheriting .htaccess directives from another.
+This may also help to add to your .htaccess file:</p>
+</div>
+<div class="section" id="platform-specific-issues">
+<h4>Platform specific issues<a class="headerlink" href="#platform-specific-issues" title="Permalink to this headline">¶</a></h4>
+</div>
+</div>
+</div>
+<div class="section" id="win32-issues">
+<h2>Win32 Issues<a class="headerlink" href="#win32-issues" title="Permalink to this headline">¶</a></h2>
+<p>If you run trac with mod_python &lt; 3.2 on Windows, uploading attachments
+will <strong>not</strong> work. This problem is resolved in mod_python 3.1.4 or
+later, so please upgrade mod_python to fix this.</p>
+</div>
+<div class="section" id="os-x-issues">
+<h2>OS X issues<a class="headerlink" href="#os-x-issues" title="Permalink to this headline">¶</a></h2>
+<p>When using mod_python on OS X you will not be able to restart Apache
+using <code class="docutils literal"><span class="pre">apachectl</span> <span class="pre">restart</span></code>. This is apparently fixed in mod_python
+3.2, but there&#8217;s also a patch available for earlier versions
+<a class="reference external" href="http://www.dscpl.com.au/projects/vampire/patches.html">​here</a>.</p>
+</div>
+<div class="section" id="selinux-issues">
+<h2>SELinux issues<a class="headerlink" href="#selinux-issues" title="Permalink to this headline">¶</a></h2>
+<p>If Trac reports something like: <em>Cannot get shared lock on db.lock</em> The
+security context on the repository may need to be set:</p>
+<p>See also
+<a class="reference external" href="http://subversion.tigris.org/faq.html#reposperms">​http://subversion.tigris.org/faq.html#reposperms</a></p>
+</div>
+<div class="section" id="freebsd-issues">
+<h2>FreeBSD issues<a class="headerlink" href="#freebsd-issues" title="Permalink to this headline">¶</a></h2>
+<p>Pay attention to the version of the installed mod_python and sqlite
+packages. Ports have both the new and old ones, but earlier versions of
+pysqlite and mod_python won&#8217;t integrate as the former requires threaded
+support in python, and the latter requires a threadless install.</p>
+<p>If you compiled and installed apache2, apache wouldn´t support threads
+(cause it doesn´t work very well on FreeBSD). You could force thread
+support when running ./configure for apache, using &#8211;enable-threads, but
+this isn´t recommendable. The best option <a class="reference external" href="http://modpython.org/pipermail/mod_python/2006-September/021983.html">​seems to
+be</a>
+adding to /usr/local/apache2/bin/ennvars the line</p>
+</div>
+<div class="section" id="fedora-7-issues">
+<h2>Fedora 7 Issues<a class="headerlink" href="#fedora-7-issues" title="Permalink to this headline">¶</a></h2>
+<p>Make sure you install the &#8216;python-sqlite2&#8217; package as it seems to be
+required for
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracModPython.html">TracModPython</a>
+but not for tracd</p>
+<p>If you get the following Trac Error
+<code class="docutils literal"><span class="pre">Unsupported</span> <span class="pre">version</span> <span class="pre">control</span> <span class="pre">system</span> <span class="pre">&quot;svn&quot;</span></code> only under mod_python,
+though it works well on the command-line and even with
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracStandalone.html">TracStandalone</a>,
+chances are that you forgot to add the path to the Python bindings with
+the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracModPython.html#ConfiguringPythonPath">PythonPath</a>
+directive. (The better way is to add a link to the bindings in the
+Python <code class="docutils literal"><span class="pre">site-packages</span></code> directory, or create a <code class="docutils literal"><span class="pre">.pth</span></code> file in that
+directory.)</p>
+<p>If this is not the case, it&#8217;s possible that you&#8217;re using Subversion
+libraries that are binary incompatible with the apache ones (an
+incompatibility of the <code class="docutils literal"><span class="pre">apr</span></code> libraries is usually the cause). In that
+case, you also won&#8217;t be able to use the svn modules for Apache
+(<code class="docutils literal"><span class="pre">mod_dav_svn</span></code>).</p>
+<p>You also need a recent version of <code class="docutils literal"><span class="pre">mod_python</span></code> in order to avoid a
+runtime error (<code class="docutils literal"><span class="pre">argument</span> <span class="pre">number</span> <span class="pre">2:</span> <span class="pre">a</span> <span class="pre">'apr_pool_t</span> <span class="pre">*'</span> <span class="pre">is</span> <span class="pre">expected</span></code>) due
+to the default usage of multiple sub-interpreters. 3.2.8 <em>should</em> work,
+though it&#8217;s probably better to use the workaround described in
+<a class="reference external" href="http://trac.edgewall.org/intertrac/%233371">​#3371</a>, in order to
+force the use of the main interpreter:</p>
+<p>This is anyway the recommended workaround for other well-known issues
+seen when using the Python bindings for Subversion within mod_python
+(<a class="reference external" href="http://trac.edgewall.org/intertrac/%232611">​#2611</a>,
+<a class="reference external" href="http://trac.edgewall.org/intertrac/%233455">​#3455</a>). See in
+particular Graham Dumpleton&#8217;s comment in
+<a class="reference external" href="http://trac.edgewall.org/intertrac/comment%3A9%3Aticket%3A3455">​#3455</a>
+explaining the issue.</p>
+<p>If the formatting of the Trac pages look weird chances are that the
+style sheets governing the page layout are not handled properly by the
+web server. Try adding the following lines to your apache configuration:</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Alias</span> <span class="o">/</span><span class="n">myproject</span><span class="o">/</span><span class="n">css</span> <span class="s2">&quot;/usr/share/trac/htdocs/css&quot;</span>
+<span class="o">&lt;</span><span class="n">Location</span> <span class="o">/</span><span class="n">myproject</span><span class="o">/</span><span class="n">css</span><span class="o">&gt;</span>
+    <span class="n">SetHandler</span> <span class="kc">None</span>
+<span class="o">&lt;/</span><span class="n">Location</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</div><p>Note: For the above configuration to have any effect it must be put
+after the configuration of your project root location, i.e.
+<code class="docutils literal"><span class="pre">&lt;Location</span> <span class="pre">/myproject</span> <span class="pre">/&gt;</span></code>.</p>
+<p>Also, setting <code class="docutils literal"><span class="pre">PythonOptimize</span> <span class="pre">On</span></code> seems to mess up the page headers
+and footers, in addition to hiding the documentation for macros and
+plugins (see #Trac8956). Considering how little effect the option has,
+it is probably a good idea to leave it <code class="docutils literal"><span class="pre">Off</span></code>.</p>
+<p>If you want to run Trac fully under https you might find that it tries
+to redirect to plain http. In this case just add the following line to
+your apache configuration:</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">VirtualHost</span> <span class="o">*</span> <span class="o">&gt;</span>
+    <span class="n">DocumentRoot</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">www</span><span class="o">/</span><span class="n">myproject</span>
+    <span class="n">ServerName</span> <span class="n">trac</span><span class="o">.</span><span class="n">mycompany</span><span class="o">.</span><span class="n">com</span>
+    <span class="n">SetEnv</span> <span class="n">HTTPS</span> <span class="mi">1</span>
+    <span class="o">....</span>
+<span class="o">&lt;/</span><span class="n">VirtualHost</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</div><p>You may encounter segfaults (reported on debian etch) if php5-mhash
+module is installed. Try to remove it to see if this solves the problem.
+See debian bug report
+<a class="reference external" href="http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=411487">​http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=411487</a></p>
+<p>Some people also have troubles when using php5 compiled with its own 3rd
+party libraries instead of system libraries. Check here
+<a class="reference external" href="http://www.djangoproject.com/documentation/modpython/#if-you-get-a-segmentation-fault">​http://www.djangoproject.com/documentation/modpython/#if-you-get-a-segmentation-fault</a></p>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracGuide.html">TracGuide</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracInstall.html">TracInstall</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracModWSGI.html">ModWSGI</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracFastCgi.html">FastCGI</a>,
+<a class="reference external" href="http://trac.edgewall.org/intertrac/TracNginxRecipe">​TracNginxRecipe</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Trac and mod_python</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a><ul>
+<li><a class="reference internal" href="#simple-configuration-single-project">Simple configuration: single project</a><ul>
+<li><a class="reference internal" href="#python-egg-cache">Python Egg Cache</a></li>
+<li><a class="reference internal" href="#configuring-authentication">Configuring Authentication</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#advanced-configuration">Advanced Configuration</a><ul>
+<li><a class="reference internal" href="#setting-the-python-egg-cache">Setting the Python Egg Cache</a></li>
+<li><a class="reference internal" href="#setting-the-pythonpath">Setting the PythonPath</a></li>
+<li><a class="reference internal" href="#setting-up-multiple-projects">Setting up multiple projects</a></li>
+<li><a class="reference internal" href="#virtual-host-configuration">Virtual Host Configuration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#troubleshooting">Troubleshooting</a><ul>
+<li><a class="reference internal" href="#login-not-working">Login Not Working</a></li>
+<li><a class="reference internal" href="#expat-related-segmentation-faults">Expat-related segmentation faults</a></li>
+<li><a class="reference internal" href="#form-submission-problems">Form submission problems</a></li>
+<li><a class="reference internal" href="#problem-with-virtual-host-configuration">Problem with virtual host configuration</a></li>
+<li><a class="reference internal" href="#problem-with-zipped-egg">Problem with zipped egg</a></li>
+<li><a class="reference internal" href="#using-htaccess">Using .htaccess</a></li>
+<li><a class="reference internal" href="#additional-htaccess-help">Additional .htaccess help</a></li>
+<li><a class="reference internal" href="#platform-specific-issues">Platform specific issues</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#win32-issues">Win32 Issues</a></li>
+<li><a class="reference internal" href="#os-x-issues">OS X issues</a></li>
+<li><a class="reference internal" href="#selinux-issues">SELinux issues</a></li>
+<li><a class="reference internal" href="#freebsd-issues">FreeBSD issues</a></li>
+<li><a class="reference internal" href="#fedora-7-issues">Fedora 7 Issues</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracModPython.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracModPython.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

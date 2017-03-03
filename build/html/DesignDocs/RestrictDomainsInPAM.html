@@ -1,0 +1,262 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Restricting the domains a PAM service can auth against &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="restricting-the-domains-a-pam-service-can-auth-against">
+<h1>Restricting the domains a PAM service can auth against<a class="headerlink" href="#restricting-the-domains-a-pam-service-can-auth-against" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1021">​https://fedorahosted.org/sssd/ticket/1021</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>Some environments require that different PAM applications can use a
+different set of SSSD domains. The legacy PAM modules, such as
+<code class="docutils literal"><span class="pre">pam_ldap</span></code> were able to use a different configuration file altogether
+as a parameter for the PAM module. This wiki page describes a similar
+feature for the SSSD.</p>
+</div>
+<div class="section" id="use-case">
+<h2>Use case<a class="headerlink" href="#use-case" title="Permalink to this headline">¶</a></h2>
+<p>An example use-case is an environment that allows external users to
+authenticate to an FTP server. This server is running as a separate
+non-privileged user and should only be able to authenticate to a
+selected SSSD domain, separate from the internal company accounts. The
+administrator is able to leverage this new feature to mark allow the FTP
+user to only authenticate against one of the domains in the FTP PAM
+config file.</p>
+</div>
+<div class="section" id="overview-of-the-solution">
+<h2>Overview of the solution<a class="headerlink" href="#overview-of-the-solution" title="Permalink to this headline">¶</a></h2>
+<p>On the PAM client side, the PAM module should receive a new option that
+specifies the SSSD domains to authenticate against. However, the SSSD
+daemon can&#8217;t fully trust all PAM services. We can&#8217;t rely on the PAM
+service fields either, as the data the PAM client sends to the PAM
+application can be faked by the client, especially by users who posses
+shell access or can start custom applications. Instead, there needs to
+be a list of users who we trust. Typically, this would be a list of
+users who run the PAM aware applications we wish to restrict (such as
+<code class="docutils literal"><span class="pre">vsftpd</span></code> or <code class="docutils literal"><span class="pre">openvpn</span></code>). This list would default to <code class="docutils literal"><span class="pre">root</span></code> only.</p>
+<p>These trusted users would be allowed to authenticate against any domain
+and would also be able to restrict the domains further using a new
+pam_sss option. For the untrusted users, we need to keep a list of
+domains allowed to authenticate against, too. Since by default there are
+no restrictions on the allowed domains, this list would default to &#8220;all
+domains are allowed&#8221;.</p>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<p>This section breaks down the Overview of the solution into consumable
+pieces.</p>
+<div class="section" id="add-a-new-option-pam-trusted-users">
+<h3>Add a new option <code class="docutils literal"><span class="pre">pam_trusted_users</span></code><a class="headerlink" href="#add-a-new-option-pam-trusted-users" title="Permalink to this headline">¶</a></h3>
+<p>A new option must be added to the PAM responder. This option will be a
+list of numerical UIDs or group names that are trusted or a special
+keyword &#8220;ALL&#8221;. This list will be parsed during PAM responder
+initialization (<code class="docutils literal"><span class="pre">pam_process_init</span></code> call) using the
+<code class="docutils literal"><span class="pre">csv_string_to_uid_array</span></code> function and stored in the PAM responder
+context (<code class="docutils literal"><span class="pre">struct</span> <span class="pre">pam_ctx</span></code>). The PAC responder does pretty much the
+same in the <code class="docutils literal"><span class="pre">pac_process_init</span></code> function.</p>
+<p>In the responder, we already have the credentials of the client stored
+in the <code class="docutils literal"><span class="pre">cli_ctx</span></code> structure. When a new request comes into the
+<code class="docutils literal"><span class="pre">pam_forwarder</span></code> function, we will match the client UID against the
+list of trusted IDs and determine whether the client is trusted or not.</p>
+<p>The default will be the special keyword ALL, meaning all users are
+trusted. This is in line with the current behaviour where any user can
+access any domain.</p>
+</div>
+<div class="section" id="add-a-option-to-limit-the-domains-for-untrusted-users">
+<h3>Add a option to limit the domains for untrusted users<a class="headerlink" href="#add-a-option-to-limit-the-domains-for-untrusted-users" title="Permalink to this headline">¶</a></h3>
+<p>Another option, called <code class="docutils literal"><span class="pre">pam_allowed_auth_domains</span></code> shall be added to
+the PAM responder. This option will list the SSSD domains an untrusted
+client can authenticate against. The option will accept either a
+comma-separated list of SSSD domains or any of two special values
+<code class="docutils literal"><span class="pre">all</span></code> and <code class="docutils literal"><span class="pre">none</span></code>. The default value will be <code class="docutils literal"><span class="pre">none</span></code> to make sure
+the administrator is required to spell out the domains that can be
+contacted by an untrusted client when he starts differentiating trusted
+and untrusted domains.</p>
+<p>The option will be parsed during <code class="docutils literal"><span class="pre">pam_process_init</span></code> and stored in the
+<code class="docutils literal"><span class="pre">pam_ctx</span></code> structure. An untrusted client will only be allowed to send
+a request to a domain that matches the list of allowed domains.</p>
+<p>In order to keep the implementation simple, the <code class="docutils literal"><span class="pre">all</span></code> keyword would
+copy all domain names into <code class="docutils literal"><span class="pre">pam_ctx</span></code> and the <code class="docutils literal"><span class="pre">none</span></code> keyword would
+set the variable holding the names to NULL. Then the check would be a
+simple loop for all cases.</p>
+<p>Care must be taken to ensure a sensible PAM error code for cases where
+the domain wouldn&#8217;t match.</p>
+</div>
+<div class="section" id="add-a-new-pam-module-option-to-limit-the-domains">
+<h3>Add a new pam module option to limit the domains<a class="headerlink" href="#add-a-new-pam-module-option-to-limit-the-domains" title="Permalink to this headline">¶</a></h3>
+<p>The PAM module will gain a new option, called <code class="docutils literal"><span class="pre">domains</span></code> that will
+allow the administrator to use a list of domains to authenticate this
+PAM service against. In the PAM responder, this option will only be in
+effect for trusted clients. If the client is trusted, only domains
+listed in this PAM option will be considered for authentication.</p>
+<p>Please note that a patch implementing most of the functionality of this
+PAM module option was contributed to the sssd-devel mailing list by
+Daniel Gollub already.</p>
+</div>
+<div class="section" id="password-changes">
+<h3>Password Changes<a class="headerlink" href="#password-changes" title="Permalink to this headline">¶</a></h3>
+<p>Password changes should be allowed against all domains, meaning that a
+user A (recognized via getpeercred) will be allow to perform a password
+change, ie implicitly allowed to access its own domain even if it is
+untrusted. Arbitrary password changes for other users should not be
+allowed.</p>
+</div>
+</div>
+<div class="section" id="configuration-changes">
+<h2>Configuration Changes<a class="headerlink" href="#configuration-changes" title="Permalink to this headline">¶</a></h2>
+<p>Several new options, described in details in the previous section, will
+be introduced. No existing options will change defaults or gain new
+option values.</p>
+</div>
+<div class="section" id="how-to-test">
+<h2>How To Test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Prepare an SSSD installation with at least two domains A and B.</li>
+<li>Pick a PAM service that is running by a trusted user. One example
+might be VPN service ran by the openvpn user or similar. Add this
+user as a value of <code class="docutils literal"><span class="pre">pam_trusted_users</span></code> option in the <code class="docutils literal"><span class="pre">[pam]</span></code>
+section.</li>
+<li>Add one of the domains (domain A) as a <code class="docutils literal"><span class="pre">domain=</span></code> parameter into the
+<code class="docutils literal"><span class="pre">auth</span></code> section of your service&#8217;s PAM config file</li>
+<li>Authenticate using the selected PAM service as a user from domain A.
+The authentication should succeed.</li>
+<li>Authenticate using the same service as a user from domain B. The
+authentication should fail and there should be a reasonable (ie not
+System Error) return code returned to the application</li>
+<li>Authenticate using a different PAM service. Make sure this service is
+ran by an untrusted user (not root!). Logins against both A and B
+should fail.</li>
+<li>Set the value of <code class="docutils literal"><span class="pre">pam_allowed_auth_domains</span></code> to A. Login against A
+should succeed from a service running as untrusted user.</li>
+<li>Change the value of <code class="docutils literal"><span class="pre">pam_allowed_auth_domains</span></code> to all. Login
+against both domains should succeed from a service running as
+untrusted user.</li>
+<li>Remove the <code class="docutils literal"><span class="pre">domains=</span></code> option from the PAM config file. The trusted
+service should now be able to log in against both SSSD domains.</li>
+<li>Perform a password change as an untrusted user against a domain that
+he should not normally be allowed to use. The password change must
+succeed.</li>
+</ol>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Daniel Gollub &lt;<a class="reference external" href="mailto:dgollub&#37;&#52;&#48;brocade&#46;com">​dgollub<span>&#64;</span>brocade<span>&#46;</span>com</a>&gt;</li>
+<li>Jakub Hrozek &lt;<a class="reference external" href="mailto:jhrozek&#37;&#52;&#48;redhat&#46;com">​jhrozek<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+<li>Simo Sorce &lt;<a class="reference external" href="mailto:simo&#37;&#52;&#48;redhat&#46;com">​simo<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Restricting the domains a PAM service can auth against</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem statement</a></li>
+<li><a class="reference internal" href="#use-case">Use case</a></li>
+<li><a class="reference internal" href="#overview-of-the-solution">Overview of the solution</a></li>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a><ul>
+<li><a class="reference internal" href="#add-a-new-option-pam-trusted-users">Add a new option <code class="docutils literal"><span class="pre">pam_trusted_users</span></code></a></li>
+<li><a class="reference internal" href="#add-a-option-to-limit-the-domains-for-untrusted-users">Add a option to limit the domains for untrusted users</a></li>
+<li><a class="reference internal" href="#add-a-new-pam-module-option-to-limit-the-domains">Add a new pam module option to limit the domains</a></li>
+<li><a class="reference internal" href="#password-changes">Password Changes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuration-changes">Configuration Changes</a></li>
+<li><a class="reference internal" href="#how-to-test">How To Test</a></li>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/RestrictDomainsInPAM.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/RestrictDomainsInPAM.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

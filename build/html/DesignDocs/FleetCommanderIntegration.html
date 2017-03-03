@@ -1,0 +1,272 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Fleet Commander Integration &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="fleet-commander-integration">
+<h1>Fleet Commander Integration<a class="headerlink" href="#fleet-commander-integration" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2995">​https://fedorahosted.org/sssd/ticket/2995</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>FleetCommander is a service to centrally manage Desktop environments. It
+includes a server to define desktop profiles and a client to apply
+profile information to the user&#8217;s desktop session on a specified
+machine.</p>
+<p>This design document describes the SSSD part of an integration of
+FleetCommander with FreeIPA. The integration is done two-fold, the IPA
+part of the integration is <a class="reference external" href="https://github.com/abbra/freeipa-desktop-profile/blob/master/plugin/Feature.mediawiki">​documented
+separately</a>.</p>
+</div>
+<div class="section" id="use-cases">
+<h2>Use cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+<p>As an administrator, I want to manage desktop profiles in a centralized
+way</p>
+<p>As an administrator, I want to use centrally defined users, groups,
+hosts and host groups to specify how desktop profiles should be applied.</p>
+<p>As an administrator, I want to make sure desktop profiles associated
+with a specific user or user group are downloaded and applied on a
+specific FreeIPA client according to the desktop profile rules defined
+in FreeIPA.</p>
+</div>
+<div class="section" id="overview-of-the-solution">
+<h2>Overview of the solution<a class="headerlink" href="#overview-of-the-solution" title="Permalink to this headline">¶</a></h2>
+<p>FleetCommander consists on two components:</p>
+<ul class="simple">
+<li>a web service integrated with Cockpit that serves the dynamic
+application and the profile data to the network.</li>
+<li>and a client side daemon that runs on every host of the network.</li>
+</ul>
+<p>Since this design page deals with the client side of the whole picture,
+this paragraph will focus on the integration of the FC client side
+daemon with SSSD.</p>
+<p>The FC profiles will be downloaded by a new <code class="docutils literal"><span class="pre">session_provider</span></code> of IPA.
+This provider will do nothing by default and will include an option to
+download FC rules from IPA LDAP (perhaps
+<code class="docutils literal"><span class="pre">ipa_enable_deskprofile</span> <span class="pre">=</span> <span class="pre">True</span></code>).</p>
+<p>In order to minimize the required client-side configuration changes,
+enabling the Fleet Commander client side deamon will drop SSSD
+configuration that enables the SSSD functionality and restarts SSSD.</p>
+<p>When a FreeIPA domain user logs in, the IPA provider will download the
+Fleet Commander profile and rule objects and drop the resulting JSON
+files into a per-user directory. The file names must be normalized and
+prepended with priority (please refer to the IPA design page for more
+details).</p>
+<p>In the future, we would like to link the Fleet Commander profiles with
+HBAC rules, but the first implementation will not include this part.</p>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<p>The implementation has two distinct parts &#8211; enabling the IPA session
+provider&#8217;s Fleet Commander functionality and actually fetching the Fleet
+Commander data.</p>
+<div class="section" id="enabling-the-ipa-session-provider">
+<h3>Enabling the IPA session provider<a class="headerlink" href="#enabling-the-ipa-session-provider" title="Permalink to this headline">¶</a></h3>
+<p>Since searching for the Fleet Commander profiles does not come for free
+- at least one LDAP search must be issued, perhaps more unless we cache
+the host groups, we should only enable this functionality if the Fleet
+Commander client daemon is enabled as well. To this end, enabling the FC
+client deamon would trigger a one-shot systemd service that would drop
+an include file to SSSD&#8217;s <code class="docutils literal"><span class="pre">conf.d</span></code> directory.</p>
+<p>The systemd service might be implemented along these lines:</p>
+<p>This systemd unit might be stored in
+<code class="docutils literal"><span class="pre">/lib/systemd/system/sssd-deskprofile.service</span></code>.</p>
+<p>The sssd.snippet.conf file should look like:</p>
+<p>Having to setup the domain name is something that must be done either by
+the administrator or by the FC client daemon. Currently we have a Python
+API that provides the domains in the config file and maybe the FC client
+daemon could use that or maybe IPA client could generate the file and
+put it somewhere where it&#8217;s inactive for FC client daemon to pick it up.
+It&#8217;s a problem that still has to be solved on FC client daemon&#8217;s side.</p>
+</div>
+<div class="section" id="looking-up-the-fleet-commander-profiles-and-storing-the-json-profile-data">
+<h3>Looking up the Fleet Commander profiles and storing the JSON profile data<a class="headerlink" href="#looking-up-the-fleet-commander-profiles-and-storing-the-json-profile-data" title="Permalink to this headline">¶</a></h3>
+<p>Similar to how we look up and store sudo and HBAC rules, we will look up
+all profiles that apply to this host, with:</p>
+<p>All host groups the IPA client is a member of must be included in the
+<code class="docutils literal"><span class="pre">memberHost</span></code> part of the filter. However, since in the typical
+scenario, sessions provider will be called after HBAC or SELinux
+processing was done, the host and host groups will be usually already
+cached and can be just reused from the cache.</p>
+<p>Once all profiles are cached, processing and selection of the profiles
+that apply to the user logging in would be done offline. Again, this is
+similar to how we process sudo or HBAC rules. The local search&#8217;s filter
+will look for the user and all his groups. For performance reasons, we
+need to check if initgroups was performed prior to looking up the
+profiles and only issue another initgroups request if the user entry&#8217;s
+inigroup timestamp is expired.</p>
+<p>The profiles will also be stored in the cache to allow offline
+processing. As an additional enhancement, we can skip writing the
+profile data to the cache if the remote data has not changed. We can
+take a look at the <code class="docutils literal"><span class="pre">modifyTimestamp</span></code> attribute value to see if any of
+the entries need an update in the cache.</p>
+<p>The LDAP search will include the Fleet Commander payload data in the
+profile&#8217;s <code class="docutils literal"><span class="pre">data</span></code> attribute. Once the data are known, SSSD will write
+them to the disk. Since writing to the disk is typically quite fast</p>
+<p>The JSON files will be stored in a new directory owned by the
+<code class="docutils literal"><span class="pre">sssd-ipa</span></code> subpackage. The top-level directory could be at
+<code class="docutils literal"><span class="pre">/var/lib/sss/fleetcmd/</span></code> with per-user subdirectories. So each
+per-user JSON file would be stored at
+<code class="docutils literal"><span class="pre">/var/lib/sss/deskprofile/&lt;domain&gt;/&lt;username&gt;/&lt;profilename&gt;.json</span></code>. The
+<code class="docutils literal"><span class="pre">&lt;username&gt;</span></code> directories need to be owned by the user being logged in.</p>
+<p>The <code class="docutils literal"><span class="pre">&lt;profilename.json&gt;</span></code> file must include the priority as a number
+which is read from the rule&#8217;s <code class="docutils literal"><span class="pre">prio</span></code> attribute. The Fleet Commander
+client deamon will then process the JSON files in this priority. The
+filenames must also be normalized so that characters with a special
+meaning in shell are escaped and spaces are converted to another
+character such as underscores. Please refer to the IPA design page for
+more details.</p>
+<p>In the first version, the profiles will always be written again. In the
+future, we might want to optimize the process further by only writing
+the JSON profiles if they differ from what&#8217;s already stored on the disk.
+This might be doable by storing the modifyTimestamp in the JSON profiles
+again, if FC is able to ignore certain JSON key-value pairs that would
+be private to SSSD or just storing the largest USN value of the found
+profiles in the included directory in a specially-named file.</p>
+<p>During implementation, as much code as possible should be reused from
+the IPA HBAC access code and/or SELinux rule processing code.</p>
+</div>
+</div>
+<div class="section" id="configuration-changes">
+<h2>Configuration changes<a class="headerlink" href="#configuration-changes" title="Permalink to this headline">¶</a></h2>
+<p>Two new configuration options will be added:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">session_provider</span></code> that will be inherited from the <code class="docutils literal"><span class="pre">id_provider</span></code>
+value, so for IPA clients, this provider will default to <code class="docutils literal"><span class="pre">ipa</span></code>. A
+default <code class="docutils literal"><span class="pre">session_provider</span></code> for other providers will just shortcut
+and return success.</li>
+<li>An option that enables the FC rules and profiles processing. A
+proposed option name is <code class="docutils literal"><span class="pre">ipa_enable_deskprofile</span></code> with boolean
+semantics.</li>
+</ul>
+</div>
+<div class="section" id="how-to-test">
+<h2>How To Test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<p>Please see the use-cases above.</p>
+</div>
+<div class="section" id="how-to-debug">
+<h2>How To Debug<a class="headerlink" href="#how-to-debug" title="Permalink to this headline">¶</a></h2>
+<p>DEBUG messages will be added to the new session provider so that the
+admin can trace if the session provider was invoked at all. An easy way
+to debug the integration is to enable the sessions provider and the
+FleetCommander integration manually w/o dropping the file by the FC
+client side daemon.</p>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Alexander Bokovoy</li>
+<li>Jakub Hrozek</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Fleet Commander Integration</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem statement</a></li>
+<li><a class="reference internal" href="#use-cases">Use cases</a></li>
+<li><a class="reference internal" href="#overview-of-the-solution">Overview of the solution</a></li>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a><ul>
+<li><a class="reference internal" href="#enabling-the-ipa-session-provider">Enabling the IPA session provider</a></li>
+<li><a class="reference internal" href="#looking-up-the-fleet-commander-profiles-and-storing-the-json-profile-data">Looking up the Fleet Commander profiles and storing the JSON profile data</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuration-changes">Configuration changes</a></li>
+<li><a class="reference internal" href="#how-to-test">How To Test</a></li>
+<li><a class="reference internal" href="#how-to-debug">How To Debug</a></li>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/FleetCommanderIntegration.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/FleetCommanderIntegration.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,676 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Syntax Coloring of Source Code &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="syntax-coloring-of-source-code">
+<h1>Syntax Coloring of Source Code<a class="headerlink" href="#syntax-coloring-of-source-code" title="Permalink to this headline">¶</a></h1>
+<p>Trac supports language-specific syntax highlighting of source code
+within wiki formatted text in <a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiProcessors.html#CodeHighlightingSupport">wiki
+processors</a>
+blocks and in the <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracBrowser.html">repository
+browser</a>.</p>
+<p>To do this, Trac uses external libraries with support for a great number
+of programming languages.</p>
+<p>Currently Trac supports syntax coloring using one or more of the
+following packages:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://pygments.pocoo.org/">​Pygments</a>, by far the preferred
+system, as it covers a wide range of programming languages and other
+structured texts and is actively supported</li>
+<li><a class="reference external" href="http://www.codento.com/people/mtr/genscript/">​GNU Enscript</a>,
+commonly available on Unix but somewhat unsupported on Windows</li>
+<li><a class="reference external" href="http://silvercity.sourceforge.net/">​SilverCity</a>, legacy system,
+some versions can be
+<a class="reference external" href="http://trac.edgewall.org/wiki/TracFaq#why-is-my-css-code-not-being-highlighted-even-though-i-have-silvercity-installed">​problematic</a></li>
+</ul>
+<p>To activate syntax coloring, simply install either one (or more) of
+these packages (see
+<a class="reference external" href="https://fedorahosted.org/sssd#ExtraSoftware">#ExtraSoftware</a> section
+below). If none of these packages is available, Trac will display the
+data as plain text.</p>
+<div class="section" id="about-pygments">
+<h2>About Pygments<a class="headerlink" href="#about-pygments" title="Permalink to this headline">¶</a></h2>
+<p>Starting with trac 0.11 <a class="reference external" href="http://pygments.org/">​pygments</a> will be the
+new default highlighter. It&#8217;s a highlighting library implemented in pure
+python, very fast, easy to extend and <a class="reference external" href="http://pygments.org/docs/">​well
+documented</a>.</p>
+<p>The Pygments default style can specified in the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#mimeviewer-section">mime-viewer</a>
+section of trac.ini. The default style can be overridden by setting a
+Style preference on the <a class="reference external" href="https://fedorahosted.org/sssd/prefs/pygments">preferences
+page</a>.</p>
+<p>It&#8217;s very likely that the list below is outdated because the list of
+supported pygments lexers is growing weekly. Just have a look at the
+page of <a class="reference external" href="http://pygments.org/docs/lexers/">​supported lexers</a> on the
+pygments webpage.</p>
+<div class="section" id="syntax-coloring-support">
+<h3>Syntax Coloring Support<a class="headerlink" href="#syntax-coloring-support" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="known-mime-types">
+<h2>Known MIME Types<a class="headerlink" href="#known-mime-types" title="Permalink to this headline">¶</a></h2>
+<div class="mimetypes"><table border="1" class="docutils">
+<colgroup>
+<col width="28%" />
+<col width="72%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">MIME Types</th>
+<th class="head"><a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiProcessors.html">WikiProcessors</a></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">application/javascript</span></code></td>
+<td><code class="docutils literal"><span class="pre">js</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">application/msword</span></code></td>
+<td><code class="docutils literal"><span class="pre">doc</span> <span class="pre">dot</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">application/pdf</span></code></td>
+<td><code class="docutils literal"><span class="pre">pdf</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">application/postscript</span></code></td>
+<td><code class="docutils literal"><span class="pre">ps</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">application/rss+xml</span></code></td>
+<td><code class="docutils literal"><span class="pre">rss</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">application/rtf</span></code></td>
+<td><code class="docutils literal"><span class="pre">rtf</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">application/x-csh</span></code></td>
+<td><code class="docutils literal"><span class="pre">csh</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">application/x-sh</span></code></td>
+<td><code class="docutils literal"><span class="pre">sh</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">application/x-troff</span></code></td>
+<td><code class="docutils literal"><span class="pre">nroff</span> <span class="pre">roff</span> <span class="pre">troff</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">application/x-yaml</span></code></td>
+<td><code class="docutils literal"><span class="pre">yaml</span> <span class="pre">yml</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">application/xsl+xml</span></code></td>
+<td><code class="docutils literal"><span class="pre">xsl</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">application/xslt+xml</span></code></td>
+<td><code class="docutils literal"><span class="pre">xslt</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">image/svg+xml</span></code></td>
+<td><code class="docutils literal"><span class="pre">svg</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">image/x-icon</span></code></td>
+<td><code class="docutils literal"><span class="pre">ico</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">model/vrml</span></code></td>
+<td><code class="docutils literal"><span class="pre">vrml</span> <span class="pre">wrl</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">text/css</span></code></td>
+<td><code class="docutils literal"><span class="pre">css</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">text/html</span></code></td>
+<td><code class="docutils literal"><span class="pre">htm</span> <span class="pre">html</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">text/plain</span></code></td>
+<td><code class="docutils literal"><span class="pre">AUTHORS</span> <span class="pre">COPYING</span> <span class="pre">ChangeLog</span> <span class="pre">INSTALL</span> <span class="pre">README</span> <span class="pre">RELEASE</span> <span class="pre">TXT</span> <span class="pre">text</span> <span class="pre">txt</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">text/x-ada</span></code></td>
+<td><code class="docutils literal"><span class="pre">ada</span> <span class="pre">adb</span> <span class="pre">ads</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">text/x-asm</span></code></td>
+<td><code class="docutils literal"><span class="pre">asm</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">text/x-asp</span></code></td>
+<td><code class="docutils literal"><span class="pre">asp</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">text/x-awk</span></code></td>
+<td><code class="docutils literal"><span class="pre">awk</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">text/x-c++hdr</span></code></td>
+<td><code class="docutils literal"><span class="pre">H</span> <span class="pre">HH</span> <span class="pre">c++hdr</span> <span class="pre">hh</span> <span class="pre">hpp</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">text/x-c++src</span></code></td>
+<td><code class="docutils literal"><span class="pre">C</span> <span class="pre">C++</span> <span class="pre">CC</span> <span class="pre">c++</span> <span class="pre">c++src</span> <span class="pre">cc</span> <span class="pre">cpp</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">text/x-chdr</span></code></td>
+<td><code class="docutils literal"><span class="pre">chdr</span> <span class="pre">h</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">text/x-csharp</span></code></td>
+<td><code class="docutils literal"><span class="pre">C#</span> <span class="pre">c#</span> <span class="pre">cs</span> <span class="pre">csharp</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">text/x-csrc</span></code></td>
+<td><code class="docutils literal"><span class="pre">c</span> <span class="pre">csrc</span> <span class="pre">xs</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">text/x-diff</span></code></td>
+<td><code class="docutils literal"><span class="pre">diff</span> <span class="pre">patch</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">text/x-dylan</span></code></td>
+<td><code class="docutils literal"><span class="pre">dylan</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">text/x-eiffel</span></code></td>
+<td><code class="docutils literal"><span class="pre">e</span> <span class="pre">eiffel</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">text/x-elisp</span></code></td>
+<td><code class="docutils literal"><span class="pre">el</span> <span class="pre">elisp</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">text/x-fortran</span></code></td>
+<td><code class="docutils literal"><span class="pre">f</span> <span class="pre">fortran</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">text/x-haskell</span></code></td>
+<td><code class="docutils literal"><span class="pre">haskell</span> <span class="pre">hs</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">text/x-idl</span></code></td>
+<td><code class="docutils literal"><span class="pre">ice</span> <span class="pre">idl</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">text/x-inf</span></code></td>
+<td><code class="docutils literal"><span class="pre">inf</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">text/x-ini</span></code></td>
+<td><code class="docutils literal"><span class="pre">cfg</span> <span class="pre">ini</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">text/x-java</span></code></td>
+<td><code class="docutils literal"><span class="pre">java</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">text/x-ksh</span></code></td>
+<td><code class="docutils literal"><span class="pre">ksh</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">text/x-lua</span></code></td>
+<td><code class="docutils literal"><span class="pre">lua</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">text/x-m4</span></code></td>
+<td><code class="docutils literal"><span class="pre">m4</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">text/x-mail</span></code></td>
+<td><code class="docutils literal"><span class="pre">mail</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">text/x-makefile</span></code></td>
+<td><code class="docutils literal"><span class="pre">GNUMakefile</span> <span class="pre">Makefile</span> <span class="pre">make</span> <span class="pre">makefile</span> <span class="pre">mk</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">text/x-objc</span></code></td>
+<td><code class="docutils literal"><span class="pre">m</span> <span class="pre">mm</span> <span class="pre">objc</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">text/x-ocaml</span></code></td>
+<td><code class="docutils literal"><span class="pre">ml</span> <span class="pre">mli</span> <span class="pre">ocaml</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">text/x-pascal</span></code></td>
+<td><code class="docutils literal"><span class="pre">pas</span> <span class="pre">pascal</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">text/x-perl</span></code></td>
+<td><code class="docutils literal"><span class="pre">PL</span> <span class="pre">perl</span> <span class="pre">pl</span> <span class="pre">pm</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">text/x-php</span></code></td>
+<td><code class="docutils literal"><span class="pre">php</span> <span class="pre">php3</span> <span class="pre">php4</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">text/x-psp</span></code></td>
+<td><code class="docutils literal"><span class="pre">psp</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">text/x-pyrex</span></code></td>
+<td><code class="docutils literal"><span class="pre">pyrex</span> <span class="pre">pyx</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">text/x-python</span></code></td>
+<td><code class="docutils literal"><span class="pre">py</span> <span class="pre">python</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">text/x-rfc</span></code></td>
+<td><code class="docutils literal"><span class="pre">rfc</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">text/x-rst</span></code></td>
+<td><code class="docutils literal"><span class="pre">rst</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">text/x-ruby</span></code></td>
+<td><code class="docutils literal"><span class="pre">rb</span> <span class="pre">ruby</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">text/x-scheme</span></code></td>
+<td><code class="docutils literal"><span class="pre">scheme</span> <span class="pre">scm</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">text/x-sql</span></code></td>
+<td><code class="docutils literal"><span class="pre">sql</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">text/x-tcl</span></code></td>
+<td><code class="docutils literal"><span class="pre">tcl</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">text/x-tex</span></code></td>
+<td><code class="docutils literal"><span class="pre">tex</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">text/x-textile</span></code></td>
+<td><code class="docutils literal"><span class="pre">textile</span> <span class="pre">txtl</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">text/x-vba</span></code></td>
+<td><code class="docutils literal"><span class="pre">bas</span> <span class="pre">vb</span> <span class="pre">vba</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">text/x-verilog</span></code></td>
+<td><code class="docutils literal"><span class="pre">v</span> <span class="pre">verilog</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">text/x-vhdl</span></code></td>
+<td><code class="docutils literal"><span class="pre">vhd</span> <span class="pre">vhdl</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">text/x-zsh</span></code></td>
+<td><code class="docutils literal"><span class="pre">zsh</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">text/xml</span></code></td>
+<td><code class="docutils literal"><span class="pre">xml</span></code></td>
+</tr>
+</tbody>
+</table>
+</div><p>Note that the rich content may be directly <em>rendered</em> instead of syntax
+highlighted. This usually depends on which auxiliary packages are
+installed and on which components are activated in your setup. For
+example a <code class="docutils literal"><span class="pre">text/x-rst</span></code> document will be rendered via <code class="docutils literal"><span class="pre">docutils</span></code> if
+it is installed and the <code class="docutils literal"><span class="pre">trac.mimeview.rst.ReStructuredTextRenderer</span></code>
+is not disabled, and will be syntax highlighted otherwise.</p>
+<p>In a similar way, a document with the mimetype <code class="docutils literal"><span class="pre">text/x-trac-wiki</span></code> is
+rendered using the Trac wiki formatter, unless the
+<code class="docutils literal"><span class="pre">trac.mimeview.api.WikiTextRenderer</span></code> component is disabled.</p>
+<p>HTML documents are directly rendered only if the <code class="docutils literal"><span class="pre">render_unsafe_html</span></code>
+settings are enabled in the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">TracIni</a> (those
+settings are present in multiple sections, as there are different
+security concerns depending where the document comes from). If you want
+to ensure that an HTML document gets syntax highlighted and not
+rendered, use the <code class="docutils literal"><span class="pre">text/xml</span></code> mimetype.</p>
+<p>If mimetype such as &#8216;svn:mime-type&#8217; is set to &#8216;text/plain&#8217;, there is no
+coloring even if file is known type like &#8216;java&#8217;.</p>
+</div>
+<div class="section" id="list-of-languages-supported-by-highlighter">
+<h2>List of Languages Supported, by Highlighter<a class="headerlink" href="#list-of-languages-supported-by-highlighter" title="Permalink to this headline">¶</a></h2>
+<p>This list is only indicative.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="30%" />
+<col width="30%" />
+<col width="7%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>&nbsp;</td>
+<td>SilverCity</td>
+<td>Enscript</td>
+<td>Pygments</td>
+</tr>
+<tr class="row-even"><td>Ada</td>
+<td>&nbsp;</td>
+<td>✓</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>Asm</td>
+<td>&nbsp;</td>
+<td>✓</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>Apache Conf</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>✓</td>
+</tr>
+<tr class="row-odd"><td>ASP</td>
+<td>✓</td>
+<td>✓</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>C</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="row-odd"><td>C#</td>
+<td>&nbsp;</td>
+<td>✓ :sup:<a href="#id1"><span class="problematic" id="id2">``</span></a>(1) &lt;<a class="reference external" href="https://fedorahosted.org/sssd#a1">https://fedorahosted.org/sssd#a1</a>&gt;`__`</td>
+<td>✓</td>
+</tr>
+<tr class="row-even"><td>C++</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="row-odd"><td>CMake</td>
+<td>?</td>
+<td>?</td>
+<td>✓</td>
+</tr>
+<tr class="row-even"><td>Java</td>
+<td>✓ :sup:<a href="#id3"><span class="problematic" id="id4">``</span></a>(2) &lt;<a class="reference external" href="https://fedorahosted.org/sssd#a2">https://fedorahosted.org/sssd#a2</a>&gt;`__`</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="row-odd"><td>Awk</td>
+<td>&nbsp;</td>
+<td>✓</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>Boo</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>✓</td>
+</tr>
+<tr class="row-odd"><td>CSS</td>
+<td>✓</td>
+<td>&nbsp;</td>
+<td>✓</td>
+</tr>
+<tr class="row-even"><td>Python Doctests</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>✓</td>
+</tr>
+<tr class="row-odd"><td>Diff</td>
+<td>&nbsp;</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="row-even"><td>Eiffel</td>
+<td>&nbsp;</td>
+<td>✓</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>Elisp</td>
+<td>&nbsp;</td>
+<td>✓</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>Fortran</td>
+<td>&nbsp;</td>
+<td>✓ :sup:<a href="#id5"><span class="problematic" id="id6">``</span></a>(1) &lt;<a class="reference external" href="https://fedorahosted.org/sssd#a1">https://fedorahosted.org/sssd#a1</a>&gt;`__`</td>
+<td>✓</td>
+</tr>
+<tr class="row-odd"><td>Haskell</td>
+<td>&nbsp;</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="row-even"><td>Genshi</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>✓</td>
+</tr>
+<tr class="row-odd"><td>HTML</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="row-even"><td>IDL</td>
+<td>&nbsp;</td>
+<td>✓</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>INI</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>✓</td>
+</tr>
+<tr class="row-even"><td>Javascript</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="row-odd"><td>Lua</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>✓</td>
+</tr>
+<tr class="row-even"><td>m4</td>
+<td>&nbsp;</td>
+<td>✓</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>Makefile</td>
+<td>&nbsp;</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="row-even"><td>Mako</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>✓</td>
+</tr>
+<tr class="row-odd"><td>Matlab :sup:<a href="#id7"><span class="problematic" id="id8">``</span></a>(3) &lt;<a class="reference external" href="https://fedorahosted.org/sssd#a3">https://fedorahosted.org/sssd#a3</a>&gt;`__`</td>
+<td>&nbsp;</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="row-even"><td>Mygthy</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>✓</td>
+</tr>
+<tr class="row-odd"><td>Objective-C</td>
+<td>&nbsp;</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="row-even"><td>OCaml</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>✓</td>
+</tr>
+<tr class="row-odd"><td>Pascal</td>
+<td>&nbsp;</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="row-even"><td>Perl</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="row-odd"><td>PHP</td>
+<td>✓</td>
+<td>&nbsp;</td>
+<td>✓</td>
+</tr>
+<tr class="row-even"><td>PSP</td>
+<td>✓</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>Pyrex</td>
+<td>&nbsp;</td>
+<td>✓</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>Python</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="row-odd"><td>Ruby</td>
+<td>✓</td>
+<td>✓ :sup:<a href="#id9"><span class="problematic" id="id10">``</span></a>(1) &lt;<a class="reference external" href="https://fedorahosted.org/sssd#a1">https://fedorahosted.org/sssd#a1</a>&gt;`__`</td>
+<td>✓</td>
+</tr>
+<tr class="row-even"><td>Scheme</td>
+<td>&nbsp;</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="row-odd"><td>Shell</td>
+<td>&nbsp;</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="row-even"><td>Smarty</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>✓</td>
+</tr>
+<tr class="row-odd"><td>SQL</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="row-even"><td>Troff</td>
+<td>&nbsp;</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="row-odd"><td>TCL</td>
+<td>&nbsp;</td>
+<td>✓</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>Tex</td>
+<td>&nbsp;</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="row-odd"><td>Verilog</td>
+<td>✓ :sup:<a href="#id11"><span class="problematic" id="id12">``</span></a>(2) &lt;<a class="reference external" href="https://fedorahosted.org/sssd#a2">https://fedorahosted.org/sssd#a2</a>&gt;`__`</td>
+<td>✓</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>VHDL</td>
+<td>&nbsp;</td>
+<td>✓</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>Visual Basic</td>
+<td>&nbsp;</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="row-even"><td>VRML</td>
+<td>&nbsp;</td>
+<td>✓</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>XML</td>
+<td>✓</td>
+<td>&nbsp;</td>
+<td>✓</td>
+</tr>
+</tbody>
+</table>
+<p><em>(1) Not included in the Enscript distribution. Additional highlighting
+rules can be obtained for
+`​Ruby &lt;http://neugierig.org/software/ruby/&gt;`__,
+`​C# &lt;http://wiki.hasno.info/index.php/Csharp.st&gt;`__, `​Fortran
+90x/2003 &lt;http://wiki.hasno.info/index.php/F90.st&gt;`__</em></p>
+<p><em>(2) since Silvercity 0.9.7 released on 2006-11-23</em></p>
+<p><em>(3) By default ``.m`` files are considered Objective-C files. In order
+to treat ``.m`` files as MATLAB files, add &#8220;text/matlab:m&#8221; to the
+&#8220;mime_map&#8221; setting in the `[mimeviewer] section of
+trac.ini &lt;https://docs.pagure.org/sssd-test2/TracIni.html#mimeviewer-section&gt;`__.</em></p>
+<div class="section" id="extra-software">
+<h3>Extra Software<a class="headerlink" href="#extra-software" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>GNU Enscript —
+<a class="reference external" href="http://directory.fsf.org/GNU/enscript.html">​http://directory.fsf.org/GNU/enscript.html</a></li>
+<li>GNU Enscript for Windows —
+<a class="reference external" href="http://gnuwin32.sourceforge.net/packages/enscript.htm">​http://gnuwin32.sourceforge.net/packages/enscript.htm</a></li>
+<li>SilverCity —
+<a class="reference external" href="http://silvercity.sf.net/">​http://silvercity.sf.net/</a></li>
+<li><strong>Pygments — `​http://pygments.org/ &lt;http://pygments.org/&gt;`__</strong></li>
+</ul>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiProcessors.html">WikiProcessors</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html">WikiFormatting</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracWiki.html">TracWiki</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracBrowser.html">TracBrowser</a></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Syntax Coloring of Source Code</a><ul>
+<li><a class="reference internal" href="#about-pygments">About Pygments</a><ul>
+<li><a class="reference internal" href="#syntax-coloring-support">Syntax Coloring Support</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#known-mime-types">Known MIME Types</a></li>
+<li><a class="reference internal" href="#list-of-languages-supported-by-highlighter">List of Languages Supported, by Highlighter</a><ul>
+<li><a class="reference internal" href="#extra-software">Extra Software</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracSyntaxColoring.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracSyntaxColoring.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

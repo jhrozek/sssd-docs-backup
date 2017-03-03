@@ -1,0 +1,556 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><a class="reference external" href="#Introduction">Introduction</a></li>
+<li><a class="reference external" href="#WhyCodingGuidelines">Why Coding Guidelines?</a><ol class="arabic">
+<li><a class="reference external" href="#Maintainability">Maintainability</a></li>
+<li><a class="reference external" href="#Readability">Readability</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#Definitions">Definitions</a></li>
+<li><a class="reference external" href="#NoteonC99">Note on C99</a></li>
+<li><a class="reference external" href="#Rules">Rules</a><ol class="arabic">
+<li><a class="reference external" href="#GeneralRules">General Rules</a></li>
+<li><a class="reference external" href="#SpacesandIndentation">Spaces and Indentation</a></li>
+<li><a class="reference external" href="#LengthofLine">Length of Line</a></li>
+<li><a class="reference external" href="#Comments">Comments</a></li>
+<li><a class="reference external" href="#IFDEF">IFDEF</a></li>
+<li><a class="reference external" href="#IncludeFiles">Include Files</a></li>
+<li><a class="reference external" href="#Macros">Macros</a></li>
+<li><a class="reference external" href="#Useofgoto">Use of goto</a><ol class="arabic">
+<li><a class="reference external" href="#Labeldone">Label done</a></li>
+<li><a class="reference external" href="#Labelfail">Label fail</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#Variables">Variables</a><ol class="arabic">
+<li><a class="reference external" href="#Naming">Naming</a></li>
+<li><a class="reference external" href="#Declaring">Declaring</a></li>
+<li><a class="reference external" href="#UseofTypedefs">Use of Typedefs</a></li>
+<li><a class="reference external" href="#DeclaringStructures">Declaring Structures</a></li>
+<li><a class="reference external" href="#GlobalVariables">Global Variables</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#Functions">Functions</a><ol class="arabic">
+<li><a class="reference external" href="#ExternalFunctionDeclarations">External Function
+Declarations</a></li>
+<li><a class="reference external" href="#DeclaringModuleFunctions">Declaring Module Functions</a></li>
+<li><a class="reference external" href="#OrderoftheFunctions">Order of the Functions</a></li>
+<li><a class="reference external" href="#NamingFunctions">Naming Functions</a></li>
+<li><a class="reference external" href="#IndentingFunctions">Indenting Functions</a></li>
+<li><a class="reference external" href="#FunctionDeclaration">Function Declaration</a></li>
+<li><a class="reference external" href="#FunctionParameters">Function Parameters</a></li>
+<li><a class="reference external" href="#UseofConst">Use of Const</a></li>
+<li><a class="reference external" href="#ToolstoUse">Tools to Use</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#ConditionsandStatements">Conditions and Statements</a><ol class="arabic">
+<li><a class="reference external" href="#Condition">Condition</a></li>
+<li><a class="reference external" href="#IFStatements">IF Statements</a></li>
+<li><a class="reference external" href="#Loops">Loops</a><ol class="arabic">
+<li><a class="reference external" href="#Switch">Switch</a></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><a class="reference external" href="#Strings">Strings</a><ol class="arabic">
+<li><a class="reference external" href="#Internationalizedi18nStrings">Internationalized (i18n)
+Strings</a></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</div><p>This guide is work in progress and should replace the older FreeIPA
+guide.</p>
+<div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>This manual contains coding standards and guidelines for SSSD and
+FreeIPA contributors. It is updated based heavily on the FreeIPA style
+which was based on <a class="reference external" href="http://directory.fedoraproject.org/wiki?title=Coding_Style">​389 Directory Server style
+guide</a>
+but deviates from it and covers more aspects.</p>
+<p>All new code should adhere to these standards but please do not go back
+and make wholesale formatting changes to the old code. It just confuses
+things and is generally a waste of time.</p>
+</div>
+<div class="section" id="why-coding-guidelines">
+<h1>Why Coding Guidelines?<a class="headerlink" href="#why-coding-guidelines" title="Permalink to this headline">¶</a></h1>
+<p>The Coding Guidelines are necessary to improve maintainability and
+readability of the code.</p>
+<div class="section" id="maintainability">
+<h2>Maintainability<a class="headerlink" href="#maintainability" title="Permalink to this headline">¶</a></h2>
+<p>If you&#8217;re merging changes from a patch it&#8217;s much easier if everyone is
+using the same coding style. This isn&#8217;t the reality for a lot of our
+code, but we&#8217;re trying to get to the point where most of it uses the
+same style.</p>
+</div>
+<div class="section" id="readability">
+<h2>Readability<a class="headerlink" href="#readability" title="Permalink to this headline">¶</a></h2>
+<p>Remember, code isn&#8217;t just for compilers, it&#8217;s for people, too. If it
+wasn&#8217;t for people, we would all be programming in assembly. Coding style
+and consistency mean that if you go from one part of the code to another
+you don&#8217;t spend time having to re-adjust from one style to another.
+Blocks are consistent and readable and the flow of the code is apparent.
+Coding style adds value for people who have to read your code after
+you&#8217;ve been hit by a bus. Remember that.</p>
+</div>
+</div>
+<div class="section" id="definitions">
+<h1>Definitions<a class="headerlink" href="#definitions" title="Permalink to this headline">¶</a></h1>
+<p>The following guidelines apply to developing code in the SSSD project.
+Some rules are mandatory some rules are just suggestions or
+recommendations. We will use following terminology to identify whether
+this or that rule is mandatory or not.</p>
+<ul class="simple">
+<li>MUST – everybody must follow the rule</li>
+<li>HIGHLY RECOMMENDED – the rule should be followed unless there are
+some serious reasons why they should not be followed.</li>
+<li>RECOMMENDED – it is a best practice to use this rule. It is not
+required but strongly encouraged.</li>
+<li>DISCRETION – follow this at developer discretion.</li>
+</ul>
+</div>
+<div class="section" id="note-on-c99">
+<h1>Note on C99<a class="headerlink" href="#note-on-c99" title="Permalink to this headline">¶</a></h1>
+<p>We compile code with -std=gnu99 flag. It is OK to use C99 features
+supported by GCC and Clang, however C++ style line comments (*) should
+still be avoided. Using variable length arrays should be done with
+caution and only be used for smaller arrays.*</p>
+</div>
+<div class="section" id="rules">
+<h1>Rules<a class="headerlink" href="#rules" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="general-rules">
+<h2>General Rules<a class="headerlink" href="#general-rules" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>MUST: All source and header files must include a copy of the license.</li>
+<li>HIGHLY RECOMMENDED: Stick to a K&amp;R coding style for C.</li>
+<li>HIGHLY RECOMMENDED: Curly braces on same line as if/while.</li>
+<li>MUST: All code should be peer reviewed before being checked in.</li>
+<li>MUST: If you are fixing a bug, attach the patch to the bug report.</li>
+<li>HIGHLY RECOMMENDED: For Python we have an enforced style in many
+cases already but consistency is important.</li>
+</ul>
+</div>
+<div class="section" id="spaces-and-indentation">
+<h2>Spaces and Indentation<a class="headerlink" href="#spaces-and-indentation" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>MUST: No tabs all indentation 4 spaces.</li>
+<li>HIGHLY RECOMMENDED: When wrapping lines, try to break it:<ul>
+<li>after a comma</li>
+<li>before an operator</li>
+<li>align the new line with the beginnigng of the expression at the
+same level in the previous line</li>
+<li>in case of long &#8220;if&#8221; statements, wrap the line before an operator
+and indent the new line</li>
+<li>if all else fails, just indent 8 spaces.</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="length-of-line">
+<h2>Length of Line<a class="headerlink" href="#length-of-line" title="Permalink to this headline">¶</a></h2>
+<p>MUST: Do not make lines longer than 120 characters.</p>
+<p>HIGHLY RECOMMENDED: Keep lines within 80 character boundary for better
+readability.</p>
+</div>
+<div class="section" id="comments">
+<h2>Comments<a class="headerlink" href="#comments" title="Permalink to this headline">¶</a></h2>
+<p>MUST: Use only C style comments /* */ not C++.</p>
+<p>MUST: When commenting use the following styles:</p>
+<p>Avoid:</p>
+<p>HIGHLY RECOMMENDED: Avoid useless comments that do not add value to the
+code.</p>
+<p>HIGHLY RECOMMENDED: Each function should be preceded with a block
+comment describing what the function is supposed to do.</p>
+<p>HIGHLY RECOMMENDED: Block comments should be preceded by a blank line to
+set it apart. Line up the * characters in the block comment.</p>
+<p>HIGHLY RECOMMENDED: Python comments can use either the # or &#8220;&#8221;&#8221; form</p>
+</div>
+<div class="section" id="ifdef">
+<h2>IFDEF<a class="headerlink" href="#ifdef" title="Permalink to this headline">¶</a></h2>
+<p>HIGHLY RECOMMENDED: When using #ifdefs, it&#8217;s nice to add comments in the
+pairing #endif:</p>
+<p>or:</p>
+</div>
+<div class="section" id="include-files">
+<h2>Include Files<a class="headerlink" href="#include-files" title="Permalink to this headline">¶</a></h2>
+<p>RECOMMENDED: Includes should be grouped properly. Standard headers and
+local headers should definitely be separated by a blank line. Other
+logical grouping should be reasonably done if needed. Files inside the
+groups should be sorted alphabetically, unless a specific order is
+required - this however is very rare, and must not happen. Also, one
+shouldn&#8217;t depend on the fact that one header file includes other one,
+unless it is really obvious and/or desirable, like in cases when one
+header file practically &#8220;enhances&#8221; the other one, for example with more
+error codes, etc.</p>
+</div>
+<div class="section" id="macros">
+<h2>Macros<a class="headerlink" href="#macros" title="Permalink to this headline">¶</a></h2>
+<p>HIGHLY RECOMMENDED: Macros that are unsafe should be in upper-case. This
+also applies to macros that span multiple lines:</p>
+<p>Notice that arguments should be in parentheses if there&#8217;s a risk. Also
+notice that a is referenced two times, and hence the macro is dangerous.
+Wrapping the body in do { } while (0) makes it safe to use it like this:</p>
+<p>Notice the semicolon is used after the invocation, not in the macro
+definition.</p>
+<p>Otherwise, if a macro is safe (for example a simple wrapping function),
+then the case can be lower-case.</p>
+</div>
+<div class="section" id="use-of-goto">
+<h2>Use of goto<a class="headerlink" href="#use-of-goto" title="Permalink to this headline">¶</a></h2>
+<p>We use goto to simplify cleanup operations and some other tasks that
+need to be done before leaving the function.</p>
+<p>MUST: Never use goto to jump backwards in the code</p>
+<p>HIGHLY RECOMMENDED: If goto is needed in the code, use one of the
+following labels: done, fail (TBD: add other allowed labels)</p>
+<p>RECOMMENDED: Do not use more than one goto label per function.</p>
+<div class="section" id="label-done">
+<h3>Label done<a class="headerlink" href="#label-done" title="Permalink to this headline">¶</a></h3>
+<p>Label done is used as jump target before exit. Clean-up operations, such
+as freeing local talloc context, usually follow the done label. Both
+successful and unsuccessful function executions pass this label.</p>
+</div>
+<div class="section" id="label-fail">
+<h3>Label fail<a class="headerlink" href="#label-fail" title="Permalink to this headline">¶</a></h3>
+<p>Used as special exit path when function fails. Successful function
+execution typically does not execute statements after this label.</p>
+</div>
+</div>
+<div class="section" id="variables">
+<h2>Variables<a class="headerlink" href="#variables" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="naming">
+<h3>Naming<a class="headerlink" href="#naming" title="Permalink to this headline">¶</a></h3>
+<p>HIGHLY RECOMMENDED: Use low case multi word underscore separated
+notation for naming variables.</p>
+<p>HIGHLY RECOMMENDED: Make name meaningful.</p>
+<p>MUST: Never use Hungarian notation when naming variables.</p>
+</div>
+<div class="section" id="declaring">
+<h3>Declaring<a class="headerlink" href="#declaring" title="Permalink to this headline">¶</a></h3>
+<p>instead of</p>
+<p>HIGHLY RECOMMENDED: Initialize at declaration time when possible.</p>
+<p>RECOMMENDED: Avoid complex variable initializations (like calling
+functions) when declaring variables like:</p>
+<p>MUST: Always declare variables at the top of the function or block. If
+you find yourself declaring many variables inside inner block or loop,
+consider refactoring the block into helper function. HIGHLY RECOMMENDED:
+Avoid shadowing variables. Use different name even if the shadowed
+variable is not important for the inner blocks.</p>
+<p>RECOMMENDED: Don&#8217;t initialize static or global variables to 0 or NULL.</p>
+</div>
+<div class="section" id="use-of-typedefs">
+<h3>Use of Typedefs<a class="headerlink" href="#use-of-typedefs" title="Permalink to this headline">¶</a></h3>
+<p>HIGHLY RECOMMENDED: Avoid using typedefs. Typedefs obscure structures
+and make it harder to understand and debug.</p>
+</div>
+<div class="section" id="declaring-structures">
+<h3>Declaring Structures<a class="headerlink" href="#declaring-structures" title="Permalink to this headline">¶</a></h3>
+<p>DISCRETION: When defining structure or union try make it easy to read.
+You may use some form of alignment if you see that this might make it
+more readable.</p>
+</div>
+<div class="section" id="global-variables">
+<h3>Global Variables<a class="headerlink" href="#global-variables" title="Permalink to this headline">¶</a></h3>
+<p>HIGHLY RECOMMENDED: Avoid using global variables. They make for very
+poor code. Should be used only if no other way can be found. They tend
+to be not thread/async safe</p>
+</div>
+</div>
+<div class="section" id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="external-function-declarations">
+<h3>External Function Declarations<a class="headerlink" href="#external-function-declarations" title="Permalink to this headline">¶</a></h3>
+<p>HIGHLY RECOMMENDED: Avoid situations where you have to explicitly list
+out external function. The header files should in general take care of
+the external function declaration. If this is not the case it is subject
+for review of the header file hierarchy.</p>
+</div>
+<div class="section" id="declaring-module-functions">
+<h3>Declaring Module Functions<a class="headerlink" href="#declaring-module-functions" title="Permalink to this headline">¶</a></h3>
+<p>DISCRETION: It up to the developer to define the order of the functions
+in the module and thus declare functions at the top or use a native flow
+of the module and avoid forward function declarations.</p>
+</div>
+<div class="section" id="order-of-the-functions">
+<h3>Order of the Functions<a class="headerlink" href="#order-of-the-functions" title="Permalink to this headline">¶</a></h3>
+<p>DISCRETION: It is up to the developer which approach to use: whether to
+write the main function at the top of the module and then all the
+supporting functions or start with supporting functions and have the
+main one at the bottom. Both approaches are acceptable. One can use
+additional comments to help identify how the module is structured.</p>
+</div>
+<div class="section" id="naming-functions">
+<h3>Naming Functions<a class="headerlink" href="#naming-functions" title="Permalink to this headline">¶</a></h3>
+<p>MUST: For function names use multi word underscore separate naming
+convention like this monitor_task_init(struct task_server *task);</p>
+<p>MUST: Never use Hungarian notation when naming functions.</p>
+</div>
+<div class="section" id="indenting-functions">
+<h3>Indenting Functions<a class="headerlink" href="#indenting-functions" title="Permalink to this headline">¶</a></h3>
+<p>DISCRETION: It is up to the developer which pattern to use when
+indenting the function parameters if function has long name and has to
+be split between multiple lines. The pattern however MUST be consistent
+across the module so if you are fixing somebodies code continue with the
+pattern used in the module.</p>
+</div>
+<div class="section" id="function-declaration">
+<h3>Function Declaration<a class="headerlink" href="#function-declaration" title="Permalink to this headline">¶</a></h3>
+<p>DISCRETION: It is up to the developer whether to put the return type of
+the function and modifiers (static for example) in front of the function
+on the same line or start the line with the an actual function name. In
+any case the pattern MUST be consistent across the module. If you are
+adding function to an already existing module follow its pattern. MUST:
+Put opening “{“ of the function body on the beginning of the new line
+after the function declaration. HIGHLY RECOMMENDED: Do not put spaces
+before or after parenthesis in the declaration of the parameters. For
+example:</p>
+<blockquote>
+<div>OK: `` int foo(int bar, int baz); `` NOT OK:
+`` int bad ( arg1 , arg2 ); ``</div></blockquote>
+</div>
+<div class="section" id="function-parameters">
+<h3>Function Parameters<a class="headerlink" href="#function-parameters" title="Permalink to this headline">¶</a></h3>
+<p>RECOMMENDED: Try to always put &#8220;input&#8221; arguments before &#8220;output&#8221;
+arguments, if you have arguments that provide both input an output put
+them between the pure-input and the pure-output ones. Add underscore
+prefix &#8220;_&#8221; to output arguments.</p>
+<blockquote>
+<div>OK: `` foo(int in1, void <a href="#id1"><span class="problematic" id="id2">*</span></a>in2, char <a href="#id3"><span class="problematic" id="id4">**</span></a>_ou1); `` NOT OK:
+`` voo(char <a href="#id5"><span class="problematic" id="id6">**</span></a>ou1, int in1); ``</div></blockquote>
+</div>
+<div class="section" id="use-of-const">
+<h3>Use of Const<a class="headerlink" href="#use-of-const" title="Permalink to this headline">¶</a></h3>
+<p>RECOMMENDED: If appropriate, always use the const modifier for pointers
+passed to the function. This makes the intentions of the function more
+clearer, plus allows the compiler to catch more bugs and make some
+optimizations.</p>
+</div>
+<div class="section" id="tools-to-use">
+<h3>Tools to Use<a class="headerlink" href="#tools-to-use" title="Permalink to this headline">¶</a></h3>
+<p>RECOMMENDED: Creating lists and queues was already done a lot of times.
+When possible, use some common functions for manipulating these to avoid
+mistakes.</p>
+</div>
+</div>
+<div class="section" id="conditions-and-statements">
+<h2>Conditions and Statements<a class="headerlink" href="#conditions-and-statements" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="condition">
+<h3>Condition<a class="headerlink" href="#condition" title="Permalink to this headline">¶</a></h3>
+<p>RECOMMENDED: Use the full condition syntax like (str == NULL) rather
+than (!str).</p>
+</div>
+<div class="section" id="if-statements">
+<h3>IF Statements<a class="headerlink" href="#if-statements" title="Permalink to this headline">¶</a></h3>
+<p>HIGHLY RECOMMENDED: If-else statements should have the following form:</p>
+<p>HIGHLY RECOMMENDED: Balance the braces in the if and else in an if-else
+statement if either has only one line:</p>
+<p>HIGHLY RECOMMENDED: Use braces even if there s just one line in the if
+statement.</p>
+<p>DISCRETION: You can avoid the braces if entire if statement is on one
+line.</p>
+<p>NOT OK:</p>
+<p>OK:</p>
+<p>Also OK:</p>
+<p>Always use braces if there is an else part:</p>
+<p>HIGHLY RECOMMENDED: Avoid last-return-in-else problem. Code should look
+like this:</p>
+<p><strong>NOT</strong> like this:</p>
+<p>HIGHLY RECOMMENDED: Conditions with &lt;, &lt;=, &gt;= or == operators should
+isolate the value being checked (untrusted value) on the left hand side
+of the comparison. The right hand side should contain trusted values
+(thus avoiding overflows/underflows). Use unsigned types when storing
+sizes or lengths. For example if variable len is untrusted and variables
+size and p are trusted (NOTE: sizes and length should be stored in
+unsigned types):</p>
+<blockquote>
+<div>NOT OK: `` if ((p + len ) &gt; size) return EINVAL; `` OK:
+`` if (len &gt; size - p) return EINVAL; ``</div></blockquote>
+</div>
+<div class="section" id="loops">
+<h3>Loops<a class="headerlink" href="#loops" title="Permalink to this headline">¶</a></h3>
+<p>HIGHLY RECOMMENDED: For, while and until statements should take a
+similar form:</p>
+<div class="section" id="switch">
+<h4>Switch<a class="headerlink" href="#switch" title="Permalink to this headline">¶</a></h4>
+<p>HIGHLY RECOMMENDED: Use the following style for the switch statements.
+Add comments if missing break is intentional.</p>
+</div>
+</div>
+</div>
+<div class="section" id="strings">
+<h2>Strings<a class="headerlink" href="#strings" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="internationalized-i18n-strings">
+<h3>Internationalized (i18n) Strings<a class="headerlink" href="#internationalized-i18n-strings" title="Permalink to this headline">¶</a></h3>
+<p>If the string will be internationalized (e.g. is marked with _()) and
+it has more than one format substitution you <strong>*MUST*</strong> use <em>index</em>
+format specifiers, not positional format specifiers. Translators need
+the option to reorder where substitutions appear in a string because the
+ordering of nouns, verbs, phrases, etc. differ between languages. If
+conventional positional format conversion specifiers (e.g. %s %d) are
+used the string cannot be reordered because the ordering of the format
+specifiers must match the ordering of the printf arguments supplying the
+substitutions. The fix for this is easy, use indexed format specifiers.
+An indexed specifier includes an (1 based) index to the % character that
+introduces the format specifier (e.g. %1$ to indicate the first
+argument). That index is used to select the matching argument from the
+argument list. When indexed specifiers are used <em>all</em> format specifiers
+and <em>all</em> * width fields <strong>*MUST*</strong> use indexed specifiers.</p>
+<p>Here is an example of incorrect usage with positional specifiers:</p>
+<p>Here is the correct usage using indexed specifiers:</p>
+<p>See man 3 printf as well as section 15.3.1 &#8220;C Format Strings&#8221; in the GNU
+gettext manual for more details.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Introduction</a></li>
+<li><a class="reference internal" href="#why-coding-guidelines">Why Coding Guidelines?</a><ul>
+<li><a class="reference internal" href="#maintainability">Maintainability</a></li>
+<li><a class="reference internal" href="#readability">Readability</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#definitions">Definitions</a></li>
+<li><a class="reference internal" href="#note-on-c99">Note on C99</a></li>
+<li><a class="reference internal" href="#rules">Rules</a><ul>
+<li><a class="reference internal" href="#general-rules">General Rules</a></li>
+<li><a class="reference internal" href="#spaces-and-indentation">Spaces and Indentation</a></li>
+<li><a class="reference internal" href="#length-of-line">Length of Line</a></li>
+<li><a class="reference internal" href="#comments">Comments</a></li>
+<li><a class="reference internal" href="#ifdef">IFDEF</a></li>
+<li><a class="reference internal" href="#include-files">Include Files</a></li>
+<li><a class="reference internal" href="#macros">Macros</a></li>
+<li><a class="reference internal" href="#use-of-goto">Use of goto</a><ul>
+<li><a class="reference internal" href="#label-done">Label done</a></li>
+<li><a class="reference internal" href="#label-fail">Label fail</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#variables">Variables</a><ul>
+<li><a class="reference internal" href="#naming">Naming</a></li>
+<li><a class="reference internal" href="#declaring">Declaring</a></li>
+<li><a class="reference internal" href="#use-of-typedefs">Use of Typedefs</a></li>
+<li><a class="reference internal" href="#declaring-structures">Declaring Structures</a></li>
+<li><a class="reference internal" href="#global-variables">Global Variables</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#functions">Functions</a><ul>
+<li><a class="reference internal" href="#external-function-declarations">External Function Declarations</a></li>
+<li><a class="reference internal" href="#declaring-module-functions">Declaring Module Functions</a></li>
+<li><a class="reference internal" href="#order-of-the-functions">Order of the Functions</a></li>
+<li><a class="reference internal" href="#naming-functions">Naming Functions</a></li>
+<li><a class="reference internal" href="#indenting-functions">Indenting Functions</a></li>
+<li><a class="reference internal" href="#function-declaration">Function Declaration</a></li>
+<li><a class="reference internal" href="#function-parameters">Function Parameters</a></li>
+<li><a class="reference internal" href="#use-of-const">Use of Const</a></li>
+<li><a class="reference internal" href="#tools-to-use">Tools to Use</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#conditions-and-statements">Conditions and Statements</a><ul>
+<li><a class="reference internal" href="#condition">Condition</a></li>
+<li><a class="reference internal" href="#if-statements">IF Statements</a></li>
+<li><a class="reference internal" href="#loops">Loops</a><ul>
+<li><a class="reference internal" href="#switch">Switch</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#strings">Strings</a><ul>
+<li><a class="reference internal" href="#internationalized-i18n-strings">Internationalized (i18n) Strings</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/CodingStyle.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/CodingStyle.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

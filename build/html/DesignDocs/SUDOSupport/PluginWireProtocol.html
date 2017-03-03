@@ -1,0 +1,273 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Sudo Plugin Wire Protocol &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#SudoPluginWireProtocol">Sudo Plugin Wire Protocol</a></li>
+<li><a class="reference external" href="#PolicyPlugin">Policy Plugin</a><ol class="arabic">
+<li><a class="reference external" href="#open">open()</a></li>
+<li><a class="reference external" href="#close">close()</a></li>
+<li><a class="reference external" href="#check_policy">check_policy()</a></li>
+<li><a class="reference external" href="#validate">validate()</a></li>
+<li><a class="reference external" href="#invalidate">invalidate()</a></li>
+<li><a class="reference external" href="#ConversationAPIPrintf-stylefuctions">Conversation API &amp; Printf-style
+fuctions</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#THEPLUGINWIREPROTOCOL">THE PLUGIN WIRE PROTOCOL</a></li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="sudo-plugin-wire-protocol">
+<h1>Sudo Plugin Wire Protocol<a class="headerlink" href="#sudo-plugin-wire-protocol" title="Permalink to this headline">¶</a></h1>
+<p>Sudo v1.8 supports a plugin API that can be used to extend features of
+SUDO. These pluggable modules can be of two types</p>
+<ol class="arabic simple">
+<li>Policy Plugin</li>
+<li>I/O log Plugin</li>
+</ol>
+<p>Policy plugin can determine whether the user is allowed run the
+specified command as specified user. Only one policy plugin may be
+loaded at a time. Where as the I/O log plugin logs the session to local
+file including the tty input/output, stdin, stdout, stderr etc. Through
+this policy plugin the user can different security policies that can be
+plugged into action. In the forwarder plugin we are not using I/O plugin
+to log data.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="policy-plugin">
+<h1>Policy Plugin<a class="headerlink" href="#policy-plugin" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="open">
+<h2>open()<a class="headerlink" href="#open" title="Permalink to this headline">¶</a></h2>
+<p>This function opens the connection between plugin and SUDO</p>
+<p><strong>Input</strong></p>
+<p>&#64;param[in] version - The major and minor version number of the plugin
+API</p>
+<p>&#64;param[in] conversation - A pointer to the conversation function that
+can be used by the plugin to interact with the user (see below). Returns
+0 on success and -1 on failure.</p>
+<p>&#64;param[in] plugin_printf - A pointer to a printf-style function that
+may be used to display informational or error messages</p>
+<p>&#64;param[in] user_info - A vector of user-supplied sudo settings in the
+form of &#8220;name=value&#8221; strings. The vector is terminated by a NULL
+pointer.</p>
+<p>&#64;param[in] user_env - A vector of information about the user running
+the command in the form of &#8220;name=value&#8221; strings. The vector is
+terminated by a NULL pointer.</p>
+<p><strong>Output</strong></p>
+<p>&#64;return 1 success</p>
+<p>&#64;return 0 failure</p>
+<p>&#64;return -1 general error</p>
+<p>&#64;return -2 usage error,</p>
+<p>If an error occurs, the plugin may optionally call the conversation or
+plugin_printf function with SUDO_CONF_ERROR_MSG to present
+additional error information to the user.</p>
+</div>
+<div class="section" id="close">
+<h2>close()<a class="headerlink" href="#close" title="Permalink to this headline">¶</a></h2>
+<p>The close function is called when the command being run by sudo
+finishes.</p>
+<p><strong>Input</strong></p>
+<p>&#64;param[in] exit_status - The command&#8217;s exit status, as returned by the
+wait system call. The value of exit_status is undefined if error is
+non-zero.</p>
+<p>&#64;param[out] error - If the command could not be executed, this is set to
+the value of errno set by the execve system call. If the command was
+successfully executed, the value of error is 0.</p>
+</div>
+<div class="section" id="check-policy">
+<h2>check_policy()<a class="headerlink" href="#check-policy" title="Permalink to this headline">¶</a></h2>
+<p>The check_policy function is called by sudo to determine whether the
+user is allowed to run the specified commands.</p>
+<p><strong>Input</strong></p>
+<p>&#64;param[in] argc - The number of elements in argv, not counting the final
+NULL pointer.</p>
+<p>&#64;param[in] argv - The argument vector describing the command the user
+wishes to run, in the same form as what would be passed to the execve()
+system call which is terminated by a NULL pointer.</p>
+<p>&#64;param[in] env_add - Additional environment variables specified by the
+user on the command line in the form of a NULL-terminated vector of
+&#8220;name=value&#8221; strings.</p>
+<p>&#64;param[in] command_info - Information about the command being run in
+the form of &#8220;name=value&#8221; strings.</p>
+<p>&#64;param[out] argv_out - The NULL-terminated argument vector to pass to
+the execve() system call when executing the command.</p>
+<p>&#64;param[in] user_env_out - The NULL-terminated environment vector to
+use when executing the command.</p>
+<p><strong>Output</strong></p>
+<p>&#64;return 1 - Command is allowed</p>
+<p>&#64;return -1 - general error</p>
+<p>&#64;return -2 - usage error</p>
+<p>If an error occurs, the plugin may optionally call the conversation or
+plugin_printf function with SUDO_CONF_ERROR_MSG to present
+additional error information to the user.</p>
+</div>
+<div class="section" id="validate">
+<h2>validate()<a class="headerlink" href="#validate" title="Permalink to this headline">¶</a></h2>
+<p>The validate function is called when sudo is run with the -v flag. For
+policy plugins such as sudoers that cache authentication credentials,
+this function will validate and cache the credentials. i.e, sudo will
+update the user&#8217;s cached credentials, authenticating the user&#8217;s password
+if necessary. The default sudoers plugin caches the user credential for
+a timeout of 5 minutes. The invocation of validate function through
+&#8216;sudo -v&#8217; flag extends the timeout of the user credentials after
+authentication if necessary.</p>
+<p>No Input</p>
+<p><strong>Output</strong></p>
+<p>&#64;return 1 - success</p>
+<p>&#64;return 0 - failure</p>
+<p>&#64;return -1 - error</p>
+<p>On error, the plugin may optionally call the conversation or
+plugin_printf function with SUDO_CONF_ERROR_MSG to present
+additional error information to the user.</p>
+</div>
+<div class="section" id="invalidate">
+<h2>invalidate()<a class="headerlink" href="#invalidate" title="Permalink to this headline">¶</a></h2>
+<p>The invalidate function is called when sudo is called with the -k or -K
+flag. This function will invalidate the credentials. i.e, the user
+credentials will be marked as invalid so that on the nest invocation of
+sudo user will be forcefuilly prompted undergo the authentication
+procedures. The invalidate function should be NULL if the plugin does
+not support credential caching.</p>
+<p><strong>Input</strong></p>
+<p>&#64;param[in] remove - If the remove flag is set, the plugin may remove the
+credentials instead of simply invalidating them.</p>
+</div>
+<div class="section" id="conversation-api-printf-style-fuctions">
+<h2>Conversation API &amp; Printf-style fuctions<a class="headerlink" href="#conversation-api-printf-style-fuctions" title="Permalink to this headline">¶</a></h2>
+<p>If the plugin needs to interact with the user or display informational
+or error messages, it may do so via the conversation function. The
+caller must include a trailing newline in msg if one is to be printed.
+The messages are passed in the the msg[] array of sudo_conv_messages
+and the replies are received in the array sudo_conv_reply structures.</p>
+<p>The format of sudo_conv_messages and sudo_conv_reply are</p>
+<p>The msg_type can be any one of these</p>
+<p>The formatted string given in the printf-style function is printed to
+the screen.</p>
+</div>
+</div>
+<div class="section" id="the-plugin-wire-protocol">
+<h1>THE PLUGIN WIRE PROTOCOL<a class="headerlink" href="#the-plugin-wire-protocol" title="Permalink to this headline">¶</a></h1>
+<blockquote>
+<div>This is the structure of message packet that is sent from plugin to
+SSSD responder for getting the authentication result.</div></blockquote>
+<p>The structure is as shown below.</p>
+<p>Each string message is grouped into a container of format:</p>
+<p>and each integer messages are grouped into container as:</p>
+<p>So that string message occupies a space of { 2*(sizeof
+uint32_t)+sizeof string } and integer type takes a space of {
+3*(sizeof uint32_t) }</p>
+<p>message_type : is defined at &#8220;sss_sudo_cli.h&#8221; as <strong>enum
+sudo_item_type</strong></p>
+<p>The message foramt will be:</p>
+<p>where start_header : SSS_START_OF_SUDO_REQUEST</p>
+<blockquote>
+<div>end_header : SSS_END_OF_SUDO_REQUEST</div></blockquote>
+<p>The messages are:</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Sudo Plugin Wire Protocol</a></li>
+<li><a class="reference internal" href="#policy-plugin">Policy Plugin</a><ul>
+<li><a class="reference internal" href="#open">open()</a></li>
+<li><a class="reference internal" href="#close">close()</a></li>
+<li><a class="reference internal" href="#check-policy">check_policy()</a></li>
+<li><a class="reference internal" href="#validate">validate()</a></li>
+<li><a class="reference internal" href="#invalidate">invalidate()</a></li>
+<li><a class="reference internal" href="#conversation-api-printf-style-fuctions">Conversation API &amp; Printf-style fuctions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-plugin-wire-protocol">THE PLUGIN WIRE PROTOCOL</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/DesignDocs/SUDOSupport/PluginWireProtocol.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../../_sources/DesignDocs/SUDOSupport/PluginWireProtocol.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

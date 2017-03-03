@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>How to detect that we are offline &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <p>On this page I collect some idea about offline detection in sssd and
+possible implementations.</p>
+<p>There are two main areas, how to detect if we are offline and how to
+detect that we are online again. When the sssd starts it should always
+assume that it is online and all configured service are available. This
+means that we do not need to save the offline/online state to some
+persistent storage.</p>
+<div class="section" id="how-to-detect-that-we-are-offline">
+<h1>How to detect that we are offline<a class="headerlink" href="#how-to-detect-that-we-are-offline" title="Permalink to this headline">¶</a></h1>
+<p>Not only system running sssd as a whole can be offline, but single
+services can be offline for different reasons, too. Thus the offline
+state needs to be detect for each service independently. The most
+generic way is to define a service timeout in each backend. If a request
+to a service last longer than the configured timeout the backend will
+cancel the request and returns with an error message that the service is
+temporarily unavailable. It is up to the backend to decide if there is
+some additional cleanup necessary or not. For example the kerberos
+backend might single the corresponding child process that it should
+terminate to release system resources.</p>
+<div class="section" id="identity-component">
+<h2>Identity component<a class="headerlink" href="#identity-component" title="Permalink to this headline">¶</a></h2>
+<p>Calls the the NSS (Name Service Switch) system are in general quite
+frequent and may slow down the system performance considerably if
+timeouts are involved in each query. Accordingly it make sense to save
+the offline state to answer all further calls from the cache. To avoid
+unnecessary state switches due to short glitches in the network a
+counter and a threshold value should be defined. If a single NSS call
+fails due to a timeout it will increment the counter. If a NSS call is
+successful it will set the counter to 0. If the counter reaches the
+threshold value the backend is marked offline. Additionally it will set
+an offline flag in the PONG response to the monitor.</p>
+</div>
+<div class="section" id="authn-authz-component">
+<h2>AuthN, AuthZ component<a class="headerlink" href="#authn-authz-component" title="Permalink to this headline">¶</a></h2>
+<p>Authentication request in general do not occur very often and require a
+user interaction. A not too large timeout is acceptable here. An
+authentication request should always try to reach the corresponding
+network service before falling back to the cache. Like in the NSS case a
+successful online authentication set the offline counter of the backend
+to 0 and a failed authentication due to a timeout should increment it.
+Other PAM request (authorization/access control) should behave similar
+except that they should not try to reach the network server if the
+offline counter is above the threshold but should consult the cache
+immediately.</p>
+<p>On systems with a large number of authentication request per time where
+the pending request will consume a large amount of system resources a
+global online/offline switch, as suggested by Simo, might help.</p>
+</div>
+</div>
+<div class="section" id="how-to-detect-that-we-are-online-again">
+<h1>How to detect that we are online again<a class="headerlink" href="#how-to-detect-that-we-are-online-again" title="Permalink to this headline">¶</a></h1>
+<p>There are a number of different way to detect changes in a system with
+respect to the network. Unfortunately most of them are not portable and
+will not cover all possible cases of coming back online we are
+interested in. But although it might be nice to switch back from offline
+to online as soon as the service is available again, I&#8217;m wondering if
+this is really necessary.</p>
+<div class="section" id="id1">
+<h2>AuthN, AuthZ component<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>Because each authentication request is first send to the network service
+before going to the cache, authentications automatically will be done
+online if the service is available again. If the backend is marked
+offline the offline counter will set set to 0.</p>
+</div>
+<div class="section" id="id2">
+<h2>Identity component<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>If the sssd is answering NSS calls from the cache, i.e. the system id
+offline with respect to the id provider backened, it is in my opinion
+not necessary to switch to the online status as soon as the
+corresponding network service becomes available again. For example a
+successful online authentication will reset the offline counter of the
+backend and sets the id provider to the online status again. But this
+will only work if either the system is completely offline or
+authentication and id are provided by the same backend. If
+authentication and id provider are different, e.g. LDAP for id and
+kerberos for authentication, and only the LDAP server is not available
+for some time, the authentication backend will not change its state and
+therefore the monitor will see no change in the status of this backend
+and send no signal to the other backends.</p>
+<p>To catch all case the id backend needs to check to online state on its
+own. This can be done event based or time based. For the former when
+offline every NSS call is counted and every Nth call is send to the
+network service to see if it is online again. For the time based scheme
+a request to the network service is scheduled for some time in the
+future and if the request failed a new one is scheduled. If either case
+a state change will be signaled to the monitor by the online flag in the
+PONG reply and the monitor can act accordingly.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">How to detect that we are offline</a><ul>
+<li><a class="reference internal" href="#identity-component">Identity component</a></li>
+<li><a class="reference internal" href="#authn-authz-component">AuthN, AuthZ component</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-detect-that-we-are-online-again">How to detect that we are online again</a><ul>
+<li><a class="reference internal" href="#id1">AuthN, AuthZ component</a></li>
+<li><a class="reference internal" href="#id2">Identity component</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/OfflineDetection.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/OfflineDetection.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Supporting Local Users as members of LDAP Groups for RRFc2307 servers &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="supporting-local-users-as-members-of-ldap-groups-for-rrfc2307-servers">
+<h1>Supporting Local Users as members of LDAP Groups for RRFc2307 servers<a class="headerlink" href="#supporting-local-users-as-members-of-ldap-groups-for-rrfc2307-servers" title="Permalink to this headline">¶</a></h1>
+<p>Related Tickets:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1020">​SSSD does not list local user&#8217;s group membership defined in
+LDAP</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem Statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>SSSD Has been built around the concept of self-contained Identity
+Domains. Because of this all users of a domain must be present in the
+domain itself to be available as members of the domain groups.</p>
+<p>Historically identity providers like nss_ldap has allowed to include
+local users in remote LDAP servers that use the RFC2307 (not bis)
+schema. With that schema group members are identified by the simple user
+name. So if a user by the same name happened to exist on the local
+workstation the LDAP group would end up being assigned to the user
+during operations like initgroups.</p>
+<p>This is technically a violation of the Identity domain and works mostly
+by accident. However in order to keep compatibility with existing
+deployments it has been requested to allow sssd to honor initgroups
+request for local users that happen to be referenced in RFC2307 LDAP
+servers.</p>
+</div>
+<div class="section" id="solution">
+<h2>Solution<a class="headerlink" href="#solution" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="new-option">
+<h3>New Option<a class="headerlink" href="#new-option" title="Permalink to this headline">¶</a></h3>
+<p>We introduce a new boolean option named
+ldap_rfc2307_fallback_to_local_users This option enables or
+disables the compatibility behavior. The option is set to &#8216;false&#8217; by
+default.</p>
+</div>
+<div class="section" id="behavior">
+<h3>Behavior<a class="headerlink" href="#behavior" title="Permalink to this headline">¶</a></h3>
+<p>When the above option is enabled the LDAP provider will perform
+additional local lookups for users only if the schema in use is RFC2307.
+A simple getpwnam() or getpwuid() call is performed when looking up
+users if the LDAP server returns no entry. If the a local user by the
+same name or id exists it is stored in the cache like if it were an LDAP
+user. The same is done for initgroups calls.</p>
+</div>
+<div class="section" id="details">
+<h3>Details<a class="headerlink" href="#details" title="Permalink to this headline">¶</a></h3>
+<p>Calls like initgroups will not fail anymore if the user is not found in
+LDAP like they normally would do and groups this user &#8216;belongs to&#8217; are
+returned. The groups returned are the ones found in LDAP that have this
+user&#8217;s name in the memberUid attribute.</p>
+<p>SSSD backends disable by default recursion from nsswitch calls into SSSD
+itslef. It is therefore safe to call functions like getpwnam() or
+getpwuid() from within a backend. These functions will not enter the nss
+client and will return all users from any other backend listed in
+nsswitch.conf for the &#8216;passwd&#8217; database.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Supporting Local Users as members of LDAP Groups for RRFc2307 servers</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem Statement</a></li>
+<li><a class="reference internal" href="#solution">Solution</a><ul>
+<li><a class="reference internal" href="#new-option">New Option</a></li>
+<li><a class="reference internal" href="#behavior">Behavior</a></li>
+<li><a class="reference internal" href="#details">Details</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/LocalGroupMembersForRFC2307.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/LocalGroupMembersForRFC2307.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

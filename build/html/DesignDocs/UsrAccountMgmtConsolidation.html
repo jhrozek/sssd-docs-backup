@@ -1,0 +1,218 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>User Account Management Consolidation &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="user-account-management-consolidation">
+<h1>User Account Management Consolidation<a class="headerlink" href="#user-account-management-consolidation" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li>N/A</li>
+</ul>
+<p>The following proposal is the result of the understanding reached at the
+February 22nd, 2013 meeting held at the Red Hat offices in Brno.</p>
+<div class="section" id="problem-statement">
+<h2>Problem Statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>User management is currently fragmented throughout our system. The only
+unifying interface is nsswitch, provided by glibc. However, this
+interface is minimal, provides only POSIX information and is a querying
+interface only.</p>
+<p>An interface used for limited editing of account data is provided
+through libuser. This library can be used to modify data in local files
+or LDAP servers. However the libuser interface is not generic and does
+not allow to dynamically select the target database nor add additional
+user data.</p>
+<p>Desktop tools augment user information by storing additional data in a
+separate database.</p>
+</div>
+<div class="section" id="legacy-aspects-of-user-management">
+<h2>Legacy aspects of user management<a class="headerlink" href="#legacy-aspects-of-user-management" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="local-files">
+<h3>Local files<a class="headerlink" href="#local-files" title="Permalink to this headline">¶</a></h3>
+<p>Even today, many tools may still have direct dependencies on the files
+even tough the
+<a class="reference external" href="https://www.gnu.org/software/libc/manual/html_node/Name-Service-Switch.html">​nsswitch</a>
+interface has been around for a long time. Also some administrators are
+used to vipw password files or use scripts that directly manipulate
+them. For these reasons it is not advisable to stop using the
+traditional files for local accounts completely.</p>
+<p>The only option to augment the files with non-POSIX information is to
+access them through a common interface and store additional information
+in a separate database. Legacy files would still remain authoritative.</p>
+</div>
+<div class="section" id="managing-remote-accounts">
+<h3>Managing remote accounts<a class="headerlink" href="#managing-remote-accounts" title="Permalink to this headline">¶</a></h3>
+<p>For accessing remote information, nsswitch became the de facto standard.
+Red Hat is standardizing on the SSSD daemon for accessing remote user
+information and perform authentication for remote users.</p>
+<p>Remote directories often provide more flexibility, so additional data
+will pushed there when possible. However in some cases additional
+information may need to be stored locally if the remote server can&#8217;t
+hold it. The directory remains authoritative.</p>
+</div>
+</div>
+<div class="section" id="unified-interface-through-sssd">
+<h2>Unified interface through SSSD<a class="headerlink" href="#unified-interface-through-sssd" title="Permalink to this headline">¶</a></h2>
+<p>The proposal is to leverage SSSD to unify account management. The pros
+and cons of this approach are listed below:</p>
+<ul class="simple">
+<li>Pros:<ul>
+<li>Provides all the infrastructure needed to cache remote data and to
+store locally additional information.</li>
+<li>SSSD&#8217;s database is easily extensible (LDAP -like)</li>
+<li>Already provide PAM and nsswitch interfaces</li>
+</ul>
+</li>
+<li>Cons:<ul>
+<li>Misses an interface to directly manage users, however already has
+infrastructure in place to make it easy to build this interface.</li>
+</ul>
+</li>
+</ul>
+<div class="section" id="changing-authentication-and-user-lookup">
+<h3>Changing authentication and user lookup<a class="headerlink" href="#changing-authentication-and-user-lookup" title="Permalink to this headline">¶</a></h3>
+<p>The system will continue to use the classic PAM and nsswitch interfaces
+for authentication and account lookups.</p>
+<p>However we will probably change the PAM stack to try pam_sss before
+pam_unix so that sssd is consulted first and pam_unix is only used as
+a fallback to directly access files.</p>
+<p>Similarly for the nsswitch interface we will probably switch passwd and
+group (and potentially other) database to use the sss target first and
+only later fall back to the files target</p>
+</div>
+</div>
+<div class="section" id="action-items">
+<h2>Action Items<a class="headerlink" href="#action-items" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Develop dbus interface specification to satisfy desktop requirements
+(design doc for SSSD)</li>
+<li>Open tickets in SSSD to:<ul>
+<li>Build Files provider in SSSD</li>
+<li>Build Rich API/dbus responder</li>
+<li>Insure additional information pins cache contents</li>
+</ul>
+</li>
+<li>Modify libuser to become a compatibility layer on top of the Rich
+API/dbus responder</li>
+<li>Test and implement Root only access to files, and channel all access
+through sssd<ul>
+<li>Needed for openshift and similar containerized envs.</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Simo Sorce &lt;<a class="reference external" href="mailto:ssorce&#37;&#52;&#48;redhat&#46;com">​ssorce<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">User Account Management Consolidation</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem Statement</a></li>
+<li><a class="reference internal" href="#legacy-aspects-of-user-management">Legacy aspects of user management</a><ul>
+<li><a class="reference internal" href="#local-files">Local files</a></li>
+<li><a class="reference internal" href="#managing-remote-accounts">Managing remote accounts</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#unified-interface-through-sssd">Unified interface through SSSD</a><ul>
+<li><a class="reference internal" href="#changing-authentication-and-user-lookup">Changing authentication and user lookup</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#action-items">Action Items</a></li>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/UsrAccountMgmtConsolidation.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/UsrAccountMgmtConsolidation.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>D-Bus Interface: Domains &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="d-bus-interface-domains">
+<h1>D-Bus Interface: Domains<a class="headerlink" href="#d-bus-interface-domains" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2187">​https://fedorahosted.org/sssd/ticket/2187</a></li>
+</ul>
+<p>Related design page(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/DesignDocs/DBusResponder.html">​https://fedorahosted.org/sssd/wiki/DesignDocs/DBusResponder</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>This design document describes how domain objects are exposed on the
+bus.</p>
+<div class="section" id="d-bus-interface">
+<h3>D-Bus Interface<a class="headerlink" href="#d-bus-interface" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="org-freedesktop-sssd-infopipe-domains">
+<h2>org.freedesktop.sssd.infopipe.Domains<a class="headerlink" href="#org-freedesktop-sssd-infopipe-domains" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>/org/freedesktop/sssd/infopipe/Domains</li>
+</ul>
+<ul class="simple">
+<li>ao List()<ul>
+<li>Returns list of domains.</li>
+</ul>
+</li>
+<li>ao FindByName(s:domain_name)<ul>
+<li>Returns object path of <em>domain_name</em>.</li>
+</ul>
+</li>
+</ul>
+<p>None.</p>
+<p>None.</p>
+</div>
+<div class="section" id="org-freedesktop-sssd-infopipe-domains-domain">
+<h2>org.freedesktop.sssd.infopipe.Domains.Domain<a class="headerlink" href="#org-freedesktop-sssd-infopipe-domains-domain" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>/org/freedesktop/sssd/infopipe/Domains/*</li>
+</ul>
+<ul class="simple">
+<li>ao ListSubdomains()<ul>
+<li>Returns all subdomains associated with this domain.</li>
+</ul>
+</li>
+</ul>
+<p>None.</p>
+<ul class="simple">
+<li><strong>property</strong> String name<ul>
+<li>The name of this domain. Same as the domain stanza in the
+sssd.conf</li>
+</ul>
+</li>
+<li><strong>property</strong> String[] primary_servers<ul>
+<li>Array of primary servers associated with this domain</li>
+</ul>
+</li>
+<li><strong>property</strong> String[] backup_servers<ul>
+<li>Array of backup servers associated with this domain</li>
+</ul>
+</li>
+<li><strong>property</strong> Uint32 min_id<ul>
+<li>Minimum uid and gid value for this domain</li>
+</ul>
+</li>
+<li><strong>property</strong> Uint32 max_id<ul>
+<li>Maximum uid and gid value for this domain</li>
+</ul>
+</li>
+<li><strong>property</strong> String realm<ul>
+<li>The Kerberos realm this domain is configured with</li>
+</ul>
+</li>
+<li><strong>property</strong> String forest<ul>
+<li>The domain forest this domain belongs to</li>
+</ul>
+</li>
+<li><strong>property</strong> String login_format<ul>
+<li>The login format this domain expects.</li>
+</ul>
+</li>
+<li><strong>property</strong> String fully_qualified_name_format<ul>
+<li>The format of fully qualified names this domain uses</li>
+</ul>
+</li>
+<li><strong>property</strong> Boolean enumerable<ul>
+<li>Whether this domain can be enumarated or not</li>
+</ul>
+</li>
+<li><strong>property</strong> Boolean use_fully_qualified_names<ul>
+<li>Whether this domain requires fully qualified names</li>
+</ul>
+</li>
+<li><strong>property</strong> Boolean subdomain<ul>
+<li>Whether the domain is an autodiscovered subdomain or a
+user-defined domain</li>
+</ul>
+</li>
+<li><strong>property</strong> ObjectPath parent_domain<ul>
+<li>Object path of a parent domain or empty string if this is a root
+domain</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="how-to-test">
+<h2>How To Test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<p>Call the D-Bus methods and properties. For example with <strong>dbus-send</strong>
+tool.</p>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Pavel Březina &lt;<a class="reference external" href="mailto:pbrezina&#37;&#52;&#48;redhat&#46;com">​pbrezina<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">D-Bus Interface: Domains</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem statement</a><ul>
+<li><a class="reference internal" href="#d-bus-interface">D-Bus Interface</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#org-freedesktop-sssd-infopipe-domains">org.freedesktop.sssd.infopipe.Domains</a></li>
+<li><a class="reference internal" href="#org-freedesktop-sssd-infopipe-domains-domain">org.freedesktop.sssd.infopipe.Domains.Domain</a></li>
+<li><a class="reference internal" href="#how-to-test">How To Test</a></li>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/DBusDomains.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/DBusDomains.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

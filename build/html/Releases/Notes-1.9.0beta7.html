@@ -1,0 +1,320 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>This is a bugfix release. No new features have been added. The most
+important bugs fixed include:</li>
+<li>Fixed security bug CVE-2012-3462 - HBAC rules were ignored when the
+SELinux login context support was enabled</li>
+<li>Mutexes in the nss_sss module are now released correctly if one
+thread in a multithreaded application is cancelled while the mutex is
+locked</li>
+<li>The fail over code works correctly when the IPA provider is not able
+to establish a GSSAPI-encrypted connection to an IPA server</li>
+<li>The SSSD correctly accepts -1 as a valid value of the shadow
+attributes</li>
+<li>When the SSSD is unable to resolve a host name, it tries the next
+configured server now instead of going offline</li>
+<li>The default SELinux login context for IPA users was changed to
+unconfined_t when there are no rules on the server</li>
+<li>A file descriptor leak in cases the SSSD was unable to establish SSL
+connection to an LDAP server was fixed</li>
+</ul>
+</div>
+<div class="section" id="packaging-changes">
+<h1>Packaging Changes<a class="headerlink" href="#packaging-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>A new Python wrapper around the murmur hash library has been
+introduced. It is only useful to the FreeIPA server at the moment.</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/734">#734</a></dt>
+<dd>on reconnect we need to detect that a ipa/ds server has been
+reinitialized</dd>
+<dt><a class="reference external" href="/sssd/ticket/1156">#1156</a></dt>
+<dd>Do not use &#8220;goto&#8221; to jump backwards in the proxy code</dd>
+<dt><a class="reference external" href="/sssd/ticket/1194">#1194</a></dt>
+<dd>when nesting limit is reached, the LDAP provider tries to establish
+link to members outside the nesting limit</dd>
+<dt><a class="reference external" href="/sssd/ticket/1365">#1365</a></dt>
+<dd>ipv6 address with square brackets doesn&#8217;t work for krb5_server</dd>
+<dt><a class="reference external" href="/sssd/ticket/1388">#1388</a></dt>
+<dd>domain.remove_provider() does not work</dd>
+<dt><a class="reference external" href="/sssd/ticket/1390">#1390</a></dt>
+<dd>Add support for nested automount maps</dd>
+<dt><a class="reference external" href="/sssd/ticket/1393">#1393</a></dt>
+<dd>shadow attributes should accept -1</dd>
+<dt><a class="reference external" href="/sssd/ticket/1396">#1396</a></dt>
+<dd>Kerberos validation algorithm is insufficient for cross-realm trusts</dd>
+<dt><a class="reference external" href="/sssd/ticket/1415">#1415</a></dt>
+<dd>Group lookups no longer work when fastcache cannot be initialized</dd>
+<dt><a class="reference external" href="/sssd/ticket/1416">#1416</a></dt>
+<dd>sssd_be crashes on using inappropriate keytab file</dd>
+<dt><a class="reference external" href="/sssd/ticket/1430">#1430</a></dt>
+<dd>Password change prompt doesn&#8217;t appear when &#8220;User must change
+password on next logon&#8221; is set for a AD user.</dd>
+<dt><a class="reference external" href="/sssd/ticket/1436">#1436</a></dt>
+<dd>LOCAL domain lookups don&#8217;t work</dd>
+<dt><a class="reference external" href="/sssd/ticket/1446">#1446</a></dt>
+<dd>sssd does not try another server when unable to resolve hostname</dd>
+<dt><a class="reference external" href="/sssd/ticket/1447">#1447</a></dt>
+<dd>Fail over does not work correctly when IPA server is establishing a
+GSSAPI-encrypted LDAP connection</dd>
+<dt><a class="reference external" href="/sssd/ticket/1453">#1453</a></dt>
+<dd>proxy provider: value stored to status is never read in
+get_pw_name</dd>
+<dt><a class="reference external" href="/sssd/ticket/1455">#1455</a></dt>
+<dd>SELinux code must fall back to default only if there are no rules on
+the server</dd>
+<dt><a class="reference external" href="/sssd/ticket/1456">#1456</a></dt>
+<dd>Attempt to close the same file stream twice</dd>
+<dt><a class="reference external" href="/sssd/ticket/1457">#1457</a></dt>
+<dd>Insecure temporary file in IPA subdomain provider</dd>
+<dt><a class="reference external" href="/sssd/ticket/1459">#1459</a></dt>
+<dd>SRV servers are always marked as back up</dd>
+<dt><a class="reference external" href="/sssd/ticket/1460">#1460</a></dt>
+<dd>SSSD thread issue can cause the application to not get any identity
+information</dd>
+<dt><a class="reference external" href="/sssd/ticket/1470">#1470</a></dt>
+<dd>FreeIPA HBAC rules ignored when FreeIPA and SSSD are configured to
+set SELinux user context</dd>
+<dt><a class="reference external" href="/sssd/ticket/1472">#1472</a></dt>
+<dd>Duplicate detection in fail over does not work</dd>
+<dt><a class="reference external" href="/sssd/ticket/1478">#1478</a></dt>
+<dd>ldap_autofs_* options missing from
+/usr/share/sssd/sssd.api.d/sssd-ldap.conf</dd>
+<dt><a class="reference external" href="/sssd/ticket/1480">#1480</a></dt>
+<dd>1.9.0b6 does not build with SELinux disabled</dd>
+<dt><a class="reference external" href="/sssd/ticket/1488">#1488</a></dt>
+<dd>Segfault in IPA subdomain provider</dd>
+<dt><a class="reference external" href="/sssd/ticket/1490">#1490</a></dt>
+<dd>SSSD does not close TCP connections when SSL fails</dd>
+<dt><a class="reference external" href="/sssd/ticket/1491">#1491</a></dt>
+<dd>Consolidate functions that make a realm upper-case</dd>
+<dt><a class="reference external" href="/sssd/ticket/1492">#1492</a></dt>
+<dd>There is no /etc/selinux/targeted/logins on RHEL5</dd>
+<dt><a class="reference external" href="/sssd/ticket/1500">#1500</a></dt>
+<dd>SSSD&#8217;s default ccache location needs to be updated (again), and the
+man pages should reflect it</dd>
+</dl>
+</div></div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Ariel Barria (1):</p>
+<ul class="simple">
+<li>SIGUSR2 should force SSSD to reread resolv.conf as well</li>
+</ul>
+<p>Jakub Hrozek (32):</p>
+<ul class="simple">
+<li>Bumping version for the 1.9.0 release</li>
+<li>Don&#8217;t call fo_set_{server,port}_status for SRV servers</li>
+<li>Fix the version number</li>
+<li>SYSDB: Check the return value</li>
+<li>SYSDB: Use ldb_msg_add_string for simple string additions</li>
+<li>Failover: Return last tried server if it&#8217;s still being tried</li>
+<li>Subdomains: Send the DP reply in the correct format</li>
+<li>Always mark SRV servers as primary</li>
+<li>Allocate on top of a talloc context, not NULL</li>
+<li>Abort PAM access phase if HBAC does not return PAM_SUCCESS</li>
+<li>Change default for ldap_idmap_range_min to 200000</li>
+<li>Don&#8217;t use server after SRV data collapsed</li>
+<li>Document entry_cache_autofs_timeout</li>
+<li>Add autofs-related options to configAPI</li>
+<li>sss_client: Group lookups should work even when fastcache cannot be
+initialized</li>
+<li>FO: Don&#8217;t retry the same server if it&#8217;s not working</li>
+<li>FO: Return EAGAIN if there are more servers to try</li>
+<li>KRB5: Only return PAM error for unreachable kpasswd when performing
+chpass</li>
+<li>Build SELinux code in responder conditionally</li>
+<li>Do not try to remove the temp login file if already renamed</li>
+<li>Only create the SELinux login file if there are mappings on the
+server</li>
+<li>Fix compilation error in Python murmurhash bindings</li>
+<li>Process all groups from a single nesting level</li>
+<li>Use PTHREAD_MUTEX_ROBUST to avoid deadlock in the client</li>
+<li>RPM: Switch the default ccache location</li>
+<li>RPM: Always include the patch file</li>
+<li>Check if the SELinux login directory exists</li>
+<li>SYSDB: Commit transaction in sysdb_store_user</li>
+<li>SYSDB: Abort unit test if sysdb_getpwnam fails</li>
+<li>Retry the next server if bind during LDAP auth times out</li>
+<li>Don&#8217;t terminate the same connection twice</li>
+<li>Update translations for 1.9.0 beta 7 release</li>
+</ul>
+<p>Jan Cholasta (3):</p>
+<ul class="simple">
+<li>SSH: Return error code in SSH utility functions</li>
+<li>SSH: Simplify public key formatting function</li>
+<li>SSH: Add support for OpenSSH-style public keys</li>
+</ul>
+<p>Michal Zidek (10):</p>
+<ul class="simple">
+<li>Return value of fread in src/tools/sss_debuglevel.c no longer
+ignored.</li>
+<li>Change default value of ldap_sasl_string to <a class="reference external" href="mailto:host/hostname&#37;&#52;&#48;REALM">host/hostname<span>&#64;</span>REALM</a> in
+man page.</li>
+<li>SRV resolution for backup servers should not be permitted.</li>
+<li>When ldap_group_nesting_level was reached, the LDAP provider tried
+to link group members with groups outside nesting limit.</li>
+<li>Duplicate detection in fail over did not work.</li>
+<li>Typo in debug message (SSSd -&gt; SSSD).</li>
+<li>Unify usage of sysdb transactions</li>
+<li>Fix: IPv6 address with square brackets doesn&#8217;t work.</li>
+<li>Adding -std=gnu99 flag.</li>
+<li>Unify usage of sysdb transactions (part 2).</li>
+</ul>
+<p>Nick Guay (1):</p>
+<ul class="simple">
+<li>remove duplicate sss_obfuscate reference in seealso manpage section</li>
+</ul>
+<p>Ondrej Kos (5):</p>
+<ul class="simple">
+<li>Removed unused variable assignment</li>
+<li>Replaced &#8220;id_max&#8221; &amp; &#8220;id_min&#8221;</li>
+<li>Backward GOTOs rewritten into do-while loops.</li>
+<li>AD context was set to null due to type mismatch</li>
+<li>Consolidation of functions that make realm upper-case</li>
+</ul>
+<p>Pavel Březina (12):</p>
+<ul class="simple">
+<li>tests: build sysdb ssh tests conditionally</li>
+<li>shadow attributes can contain -1</li>
+<li>Add end of line to debug message</li>
+<li>monitor: set debug level when unable to load configuration</li>
+<li>Remove redefinition of some SYSDB_* macros</li>
+<li>Rename SYSDB_SUDO_CACHE_AT_OC to SYSDB_SUDO_CACHE_OC</li>
+<li>Remove SYSDB_SUDO_CACHE_OC from attribute lists</li>
+<li>Fix LOCAL domain lookups</li>
+<li>Close LDAP connection when unable to install TLS</li>
+<li>Unbreak build on RHEL5: replace ldap_destroy() with
+ldap_unbind_ext()</li>
+<li>Remove compilation warning: ret may be uninitialized</li>
+<li>Clean up cache on server reinitialization</li>
+</ul>
+<p>Stephen Gallagher (6):</p>
+<ul class="simple">
+<li>SSSDConfig: Fix nonfunctional SSSDDomain.remove_provider()</li>
+<li>IPA: Do not attempt to close the same file twice</li>
+<li>IPA: Securely set umask for mkstemp in subdomain provider</li>
+<li>MAN: Fix minor typo in ldap_search_base section</li>
+<li>MAN: Improve description of ldap_*_search_base options</li>
+<li>SYSDB: Make sysdb_attrs_get_el_int() public</li>
+</ul>
+<p>Sumit Bose (5):</p>
+<ul class="simple">
+<li>Add python bindings for murmurhash3</li>
+<li>accept_fd_handler: add missing return</li>
+<li>Fix fallback in validate_tgt()</li>
+<li>Use new debug levels in validate_tgt()</li>
+<li>Check flat names when searching for sub-domains as well</li>
+</ul>
+<p>Yuri Chornoivan (1):</p>
+<ul class="simple">
+<li>Fix various typos in documentation.</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#packaging-changes">Packaging Changes</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.9.0beta7.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.9.0beta7.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>DEPRECATED (moved to sssctl) &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="deprecated-moved-to-sssctl">
+<h1>DEPRECATED (moved to sssctl)<a class="headerlink" href="#deprecated-moved-to-sssctl" title="Permalink to this headline">¶</a></h1>
+<p>This tool is no longer developed and it&#8217;s functionality was moved to
+sssctl tool.</p>
+</div>
+<div class="section" id="sss-confcheck-tool">
+<h1>sss_confcheck tool<a class="headerlink" href="#sss-confcheck-tool" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2269">​https://fedorahosted.org/sssd/ticket/2269</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>There is no easy way to debug the SSSD configuration without having to
+look into the debug logs. Moreover the debug logs can be difficult to
+understand for people outside SSSD development team. Some common issues
+can be identified during static offline analysis of the config files. To
+find these issues soon we need a tool that performs this analysis and
+provides human readable report.</p>
+</div>
+<div class="section" id="use-cases">
+<h2>Use cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>performing ad-hoc static analysis of the installed SSSD configuration</li>
+<li>performing ad-hoc static analysis of SSSD configuration files
+retrieved from user with some SSSD problems</li>
+</ul>
+</div>
+<div class="section" id="overview-of-the-solution-sss-confcheck-tool">
+<h2>Overview of the solution - sss_confcheck tool<a class="headerlink" href="#overview-of-the-solution-sss-confcheck-tool" title="Permalink to this headline">¶</a></h2>
+<p>A new tool will be added to sss_* tools that will perform static
+analysis of SSSD configuration files. This tool can be run without any
+parameters in which case it will print a report to the standard output
+in the following or similar format:</p>
+<p>Available options:</p>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<p>The tool will use ding-libs validators feature described in this design
+document
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/DesignDocs/libini-config-file-checks.html">​https://fedorahosted.org/sssd/wiki/DesignDocs/libini-config-file-checks</a>.</p>
+</div>
+<div class="section" id="configuration-changes">
+<h2>Configuration changes<a class="headerlink" href="#configuration-changes" title="Permalink to this headline">¶</a></h2>
+<p>No configuration changes.</p>
+</div>
+<div class="section" id="how-to-test">
+<h2>How To Test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<p>Depending on the capabilities of validators used by SSSD, make an error
+in configuration and run sss_confcheck to see if it was detected.</p>
+</div>
+<div class="section" id="planned-features-in-version-1-initial-version">
+<h2>Planned features in version 1 - initial version<a class="headerlink" href="#planned-features-in-version-1-initial-version" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">Validators capabilities:</div>
+</div>
+<ul class="simple">
+<li>able to detect typo in option name</li>
+<li>able to detect typo in section name</li>
+<li>able to detect option in wrong section</li>
+</ul>
+<p>Limitations:</p>
+<ul class="simple">
+<li>printing the resulting configuration (after merging with snippets)
+may not be in the initial version.</li>
+</ul>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<p>Michal Židek <a class="reference external" href="mailto:mzidek&#37;&#52;&#48;redhat&#46;com">​mzidek<span>&#64;</span>redhat<span>&#46;</span>com</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">DEPRECATED (moved to sssctl)</a></li>
+<li><a class="reference internal" href="#sss-confcheck-tool">sss_confcheck tool</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem statement</a></li>
+<li><a class="reference internal" href="#use-cases">Use cases</a></li>
+<li><a class="reference internal" href="#overview-of-the-solution-sss-confcheck-tool">Overview of the solution - sss_confcheck tool</a></li>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a></li>
+<li><a class="reference internal" href="#configuration-changes">Configuration changes</a></li>
+<li><a class="reference internal" href="#how-to-test">How To Test</a></li>
+<li><a class="reference internal" href="#planned-features-in-version-1-initial-version">Planned features in version 1 - initial version</a></li>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/ConfigCheckTool.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/ConfigCheckTool.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

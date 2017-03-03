@@ -1,0 +1,358 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Inter-process communication between SSSD processes &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="inter-process-communication-between-sssd-processes">
+<h1>Inter-process communication between SSSD processes<a class="headerlink" href="#inter-process-communication-between-sssd-processes" title="Permalink to this headline">¶</a></h1>
+<p>This document describes how the different SSSD processes communicate
+between one another with a special epmhasis on the Sbus protocol. In
+addition, the document describes the interfaces SSSD might use to
+communicate with external libraries or programs, such as libkrb5 or how
+are the requests from NSS and PAM modules received.</p>
+<div class="section" id="an-overview-of-the-sssd-architecture">
+<h2>An overview of the SSSD architecture<a class="headerlink" href="#an-overview-of-the-sssd-architecture" title="Permalink to this headline">¶</a></h2>
+<p>The SSSD consists of several processes, each of them has its own
+function. The SSSD processes can be one of the following:</p>
+<ol class="arabic simple">
+<li>the <em>monitor</em> - The purpose of the monitor process is to spawn the
+other processes, periodically ping them if to check if they are still
+running and respawn them if not. There is only one instance of the
+monitor process at a given time.</li>
+<li>a <em>data provider</em> - The data provider process communicates with the
+remote server (i.e. queries the remote server for a user) and updates
+the cache (i.e. writes the user entry. There is one Data Provider
+process per remote server.</li>
+<li>a <em>responder</em> - The system libraries (such as the Name Service Switch
+module or the PAM module) communicate with the corresponding
+responder process. When the responder process receives a query, it
+checks the cache first and attempts to return the requested data from
+cache. If the data is not cached (or is expired), the responder sends
+a message to the Data Provider requesting the cache to be updated.
+When the Data Provider is done updating the cache, the responder
+process checks the cache again and returns the updated data. It is
+important to note that the responder process never returns the data
+directly from the server, the data is always written to the cache by
+the Data Provider Process and returned to the calling library in the
+responder process.</li>
+<li>a <em>helper process</em> - The SSSD performs some operations that would be
+blocking, such as kinit in a special helper sub-process. The
+sub-processes are forked from the Data Provider processes again for
+each operation, there is no preforked pool of helper processes. The
+SSSD establishes pipes towards the processes&#8217; standard input and
+output to communicate with the child using an ad-hoc wire protocol.</li>
+</ol>
+</div>
+<div class="section" id="dbus-and-sbus">
+<h2>DBus and SBUS<a class="headerlink" href="#dbus-and-sbus" title="Permalink to this headline">¶</a></h2>
+<p>The SSSD uses the DBus protocol to pass messages between the SSSD
+processes. It should be noted that the core SSSD does NOT listen on or
+use the system bus. The SSSD only uses the DBus protocol to pass
+messages between the processes. There is a public SSSD DBus interface,
+starting with the 1.12 upstream release, but that resides in a separate
+sub-package and is not related to the interprocess communication between
+the different components.</p>
+<div class="section" id="a-quick-overview-of-the-dbus-concepts">
+<h3>A quick overview of the DBus concepts<a class="headerlink" href="#a-quick-overview-of-the-dbus-concepts" title="Permalink to this headline">¶</a></h3>
+<p>The DBus protocol consists of several primary components:</p>
+<ol class="arabic simple">
+<li>The <em>D-BUS Server</em> - Rather than accepting connections and listening
+for requests on that connection, the D-BUS server is instead used
+only for establishing connections. A DBus server is identified by its
+address. Server addresses consist of a transport name followed by a
+colon, and then an optional, comma-separated list of keys and values
+in the form key=value, for example <code class="docutils literal"><span class="pre">unix:path=/tmp/dbus-test</span></code>.</li>
+<li>The <em>D-BUS Connection</em> - Once a D-BUS connection has been made to a
+D-BUS server, it becomes a peer-to-peer connection. Either end of the
+connection can listen for method calls or signals, and either end can
+initiate them.</li>
+<li>The <em>D-BUS Message</em> - D-BUS messages come in three primary forms.
+These are D-BUS method calls, D-BUS Signals and D-BUS errors. D-BUS
+signals and D-BUS errors are one-way messages from one end of a D-BUS
+connection to the other, intended to carry a brief message (such as a
+signal to start or stop a service, or a notification that an error
+has occurred in the connection). D-BUS errors are usually generated
+by the internal D-BUS API itself, though they can be generated by
+your own code as well. D-BUS method calls are the bread-and-butter of
+the D-BUS protocol. The purpose of these calls is to essentially run
+a method on a remote process and treat it as if it had been run
+locally. These calls may (or may not) receive replies from the other
+end of the connection.</li>
+<li>The <em>D-BUS System Bus</em> - The system bus is a special implementation
+of the D-BUS protocol. It was designed by the freedesktop project to
+handle communication between the many system daemons. We DO NOT use
+the system bus in the SSSD.</li>
+</ol>
+</div>
+<div class="section" id="dbus-and-s-bus">
+<h3>DBus and S-Bus<a class="headerlink" href="#dbus-and-s-bus" title="Permalink to this headline">¶</a></h3>
+<p>For performance reasons, the SSSD works in a completely non-blocking way
+using the tevent event loop library from the Samba project. To integrate
+the DBus API with the event loop and provide a level of abstraction, the
+SSSD uses a wrapper around the D-Bus library called the S-Bus. The S-Bus
+code can be found in the
+<a class="reference external" href="http://git.fedorahosted.org/cgit/sssd.git/tree/src/sbus">​src/sbus</a>
+subdirectory. In particular, the wrappers and tevent integration can be
+found in
+<a class="reference external" href="http://git.fedorahosted.org/cgit/sssd.git/tree/src/sbus/sssd_dbus_common.c">​sssd_dbus_common.c</a>
+and
+<a class="reference external" href="http://git.fedorahosted.org/cgit/sssd.git/tree/src/sbus/sssd_dbus_connection.c">​sssd_dbus_connection.c</a>
+files. When the message is received, the tevent loop invokes the
+<code class="docutils literal"><span class="pre">sbus_message_handler</span></code> function which is located in
+<a class="reference external" href="http://git.fedorahosted.org/cgit/sssd.git/tree/src/sbus/sssd_dbus_connection.c">​sssd_dbus_connection.c</a>.
+The handler selects the SSSD internal interface that receives the
+message and invokes the appropriate handler.</p>
+</div>
+<div class="section" id="describing-the-sbus-and-public-dbus-interfaces">
+<h3>Describing the SBUS and public DBus interfaces<a class="headerlink" href="#describing-the-sbus-and-public-dbus-interfaces" title="Permalink to this headline">¶</a></h3>
+<p>Starting with upstream version 1.12, when the SSSD implemented its
+public DBus interface, the SSSD switched from hardcoding interface
+names, methods etc in the source files directly to only describing the
+interfaces in XML files using the <a class="reference external" href="http://dbus.freedesktop.org/doc/dbus-specification.html#introspection-format">​introspection
+format</a>,
+which are then used to autogenerate message handlers, property getters
+and similar. While using generated code might sound odd at first, using
+a code generator removes a large amount of code duplication, packing and
+unpacking from DBus types to C types or vice versa, or unpacking DBus
+message properties (if needed).</p>
+<p>The code generator and the generated code are currently used for both
+the DBus public interface (which is outside the scope of this page) and
+the internal SBUS communication. The internal SBUS code, however, uses
+the generated code in a &#8216;raw&#8217; mode mostly and still does
+packing/unpacking of the parameters on its own. The reason is that the
+&#8216;raw&#8217; code in SSSD predates the code generator, is quite stable and
+tested and converting it to the easier handlers with unpacked parameters
+might cause functional regressions.</p>
+<p>One example of the canonical XML code might be found in the <a class="reference external" href="https://git.fedorahosted.org/cgit/sssd.git/tree/src/tests/sbus_codegen_tests.xml">​unit
+tests</a>,
+along with the <a class="reference external" href="https://git.fedorahosted.org/cgit/sssd.git/tree/src/tests/sbus_codegen_tests_generated.c">​corresponding autogenerated
+code</a>.
+The XML files for the internal interfaces, such as the <a class="reference external" href="https://git.fedorahosted.org/cgit/sssd.git/tree/src/providers/data_provider_iface.xml">​Data
+Provider</a>
+can also be inspected. Since all the internal interfaces use the raw
+approach, the autogenerated code is <a class="reference external" href="https://git.fedorahosted.org/cgit/sssd.git/tree/src/providers/data_provider_iface_generated.c">​quite
+terse</a>
+and the <a class="reference external" href="https://git.fedorahosted.org/cgit/sssd.git/tree/src/providers/data_provider_be.c">​interface
+handlers</a>
+do the packing and unpacking on their own.</p>
+</div>
+<div class="section" id="an-sbus-server">
+<h3>An SBus server<a class="headerlink" href="#an-sbus-server" title="Permalink to this headline">¶</a></h3>
+<p>An S-Bus server is an abstraction of the DBus server. An S-Bus server is
+always identified with an UNIX socket located in the directory
+<code class="docutils literal"><span class="pre">/var/lib/sss/pipes/private</span></code>. Two processes act as an S-Bus server in
+the SSSD:</p>
+<ol class="arabic simple">
+<li>The monitor - Both the responders and the Data providers establish
+connection to the monitor after startup. The monitor then
+periodically sends &#8220;pings&#8221; to the worker processes to check if they
+are still up and running. The other S-Bus methods the monitor can
+invoke include &#8220;rotateLogs&#8221; to force log rotation or &#8220;resetOffline&#8221;
+to force that the next operation attempts to contact the remote
+server regardless of the connection status. The complete list of
+methods is in
+<a class="reference external" href="http://git.fedorahosted.org/cgit/sssd.git/tree/src/monitor/monitor_interfaces.h#n41">​src/monitor/monitor_interfaces.h</a><ul>
+<li>listens on <code class="docutils literal"><span class="pre">/var/lib/sss/pipes/private/sbus-monitor</span></code>.</li>
+</ul>
+</li>
+<li>The Data Providers - The Responder processes connect to the Data
+Provider processes with a cache update request. The Data Provider
+then communicates with the remote server, updates the cache and sends
+a message back to the responder, indicating that the cache was
+updated. Each responder calls a different DBus method depending on
+the data type the cache should be updated with. For example, the
+<code class="docutils literal"><span class="pre">getAccountInfo</span></code> method is called from the NSS.<ul>
+<li>listens on <code class="docutils literal"><span class="pre">/var/lib/sss/pipes/private/sbus-dp_$domain_name</span></code></li>
+</ul>
+</li>
+</ol>
+</div>
+<div class="section" id="two-kinds-of-messages">
+<h3>Two kinds of messages<a class="headerlink" href="#two-kinds-of-messages" title="Permalink to this headline">¶</a></h3>
+<p>The SSSD sends an SBUS message between two of its components under two
+different circumstances:</p>
+<ol class="arabic simple">
+<li>When a request is received, completing the request might require
+communicating with another subprocess. An example of this is when a
+<code class="docutils literal"><span class="pre">getpwnam()</span></code> call triggers an LDAP search - the NSS responder sends
+an SBUS message to the Data Provider to update the cache.</li>
+<li>Control messages sent by the monitor. The monitor process (aka the
+sssd process) sends periodical <code class="docutils literal"><span class="pre">ping</span></code> messages to all subprocesses
+it controls. If a subprocess doesn&#8217;t respond with a <code class="docutils literal"><span class="pre">pong</span></code> message
+in time, it gets killed and restarted.</li>
+</ol>
+<p>This means, there is ongoing sbus communication even though the sssd is
+otherwise idle.</p>
+</div>
+</div>
+<div class="section" id="unix-signals">
+<h2>Unix signals<a class="headerlink" href="#unix-signals" title="Permalink to this headline">¶</a></h2>
+<p>Apart from the internal SBUS communication, SSSD also uses UNIX signals
+for certain functionality - either for communication with external
+utilities or for cases where the SBUS communication might not work, such
+as an unresponsive worker process. Below is an overview of the supported
+signals and their use. The singal handlers are typically integrated with
+the tevent event loop using its <code class="docutils literal"><span class="pre">tevent_add_signal</span></code> call.</p>
+<dl class="docutils">
+<dt>SIGTERM</dt>
+<dd>If a responder or a provider process fails to send a <code class="docutils literal"><span class="pre">pong</span></code>
+message to the monitor process after receiving the <code class="docutils literal"><span class="pre">ping</span></code> message,
+the monitor terminates the unresponsive process with a SIGTERM. Also
+used to terminate helper processes (such as the krb5_child process)
+in case of a timeout.</dd>
+<dt>SIGKILL</dt>
+<dd>In cases where an unresponsive worker process does not terminate
+after receiving SIGTERM, the monitor forcibly kills it with SIGILL</dd>
+<dt>SIGUSR1</dt>
+<dd>Can be handled a sssd_be process individually or the monitor
+process (in that case, the monitor re-sends the signal to all
+sssd_be processes it handles). Upon receiving this signal, the
+sssd_be process transitions into the &#8216;offline&#8217; state. This signal
+is mostly useful for testing.</dd>
+<dt>SIGUSR2</dt>
+<dd>Similar to the SIGUSR1 signal, the SIGUSR2 would cause an sssd_be
+process to reset the offline status and retry the next request it
+receives against a remote server.</dd>
+<dt>SIGHUP</dt>
+<dd>Can be delivered to the sssd process. After receiving SIGHUP, the
+monitor rotates its logfile and sends a <code class="docutils literal"><span class="pre">reset</span></code> method to the
+managed processes. The managed processes also rotate logfiles. In
+addition, the sssd_be processes re-read resolv.conf and the
+sssd_nss process clears the fast in-memory cache.</dd>
+</dl>
+</div>
+<div class="section" id="local-sockets">
+<h2>Local sockets<a class="headerlink" href="#local-sockets" title="Permalink to this headline">¶</a></h2>
+<p>After startup, the SSSD also creates several local (AF_UNIX) sockets to
+listen on. These sockets are used by the NSS and PAM modules and also
+the external programs SSSD integrates with, such as sudo, OpenSSH or
+autofs. All consumers use the sockets in a similar fashion, so they can
+be commonly called SSS clients.</p>
+<p>The clients all employ a request/response protocol. using its own
+TLV-encoding. Note that the SSS clients only support synchronous I/O, so
+it may block (e.g. while waiting for a response). On the other hand, the
+responders supports asynchronous I/O using its tevent main loop, so it
+will not block (e.g. while waiting to read from a client).</p>
+</div>
+<div class="section" id="kdcinfo-files">
+<h2>KDCInfo files<a class="headerlink" href="#kdcinfo-files" title="Permalink to this headline">¶</a></h2>
+<p>The SSSD might discover additional KDC or Kadmin servers that are not
+defined in krb5.conf. However, it would still be prudent if tools like
+kinit or kpasswd could talk to the same servers the SSSD talks to. To
+this end, the SSSD implements a plugin for libkrb5, located in the
+<a class="reference external" href="https://git.fedorahosted.org/cgit/sssd.git/tree/src/krb5_plugin/sssd_krb5_locator_plugin.c">​sssd_krb5_locator_plugin.c</a>
+file. When a new KDC is discovered, the sssd_be process writes the IP
+address of this KDC into a file under the /var/lib/sss/pubconf
+directory. With the help of the locator plugin, libkrb5 is able to read
+these files in the pubconf directory and use the KDC servers discovered
+by the SSSD.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Inter-process communication between SSSD processes</a><ul>
+<li><a class="reference internal" href="#an-overview-of-the-sssd-architecture">An overview of the SSSD architecture</a></li>
+<li><a class="reference internal" href="#dbus-and-sbus">DBus and SBUS</a><ul>
+<li><a class="reference internal" href="#a-quick-overview-of-the-dbus-concepts">A quick overview of the DBus concepts</a></li>
+<li><a class="reference internal" href="#dbus-and-s-bus">DBus and S-Bus</a></li>
+<li><a class="reference internal" href="#describing-the-sbus-and-public-dbus-interfaces">Describing the SBUS and public DBus interfaces</a></li>
+<li><a class="reference internal" href="#an-sbus-server">An SBus server</a></li>
+<li><a class="reference internal" href="#two-kinds-of-messages">Two kinds of messages</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#unix-signals">Unix signals</a></li>
+<li><a class="reference internal" href="#local-sockets">Local sockets</a></li>
+<li><a class="reference internal" href="#kdcinfo-files">KDCInfo files</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/IPC.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/IPC.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

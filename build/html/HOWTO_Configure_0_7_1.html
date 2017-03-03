@@ -1,0 +1,470 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>About &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#About">About</a></li>
+<li><a class="reference external" href="#Installation">Installation</a></li>
+<li><a class="reference external" href="#Upgradingfromapreviousversion">Upgrading from a previous
+version</a></li>
+<li><a class="reference external" href="#RunningSSSD">Running SSSD</a></li>
+<li><a class="reference external" href="#Configuration">Configuration</a><ol class="arabic">
+<li><a class="reference external" href="#ConfigureNSSforfetchinguserandgroupinformation">Configure NSS for fetching user and group
+information</a></li>
+<li><a class="reference external" href="#ConfigurePAMforauthentication">Configure PAM for
+authentication</a></li>
+<li><a class="reference external" href="#SSSDdaemonconfiguration">SSSD daemon configuration</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#Configuringservices">Configuring services</a><ol class="arabic">
+<li><a class="reference external" href="#Generalconfigurationoptions">General configuration
+options</a></li>
+<li><a class="reference external" href="#NSSconfigurationoptions">NSS configuration options</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#Configuringdomains">Configuring domains</a><ol class="arabic">
+<li><a class="reference external" href="#Domainconfigurationoptions">Domain configuration options</a></li>
+<li><a class="reference external" href="#Optionsvalidforproxyidentitydomains">Options valid for proxy identity
+domains</a></li>
+<li><a class="reference external" href="#TheLOCALprovider">The LOCAL provider</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#Domainconfigurationexamples">Domain configuration examples</a><ol class="arabic">
+<li><a class="reference external" href="#Example1:AstandaloneLOCALdomain">Example 1: A standalone LOCAL
+domain</a></li>
+<li><a class="reference external" href="#Example2:AuthenticatingagainstanativeLDAPdomain">Example 2: Authenticating against a native LDAP
+domain</a></li>
+<li><a class="reference external" href="#Example3:AuthenticatingagainstaKerberosserver">Example 3: Authenticating against a Kerberos
+server</a></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="about">
+<h1>About<a class="headerlink" href="#about" title="Permalink to this headline">¶</a></h1>
+<p>SSSD provides a set of daemons to manage access to remote directories
+and authentication mechanisms, it provides an NSS and PAM interface
+toward the system and a pluggable backend system to connect to multiple
+different account sources. It is also the basis to provide client
+auditing and policy services for projects like FreeIPA.</p>
+<p>SSSD takes advantage of the common set of tools. More information about
+those tools can be found
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiPage/SSSDTools.html">here.</a></p>
+<p>This page is intended to outline a series of steps needed to install and
+configure SSSD. It is aimed at Fedora primarily in terms of commands and
+config file placement, but in general, things should work on other
+distributions, too.</p>
+<p>More information about SSSD can be found on its <a class="reference external" href="https://fedorahosted.org/sssd/">​project
+page</a>.</p>
+<p>This document is being updated for the development version of SSSD.</p>
+</div>
+<div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>On Fedora (since F11), all that is needed is:</p>
+<p>If you&#8217;re using another distribution or want to get the latest bits from
+the git repository, clone the SSSD repository:</p>
+<p>You can now build and install SSSD locally. The complete process is
+described into great detail in a text file <code class="docutils literal"><span class="pre">BUILD.txt</span></code> in sssd&#8217;s
+source tree.</p>
+<p>Another option is to build and install RPMs from the git tree, issue:</p>
+<p>For this to work, you&#8217;ll also need to have git, and all the build
+requirements of SSSD installed. The built RPMs will be in the
+<code class="docutils literal"><span class="pre">rpmbuild/RPMS</span></code> subdirectory.</p>
+</div>
+<div class="section" id="upgrading-from-a-previous-version">
+<h1>Upgrading from a previous version<a class="headerlink" href="#upgrading-from-a-previous-version" title="Permalink to this headline">¶</a></h1>
+<p>Starting from version 0.6.0, SSSD uses a different and simplified
+configuration file format. Existing config files need to be migrated to
+the new format and SSSD provides a script to automate the migration
+process.</p>
+<p>If you are using RPMs, the script will be run automatically when
+upgrading the package to the new version. Your <code class="docutils literal"><span class="pre">/etc/sssd/sssd.conf</span></code>
+config file will be upgraded in-place, copying the old one to
+<code class="docutils literal"><span class="pre">/etc/sssd/sssd.conf.bak</span></code>.</p>
+<p>If you need to run the script manually, perhaps when using SSSD built
+from source, the synopsis is as follows:</p>
+<p>When not given, both <code class="docutils literal"><span class="pre">FILE</span></code> and <code class="docutils literal"><span class="pre">OUTFILE</span></code> default to
+<code class="docutils literal"><span class="pre">/etc/sssd/sssd.conf</span></code>, performing the conversion in-place and copying
+the original to <code class="docutils literal"><span class="pre">/etc/sssd/sssd.conf.bak</span></code>. Adding the <code class="docutils literal"><span class="pre">--no-backup</span></code>
+option would turn off producing the backup files.</p>
+<p>Please note that in the current version, the upgrade script does not
+migrate comments in the configuration file.</p>
+</div>
+<div class="section" id="running-sssd">
+<h1>Running SSSD<a class="headerlink" href="#running-sssd" title="Permalink to this headline">¶</a></h1>
+<p>To start the daemon, just start the sssd service:</p>
+<p>For debugging, it may be more comfortable to run the daemon in
+foreground:</p>
+<p>Another option that might be of interest especially for testing a
+configuration is <code class="docutils literal"><span class="pre">-d/--debug-level</span></code>, that tells sssd to print more
+debug information according to debug level specified. The debug level
+can also be specified per-service (see below). Timestamps can be added
+to the debug information by specifying &#8216;&#8211;debug-timestamps&#8217;</p>
+</div>
+<div class="section" id="configuration">
+<h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
+<p>The configuration of the deamon itself is done via editing
+<code class="docutils literal"><span class="pre">/etc/sssd/sssd.conf</span></code>. The file has a ini-style syntax - the file
+consists of sections that in turn consist of key=value pairs. If you
+need to use more values, separate them with commas. For example:</p>
+<p>A comment starts with a hash sign (<code class="docutils literal"><span class="pre">#</span></code>) or a semicolon (<code class="docutils literal"><span class="pre">;</span></code>). The
+data types used are string, integer and bool (with values of
+<code class="docutils literal"><span class="pre">TRUE/FALSE</span></code>).</p>
+<p>It is also possible to use an alternate config file by using the
+<code class="docutils literal"><span class="pre">-c/--config</span></code> parameter of sssd.</p>
+<p>For more information on configuring SSSD, see the <code class="docutils literal"><span class="pre">sssd.conf(5)</span></code> man
+page that comes with SSSD.</p>
+<div class="section" id="configure-nss-for-fetching-user-and-group-information">
+<h2>Configure NSS for fetching user and group information<a class="headerlink" href="#configure-nss-for-fetching-user-and-group-information" title="Permalink to this headline">¶</a></h2>
+<p>In order to configure your system to use sssd for user information, SSSD
+provides a new <em>nss_sss</em> NSS module. To use it, you need to configure
+NSS to use the <em>sss</em> name database along with the classic UNIX file
+database. Edit your <code class="docutils literal"><span class="pre">/etc/nsswitch.conf</span></code>:</p>
+</div>
+<div class="section" id="configure-pam-for-authentication">
+<h2>Configure PAM for authentication<a class="headerlink" href="#configure-pam-for-authentication" title="Permalink to this headline">¶</a></h2>
+<p>Configuring PAM should be done with extreme care. A mistake or typo in
+the PAM config file can lock you out of the system completely. Always
+backup your config files before doing any changes and keep a session
+open in order to be able to revert changes you do.</p>
+<p>Enable the use of the SSSD for PAM. If you are changing the default PAM
+config on Fedora, it should look like:</p>
+<p>Recent PAM implementations allow to include PAM configurations, e.g.</p>
+<p>If you use includes please note that in the example above
+pam_console.so is not executed if a sufficient condition from
+system-auth returns PAM_SUCCESS.</p>
+<p>Some of the later examples use a proxy auth provider between pam_sss
+and other PAM modules using the <code class="docutils literal"><span class="pre">pam-target</span></code> configuration directive
+that references a file in <code class="docutils literal"><span class="pre">/etc/pam.d</span></code>. It is important <strong>not</strong> to
+include <code class="docutils literal"><span class="pre">pam_sss.so</span></code> modules in these proxied targets, otherwise the
+PAM stack may go into a loop.</p>
+</div>
+<div class="section" id="sssd-daemon-configuration">
+<h2>SSSD daemon configuration<a class="headerlink" href="#sssd-daemon-configuration" title="Permalink to this headline">¶</a></h2>
+<p>I suggest that you start with the <code class="docutils literal"><span class="pre">/etc/sssd/sssd.conf</span></code> file that
+comes with the Fedora RPMs as it contains comments to aid you. The
+source distribution contains an example config file in the
+<code class="docutils literal"><span class="pre">server/examples</span></code> subdirectory.</p>
+</div>
+</div>
+<div class="section" id="configuring-services">
+<h1>Configuring services<a class="headerlink" href="#configuring-services" title="Permalink to this headline">¶</a></h1>
+<p>Individual pieces of SSSD functionality are provided by special SSSD
+services that are started and stopped together with SSSD. The services
+provided by SSSD have their own configuration sections. The <code class="docutils literal"><span class="pre">[sssd]</span></code>
+section also lists the services that are active and should be started
+when sssd starts within the <code class="docutils literal"><span class="pre">services</span></code> directive.</p>
+<p>At present, we use three services in this HOWTO - NSS, PAM and a service
+called monitor that watches over other services, starts or restarts them
+as needed.</p>
+<ul class="simple">
+<li>An NSS provider service that answers NSS requests from the
+<code class="docutils literal"><span class="pre">nss_sss</span></code> module</li>
+<li>A PAM provider service that manages a PAM conversation through the
+<code class="docutils literal"><span class="pre">pam_sss</span></code> PAM module</li>
+<li>The monitor service maintains the other processes and restarts them
+if they die. Its options are specified in the [sssd] section</li>
+</ul>
+<p>The following subsections list only the most important configuration
+optiosn. See the <code class="docutils literal"><span class="pre">sssd.conf(5)</span></code> manual page that is shipped with SSSD
+for all the configuration options available.</p>
+<div class="section" id="general-configuration-options">
+<h2>General configuration options<a class="headerlink" href="#general-configuration-options" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt><strong>debug_level</strong> (integer)</dt>
+<dd>This is a per-service setting (that is, it can appear in any of the
+service sections and sets the debug level for that service.</dd>
+<dt><strong>reconnection_retries</strong> (integer)</dt>
+<dd>Number of times services should attempt to reconnect in the event of
+a Data Provider Backend crash or restart before they give up</dd>
+</dl>
+</div>
+<div class="section" id="nss-configuration-options">
+<h2>NSS configuration options<a class="headerlink" href="#nss-configuration-options" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt><strong>enum_cache_timeout</strong> (integer)</dt>
+<dd>How long should <code class="docutils literal"><span class="pre">nss_sss</span></code> cache enumerations (requests for info
+about all users)</dd>
+<dt><strong>entry_cache_nowait_timeout</strong> (integer)</dt>
+<dd>How long should nss_sss return cached entries before initiating an
+out-of-band cache refresh (0 disables this feature)</dd>
+<dt><strong>entry_negative_timeout</strong> (integer)</dt>
+<dd>How long should <code class="docutils literal"><span class="pre">nss_sss</span></code> cache negative cache hits (that is,
+queries for invalid database entries, like nonexitent ones) before
+asking the backend again</dd>
+<dt><strong>filter_users</strong>, <strong>filter_groups</strong> (string)</dt>
+<dd>Exclude certain users from being fetched from the <code class="docutils literal"><span class="pre">sss</span></code> NSS
+database. This is particularly useful for system accounts like root.</dd>
+<dt><strong>filter_users_in_groups</strong> (bool)</dt>
+<dd>If you want filtered user still be group members set this option to
+false.</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="configuring-domains">
+<h1>Configuring domains<a class="headerlink" href="#configuring-domains" title="Permalink to this headline">¶</a></h1>
+<p>A domain is a database containing user information. SSSD can use more
+domains at the same time, but at least one must be configured or SSSD
+won&#8217;t start. Using SSSD domains, it is possible to use several LDAP
+servers providing several unique namespaces.</p>
+<p>Add new domains configurations into <code class="docutils literal"><span class="pre">[domain/&lt;NAME&gt;]</span></code> sections. Then
+add the list of domains (in the order you want them to be queried) in
+the &#8216;domains&#8217; attribute of the domains section. For example, to use only
+<code class="docutils literal"><span class="pre">LOCAL</span></code> domain:</p>
+<p>The following subsections will list examples of configuring different
+types of domains.</p>
+<div class="section" id="domain-configuration-options">
+<h2>Domain configuration options<a class="headerlink" href="#domain-configuration-options" title="Permalink to this headline">¶</a></h2>
+<p>These configuration options can be present in a domain configuration
+section, that is, in a section called <code class="docutils literal"><span class="pre">[domain/&lt;NAME&gt;]</span></code>.</p>
+<dl class="docutils">
+<dt><strong>min_id, max_id</strong> (integer)</dt>
+<dd>UID limits for the domain. If a domain contains entry that is
+outside these limits, it is ignored</dd>
+<dt><strong>enumerate</strong> (bool)</dt>
+<dd>Determines if a domain can be enumerated. This parameter affects
+enumerating of both users and groups.</dd>
+<dt><strong>timeout</strong> (integer)</dt>
+<dd>Timeout in seconds for this particular domain. Raising this timeout
+might prove useful for slower backends like distant LDAP servers.
+The default is 0 (no timeout).</dd>
+<dt><strong>cache_credentials</strong> (bool)</dt>
+<dd>Determines if user credentials are also cached in the local LDB
+cache</dd>
+<dt><strong>store_legacy_passwords</strong> (bool)</dt>
+<dd>Whether to also store passwords in a legacy domain</dd>
+<dt><strong>id_provider</strong> (string)</dt>
+<dd><p class="first">The Data Provider identity backend to use for this domain. Currently
+supported identity backends are:</p>
+<ul class="last simple">
+<li>proxy: Support a legacy NSS provider (e.g. nss_nis)</li>
+<li>local: SSSD internal local provider</li>
+<li>ldap: ldap provider</li>
+</ul>
+</dd>
+<dt><strong>entry_cache_timeout</strong> (integer)</dt>
+<dd>How long should the domain&#8217;s Data Provider cache positive cache hits
+(that is, queries for valid database entries) before asking the
+database again</dd>
+<dt><strong>use_fully_qualified_names</strong> (bool)</dt>
+<dd>If set to TRUE, all requests to this domain must use fully qualified
+names. For example, if used in LOCAL domain that contains a &#8220;test&#8221;
+user, <code class="docutils literal"><span class="pre">getent</span> <span class="pre">passwd</span> <span class="pre">test</span></code> wouldn&#8217;t find the user while
+<code class="docutils literal"><span class="pre">getent</span> <span class="pre">passwd</span> <span class="pre">test&#64;LOCAL</span></code> would</dd>
+<dt><strong>auth_provider</strong> (string)</dt>
+<dd><p class="first">The authentication provider used for the domain. Supported auth
+providers are:</p>
+<ul class="last simple">
+<li>ldap for native LDAP authentication. See sssd-ldap(5) for more
+information on configuring LDAP.</li>
+<li>krb5 for Kerberos authentication. See sssd-krb5(5) for more
+information on configuring Kerberos.</li>
+<li>proxy for relaying authentication to some other PAM target.</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="options-valid-for-proxy-identity-domains">
+<h2>Options valid for proxy identity domains<a class="headerlink" href="#options-valid-for-proxy-identity-domains" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt><strong>proxy_pam_target</strong> (string)</dt>
+<dd>The proxy target PAM proxies to. If not set, a default setting of
+<code class="docutils literal"><span class="pre">sssd_pam_proxy_default</span></code> is used.</dd>
+<dt><strong>proxy lib_name</strong> (string)</dt>
+<dd>The name of NSS library. The NSS functions searched for in the
+library are in the form of <code class="docutils literal"><span class="pre">_nss_$(libName)_$(function)</span></code>, for
+example <code class="docutils literal"><span class="pre">_nss_nis_getpwent</span></code>.</dd>
+</dl>
+</div>
+<div class="section" id="the-local-provider">
+<h2>The LOCAL provider<a class="headerlink" href="#the-local-provider" title="Permalink to this headline">¶</a></h2>
+<p>There is a special identity and authentication provider in SSSD named
+<em>local</em>. Its backend is stored on disk in a format called <em>LDB</em>, an
+on-disk LDAP-like database.</p>
+<p>One difference in comparison with the classic files is that groups in
+the LOCAL backend can be nested. The LOCAL domain is also meant to
+contain additional user information such as user picture or keyboard
+settings.</p>
+<p>Instead of using User Private Groups (where a group is created for every
+user), which is usually the default in files-based scheme, the LOCAL
+domain uses a concept called Magic Private Groups. By using the Magic
+Private Groups option, you are imposing two limitations to the ID space
+and name space:</p>
+<ol class="arabic simple">
+<li>users and groups share a common name space, there can never be a
+separate group with a same name as a user</li>
+<li>users and groups share a common ID space, there can never be a group
+with a same ID as a user</li>
+</ol>
+<p>Using Magic Private groups bring the benefit of better Windows
+Interoperability (in Windows, the ID and name spaces are unique) and
+also avoids creating a group for every user, thus cluttering the group
+space. Also, for NSS calls, every user is actually returned a user&#8217;s
+private group without having to explicitly create the group, thus having
+the same effect as User Private Groups</p>
+<p>To manage users in the LOCAL backend, SSSD comes with a set of tools
+that resemble their shadow-utils counterparts in names as well as
+parameters. The tools include <em>sss_useradd</em>, <em>sss_groupadd</em> for adding
+users and groups, <em>sss_userdel</em>, <em>sss_groupdel</em> for removing them and
+<em>sss_usermod</em>, <em>sss_groupmod</em> for changing their attributes. You can
+see details about tools usage by running them with the <code class="docutils literal"><span class="pre">--help</span></code>
+argument.</p>
+</div>
+</div>
+<div class="section" id="domain-configuration-examples">
+<h1>Domain configuration examples<a class="headerlink" href="#domain-configuration-examples" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="example-1-a-standalone-local-domain">
+<h2>Example 1: A standalone LOCAL domain<a class="headerlink" href="#example-1-a-standalone-local-domain" title="Permalink to this headline">¶</a></h2>
+<p>Put the following definition of LOCAL domain into your sssd config file:</p>
+<p>Now, add a LOCAL user using sssd management tools:</p>
+<p>A home directory for the new user will be created. Refer to
+<code class="docutils literal"><span class="pre">sss_useradd</span></code> and <code class="docutils literal"><span class="pre">sssd.conf</span></code> manual pages for more documentation on
+the subject.</p>
+<p>If you configured NSS to use the SSS domain, you should be able to
+request the user information now:</p>
+<p>Changing the user&#8217;s password and logging in should be also possible now:</p>
+</div>
+<div class="section" id="example-2-authenticating-against-a-native-ldap-domain">
+<h2>Example 2: Authenticating against a native LDAP domain<a class="headerlink" href="#example-2-authenticating-against-a-native-ldap-domain" title="Permalink to this headline">¶</a></h2>
+<p>A native LDAP domain requires a running LDAP server to authenticate
+against. The client configuration is done in <code class="docutils literal"><span class="pre">/etc/sssd/sssd.conf</span></code>.</p>
+<p>If you want to <strong>authenticate</strong> against an LDAP server <strong>TLS/SSL is
+required</strong>. sssd does not support authentication over an unencrypted
+channel. If the LDAP server is used only as an identify provider, an
+encrypted channel is not needed.</p>
+<p>The domain configuration in sssd config would look like this:</p>
+<p>All the parameters for a native LDAP domain are described in the
+<code class="docutils literal"><span class="pre">sssd-ldap(5)</span></code> manual page.</p>
+</div>
+<div class="section" id="example-3-authenticating-against-a-kerberos-server">
+<h2>Example 3: Authenticating against a Kerberos server<a class="headerlink" href="#example-3-authenticating-against-a-kerberos-server" title="Permalink to this headline">¶</a></h2>
+<p>In order to set up Kerberos authentication, you need to know the address
+of your KDC and the Kerberos realm. Using these parameters, the
+configuration is very simple:</p>
+<p>All the parameters for a configuring Kerberos authentication are
+described in the <code class="docutils literal"><span class="pre">sssd-krb5(5)</span></code> manual page.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">About</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#upgrading-from-a-previous-version">Upgrading from a previous version</a></li>
+<li><a class="reference internal" href="#running-sssd">Running SSSD</a></li>
+<li><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li><a class="reference internal" href="#configure-nss-for-fetching-user-and-group-information">Configure NSS for fetching user and group information</a></li>
+<li><a class="reference internal" href="#configure-pam-for-authentication">Configure PAM for authentication</a></li>
+<li><a class="reference internal" href="#sssd-daemon-configuration">SSSD daemon configuration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuring-services">Configuring services</a><ul>
+<li><a class="reference internal" href="#general-configuration-options">General configuration options</a></li>
+<li><a class="reference internal" href="#nss-configuration-options">NSS configuration options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuring-domains">Configuring domains</a><ul>
+<li><a class="reference internal" href="#domain-configuration-options">Domain configuration options</a></li>
+<li><a class="reference internal" href="#options-valid-for-proxy-identity-domains">Options valid for proxy identity domains</a></li>
+<li><a class="reference internal" href="#the-local-provider">The LOCAL provider</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#domain-configuration-examples">Domain configuration examples</a><ul>
+<li><a class="reference internal" href="#example-1-a-standalone-local-domain">Example 1: A standalone LOCAL domain</a></li>
+<li><a class="reference internal" href="#example-2-authenticating-against-a-native-ldap-domain">Example 2: Authenticating against a native LDAP domain</a></li>
+<li><a class="reference internal" href="#example-3-authenticating-against-a-kerberos-server">Example 3: Authenticating against a Kerberos server</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/HOWTO_Configure_0_7_1.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/HOWTO_Configure_0_7_1.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

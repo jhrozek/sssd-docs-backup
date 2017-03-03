@@ -1,0 +1,314 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>D-Bus Interface: Users and Groups &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="d-bus-interface-users-and-groups">
+<h1>D-Bus Interface: Users and Groups<a class="headerlink" href="#d-bus-interface-users-and-groups" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2150">​https://fedorahosted.org/sssd/ticket/2150</a></li>
+</ul>
+<p>Related design page(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/DesignDocs/DBusResponder.html">​https://fedorahosted.org/sssd/wiki/DesignDocs/DBusResponder</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>This design document describes how users and groups are represented on
+SSSD D-Bus interface.</p>
+</div>
+<div class="section" id="use-cases">
+<h2>Use cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Listing users and groups in access control GUI</li>
+<li>Obtaining extra information about user that is not available through
+standard APIs</li>
+</ul>
+<div class="section" id="d-bus-interface">
+<h3>D-Bus Interface<a class="headerlink" href="#d-bus-interface" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="org-freedesktop-sssd-infopipe-users">
+<h2>org.freedesktop.sssd.infopipe.Users<a class="headerlink" href="#org-freedesktop-sssd-infopipe-users" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>/org/freedesktop/sssd/infopipe/Users</li>
+</ul>
+<ul class="simple">
+<li>o FindByName(s:name)</li>
+<li>o FindByID(u:id)</li>
+<li>ao ListByName(s:filter, u:limit)<ul>
+<li>filter: possible asterisk as wildcard character; minimum length is
+required</li>
+<li>limit: maximum number of entries returned, 0 means unlimited or to
+maximum allowed number</li>
+</ul>
+</li>
+<li>ao ListByDomainAndName(s:domain_name, s:filter, u:limit)<ul>
+<li>filter: possible asterisk as wildcard character; minimum length is
+required</li>
+<li>limit: maximum number of entries returned, 0 means unlimited or to
+maximum allowed number</li>
+</ul>
+</li>
+</ul>
+<p>None.</p>
+<p>None.</p>
+</div>
+<div class="section" id="org-freedesktop-sssd-infopipe-users-user">
+<h2>org.freedesktop.sssd.infopipe.Users.User<a class="headerlink" href="#org-freedesktop-sssd-infopipe-users-user" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>/org/freedesktop/sssd/infopipe/Users/$DOMAIN/$UID</li>
+</ul>
+<ul class="simple">
+<li>void UpdateGroupsList()<ul>
+<li>Performs initgroups on the user.</li>
+</ul>
+</li>
+</ul>
+<p>None.</p>
+<ul class="simple">
+<li>s name<ul>
+<li>The user&#8217;s login name.</li>
+</ul>
+</li>
+<li>u uidNumber<ul>
+<li>The user&#8217;s UID.</li>
+</ul>
+</li>
+<li>u gidNumber<ul>
+<li>The user&#8217;s primary GID.</li>
+</ul>
+</li>
+<li>s gecos<ul>
+<li>The user&#8217;s real name.</li>
+</ul>
+</li>
+<li>s homeDirectory<ul>
+<li>The user&#8217;s home directory</li>
+</ul>
+</li>
+<li>s loginShell<ul>
+<li>The user&#8217;s login shell</li>
+</ul>
+</li>
+<li>a{sas} extraAttributes<ul>
+<li>Extra attributes as configured by the SSSD. The key is the
+attribute name, value is array of strings that contains the
+values.</li>
+</ul>
+</li>
+<li>ao groups<ul>
+<li>An array of object paths representing the groups the user is a
+member of.</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="org-freedesktop-sssd-infopipe-groups">
+<h2>org.freedesktop.sssd.infopipe.Groups<a class="headerlink" href="#org-freedesktop-sssd-infopipe-groups" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>/org/freedesktop/sssd/infopipe/Groups</li>
+</ul>
+<ul class="simple">
+<li>o FindByName(s:name)</li>
+<li>o FindByID(u:id)</li>
+<li>ao ListByName(s:filter, u:limit)<ul>
+<li>filter: possible asterisk as wildcard character; minimum length is
+required</li>
+<li>limit: maximum number of entries returned, 0 means unlimited or to
+maximum allowed number</li>
+</ul>
+</li>
+<li>ao ListByDomainAndName(s:domain_name, s:filter, u:limit)<ul>
+<li>filter: possible asterisk as wildcard character; minimum length is
+required</li>
+<li>limit: maximum number of entries returned, 0 means unlimited or to
+maximum allowed number</li>
+</ul>
+</li>
+</ul>
+<p>None.</p>
+</div>
+<div class="section" id="org-freedesktop-sssd-infopipe-groups-group">
+<h2>org.freedesktop.sssd.infopipe.Groups.Group<a class="headerlink" href="#org-freedesktop-sssd-infopipe-groups-group" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>/org/freedesktop/sssd/infopipe/Groups/$DOMAIN/$GID</li>
+</ul>
+<p>None.</p>
+<p>None.</p>
+<ul class="simple">
+<li>s name<ul>
+<li>The group&#8217;s name.</li>
+</ul>
+</li>
+<li>u gidNumber<ul>
+<li>The groups&#8217;s primary GID.</li>
+</ul>
+</li>
+<li>ao users<ul>
+<li>A list of the group&#8217;s member user objects.</li>
+</ul>
+</li>
+<li>ao groups<ul>
+<li>A list of the group&#8217;s member group objects.</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="overview-of-the-solution">
+<h2>Overview of the solution<a class="headerlink" href="#overview-of-the-solution" title="Permalink to this headline">¶</a></h2>
+<p>New D-Bus interfaces will be implemented in the IFP responder.</p>
+<p>Find methods perform online lookup if the entry is missing or expired.</p>
+<p>Listing methods always perform online lookup to ensure that even
+recently added entries are in the list.</p>
+<p>Listing methods can return only a limited number of entries. Number of
+entries returned can be controlled by <strong>limit</strong> parameter with hard
+limit set in sssd.conf with a new configuration option
+<strong>filter_limit</strong>. This option can be present in [ifp] and [domain]
+sections to set this limit for data provider filter searches ([domain]
+section) and also global hard limit for the listing methods itself
+([ifp] section). This limit is supposed to improve performace with large
+databases so we process only a small number of records. If the option is
+set to 0, the limit is disabled.</p>
+<p>Filter may contain only &#8216;*&#8217; asterisk as a wildcard character, it does
+not support complete set of regular expressions. The asterisk can be
+present on the beginning of the filter &#8216;*filter&#8217;, its end &#8216;filter*&#8217;,
+both sides &#8216;*filter*&#8217; or even in the middle &#8216;*fil*ter*&#8217;, since it
+is supported by both LDAP and LDB. However, only prefix-filter
+(&#8216;filter*&#8217;), can take the performace boost from indices so other filter
+may not perform so good with huge databases.</p>
+</div>
+<div class="section" id="configuration-changes">
+<h2>Configuration changes<a class="headerlink" href="#configuration-changes" title="Permalink to this headline">¶</a></h2>
+<p>The following options will be created in the [ifp] and [domain]
+sections:</p>
+<ul class="simple">
+<li>wildcard_search_limit (uint32)</li>
+</ul>
+<p>See the <a class="reference external" href="https://docs.pagure.org/sssd-test2/WildcardRefresh.html">wildcard refresh design
+page?</a> for
+more details.</p>
+</div>
+<div class="section" id="how-to-test">
+<h2>How To Test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<p>Call the D-Bus methods and properties. For example with <strong>dbus-send</strong>
+tool.</p>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Jakub Hrozek &lt;<a class="reference external" href="mailto:jhrozek&#37;&#52;&#48;redhat&#46;com">​jhrozek<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+<li>Pavel Březina &lt;<a class="reference external" href="mailto:pbrezina&#37;&#52;&#48;redhat&#46;com">​pbrezina<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">D-Bus Interface: Users and Groups</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem statement</a></li>
+<li><a class="reference internal" href="#use-cases">Use cases</a><ul>
+<li><a class="reference internal" href="#d-bus-interface">D-Bus Interface</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#org-freedesktop-sssd-infopipe-users">org.freedesktop.sssd.infopipe.Users</a></li>
+<li><a class="reference internal" href="#org-freedesktop-sssd-infopipe-users-user">org.freedesktop.sssd.infopipe.Users.User</a></li>
+<li><a class="reference internal" href="#org-freedesktop-sssd-infopipe-groups">org.freedesktop.sssd.infopipe.Groups</a></li>
+<li><a class="reference internal" href="#org-freedesktop-sssd-infopipe-groups-group">org.freedesktop.sssd.infopipe.Groups.Group</a></li>
+<li><a class="reference internal" href="#overview-of-the-solution">Overview of the solution</a></li>
+<li><a class="reference internal" href="#configuration-changes">Configuration changes</a></li>
+<li><a class="reference internal" href="#how-to-test">How To Test</a></li>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/DBusUsersAndGroups.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/DBusUsersAndGroups.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

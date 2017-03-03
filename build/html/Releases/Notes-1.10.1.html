@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Another case where the dircache might have been created with the UID
+of root was fixed</li>
+<li>Fixed a crash in case the dynamic DNS update timed out</li>
+<li>Several packaging bugs that were introduced as a result of splitting
+out the providers into separate subpackages was fixed</li>
+<li>The SRV resolution status is now correctly reset after receiving
+notification about changed network conditions</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/1778">#1778</a></dt>
+<dd>Do not copy special files when creating a home directory from a
+skeldir</dd>
+<dt><a class="reference external" href="/sssd/ticket/1814">#1814</a></dt>
+<dd>Empty Kerberos passwords handled incorrectly</dd>
+<dt><a class="reference external" href="/sssd/ticket/1827">#1827</a></dt>
+<dd>Cannot change expired password of an AD user</dd>
+<dt><a class="reference external" href="/sssd/ticket/1846">#1846</a></dt>
+<dd>cyclic group memberships may not work depending on order of
+operations</dd>
+<dt><a class="reference external" href="/sssd/ticket/1933">#1933</a></dt>
+<dd>sssd fails to resolve hosts/services once the network is up</dd>
+<dt><a class="reference external" href="/sssd/ticket/1935">#1935</a></dt>
+<dd>Several translated man pages are malformed</dd>
+<dt><a class="reference external" href="/sssd/ticket/1984">#1984</a></dt>
+<dd>sssd-common requires libndr due to pac responder dependency</dd>
+<dt><a class="reference external" href="/sssd/ticket/1992">#1992</a></dt>
+<dd>AD dyndns update crashed after attempting to update a standalone DNS
+server</dd>
+<dt><a class="reference external" href="/sssd/ticket/1999">#1999</a></dt>
+<dd>shadowLastChange updates even when PAM reports password change
+failed</dd>
+<dt><a class="reference external" href="/sssd/ticket/2002">#2002</a></dt>
+<dd>cc_residual_is_used might not work correctly with dircache</dd>
+</dl>
+</div></div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Jakub Hrozek (5):</p>
+<ul class="simple">
+<li>Updating the version for the 1.10.1 release</li>
+<li>RPM: Move sssd_pac to the krb5-common subpackage</li>
+<li>DB: sysdb_search_user_by_name: search by both name and alias</li>
+<li>RPM: Require libsss_idmap from sssd-common</li>
+<li>Updating translations for the 1.10.1 release</li>
+</ul>
+<p>Jim Collins (1):</p>
+<ul class="simple">
+<li>ldap: only update shadowLastChange when password change is successful</li>
+</ul>
+<p>Lukas Slebodnik (2):</p>
+<ul class="simple">
+<li>Return right directory name for dircache</li>
+<li>Every time use permissive control in function memberof_mod.</li>
+</ul>
+<p>Michal Zidek (1):</p>
+<ul class="simple">
+<li>Always set port status to neutral when resetting service.</li>
+</ul>
+<p>Ondrej Kos (5):</p>
+<ul class="simple">
+<li>Do not copy special files when creating homedir</li>
+<li>KRB5_CHILD: Fix handling of get_password return code</li>
+<li>Do not try to set password when authtok_length is zero</li>
+<li>KRB: Handle empty password gracefully</li>
+<li>KRB: Replace multiple calls with variable</li>
+</ul>
+<p>Pavel Březina (3):</p>
+<ul class="simple">
+<li>print hint about password complexity when new password is rejected</li>
+<li>dyndns timeout test: catch SIGCHLD handler events</li>
+<li>SIGCHLD handler: do not call callback when pvt data where freed</li>
+</ul>
+<p>Stephen Gallagher (3):</p>
+<ul class="simple">
+<li>Move pre and post scripts to sssd-common</li>
+<li>Remove sysv-&gt;systemd upgrade routines</li>
+<li>Move sssd_pac binary to the IPA and AD providers</li>
+</ul>
+</div>
+<div class="section" id="packaging-changes">
+<h1>Packaging Changes<a class="headerlink" href="#packaging-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>The sssd_pac binary is now owned by the IPA and AD providers</li>
+<li>The sysv-&gt;systemd upgrade routines were removed</li>
+<li>Several packaging fixes</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+<li><a class="reference internal" href="#packaging-changes">Packaging Changes</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.10.1.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.10.1.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

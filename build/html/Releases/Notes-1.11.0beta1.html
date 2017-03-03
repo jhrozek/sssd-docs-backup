@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>This pre-release does not bring any changes visible to the end-user.
+It is intended to be part of the development of FreeIPA 3.3 and its
+focus of supporting legacy (non-SSSD) clients in a setup where IPA
+server established a trust relationship with an Active Directory
+clients.</li>
+<li>The handling of ID ranges in the provides has been changed to use a
+plugin interface where each provider can use a different plugin and
+have a different behaviour</li>
+<li>The libsss_idmap library has been enhanced in several ways such as
+handling &#8220;external mappings&#8221; or supporting base RIDs other than 0</li>
+<li>The assumption that subdomain users always have a primary
+user-private-group (UPG) has been removed</li>
+<li>If the SSSD is running on the IPA server, it is able to perform
+lookups for trusted users directly against the AD server using the AD
+provider lookups</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/1938">#1938</a></dt>
+<dd>[RFE] Add a new call to libsss_idmap to add a new mapping where the
+first RID is not 0</dd>
+<dt><a class="reference external" href="/sssd/ticket/1960">#1960</a></dt>
+<dd>[RFE] Add range type for ID mapping in AD to libsss_idmap</dd>
+<dt><a class="reference external" href="/sssd/ticket/1961">#1961</a></dt>
+<dd>[RFE] Add plugin to LDAP provider to find new ranges</dd>
+<dt><a class="reference external" href="/sssd/ticket/1962">#1962</a></dt>
+<dd>[RFE] Integrate AD provider lookup code into IPA subdomain user
+lookup</dd>
+<dt><a class="reference external" href="/sssd/ticket/1979">#1979</a></dt>
+<dd>[RFE] Add an optional unique range identifier</dd>
+<dt><a class="reference external" href="/sssd/ticket/1993">#1993</a></dt>
+<dd>[RFE] Add a new option to denote server mode</dd>
+</dl>
+</div></div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Jakub Hrozek (11):</p>
+<ul class="simple">
+<li>Updating the version for the 1.10.1 release</li>
+<li>Bump version to track 1.11 development</li>
+<li>IPA: Add a server mode option</li>
+<li>LDAP: Add utility function sdap_copy_map</li>
+<li>AD: decouple ad_id_ctx initialization</li>
+<li>AD: initialize failover with custom realm, domain and failover
+service</li>
+<li>IPA: Initialize server mode ctx if server mode is on</li>
+<li>AD: Move storing sdap_domain for subdomain to generic LDAP code</li>
+<li>IPA: Create and remove AD id_ctx for subdomains discovered in server
+mode</li>
+<li>IPA: Look up AD users directly if IPA server mode is on</li>
+<li>Updating translations for the 1.11 beta1 release</li>
+</ul>
+<p>Sumit Bose (18):</p>
+<ul class="simple">
+<li>idmap: allow first RID to be set</li>
+<li>idmap: add optional unique range id</li>
+<li>idmap: add option to indicate external_mapping</li>
+<li>idmap: allow NULL domain sid for external mappings</li>
+<li>idmap: add calls to check if ID mapping conforms to ranges</li>
+<li>idmap: add sss_idmap_domain_has_algorithmic_mapping</li>
+<li>Add cmocka based tests for libsss_idmap</li>
+<li>Add now options ldap_min_id and ldap_max_id</li>
+<li>SDAP IDMAP: Add configured domain to idmap context</li>
+<li>Allow different methods to find new domains for idmapping</li>
+<li>Add sdap_idmap_domain_has_algorithmic_mapping()</li>
+<li>Replace SDAP_ID_MAPPING checks with
+sdap_idmap_domain_has_algorithmic_mapping</li>
+<li>Add ipa_idmap_init()</li>
+<li>Add support for new ipaRangeType attribute</li>
+<li>Replace new_subdomain() with find_subdomain_by_name()</li>
+<li>IPA: read ranges before subdomains</li>
+<li>Save mpg state for subdomains</li>
+<li>Read mpg state for subdomains from cache</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.11.0beta1.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.11.0beta1.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

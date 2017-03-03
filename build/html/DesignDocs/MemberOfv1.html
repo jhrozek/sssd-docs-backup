@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Proposal to redesign the memberOf plugin &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#ProposaltoredesignthememberOfplugin">Proposal to redesign the memberOf
+plugin</a></li>
+<li><a class="reference external" href="#Actions">Actions</a><ol class="arabic">
+<li><a class="reference external" href="#Addnewmembertoagroupwithnoparents">Add new member to a group with no
+parents</a></li>
+<li><a class="reference external" href="#Addnewmembertoagroupwithparents">Add new member to a group with
+parents</a></li>
+<li><a class="reference external" href="#Addnewgrouptoagroupwithnoparentsnoloops">Add new group to a group with no parents (no
+loops)</a></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="proposal-to-redesign-the-memberof-plugin">
+<h1>Proposal to redesign the memberOf plugin<a class="headerlink" href="#proposal-to-redesign-the-memberof-plugin" title="Permalink to this headline">¶</a></h1>
+<p>Let us start with the following setup:</p>
+<p><a class="reference external" href="https://fedorahosted.org/sssd/attachment/wiki/DesignDocs/MemberOfv2/nestedgroups.png"><img alt="image0" src="https://fedorahosted.org/sssd/raw-attachment/wiki/DesignDocs/MemberOfv2/nestedgroups.png" /></a></p>
+</div>
+<div class="section" id="actions">
+<h1>Actions<a class="headerlink" href="#actions" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="add-new-member-to-a-group-with-no-parents">
+<h2>Add new member to a group with no parents<a class="headerlink" href="#add-new-member-to-a-group-with-no-parents" title="Permalink to this headline">¶</a></h2>
+<p>We send an ldb message to add &#8220;User 4&#8221; to &#8220;Group C&#8221;</p>
+<ol class="arabic simple">
+<li>Check whether the member attribute matches the DN of Group C (it does
+not)</li>
+<li>Examine &#8220;Group C&#8221; for memberOf attributes.</li>
+<li>No memberOf attributes exist</li>
+<li>Add memberOf(Group C) to &#8220;User 4&#8221;</li>
+</ol>
+</div>
+<div class="section" id="add-new-member-to-a-group-with-parents">
+<h2>Add new member to a group with parents<a class="headerlink" href="#add-new-member-to-a-group-with-parents" title="Permalink to this headline">¶</a></h2>
+<p>We send an ldb message to add &#8220;User 5&#8221; to &#8220;Group B&#8221;</p>
+<ol class="arabic simple">
+<li>Check whether the member attribute matches the DN of Group C (it does
+not)</li>
+<li>Examine &#8220;Group B&#8221; for memberOf attributes.</li>
+<li>&#8220;Group B&#8221; has memberOf attributes: &#8220;Group C&#8221;</li>
+<li>Check whether any of these memberOf values match &#8220;User 5&#8221; (none do)</li>
+<li>Add memberOf(Group B) and memberOf(Group C) to &#8220;User 4&#8221; and return</li>
+</ol>
+</div>
+<div class="section" id="add-new-group-to-a-group-with-no-parents-no-loops">
+<h2>Add new group to a group with no parents (no loops)<a class="headerlink" href="#add-new-group-to-a-group-with-no-parents-no-loops" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Proposal to redesign the memberOf plugin</a></li>
+<li><a class="reference internal" href="#actions">Actions</a><ul>
+<li><a class="reference internal" href="#add-new-member-to-a-group-with-no-parents">Add new member to a group with no parents</a></li>
+<li><a class="reference internal" href="#add-new-member-to-a-group-with-parents">Add new member to a group with parents</a></li>
+<li><a class="reference internal" href="#add-new-group-to-a-group-with-no-parents-no-loops">Add new group to a group with no parents (no loops)</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/MemberOfv1.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/MemberOfv1.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

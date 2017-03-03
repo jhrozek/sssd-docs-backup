@@ -1,0 +1,688 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Debugging and troubleshooting SSSD &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><a class="reference external" href="#DebuggingandtroubleshootingSSSD">Debugging and troubleshooting
+SSSD</a><ol class="arabic">
+<li><a class="reference external" href="#Lettoolshelpyou">Let tools help you!</a></li>
+<li><a class="reference external" href="#SSSDdebuglogs">SSSD debug logs</a></li>
+<li><a class="reference external" href="#TroubleshootingSUDO">Troubleshooting SUDO</a></li>
+<li><a class="reference external" href="#TroubleshootingDNSupdates">Troubleshooting DNS updates</a></li>
+<li><a class="reference external" href="#TroubleshootingUserInformation">Troubleshooting User
+Information</a></li>
+<li><a class="reference external" href="#TroubleshootingAuthenticationPasswordChangeandAccessControl">Troubleshooting Authentication, Password Change and Access
+Control</a></li>
+<li><a class="reference external" href="#Bugreports">Bug reports</a></li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="debugging-and-troubleshooting-sssd">
+<h1>Debugging and troubleshooting SSSD<a class="headerlink" href="#debugging-and-troubleshooting-sssd" title="Permalink to this headline">¶</a></h1>
+<p>This document should help users who are trying to troubleshoot why their
+SSSD setup is not working as expected. After following the steps
+described here, the user should be able to either fix the configuration
+himself or provide the developers/support a complete set of debug
+information to follow on <a class="reference external" href="https://docs.pagure.org/sssd-test2/Reporting_sssd_bugs.html">in a bug
+report</a>.</p>
+<p>The SSSD provides two major features - obtaining information about users
+and authenticating users. Each of these hooks into different system APIs
+and should be viewed separately. However, a successfull authentication
+can only be performed when the information about a user can be
+retrieved, so if authentication doesn&#8217;t work in your case, please make
+sure you can at least obtain info from about the user with
+<code class="docutils literal"><span class="pre">getent</span> <span class="pre">passwd</span></code> or <code class="docutils literal"><span class="pre">id</span></code>.</p>
+<div class="section" id="let-tools-help-you">
+<h2>Let tools help you!<a class="headerlink" href="#let-tools-help-you" title="Permalink to this headline">¶</a></h2>
+<p>Rather than hand-crafting the SSSD and system configuration yourself,
+it&#8217;s much wiser to let an automated tool do its job. If you want to
+connect an IPA client, use <code class="docutils literal"><span class="pre">ipa-client-install</span></code>. For connecting a
+machine to an Active Directory domain,
+<a class="reference external" href="http://freedesktop.org/software/realmd/">​realmd</a> is the best tool
+for the job. If you&#8217;re on RHEL-6, where <code class="docutils literal"><span class="pre">realmd</span></code> is not available, you
+can still <a class="reference external" href="https://jhrozek.wordpress.com/2014/03/13/enrolling-an-active-directory-rhel-6-client-machine-using-adcli/">​use adcli from
+EPEL</a>.</p>
+<p>The <code class="docutils literal"><span class="pre">authconfig</span></code> utility can also help you set up the Name Service
+Switch and/or the PAM stack while allowing you to use a custom
+<code class="docutils literal"><span class="pre">sssd.conf</span></code> with the <code class="docutils literal"><span class="pre">--enablesssd</span></code> and <code class="docutils literal"><span class="pre">--enablesssdauth</span></code>
+options. Please note these options only enable SSSD in the NSS and PAM
+stacks but do not configure the SSSD service itself!</p>
+</div>
+<div class="section" id="sssd-debug-logs">
+<h2>SSSD debug logs<a class="headerlink" href="#sssd-debug-logs" title="Permalink to this headline">¶</a></h2>
+<p>Each process that SSSD consists of is represented by a section in the
+<code class="docutils literal"><span class="pre">sssd.conf</span></code> config file. To enable debugging persistently across SSSD
+service restarts, put the directive <code class="docutils literal"><span class="pre">debug_level=N</span></code>, where N typically
+stands for a number between 1 and 10 into the particular section. Levels
+up to 3 should log mostly failures (although we haven&#8217;t really been
+consistent especially earlier in the SSSD development) and anything
+above level 8 provides a large number of log messages. Level 6 might be
+a good starting point for debugging problems. You can also use the
+<a class="reference external" href="https://jhrozek.fedorapeople.org/sssd/git/man/sss_debuglevel.8.html">​sss_debuglevel(8)</a>
+tool to enable debugging on the fly without having to restart the
+daemon.</p>
+<p>On Fedora/RHEL, the debug logs are stored under <code class="docutils literal"><span class="pre">/var/log/sssd</span></code>. There
+is one log file per SSSD process. The services (also called responders)
+log into a log file called <code class="docutils literal"><span class="pre">sssd_$service</span></code>, for example NSS responder
+logs into <code class="docutils literal"><span class="pre">/var/log/sssd/sssd_nss.log</span></code>. The domain sections log into
+files called <code class="docutils literal"><span class="pre">sssd_$domainname.log</span></code>. The short-lived helper processes
+also log into their own log files, such as <code class="docutils literal"><span class="pre">ldap_child.log</span></code> or
+<code class="docutils literal"><span class="pre">krb5_child.log</span></code>.</p>
+<p>Keep in mind that enabling <code class="docutils literal"><span class="pre">debug_level</span></code> in the <code class="docutils literal"><span class="pre">[sssd]</span></code> section
+only enables debugging of the <code class="docutils literal"><span class="pre">sssd</span></code> process itself, not all the
+worker processes!</p>
+</div>
+<div class="section" id="troubleshooting-sudo">
+<h2>Troubleshooting SUDO<a class="headerlink" href="#troubleshooting-sudo" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://docs.pagure.org/sssd-test2/HOWTO_Troubleshoot_SUDO.html">Troubleshooting
+SUDO</a>
+- a guide to troubleshoot sudo issues</p>
+</div>
+<div class="section" id="troubleshooting-dns-updates">
+<h2>Troubleshooting DNS updates<a class="headerlink" href="#troubleshooting-dns-updates" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://docs.pagure.org/sssd-test2/HOWTO_Troubleshoot_DNS_Updates.html">Troubleshooting DNS
+updates</a>
+- a guide to troubleshoot nsupdate issues</p>
+</div>
+<div class="section" id="troubleshooting-user-information">
+<h2>Troubleshooting User Information<a class="headerlink" href="#troubleshooting-user-information" title="Permalink to this headline">¶</a></h2>
+<p>Before diving into the SSSD logs and config files it is very beneficial
+to know how does the <a class="reference external" href="https://jhrozek.wordpress.com/2015/03/11/anatomy-of-sssd-user-lookup/">​SSSD request
+flow</a>
+looks like. Having that in mind, you can go through the following
+check-list to identify where the problem might be.</p>
+<p>For even more in-depth information on SSSD&#8217;s architecture, refer to
+<a class="reference external" href="http://is.muni.cz/th/359290/fi_m/thesis.pdf">​Pavel Brezina&#8217;s
+thesis</a>.</p>
+<p>Please note the examples of the DEBUG messages are subject to change in
+future SSSD versions.</p>
+<ul>
+<li><p class="first"><strong>general tips</strong></p>
+<ol class="arabic simple">
+<li>To avoid SSSD caching, it is often useful to reproduce the bugs
+with an empty cache or at least invalid cache. However, keep in
+mind that also the cached credentials are stored in the cache!
+<strong>Do not</strong> remove the cache files if your system is offline and it
+relies on SSSD authentication!</li>
+<li>Before sending the logs and/or config files to a
+publicly-accessible space, such as mailing lists or bug trackers,
+check the files for any sensitive information</li>
+<li>Please only send log files relevant to the occurence of the issue.
+Issues in log files that are mega- or gigabytes large are more
+likely to be skipped</li>
+<li>Unless the problem you&#8217;re trying to diagnose is related to
+enumeration per, se, always reproduce the issue with
+<code class="docutils literal"><span class="pre">enumerate=false</span></code>. Triaging logs with enumeration enabled
+obfuscates the normal data flow.</li>
+</ol>
+</li>
+<li><p class="first"><strong>getent passwd or id doesn&#8217;t print the user or getent group doesn&#8217;t
+print the group at all</strong></p>
+<ol class="arabic">
+<li><p class="first">Is sssd running at all?</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">systemctl</span> <span class="pre">status</span> <span class="pre">sssd</span></code> or <code class="docutils literal"><span class="pre">service</span> <span class="pre">sssd</span> <span class="pre">status</span></code> would
+display the service status. Alternatively, check for the
+<code class="docutils literal"><span class="pre">sssd</span></code> processes with <code class="docutils literal"><span class="pre">ps</span> <span class="pre">-ef</span> <span class="pre">|</span> <span class="pre">grep</span> <span class="pre">sssd</span></code> or similar.</li>
+</ul>
+</li>
+<li><p class="first">Is the <code class="docutils literal"><span class="pre">sss</span></code> module present in <code class="docutils literal"><span class="pre">nsswitch.conf</span></code> for all
+databases?</p>
+<ul class="simple">
+<li>If there is a separate <code class="docutils literal"><span class="pre">initgroups</span></code> database configured, make
+sure it either contains the <code class="docutils literal"><span class="pre">sss</span></code> module as well or comment
+the <code class="docutils literal"><span class="pre">initgroups</span></code> line completely</li>
+</ul>
+</li>
+<li><p class="first">Does the request reach the SSSD responder processes? Enable
+debugging by putting <code class="docutils literal"><span class="pre">debug_level=6</span></code> (or higher) into the
+<code class="docutils literal"><span class="pre">[nss]</span></code> section. Restart SSSD and check the <code class="docutils literal"><span class="pre">nss</span></code> log for
+incoming requests with the matching timestamp to your <code class="docutils literal"><span class="pre">getent</span></code>
+or <code class="docutils literal"><span class="pre">id</span></code> command. Here is how an incoming request looks like with
+SSSD-1.12:</p>
+<p>Command <code class="docutils literal"><span class="pre">17</span></code> is <code class="docutils literal"><span class="pre">getpwnam(admin)</span></code>, invoked through
+<code class="docutils literal"><span class="pre">getent</span> <span class="pre">passwd</span> <span class="pre">admin</span></code></p>
+</li>
+<li><p class="first">If the command is reaching the NSS responder, does it get
+forwarded to the Data Provider? Does the Data Provider request end
+successfully? With SSSD 1.12, an unsuccessful request would look
+like this:</p>
+<p>In contrast, a request that ran into completion would look like
+this:</p>
+<p>If the Data Provider request had finished completely, but you&#8217;re
+still not seeing any data, then chances are the search didn&#8217;t
+match any object. Either, way, the next step is to look into the
+logs from the <code class="docutils literal"><span class="pre">[domain]</span></code> section. Put <code class="docutils literal"><span class="pre">debug_level=6</span></code> or
+higher into the appropriate <code class="docutils literal"><span class="pre">[domain]</span></code> section, restart SSSD,
+re-run the lookup and continue debugging in the next section.</p>
+</li>
+</ol>
+</li>
+<li><p class="first"><strong>Troubleshooting general sssd_be problems</strong></p>
+<ol class="arabic simple">
+<li>The back end performs several different operations, so it might be
+difficult to see where the problem is at first. At the highest
+level, the back end performs these steps, in this order<ul>
+<li>The request is received from the responder</li>
+<li>The back end resolves the server to connect to. This step might
+involve locating the client site or resolving a SRV query</li>
+<li>The back end establishes connection to the server. In case the
+connection is authenticated, then a proper keytab or a
+certificate might be required</li>
+<li>Once connection is established, the back end runs the search.
+You should see the LDAP filter, search base and requested
+attributes.</li>
+<li>After the search finishes, the entries that matched are stored
+to the cache</li>
+<li>When the request ends (correctly or not), the status code is
+returned to the responder</li>
+</ul>
+</li>
+<li>Make sure the back end is in &#8220;neutral&#8221; or &#8220;online&#8221; state when you
+run the search.<ul>
+<li>With some responder/provider combinations, SSSD might run a
+search immediately after startup, which, in case of
+misconfiguration, might mark the back end offline even before
+the first request by the user arrives.</li>
+<li>You can forcibly set SSSD into offline or online state using
+the SIGUSR1 and SIGUSR2 signals, see the <a class="reference external" href="https://jhrozek.fedorapeople.org/sssd/git/man/sssd.8.html">​sssd(8) man
+page</a>
+for details.</li>
+</ul>
+</li>
+<li>Can the remote server be resolved? Check if the DNS servers in
+<code class="docutils literal"><span class="pre">/etc/resolv.conf</span></code> are correct. With AD or IPA back ends, you
+generally want them to point to the AD or IPA server directly.<ul>
+<li>Use the <code class="docutils literal"><span class="pre">dig</span></code> utility to test SRV queries, for instance
+<code class="docutils literal"><span class="pre">dig</span> <span class="pre">-t</span> <span class="pre">SRV</span> <span class="pre">_ldap._tcp.ad.example.com</span> <span class="pre">&#64;127.0.0.1</span></code></li>
+</ul>
+</li>
+<li>Can the connection be established with the same security
+properties SSSD uses?<ul>
+<li>Many back ends require the connection to be authenticated. In
+case of AD and IPA, the connection is authenticated using the
+system keytab, the LDAP back end often uses certificates.</li>
+<li><code class="docutils literal"><span class="pre">ldapsearch</span> <span class="pre">-ZZ</span></code> is useful to test problems with
+certificates, since SSSD uses openldap libraries under the
+hood.</li>
+<li>For debugging GSSAPI authentication, <code class="docutils literal"><span class="pre">kinit</span></code> is useful, often
+together with <code class="docutils literal"><span class="pre">KRB5_TRACE</span></code>. Take care to select the correct
+principal, especially with the AD back end. If you select the
+highest <code class="docutils literal"><span class="pre">debug_level</span></code>, 10, then <code class="docutils literal"><span class="pre">ldap_child.log</span></code> would
+contain the Kerberos tracing information as well.</li>
+</ul>
+</li>
+<li>Are the LDAP search properties correct?<ul>
+<li>Check if all the attributes required by the search are present
+on the server. This is especially important with the AD
+provider where the entries might not contain the POSIX
+attributes at all or might not have the POSIX attributes
+replicated to Global Catalog, in case SSSD is connecting to the
+GC.</li>
+<li>Is the search base correct, especially with trusted subdomains?
+Incorrect search base with an AD subdomain would yield a
+referral.</li>
+</ul>
+</li>
+<li>Try running the same search with the <code class="docutils literal"><span class="pre">ldapsearch</span></code> utility. Don&#8217;t
+forget to use the same authentication method as SSSD uses!</li>
+</ol>
+</li>
+<li><p class="first"><strong>Assorted common SSSD problems</strong></p>
+<ol class="arabic simple">
+<li>Logins take too long or the time to execute <code class="docutils literal"><span class="pre">id</span> <span class="pre">$username</span></code> takes
+too long.<ul>
+<li>First, make sure to understand <a class="reference external" href="https://jhrozek.wordpress.com/2014/01/27/why-is-id-so-slow-with-sssd/">​what does `id username`
+do</a>.
+Do you really care about its performance? Chances are you&#8217;re
+more interested in <code class="docutils literal"><span class="pre">id</span> <span class="pre">-G</span></code> performance more.</li>
+<li>Check out the <code class="docutils literal"><span class="pre">ignore_group_members</span></code> options in the
+<a class="reference external" href="https://jhrozek.fedorapeople.org/sssd/1.14.1/man/sssd.conf.5.html">​sssd.conf(5)</a>
+manual page.</li>
+</ul>
+</li>
+<li><code class="docutils literal"><span class="pre">getent</span> <span class="pre">passwd</span></code> and <code class="docutils literal"><span class="pre">getent</span> <span class="pre">group</span></code> doesn&#8217;t display any users
+or groups.<ul>
+<li>Enumeration is disabled by design. See the <a class="reference external" href="https://docs.pagure.org/sssd-test2/FAQ.html#WhenshouldIenableenumerationinSSSDorWhyisenumerationdisabledbydefault">FAQ
+page</a>
+for explanation</li>
+</ul>
+</li>
+<li>Changes on the server are not reflected on the client for quite
+some time<ul>
+<li>The SSSD caches identity information for some time. You can
+force cache refresh on next lookup using the
+<a class="reference external" href="https://jhrozek.fedorapeople.org/sssd/git/man/sss_cache.8.html">​sss_cache(8)</a>
+tool.</li>
+<li>Please note that during login, updated information is /always/
+re-read from the server</li>
+</ul>
+</li>
+<li>After enrolling the same machine to a domain with different users
+(perhaps a test VM was enrolled to a newly provisioned server), no
+users can be resolved or log in<ul>
+<li>Probably the new server has different ID values even if the
+users are named the same (like <code class="docutils literal"><span class="pre">admin</span></code> in an IPA domain).
+Currently UID changes are not supported even though <a class="reference external" href="https://fedorahosted.org/sssd/ticket/884">​we plan
+on addressing that
+eventually</a>. At
+the moment, caches must be removed.</li>
+</ul>
+</li>
+</ol>
+</li>
+<li><p class="first"><strong>Common LDAP provider issues</strong></p>
+<ol class="arabic simple">
+<li>When running <code class="docutils literal"><span class="pre">id</span> <span class="pre">user</span></code>, no groups are displayed.</li>
+<li>When running <code class="docutils literal"><span class="pre">getent</span> <span class="pre">group</span> <span class="pre">$groupname</span></code>, no group members are
+displayed<ul>
+<li>In both cases, make sure the selected schema is correct. By
+default, SSSD will use the more common RFC 2307 schema. The
+difference between RFC 2307 and RFC 2307bis is the way which
+group membership is stored in the LDAP server. In an RFC 2307
+server, group members are stored as the multi-valued attribute
+memberuid which contains the name of the users that are
+members. In an RFC2307bis server, group members are stored as
+the multi-valued attribute member (or sometimes uniqueMember)
+which contains the DN of the user or group that is a member of
+this group. RFC2307bis allows nested groups to be maintained as
+well.</li>
+</ul>
+</li>
+<li>If using the LDAP provider with Active Directory, the back end
+randomly goes offline and performs poorly.<ul>
+<li>make sure the referrals are disabled. See the <a class="reference external" href="https://docs.pagure.org/sssd-test2/FAQ.html#WhenshouldIenableenumerationinSSSDorWhyisenumerationdisabledbydefault">FAQ
+page</a>
+for explanation. Also please consider migrating to the AD
+provider.</li>
+<li>The AD provider disabled referral support by default, so
+there&#8217;s no need to disable referrals explicitly</li>
+</ul>
+</li>
+<li>When enumeration is enabled, or when the underlying storage has
+issues, the <code class="docutils literal"><span class="pre">sssd_be</span></code> process is being killed by <code class="docutils literal"><span class="pre">SIGTERM</span></code> or
+even <code class="docutils literal"><span class="pre">SIGKILL</span></code><ul>
+<li>With huge directories, the <code class="docutils literal"><span class="pre">sssd_be</span></code> process takes a long
+time to store the entries to cache. The cache writes are
+blocking, so when <code class="docutils literal"><span class="pre">sssd_be</span></code> writes to the cache, it doesn&#8217;t
+answer heartbeat pings from the <code class="docutils literal"><span class="pre">sssd</span></code> process. As a
+consequence, the <code class="docutils literal"><span class="pre">sssd</span></code> process might consider the back end
+as stuck and forcibly kills it. You can increase the heartbeat
+interval by raising the value of the <code class="docutils literal"><span class="pre">timeout</span></code> option.</li>
+</ul>
+</li>
+<li>For configuration with <code class="docutils literal"><span class="pre">id_provider=ldap</span></code> and
+<code class="docutils literal"><span class="pre">auth_provider=ldap</span></code>, retrieving user information works, but
+authetication does not<ul>
+<li>Please note that user authentication is typically retrieved
+over unecrypted channel (unless <code class="docutils literal"><span class="pre">ldap_id_use_start_tls</span></code> is
+enabled), but authentication always happens over an ecrypted
+channel. Checking for certificate errors should be the first
+step. To test authentication manually, you can perform a
+base-search against the user entry together with ldapsearch&#8217;s
+<code class="docutils literal"><span class="pre">-Z</span></code> option.</li>
+</ul>
+</li>
+</ol>
+</li>
+<li><p class="first"><strong>Common IPA provider issues</strong></p>
+<ol class="arabic">
+<li><p class="first">In an IPA-AD trust setup, <code class="docutils literal"><span class="pre">getent</span> <span class="pre">group</span> <span class="pre">$groupname</span></code> doesn&#8217;t
+display any group members</p>
+</li>
+<li><p class="first">In an IPA-AD trust setup, <code class="docutils literal"><span class="pre">id</span> <span class="pre">$username</span></code> doesn&#8217;t display any
+groups</p>
+<ul class="simple">
+<li>This is expected with older SSSD and FreeIPA versions. In order
+to display the group members for groups and groups for user,
+you need to have at least SSSD 1.12 on the client and FreeIPA
+server 4.1 or newer at the same time</li>
+</ul>
+</li>
+<li><p class="first">In an IPA-AD trust setup, IPA users can be resolved, but AD
+trusted users can&#8217;t</p>
+<ul>
+<li><p class="first">The IPA client machines query the SSSD instance on the IPA
+server for AD users. If the client logs contain errors such as:</p>
+<p>or:</p>
+<p>Check if AD trusted users be resolved on the server at least.
+Enable debugging for the SSSD instance on the IPA server and
+take a look at SSSD logs there. Chances are the SSSD on the
+server is misconfigured or maybe not running at all.</p>
+</li>
+</ul>
+</li>
+<li><p class="first">In an IPA-AD trust setup, AD trust users cannot be resolved or
+secondary groups are missing on the IPA server</p>
+<ul>
+<li><p class="first">This can be caused by AD permissions issues if the below errors
+are seen in the logs:</p>
+<p>Validate permissions on the AD object printed in the logs. This
+can checked by manually performing ldapsearch with the same
+LDAP filter and kerberos credentials that SSSD uses(one-way
+trust uses keytab in <code class="docutils literal"><span class="pre">/var/lib/sss/keytabs/</span></code> and two-way
+trust uses host principal in <code class="docutils literal"><span class="pre">/etc/krb5.keytab</span></code>).</p>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+<li><p class="first"><strong>Common AD provider issues</strong></p>
+<ol class="arabic">
+<li><p class="first">How do I set up the AD provider?</p>
+<ul class="simple">
+<li>There is a dedicated page about <a class="reference external" href="https://docs.pagure.org/sssd-test2/Configuring_sssd_with_ad_server.html">AD provider
+setup</a></li>
+</ul>
+</li>
+<li><p class="first">Many users can&#8217;t be displayed at all with ID mapping enabled and
+SSSD domain logs contain error message such as</p>
+<p>Where XXXXXX is a number larger than 200000, then check the
+<code class="docutils literal"><span class="pre">ldap_idmap_range_size</span></code> option. You&#8217;ll likely want to increase
+its value. Keep in mind the largest ID value on a POSIX system is
+2<sup>32.</sup></p>
+</li>
+<li><p class="first">The POSIX attributes disappear randomly after login</p>
+<ul class="simple">
+<li>SSSD looks the user&#8217;s group membership in the Global Catalog to
+make sure even the cross-domain memberships are taken into
+account. Chances are the POSIX attributes are not replicated to
+the Global Catalog. You can disable the Global catalog lookups
+by disabling the <code class="docutils literal"><span class="pre">ad_enable_gc</span></code> option, but you&#8217;ll lose
+cross-domain memberships. Alternatively, modify the AD schema
+to replicate the POSIX attribute to the Global Catalog.</li>
+</ul>
+</li>
+<li><p class="first">After selecting a custom <code class="docutils literal"><span class="pre">ldap_search_base</span></code>, the group
+membership no longer displays correctly.</p>
+<ul class="simple">
+<li>If you use a non-standard LDAP search bases, please disable the
+TokenGroups performance enhancement by setting
+<code class="docutils literal"><span class="pre">ldap_use_tokengroups=False</span></code>. Otherwise, the AD provider
+would receive the group membership via a special call that is
+not restricted by the custom search base which causes
+unpredictable results</li>
+</ul>
+</li>
+<li><p class="first">SSSD keeps connecting to the forest root domain, which is not
+reachable and the whole daemon switches to offline mode as a
+result</p>
+<ul class="simple">
+<li>SSSD would connect to the forest root in order to discover all
+subdomains in the forest in case the SSSD client is enrolled
+with a member of the forest, not the forest root. This is
+because only the forest root knows all the subdomains, the
+forest member only knows about itself and the forest root.</li>
+<li>In case the SSSD client is behind a firewall preventing
+connection to the forest root, you can set
+<code class="docutils literal"><span class="pre">subomains_provider=none</span></code> to disable the forest root lookup.
+However, only users and groups from the domain SSSD is enrolled
+with would be available.</li>
+<li>Alternatively, starting with version 1.14.1, you can use the
+option <code class="docutils literal"><span class="pre">ad_enabled_domains</span></code> to selectively enable only the
+reachable domains</li>
+</ul>
+</li>
+<li><p class="first">A group my user is a member of doesn&#8217;t display in the &#8216;id&#8217; output</p>
+<ul class="simple">
+<li>Cases like this are best debugged from an empty cache</li>
+<li>Check if the group GID appears in the output of <code class="docutils literal"><span class="pre">id</span> <span class="pre">-G</span></code>
+first.<ul>
+<li>In case the group is not present in the <code class="docutils literal"><span class="pre">id</span> <span class="pre">-G</span></code> output at
+all, there is something up with the initgroups part. Check
+the schema and look for anything strange during the initgr
+operation in SSSD back end logs.</li>
+<li>If the group is present in <code class="docutils literal"><span class="pre">id</span> <span class="pre">-G</span></code> output but not in
+<code class="docutils literal"><span class="pre">id</span></code> output (or a subsequent <code class="docutils literal"><span class="pre">id</span></code> output) then there&#8217;s
+something wrong with resolving the group GIDs with
+<code class="docutils literal"><span class="pre">getgrgid()</span></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+</div>
+<div class="section" id="troubleshooting-authentication-password-change-and-access-control">
+<h2>Troubleshooting Authentication, Password Change and Access Control<a class="headerlink" href="#troubleshooting-authentication-password-change-and-access-control" title="Permalink to this headline">¶</a></h2>
+<p>In order for authentication to be successfull, the user information must
+be accurately provided first. Before debugging authentication, please
+make sure the user information is resolvable with
+<code class="docutils literal"><span class="pre">getent</span> <span class="pre">passwd</span> <span class="pre">$user</span></code> or <code class="docutils literal"><span class="pre">id</span> <span class="pre">$user</span></code>. Failing to retrieve the user
+info would also manifest in the secure logs or the journal with message
+such as:</p>
+<p>Authentication happens from PAM&#8217;s <code class="docutils literal"><span class="pre">auth</span></code> stack and corresponds to
+SSSD&#8217;s <code class="docutils literal"><span class="pre">auth_provider</span></code>. Access control takes place in PAM <code class="docutils literal"><span class="pre">account</span></code>
+phase and is linked with SSSD&#8217;s <code class="docutils literal"><span class="pre">access_provider</span></code>. And lastly,
+password changes go through the <code class="docutils literal"><span class="pre">password</span></code> stack on the PAM side to
+SSSD&#8217;s <code class="docutils literal"><span class="pre">chpass_provider</span></code>.</p>
+<p>If the user info can be retrieved, but authentication fails, the first
+place to look into is <code class="docutils literal"><span class="pre">/var/log/secure</span></code> or the system journal. Look
+for messages from <code class="docutils literal"><span class="pre">pam_sss</span></code>. Please note that not all authentication
+requests come through SSSD. Notably, SSH key authentication and GSSAPI
+SSH authentication happen directly in SSHD and SSSD is only contacted
+for the <code class="docutils literal"><span class="pre">account</span></code> phase.</p>
+<ul class="simple">
+<li><strong>Troubleshooting general authentication problems</strong><ol class="arabic">
+<li>The PAM-aware application starts the PAM conversation. Depending
+on the PAM stack configuration, the <code class="docutils literal"><span class="pre">pam_sss</span></code> module would be
+contacted.<ul>
+<li>To debug the authentication process, first check in the secure
+log or journal if <code class="docutils literal"><span class="pre">pam_sss</span></code> is called at all. If you don&#8217;t
+see <code class="docutils literal"><span class="pre">pam_sss</span></code> mentioned, chances are your PAM stack is
+misconfigured. If you see <code class="docutils literal"><span class="pre">pam_sss</span></code> being contacted, enable
+debugging in <code class="docutils literal"><span class="pre">pam</span></code> responder logs</li>
+</ul>
+</li>
+<li>SSSD&#8217;s PAM responder receives the authentication request and in
+most cases forwards it to the back end. Please note that unlike
+identity requests, the authentication/access control is typically
+not cached and always contacts the server.<ul>
+<li>The PAM responder logs should show the request being received
+from the pam stack and then forwarded to the back end.</li>
+<li>If you see the authentication request getting to the PAM
+responder, but receiving an error from the back end, check the
+back end logs. An example error output might look like:</li>
+</ul>
+</li>
+<li>The back end processes the request. This might include the
+equivalent of <code class="docutils literal"><span class="pre">kinit</span></code> done in the <code class="docutils literal"><span class="pre">krb5_child</span></code> process, an
+LDAP bind or consulting an access control list. After the back end
+request finishes, the result is sent back to the PAM responder.<ul>
+<li>For Kerberos-based (that includes the IPA and AD providers)
+<code class="docutils literal"><span class="pre">auth_provider</span></code>, look into the <code class="docutils literal"><span class="pre">krb5_child.log</span></code> file as
+well. Setting <code class="docutils literal"><span class="pre">debug_level</span></code> to 10 would also enable low-level
+Kerberos tracing information in that logfile. You can also
+simulate the authentication with <code class="docutils literal"><span class="pre">kinit</span></code>.</li>
+<li>If the back end&#8217;s <code class="docutils literal"><span class="pre">auth_provider</span></code> is LDAP-based, you can
+simulate the authentication by performing a base-scoped bind as
+the user who is logging in:</li>
+</ul>
+</li>
+<li>The PAM responder receives the result and forwards it back to the
+<code class="docutils literal"><span class="pre">pam_sss</span></code> module. The error or status message is displayed in
+<code class="docutils literal"><span class="pre">/var/log/secure</span></code> or journal.</li>
+</ol>
+</li>
+<li><strong>Assorted common SSSD authentication problems</strong><ol class="arabic">
+<li>How do I enable LDAP authentication over an unsecure connection?<ul>
+<li>Not possible, sorry. SSSD requires the use of either TLS or
+LDAPS for LDAP authentication. Perimeter security is just not
+enough.</li>
+</ul>
+</li>
+<li>There are no messages from <code class="docutils literal"><span class="pre">pam_sss</span></code> at all<ul>
+<li>Your PAM stack is likely misconfigured. Use the <code class="docutils literal"><span class="pre">authconfig</span></code>
+tool if available together with <code class="docutils literal"><span class="pre">--enablesssdauth</span></code>.</li>
+</ul>
+</li>
+<li>I can <code class="docutils literal"><span class="pre">su</span></code> to an SSSD user from <code class="docutils literal"><span class="pre">root</span></code>, but not from a regular
+user, SSH doesn&#8217;t work either<ul>
+<li>If you <code class="docutils literal"><span class="pre">su</span></code> to another user from root, you typically bypass
+SSSD authentication completely by using the <code class="docutils literal"><span class="pre">pam_rootok.so</span></code>
+module. Your SSSD setup is likely broken, please log in as an
+ordinary user and continue debugging in this section</li>
+</ul>
+</li>
+<li>I&#8217;m receiving <code class="docutils literal"><span class="pre">System</span> <span class="pre">Error</span> <span class="pre">(4)</span></code> in the authentication logs<ul>
+<li>System Error is an &#8220;Unhandled Exception&#8221; during authentication.
+It can either be an SSSD bug or a fatal error during
+authentication. Either way, please bring up your issue on the
+<a class="reference external" href="https://lists.fedorahosted.org/mailman/admin/sssd-users">​sssd-users</a>
+mailing list.</li>
+</ul>
+</li>
+<li>I&#8217;m receiving
+<code class="docutils literal"><span class="pre">Access</span> <span class="pre">denied</span> <span class="pre">for</span> <span class="pre">user</span> <span class="pre">$user:</span> <span class="pre">6</span> <span class="pre">(Permission</span> <span class="pre">denied)</span></code><ul>
+<li>Authentication went fine, but the user was denied access to the
+client machine. You can temporarily disable access control with
+setting <code class="docutils literal"><span class="pre">access_provider=permit</span></code> temporarily. Don&#8217;t forget to
+reset the access provider to a stricter setting after finding
+out the root cause!</li>
+<li>If disabling access control doesn&#8217;t help, the account might be
+locked on the server side. Check the SSSD domain logs to find
+out more.</li>
+</ul>
+</li>
+<li>I can&#8217;t get my LDAP-based access control filter right for group
+access control using the <code class="docutils literal"><span class="pre">memberOf</span></code> attribute<ul>
+<li>The LDAP-based access control is really tricky to get right and
+doesn&#8217;t typically handle nested groups well. Use the <a class="reference external" href="https://jhrozek.fedorapeople.org/sssd/git/man/sssd-simple.5.html">​simple
+access
+provider</a>
+instead.</li>
+</ul>
+</li>
+</ol>
+</li>
+<li><strong>Common IPA provider issues</strong><ol class="arabic">
+<li>In an IPA-AD trust setup, IPA users can log in, but AD users can&#8217;t<ul>
+<li>Unless you use a &#8220;legacy client&#8221; such as <code class="docutils literal"><span class="pre">nss_ldap</span></code>, then IPA
+users authenticate against the IPA server, but AD users
+authenticate against the AD servers directly. Therefore, you
+can test the authentication directly with <code class="docutils literal"><span class="pre">kinit</span></code>. Use
+<code class="docutils literal"><span class="pre">KRB5_TRACE</span></code> for extra tracing information.</li>
+</ul>
+</li>
+<li>HBAC rules keep denying access.<ul>
+<li>Use the <code class="docutils literal"><span class="pre">ipa</span> <span class="pre">hbactest</span></code> utility on the IPA server to see if
+the user is permitted access. The SSSD uses the same code as
+`ipa hbactest.</li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+</div>
+<div class="section" id="bug-reports">
+<h2>Bug reports<a class="headerlink" href="#bug-reports" title="Permalink to this headline">¶</a></h2>
+<p>If you believe you have found a bug in SSSD, please follow <a class="reference external" href="https://docs.pagure.org/sssd-test2/Reporting_sssd_bugs.html">this
+page</a>
+and file a bug report.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Debugging and troubleshooting SSSD</a><ul>
+<li><a class="reference internal" href="#let-tools-help-you">Let tools help you!</a></li>
+<li><a class="reference internal" href="#sssd-debug-logs">SSSD debug logs</a></li>
+<li><a class="reference internal" href="#troubleshooting-sudo">Troubleshooting SUDO</a></li>
+<li><a class="reference internal" href="#troubleshooting-dns-updates">Troubleshooting DNS updates</a></li>
+<li><a class="reference internal" href="#troubleshooting-user-information">Troubleshooting User Information</a></li>
+<li><a class="reference internal" href="#troubleshooting-authentication-password-change-and-access-control">Troubleshooting Authentication, Password Change and Access Control</a></li>
+<li><a class="reference internal" href="#bug-reports">Bug reports</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Troubleshooting.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/Troubleshooting.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

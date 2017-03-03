@@ -1,0 +1,270 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>SSSCTL &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="sssctl">
+<h1>SSSCTL<a class="headerlink" href="#sssctl" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/385">​https://fedorahosted.org/sssd/ticket/385</a></li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1788">​https://fedorahosted.org/sssd/ticket/1788</a></li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1828">​https://fedorahosted.org/sssd/ticket/1828</a></li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2166">​https://fedorahosted.org/sssd/ticket/2166</a></li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2954">​https://fedorahosted.org/sssd/ticket/2954</a></li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2957">​https://fedorahosted.org/sssd/ticket/2957</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>Main purpose of this task is to make administration &amp; debugging tasks
+more user friendly and thus hopefully save time of users, support and
+developers.</p>
+<p>SSSCTL will be CLI client using the SSSD infopipe as a server that will
+be providing necessary data and will perform/delegate commands to the
+SSSD providers and responders.</p>
+</div>
+<div class="section" id="use-cases">
+<h2>Use cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>online/offline state
+(<a class="reference external" href="https://fedorahosted.org/sssd/ticket/385">​https://fedorahosted.org/sssd/ticket/385</a>).
+Users have repeatedly asked for simple mean how to check if data
+provider is offline or online without need to check logs (if logging
+is enabled at all).</li>
+<li>Report whether the entry is present in SSSD cache
+(<a class="reference external" href="https://fedorahosted.org/sssd/ticket/2166">​https://fedorahosted.org/sssd/ticket/2166</a>)</li>
+<li>Check if the cached entry is valid and refresh if appropriate
+(<a class="reference external" href="https://fedorahosted.org/sssd/ticket/2166">​https://fedorahosted.org/sssd/ticket/2166</a>)</li>
+<li>Measure the time an operation took (useful in performance tuning,
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/385">​https://fedorahosted.org/sssd/ticket/385</a>)</li>
+<li>Failover status - Current state of failover process</li>
+<li>Display server to which provider is connected to
+(<a class="reference external" href="https://fedorahosted.org/sssd/ticket/385">​https://fedorahosted.org/sssd/ticket/385</a>)</li>
+<li>Display current debug level of a component</li>
+<li>Generate memory report - Usually when user is observing a memory leak
+we provide him a special build that generates talloc report which we
+can then analyze. Using this tool customer would simply select SSSD
+component that is supposed to leak memory and generate the talloc
+report immediately.</li>
+<li>Removing cache - Removing SSSD cache seems to be often misused act
+done by administrators as there are few real needs for that.
+Nevertheless, if administrator decides to remove the cache it would
+be better to do this using the tool instead of crude removing
+directories that might contain other useful data and could lead to
+serious problems. Q: Is this what was requested as &#8216;force reload&#8217;? Q:
+Should this rather be part of sss_cache tool?</li>
+</ul>
+</div>
+<div class="section" id="tool-interface">
+<h2>Tool interface<a class="headerlink" href="#tool-interface" title="Permalink to this headline">¶</a></h2>
+<p>The up-to-date list of all available commands can be printed with</p>
+<div class="section" id="domain-information">
+<h3>Domain information<a class="headerlink" href="#domain-information" title="Permalink to this headline">¶</a></h3>
+<p>List of all domain available within SSSD can be obtain with the
+following command.</p>
+<p>We can also get more information about specific domain.</p>
+<p>If a parameter is present only selected part will be printed.</p>
+</div>
+<div class="section" id="information-about-cached-entry">
+<h3>Information about cached entry<a class="headerlink" href="#information-about-cached-entry" title="Permalink to this headline">¶</a></h3>
+<p>Unless we want to use dn, we need to specify whether we want to work
+with user/group/sudo/..., interface for user follows, other object may
+be done similarly.</p>
+<p>To force an update of the cached entry:</p>
+</div>
+<div class="section" id="debug-level">
+<h3>Debug level<a class="headerlink" href="#debug-level" title="Permalink to this headline">¶</a></h3>
+<p>Optionally we can provide a debug level to set (taking over
+sss_debuglevel tool, since we already have D-Bus functionality in
+place).</p>
+<p>If a parameter is present only selected components are shown/changed.</p>
+</div>
+<div class="section" id="talloc-report">
+<h3>Talloc report<a class="headerlink" href="#talloc-report" title="Permalink to this headline">¶</a></h3>
+<p>If a parameter is present memory report is generated only for selected
+components.</p>
+</div>
+<div class="section" id="cache-operations">
+<h3>Cache operations<a class="headerlink" href="#cache-operations" title="Permalink to this headline">¶</a></h3>
+<p>This command will backup all local data that are not present on the
+server such as local view and local users. If an <em>$outputdir</em> is
+specified data will be stored there otherwise <em>/var/lib/sss/backup</em> will
+be used. If <em>&#8211;force</em> option is specified than the existing backup is
+replaced with the new one.</p>
+<p>Restore local data with the content stored in <em>$outputdir</em>.</p>
+<p>Remove SSSD cache database files, however in a manner that will backup
+all local data so it can be restored later. The user is notified that
+removing the cache will destroy all cached data and it is therefore not
+recommended to do it in offline mode.</p>
+</div>
+</div>
+<div class="section" id="overview-of-the-solution">
+<h2>Overview of the solution<a class="headerlink" href="#overview-of-the-solution" title="Permalink to this headline">¶</a></h2>
+<p>We will create a new administrator tool called <strong>sssctl</strong>. This tool
+will communicate with <strong>InfoPipe</strong> responder through its <strong>public D-Bus
+interface</strong>. The InfoPipe will then internally forward the messages to
+other SSSD components as necessary.</p>
+<p>In cases where <strong>sssctl</strong> can be replaces with combination of existing
+SSSD or system tools we will just call those tools directly through
+system call or through their API if exist. For example the remove cache
+operation is a sequence of: <em>sss_override user-export
+$dir/view_users.bak &amp;&amp; sss_override group-export $dir/view_groups.bak
+&amp;&amp; rm -f /var/lib/sss/db/*</em> so we can just call those programs.</p>
+</div>
+<div class="section" id="questions">
+<h2>Questions<a class="headerlink" href="#questions" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><strong>Q1</strong>: [Domain; Last request] What would be preferred number of
+request to be printed? Do we wan&#8217;t a parameter for this in sssd.conf
+or even make it possible to change this value dynamically?<ul>
+<li>Start with fixed number of 10 request and keep it unless a bigger
+requirenment comes.</li>
+</ul>
+</li>
+<li><strong>Q2</strong>: [Domain; Server list] Is it enough to print only active
+server or do we want full list of primary and backup servers as well?<ul>
+<li>Print full list containing also discovered servers.</li>
+</ul>
+</li>
+<li><strong>Q3</strong>: [Domain; Server list] Do we want to also print IP adresses?<ul>
+<li>Not needed.</li>
+</ul>
+</li>
+<li><strong>Q4</strong>: [Talloc report] Should we provide parameter $file or should
+we hardcod the path as SSSD logs directory, generating name from
+component and time?<ul>
+<li>Provide a file parameter but default to log directory.</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="configuration-changes">
+<h2>Configuration changes<a class="headerlink" href="#configuration-changes" title="Permalink to this headline">¶</a></h2>
+<p>No configuration changes.</p>
+</div>
+<div class="section" id="how-to-test">
+<h2>How To Test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<p>Not at the moment.</p>
+</div>
+<div class="section" id="how-to-debug">
+<h2>How To Debug<a class="headerlink" href="#how-to-debug" title="Permalink to this headline">¶</a></h2>
+<p>Not at the moment.</p>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<p>Pavel Reichl &lt;<a class="reference external" href="mailto:preichl&#37;&#52;&#48;redhat&#46;com">​preichl<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</p>
+<p>Pavel Březina &lt;<a class="reference external" href="mailto:pbrezina&#37;&#52;&#48;redhat&#46;com">​pbrezina<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">SSSCTL</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem statement</a></li>
+<li><a class="reference internal" href="#use-cases">Use cases</a></li>
+<li><a class="reference internal" href="#tool-interface">Tool interface</a><ul>
+<li><a class="reference internal" href="#domain-information">Domain information</a></li>
+<li><a class="reference internal" href="#information-about-cached-entry">Information about cached entry</a></li>
+<li><a class="reference internal" href="#debug-level">Debug level</a></li>
+<li><a class="reference internal" href="#talloc-report">Talloc report</a></li>
+<li><a class="reference internal" href="#cache-operations">Cache operations</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#overview-of-the-solution">Overview of the solution</a></li>
+<li><a class="reference internal" href="#questions">Questions</a></li>
+<li><a class="reference internal" href="#configuration-changes">Configuration changes</a></li>
+<li><a class="reference internal" href="#how-to-test">How To Test</a></li>
+<li><a class="reference internal" href="#how-to-debug">How To Debug</a></li>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/sssctl.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/sssctl.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,493 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>DBus responder design &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><a class="reference external" href="#DBusresponderdesign">DBus responder design</a><ol class="arabic">
+<li><a class="reference external" href="#ProblemStatement">Problem Statement</a></li>
+<li><a class="reference external" href="#TheDBusinterfacedesign">The DBus interface design</a><ol class="arabic">
+<li><a class="reference external" href="#Cachedobjects">Cached objects</a></li>
+<li><a class="reference external" href="#Objectexposedonthebus">Object exposed on the bus</a></li>
+<li><a class="reference external" href="#Representingusersandgroupsonthebus">Representing users and groups on the
+bus</a></li>
+<li><a class="reference external" href="#RepresentingSSSDprocessesonthebus">Representing SSSD processes on the
+bus</a></li>
+<li><a class="reference external" href="#Representingserviceobjectsonthebus">Representing service objects on the
+bus</a></li>
+<li><a class="reference external" href="#Representingdomainobjectsonthebus">Representing domain objects on the
+bus</a></li>
+<li><a class="reference external" href="#Synchronousgetterbehaviour">Synchronous getter behaviour</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#SSSDdaemonfeatures">SSSD daemon features</a><ol class="arabic">
+<li><a class="reference external" href="#Accesscontrol">Access control</a><ol class="arabic">
+<li><a class="reference external" href="#Limitingaccesstotheresponder">Limiting access to the
+responder</a></li>
+<li><a class="reference external" href="#Limitingaccesstoattributes">Limiting access to
+attributes</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#Supportfornon-POSIXusersandgroups">Support for non-POSIX users and
+groups</a></li>
+<li><a class="reference external" href="#Donotrequireenumerationtobeenabledtoretrievesetofusers">Do not require enumeration to be enabled to retrieve set of
+users</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#Authors">Authors</a></li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="dbus-responder-design">
+<h1>DBus responder design<a class="headerlink" href="#dbus-responder-design" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2072">​Provide an experimental DBus responder to retrieve custom
+attributes from SSSD
+cache</a></li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2073">​Extend the LDAP backend to retrieve extended set of
+attributes</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem Statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>The contemporary centralized user databases such as IPA or Active
+Directory store many attributes that describe the user. Apart from
+attributes that are related to a &#8220;computer user&#8221; entry such as user
+name, login shell or an ID, the databases often store data about the
+physical user represented by the entry, such as telephone number. Since
+the SSSD already has means of connecting to the remote directory,
+including advanced features like offline support or fail over, it would
+appear as a natural choice for retrieving these attributes. However, the
+only interface the SSSD provides towards the system at the moment is the
+standard <a class="reference external" href="https://www.gnu.org/software/libc/manual/html_node/Name-Service-Switch.html">​POSIX
+interface</a>
+and a couple of ad-hoc application specific responders (sudo, ssh,
+autofs). The purpose of this document is to describe a design of a new
+responder, that would listen on the system bus and allow third party
+consumers to retrieve custom attributes stored in a centralized database
+via a DBus call.</p>
+</div>
+<div class="section" id="the-dbus-interface-design">
+<h2>The DBus interface design<a class="headerlink" href="#the-dbus-interface-design" title="Permalink to this headline">¶</a></h2>
+<p>This section gathers feedback expressed in mailing lists, private e-mail
+conversations and IRC discussions and summarizes feature requests and
+areas that need improvement into a design proposal of both the DBus API
+and several required changes in the core SSSD deamon.</p>
+<div class="section" id="cached-objects">
+<h3>Cached objects<a class="headerlink" href="#cached-objects" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://docs.pagure.org/sssd-test2/DesignDocs/DBusCachedObjects.html">​D-Bus Interface: Cached
+Objects</a></p>
+</div>
+<div class="section" id="object-exposed-on-the-bus">
+<h3>Object exposed on the bus<a class="headerlink" href="#object-exposed-on-the-bus" title="Permalink to this headline">¶</a></h3>
+<p>Instead of a single interface returning object attributes in an
+LDAP-like way, the interface would be built in an object-oriented
+fashion. Each object (ie a user or a group) would be identified with an
+object path and methods would be available to the interface user to make
+it possible to retrieve either a single object or a set of object.</p>
+<p>The interface will support users, groups and domains.</p>
+</div>
+<div class="section" id="representing-users-and-groups-on-the-bus">
+<h3>Representing users and groups on the bus<a class="headerlink" href="#representing-users-and-groups-on-the-bus" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://docs.pagure.org/sssd-test2/DesignDocs/DBusUsersAndGroups.html">​D-Bus Interface: Users and
+Groups</a></p>
+</div>
+<div class="section" id="representing-sssd-processes-on-the-bus">
+<h3>Representing SSSD processes on the bus<a class="headerlink" href="#representing-sssd-processes-on-the-bus" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><strong>object path</strong>: /org/freedesktop/sssd/infopipe/Components/monitor</li>
+<li><strong>object path</strong>:
+/org/freedesktop/sssd/infopipe/Components/Responders/$responder_name</li>
+<li><strong>object path</strong>:
+/org/freedesktop/sssd/infopipe/Components/Backends/$sssd_domain_name</li>
+<li><strong>method</strong> org.freedesktop.sssd.infopipe.ListComponents()<ul>
+<li>returns: Array of object paths representing component objects</li>
+</ul>
+</li>
+<li><strong>method</strong> org.freedesktop.sssd.infopipe.ListResponders()<ul>
+<li>returns: Array of object paths representing component objects</li>
+</ul>
+</li>
+<li><strong>method</strong> org.freedesktop.sssd.infopipe.ListBackends()<ul>
+<li>returns: Array of object paths representing component objects</li>
+</ul>
+</li>
+<li><strong>method</strong> org.freedesktop.sssd.infopipe.FindMonitor()<ul>
+<li>returns: Object path representing the monitor object</li>
+</ul>
+</li>
+<li><strong>method</strong> org.freedesktop.sssd.infopipe.FindResponderByName(String
+name)<ul>
+<li><em>name</em>: The name of the responder to retrieve</li>
+<li>returns: Object path representing the responder object</li>
+</ul>
+</li>
+<li><strong>method</strong> org.freedesktop.sssd.infopipe.FindBackendByName(String
+name)<ul>
+<li><em>name</em>: The name of the backend to retrieve</li>
+<li>returns: Object path representing the backend object</li>
+</ul>
+</li>
+</ul>
+<p>The name &#8220;Components&#8221; is chosen to not imply any particular
+implementation on SSSD side.</p>
+<p>The component objects implements
+org.freedesktop.sssd.infopipe.Components interface, which is define as:</p>
+<ul class="simple">
+<li><strong>method</strong> org.freedesktop.sssd.infopipe.Components.Enable()<ul>
+<li>returns: nothing</li>
+<li>note: changes will be visible after SSSD is restarted</li>
+</ul>
+</li>
+<li><strong>method</strong> org.freedesktop.sssd.infopipe.Components.Disable()<ul>
+<li>returns: nothing</li>
+<li>note: changes will be visible after SSSD is restarted</li>
+</ul>
+</li>
+<li><strong>method</strong>
+org.freedesktop.sssd.infopipe.Components.ChangeDebugLevel(Uint32
+debug_level)<ul>
+<li><em>debug_level</em>: Debug level to set</li>
+<li>returns: nothing</li>
+<li>note: changes will be permanent but do not require restart of the
+deamon</li>
+</ul>
+</li>
+<li><strong>property</strong> String name<ul>
+<li>The name of this service.</li>
+</ul>
+</li>
+<li><strong>property</strong> Uint32 debug_level<ul>
+<li>The name of this service.</li>
+</ul>
+</li>
+<li><strong>property</strong> Boolean enabled<ul>
+<li>Whether the service is enabled or not</li>
+</ul>
+</li>
+<li><strong>property</strong> string type<ul>
+<li>Type of the component. One of &#8220;monitor&#8221;, &#8220;responder&#8221;, &#8220;backend&#8221;.</li>
+</ul>
+</li>
+</ul>
+<p>This approach will completely distinguish SSSD processes from services
+and domains, which are logical units that should not contain any
+information about SSSD architecture.</p>
+</div>
+<div class="section" id="representing-service-objects-on-the-bus">
+<h3>Representing service objects on the bus<a class="headerlink" href="#representing-service-objects-on-the-bus" title="Permalink to this headline">¶</a></h3>
+<p>This API should include methods to represent service object(s) and
+provide basic information and configuration abilities.</p>
+<ul class="simple">
+<li><strong>object path</strong>: /org/freedesktop/sssd/infopipe/Services/$service</li>
+<li><strong>method</strong> org.freedesktop.sssd.infopipe.ListServices()<ul>
+<li>returns: Array of object paths representing Service objects</li>
+</ul>
+</li>
+<li><strong>method</strong> org.freedesktop.sssd.infopipe.FindServiceByName(String
+name)<ul>
+<li><em>name</em>: The name of the service to retrieve</li>
+<li>returns: Object path representing the service object</li>
+</ul>
+</li>
+</ul>
+<p>The service object will in the first iteration include several
+properties describing the domain. As this iteration doesn&#8217;t allow any
+modification, only properties and not methods are considered:</p>
+<ul class="simple">
+<li><strong>property</strong> String name<ul>
+<li>The name of this service.</li>
+</ul>
+</li>
+<li>service dependent properties</li>
+</ul>
+<p>Other properties might be added upon request.</p>
+</div>
+<div class="section" id="representing-domain-objects-on-the-bus">
+<h3>Representing domain objects on the bus<a class="headerlink" href="#representing-domain-objects-on-the-bus" title="Permalink to this headline">¶</a></h3>
+<p>For some consumers (such as realmd), it&#8217;s important to also know the
+properties of a domain. The API should include methods to retrieve a
+active domain object(s) and represent the domains as objects on the bus
+as well.</p>
+<ul class="simple">
+<li><strong>object path</strong>: /org/freedesktop/sssd/infopipe/Domains/$domain</li>
+</ul>
+<p>The synopsis of these calls would look like:</p>
+<ul class="simple">
+<li><strong>method</strong> org.freedesktop.sssd.infopipe.ListDomains()<ul>
+<li>returns: Array of object paths representing Domain objects</li>
+</ul>
+</li>
+<li><strong>method</strong>
+org.freedesktop.sssd.infopipe.ListSubdomainsByDomain(String name)<ul>
+<li>returns: Array of object paths representing Domain objects
+associated with domain $name</li>
+</ul>
+</li>
+<li><strong>method</strong> org.freedesktop.sssd.infopipe.FindDomainByName(String
+name)<ul>
+<li><em>name</em>: The name of the domain to retrieve</li>
+<li>returns: Object path representing the domain object</li>
+</ul>
+</li>
+</ul>
+<p>The domain object will in the first iteration include several properties
+describing the domain. As this iteration doesn&#8217;t allow any modification,
+only properties and not methods are considered:</p>
+<ul class="simple">
+<li><strong>property</strong> String name<ul>
+<li>The name of this domain. Same as the domain stanza in the
+sssd.conf</li>
+</ul>
+</li>
+<li><strong>property</strong> String[] primary_servers<ul>
+<li>Array of primary servers associated with this domain</li>
+</ul>
+</li>
+<li><strong>property</strong> String[] backup_servers<ul>
+<li>Array of backup servers associated with this domain</li>
+</ul>
+</li>
+<li><strong>property</strong> Uint32 min_id<ul>
+<li>Minimum uid and gid value for this domain</li>
+</ul>
+</li>
+<li><strong>property</strong> Uint32 max_id<ul>
+<li>Maximum uid and gid value for this domain</li>
+</ul>
+</li>
+<li><strong>property</strong> String realm<ul>
+<li>The Kerberos realm this domain is configured with</li>
+</ul>
+</li>
+<li><strong>property</strong> String forest<ul>
+<li>The domain forest this domain belongs to</li>
+</ul>
+</li>
+<li><strong>property</strong> String login_format<ul>
+<li>The login format this domain expects.</li>
+</ul>
+</li>
+<li><strong>property</strong> String fully_qualified_name_format<ul>
+<li>The format of fully qualified names this domain uses</li>
+</ul>
+</li>
+<li><strong>property</strong> Boolean enumerable<ul>
+<li>Whether this domain can be enumarated or not</li>
+</ul>
+</li>
+<li><strong>property</strong> Boolean use_fully_qualified_names<ul>
+<li>Whether this domain requires fully qualified names</li>
+</ul>
+</li>
+<li><strong>property</strong> Boolean subdomain<ul>
+<li>Whether the domain is an autodiscovered subdomain or a
+user-defined domain</li>
+</ul>
+</li>
+<li><strong>property</strong> ObjectPath parent_domain<ul>
+<li>Object path of a parent domain or empty string if this is a root
+domain</li>
+</ul>
+</li>
+</ul>
+<p>Other properties such as provider type or case sensitivity might be
+added upon request. Right now, we need something other developers can
+experiment with.</p>
+</div>
+<div class="section" id="synchronous-getter-behaviour">
+<h3>Synchronous getter behaviour<a class="headerlink" href="#synchronous-getter-behaviour" title="Permalink to this headline">¶</a></h3>
+<p>Retrieving a property with a getter will always be sychronous and return
+the value currently cached. The getter might schedule an out-of-band
+update depending on the state of the cache object. The primary reason
+for the getter being synchronous is to be able to be composable, in
+other words being able to call N getters in a loop and construct a reply
+message containing N properties without resorting to asychronous updates
+of the properties.</p>
+<p>Callers that with to have an up-to-date view of the properties should
+update the object by calling a special <code class="docutils literal"><span class="pre">update</span></code> (not included atm)
+method or subscribe to the PropertiesChanged interface.</p>
+</div>
+</div>
+<div class="section" id="sssd-daemon-features">
+<h2>SSSD daemon features<a class="headerlink" href="#sssd-daemon-features" title="Permalink to this headline">¶</a></h2>
+<p>Apart from features that will directly benefit the new interface, the
+SSSD itself must adapt to some requirements as well.</p>
+<div class="section" id="access-control">
+<h3>Access control<a class="headerlink" href="#access-control" title="Permalink to this headline">¶</a></h3>
+<p>The DBus responder needs to limit who can request information at all and
+what attributes can be returned.</p>
+<div class="section" id="limiting-access-to-the-responder">
+<h4>Limiting access to the responder<a class="headerlink" href="#limiting-access-to-the-responder" title="Permalink to this headline">¶</a></h4>
+<p>The DBus responder will re-use the same mechanism the PAC responder uses
+where UIDs of clients that can contact the responder will be enumerated
+in the &#8220;allowed_uids&#8221; parameter of the responder configuration.</p>
+<p>In a future enhancement, we might add a &#8220;self&#8221; mechanism, where client
+will be allowed to read its own attributes. As limiting attribute access
+might be different for this use-case, the first iteration of the
+responder will not include the &#8220;self&#8221; mechanism.</p>
+</div>
+<div class="section" id="limiting-access-to-attributes">
+<h4>Limiting access to attributes<a class="headerlink" href="#limiting-access-to-attributes" title="Permalink to this headline">¶</a></h4>
+<p>The responder will have a whitelist of attributes that the client can
+query. No other attributes will be returned. Requesting an attribute
+that is not permitted will yield an empty response, same as if the
+attribute didn&#8217;t exist. The whitelist will include the standard set of
+POSIX attributes as returned by ie <code class="docutils literal"><span class="pre">getpwnam</span></code> by default.</p>
+<p>The administrator will be allowed to extend the whitelist in sssd.conf
+using a configuration directive either in the <code class="docutils literal"><span class="pre">[ifp]</span></code> section itself
+or per-domain. The configuration directive shall allow either explicitly
+adding attributes to the whitelist (using <code class="docutils literal"><span class="pre">+attrname</span></code>) or explicitly
+remove them using <code class="docutils literal"><span class="pre">-attrname</span></code>.</p>
+<p>The following example illustrates explicitly allowing the
+telephoneNumber attribute to be queried and removing the gecos attribute
+from the whitelist.</p>
+</div>
+</div>
+<div class="section" id="support-for-non-posix-users-and-groups">
+<h3>Support for non-POSIX users and groups<a class="headerlink" href="#support-for-non-posix-users-and-groups" title="Permalink to this headline">¶</a></h3>
+<p>Currently the SSSD supports looking up POSIX users and groups, mostly
+due to the fact that primary consumers are POSIX interfaces such as the
+Name Service Switch. For instance, the search filters in back ends
+require the presence of attributes ID.</p>
+<p>In contrast, users and groups that consumers of this new interface
+require often lack the POSIX attributes. The SSSD must be extended so
+that even non-POSIX users and groups are handled well.</p>
+</div>
+<div class="section" id="do-not-require-enumeration-to-be-enabled-to-retrieve-set-of-users">
+<h3>Do not require enumeration to be enabled to retrieve set of users<a class="headerlink" href="#do-not-require-enumeration-to-be-enabled-to-retrieve-set-of-users" title="Permalink to this headline">¶</a></h3>
+<p>At the moment, the SSSD can either fetch a single user (using getpwnam
+for example) or all available users (using getpwent). As an effect, all
+proposed DBus calls require enumeration to be switched on in order to be
+able to retrieve sets of users. The SSSD needs to either grow a way to
+retrieve several entries at once without enumerating or needs to make
+enumeration much faster.</p>
+</div>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Jakub Hrozek &lt;<a class="reference external" href="mailto:jhrozek&#37;&#52;&#48;redhat&#46;com">​jhrozek<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+<li>Pavel Březina &lt;<a class="reference external" href="mailto:pbrezina&#37;&#52;&#48;redhat&#46;com">​pbrezina<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+<li>Stef Walter &lt;<a class="reference external" href="mailto:stefw&#37;&#52;&#48;redhat&#46;com">​stefw<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">DBus responder design</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem Statement</a></li>
+<li><a class="reference internal" href="#the-dbus-interface-design">The DBus interface design</a><ul>
+<li><a class="reference internal" href="#cached-objects">Cached objects</a></li>
+<li><a class="reference internal" href="#object-exposed-on-the-bus">Object exposed on the bus</a></li>
+<li><a class="reference internal" href="#representing-users-and-groups-on-the-bus">Representing users and groups on the bus</a></li>
+<li><a class="reference internal" href="#representing-sssd-processes-on-the-bus">Representing SSSD processes on the bus</a></li>
+<li><a class="reference internal" href="#representing-service-objects-on-the-bus">Representing service objects on the bus</a></li>
+<li><a class="reference internal" href="#representing-domain-objects-on-the-bus">Representing domain objects on the bus</a></li>
+<li><a class="reference internal" href="#synchronous-getter-behaviour">Synchronous getter behaviour</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sssd-daemon-features">SSSD daemon features</a><ul>
+<li><a class="reference internal" href="#access-control">Access control</a><ul>
+<li><a class="reference internal" href="#limiting-access-to-the-responder">Limiting access to the responder</a></li>
+<li><a class="reference internal" href="#limiting-access-to-attributes">Limiting access to attributes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#support-for-non-posix-users-and-groups">Support for non-POSIX users and groups</a></li>
+<li><a class="reference internal" href="#do-not-require-enumeration-to-be-enabled-to-retrieve-set-of-users">Do not require enumeration to be enabled to retrieve set of users</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/DBusResponder.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/DBusResponder.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

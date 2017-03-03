@@ -1,0 +1,398 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Customizing the Trac Interface &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="customizing-the-trac-interface">
+<h1>Customizing the Trac Interface<a class="headerlink" href="#customizing-the-trac-interface" title="Permalink to this headline">¶</a></h1>
+<div class="system-message"><p><strong>Error: Macro TracGuideToc(None) failed</strong></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;NoneType&#39;</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span> <span class="s1">&#39;find&#39;</span>
+</pre></div>
+</div>
+</div><div class="wiki-toc"><ol class="arabic simple">
+<li><a class="reference external" href="#CustomizingtheTracInterface">Customizing the Trac Interface</a><ol class="arabic">
+<li><a class="reference external" href="#Introduction">Introduction</a></li>
+<li><a class="reference external" href="#ProjectLogoandIcon">Project Logo and Icon</a><ol class="arabic">
+<li><a class="reference external" href="#Logo">Logo</a></li>
+<li><a class="reference external" href="#Icon">Icon</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#CustomNavigationEntries">Custom Navigation Entries</a></li>
+<li><a class="reference external" href="#SiteAppearance">Site Appearance</a></li>
+<li><a class="reference external" href="#ProjectList">Project List</a></li>
+<li><a class="reference external" href="#ProjectTemplates">Project Templates</a></li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>This page is meant to give users suggestions on how they can customize
+the look of Trac. Topics on this page cover editing the HTML templates
+and CSS files, but not the program code itself. The topics are intended
+to show users how they can modify the look of Trac to meet their
+specific needs. Suggestions for changes to Trac&#8217;s interface applicable
+to all users should be filed as tickets, not listed on this page.</p>
+</div>
+<div class="section" id="project-logo-and-icon">
+<h2>Project Logo and Icon<a class="headerlink" href="#project-logo-and-icon" title="Permalink to this headline">¶</a></h2>
+<p>The easiest parts of the Trac interface to customize are the logo and
+the site icon. Both of these can be configured with settings in
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">trac.ini</a>.</p>
+<p>The logo or icon image should be put in a folder named &#8220;htdocs&#8221; in your
+project&#8217;s environment folder. (<em>Note: in projects created with a Trac
+version prior to 0.9 you will need to create this folder</em>)</p>
+<blockquote>
+<div><em>Note: you can actually put the logo and icon anywhere on your
+server (as long as it&#8217;s accessible through the web server), and use
+their absolute or server-relative URLs in the configuration.</em></div></blockquote>
+<p>Now configure the appropriate section of your
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">trac.ini</a>:</p>
+<div class="section" id="logo">
+<h3>Logo<a class="headerlink" href="#logo" title="Permalink to this headline">¶</a></h3>
+<p>Change the <code class="docutils literal"><span class="pre">src</span></code> setting to <code class="docutils literal"><span class="pre">site/</span></code> followed by the name of your
+image file. The <code class="docutils literal"><span class="pre">width</span></code> and <code class="docutils literal"><span class="pre">height</span></code> settings should be modified to
+match your image&#8217;s dimensions (the Trac chrome handler uses &#8220;<code class="docutils literal"><span class="pre">site/</span></code>&#8221;
+for files within the project directory <code class="docutils literal"><span class="pre">htdocs</span></code>, and &#8220;<code class="docutils literal"><span class="pre">common/</span></code>&#8221; for
+the common <code class="docutils literal"><span class="pre">htdocs</span></code> directory belonging to a Trac installation). Note
+that &#8216;site/&#8217; is not a placeholder for your project name, it is the
+actual prefix that should be used (literally). For example, if your
+project is named &#8216;sandbox&#8217;, and the image file is &#8216;red_logo.gif&#8217; then
+the &#8216;src&#8217; setting would be &#8216;site/red_logo.gif&#8217;, not
+&#8216;sandbox/red_logo.gif&#8217;.</p>
+</div>
+<div class="section" id="icon">
+<h3>Icon<a class="headerlink" href="#icon" title="Permalink to this headline">¶</a></h3>
+<p>Icons should be a 32x32 image in <code class="docutils literal"><span class="pre">.gif</span></code> or <code class="docutils literal"><span class="pre">.ico</span></code> format. Change the
+<code class="docutils literal"><span class="pre">icon</span></code> setting to <code class="docutils literal"><span class="pre">site/</span></code> followed by the name of your icon file.
+Icons will typically be displayed by your web browser next to the site&#8217;s
+URL and in the <code class="docutils literal"><span class="pre">Bookmarks</span></code> menu.</p>
+<p>Note though that this icon is ignored by Internet Explorer, which only
+accepts a file named <a href="#id1"><span class="problematic" id="id2">``</span></a><code class="docutils literal"><span class="pre">\</span> <span class="pre">favicon.ico\</span> <span class="pre">``</span></code> at the root of the host. To
+make the project icon work in both IE and other browsers, you can store
+the icon in the document root of the host, and reference it from
+<a href="#id3"><span class="problematic" id="id4">``</span></a><code class="docutils literal"><span class="pre">\</span> <span class="pre">trac.ini\</span> <span class="pre">``</span></code> as follows:</p>
+<p>Should your browser have issues with your favicon showing up in the
+address bar, you may put a &#8221;?&#8221; (less the quotation marks) after your
+favicon file extension.</p>
+</div>
+</div>
+<div class="section" id="custom-navigation-entries">
+<h2>Custom Navigation Entries<a class="headerlink" href="#custom-navigation-entries" title="Permalink to this headline">¶</a></h2>
+<p>The new [mainnav] and [metanav] can now be used to customize the text
+and link used for the navigation items, or even to disable them (but not
+for adding new ones).</p>
+<p>In the following example, we rename the link to the Wiki start &#8220;Home&#8221;,
+and hide the &#8220;Help/Guide&#8221;. We also make the &#8220;View Tickets&#8221; entry link to
+a specific report .</p>
+<p>See also
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracNavigation.html">TracNavigation</a>
+for a more detailed explanation of the mainnav and metanav terms.</p>
+</div>
+<div class="section" id="site-appearance">
+<h2>Site Appearance<a class="headerlink" href="#site-appearance" title="Permalink to this headline">¶</a></h2>
+<p>Trac is using <a class="reference external" href="http://genshi.edgewall.org">​Genshi</a> as the templating
+engine. Documentation is yet to be written, in the meantime the
+following tip should work.</p>
+<p>Say you want to add a link to a custom stylesheet, and then your own
+header and footer. Save the following content as <code class="docutils literal"><span class="pre">site.html</span></code> inside
+your projects <code class="docutils literal"><span class="pre">templates/</span></code> directory (each Trac project can have their
+own <code class="docutils literal"><span class="pre">site.html</span></code>), e.g. <code class="docutils literal"><span class="pre">/path/to/env/templates/site.html</span></code>:</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span>&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot;
+      xmlns:py=&quot;http://genshi.edgewall.org/&quot;
+      py:strip=&quot;&quot;&gt;
+
+  &lt;!--! Add site-specific style sheet --&gt;
+  &lt;head py:match=&quot;head&quot; py:attrs=&quot;select(&#39;@*&#39;)&quot;&gt;
+    ${select(&#39;*|comment()|text()&#39;)}
+    &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot;
+          href=&quot;${href.chrome(&#39;site/style.css&#39;)}&quot; /&gt;
+  &lt;/head&gt;
+
+  &lt;body py:match=&quot;body&quot; py:attrs=&quot;select(&#39;@*&#39;)&quot;&gt;
+    &lt;!--! Add site-specific header --&gt;
+    &lt;div id=&quot;siteheader&quot;&gt;
+      &lt;!--! Place your header content here... --&gt;
+    &lt;/div&gt;
+
+    ${select(&#39;*|text()&#39;)}
+
+    &lt;!--! Add site-specific footer --&gt;
+    &lt;div id=&quot;sitefooter&quot;&gt;
+      &lt;!--! Place your footer content here... --&gt;
+    &lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre></div>
+</div>
+</div><p>Those who are familiar with XSLT may notice that Genshi templates bear
+some similarities. However, there are some Trac specific features - for
+example <code class="docutils literal"><span class="pre">${href.chrome('site/style.css')}</span></code> attribute references a CSS
+file placed into environment&#8217;s <code class="docutils literal"><span class="pre">htdocs/</span></code> directory. In a similar
+fashion <code class="docutils literal"><span class="pre">${chrome.htdocs_location}</span></code> is used to specify the common
+<code class="docutils literal"><span class="pre">htdocs/</span></code> directory belonging to a Trac installation. That latter
+location can however be overriden using the <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#trac-config">[trac]
+htdocs_location</a>
+configuration setting.</p>
+<p><code class="docutils literal"><span class="pre">site.html</span></code> is one file to contain all your modifications. It usually
+works using the <code class="docutils literal"><span class="pre">py:match</span></code> directive (element or attribute), and it
+allows you to modify the page as it renders - the matches hook onto
+specific sections depending on what it tries to find and modify them.
+See <a class="reference external" href="http://groups.google.com/group/trac-users/browse_thread/thread/70487fb2c406c937/">​this
+thread</a>
+for a detailed explanation of the above example <code class="docutils literal"><span class="pre">site.html</span></code>. A
+<code class="docutils literal"><span class="pre">site.html</span></code> can contain any number of such <code class="docutils literal"><span class="pre">py:match</span></code> sections for
+whatever you need to modify. This is all Genshi, so the <a class="reference external" href="http://genshi.edgewall.org/wiki/Documentation/xml-templates.html">​docs on the
+exact
+syntax</a>
+can be found there.</p>
+<p>Example snippet of adding introduction text to the new ticket form (but
+not shown during preview):</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span>&lt;form py:match=&quot;div[@id=&#39;content&#39; and @class=&#39;ticket&#39;]/form&quot; py:attrs=&quot;select(&#39;@*&#39;)&quot;&gt;
+  &lt;py:if test=&quot;req.environ[&#39;PATH_INFO&#39;] == &#39;/newticket&#39; and (not &#39;preview&#39; in req.args)&quot;&gt;
+    &lt;p&gt;Please make sure to search for existing tickets before reporting a new one!&lt;/p&gt;
+  &lt;/py:if&gt;
+  ${select(&#39;*&#39;)}
+&lt;/form&gt;
+</pre></div>
+</div>
+</div><p>This example illustrates a technique of using
+<code class="docutils literal"><span class="pre">req.environ['PATH_INFO']</span></code> to limit scope of changes to one view only.
+For instance, to make changes in <code class="docutils literal"><span class="pre">site.html</span></code> only for timeline and
+avoid modifying other sections - use
+<code class="docutils literal"><span class="pre">req.environ['PATH_INFO']</span> <span class="pre">==</span> <span class="pre">'/timeline'</span></code> condition in <code class="docutils literal"><span class="pre">&lt;py:if&gt;</span></code>
+test.</p>
+<p>More examples snippets for <code class="docutils literal"><span class="pre">site.html</span></code> can be found at
+<a class="reference external" href="http://trac.edgewall.org/intertrac/wiki%3ACookBook/SiteHtml">​CookBook/SiteHtml</a>.</p>
+<p>Example snippets for <code class="docutils literal"><span class="pre">style.css</span></code> can be found at
+<a class="reference external" href="http://trac.edgewall.org/intertrac/wiki%3ACookBook/SiteStyleCss">​CookBook/SiteStyleCss</a>.</p>
+<p>If the environment is upgraded from 0.10 and a <code class="docutils literal"><span class="pre">site_newticket.cs</span></code>
+file already exists, it can actually be loaded by using a workaround -
+providing it contains no
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/ClearSilver.html">ClearSilver?</a>
+processing. In addition, as only one element can be imported, the
+content needs some sort of wrapper such as a <code class="docutils literal"><span class="pre">&lt;div&gt;</span></code> block or other
+similar parent container. The XInclude namespace must be specified to
+allow includes, but that can be moved to document root along with the
+others:</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span>&lt;form py:match=&quot;div[@id=&#39;content&#39; and @class=&#39;ticket&#39;]/form&quot; py:attrs=&quot;select(&#39;@*&#39;)&quot;
+        xmlns:xi=&quot;http://www.w3.org/2001/XInclude&quot;&gt;
+  &lt;py:if test=&quot;req.environ[&#39;PATH_INFO&#39;] == &#39;/newticket&#39; and (not &#39;preview&#39; in req.args)&quot;&gt;
+    &lt;xi:include href=&quot;site_newticket.cs&quot;&gt;&lt;xi:fallback /&gt;&lt;/xi:include&gt;
+  &lt;/py:if&gt;
+  ${select(&#39;*&#39;)}
+&lt;/form&gt;
+</pre></div>
+</div>
+</div><p>Also note that the <code class="docutils literal"><span class="pre">site.html</span></code> (despite its name) can be put in a
+common templates directory - see the <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#inherit-section">[inherit]
+templates_dir</a>
+option. This could provide easier maintainence (and a migration path
+from 0.10 for larger installations) as one new global <code class="docutils literal"><span class="pre">site.html</span></code> file
+can be made to include any existing header, footer and newticket
+snippets.</p>
+</div>
+<div class="section" id="project-list">
+<h2>Project List<a class="headerlink" href="#project-list" title="Permalink to this headline">¶</a></h2>
+<p>You can use a custom Genshi template to display the list of projects if
+you are using Trac with multiple projects.</p>
+<p>The following is the basic template used by Trac to display a list of
+links to the projects. For projects that could not be loaded it displays
+an error message. You can use this as a starting point for your own
+index template.</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span>&lt;!DOCTYPE html
+    PUBLIC &quot;-//W3C//DTD XHTML 1.0 Strict//EN&quot;
+    &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd&quot;&gt;
+&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot;
+      xmlns:py=&quot;http://genshi.edgewall.org/&quot;
+      xmlns:xi=&quot;http://www.w3.org/2001/XInclude&quot;&gt;
+  &lt;head&gt;
+    &lt;title&gt;Available Projects&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Available Projects&lt;/h1&gt;
+    &lt;ul&gt;
+      &lt;li py:for=&quot;project in projects&quot; py:choose=&quot;&quot;&gt;
+        &lt;a py:when=&quot;project.href&quot; href=&quot;$project.href&quot;
+           title=&quot;$project.description&quot;&gt;$project.name&lt;/a&gt;
+        &lt;py:otherwise&gt;
+          &lt;small&gt;$project.name: &lt;em&gt;Error&lt;/em&gt; &lt;br /&gt; ($project.description)&lt;/small&gt;
+        &lt;/py:otherwise&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre></div>
+</div>
+</div><p>Once you&#8217;ve created your custom template you will need to configure the
+webserver to tell Trac where the template is located (pls verify ... not
+yet changed to 0.11):</p>
+<p>For <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracModWSGI.html">mod_wsgi</a>:</p>
+<p>For <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracFastCgi.html">FastCGI</a>:</p>
+<p>For
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracModPython.html">mod_python</a>:</p>
+<p>For <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracCgi.html">CGI</a>:</p>
+<p>For
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracStandalone.html">TracStandalone</a>,
+you&#8217;ll need to set up the <code class="docutils literal"><span class="pre">TRAC_ENV_INDEX_TEMPLATE</span></code> environment
+variable in the shell used to launch tracd:</p>
+<ul>
+<li><p class="first">Unix</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span>$ export TRAC_ENV_INDEX_TEMPLATE=/path/to/template
+</pre></div>
+</div>
+</div></li>
+<li><p class="first">Windows</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span>$ set TRAC_ENV_INDEX_TEMPLATE=/path/to/template
+</pre></div>
+</div>
+</div></li>
+</ul>
+</div>
+<div class="section" id="project-templates">
+<h2>Project Templates<a class="headerlink" href="#project-templates" title="Permalink to this headline">¶</a></h2>
+<p>The appearance of each individual Trac environment (that is, instance of
+a project) can be customized independently of other projects, even those
+hosted by the same server. The recommended way is to use a <code class="docutils literal"><span class="pre">site.html</span></code>
+template (see
+<a class="reference external" href="https://fedorahosted.org/sssd#SiteAppearance">#SiteAppearance</a>)
+whenever possible. Using <code class="docutils literal"><span class="pre">site.html</span></code> means changes are made to the
+original templates as they are rendered, and you should not normally
+need to redo modifications whenever Trac is upgraded. If you do make a
+copy of <code class="docutils literal"><span class="pre">theme.html</span></code> or any other Trac template, you need to migrate
+your modifiations to the newer version - if not, new Trac features or
+bug fixes may not work as expected.</p>
+<p>With that word of caution, any Trac template may be copied and
+customized. The default Trac templates are located inside the installed
+Trac egg
+(<code class="docutils literal"><span class="pre">/usr/lib/pythonVERSION/site-packages/Trac-VERSION.egg/trac/templates,</span> <span class="pre">.../trac/ticket/templates,</span> <span class="pre">.../trac/wiki/templates,</span> <span class="pre">++</span></code>).
+The <a class="reference external" href="https://fedorahosted.org/sssd#ProjectList">#ProjectList</a>
+template file is called <code class="docutils literal"><span class="pre">index.html</span></code>, while the template responsible
+for main layout is called <code class="docutils literal"><span class="pre">theme.html</span></code>. Page assets such as images and
+CSS style sheets are located in the egg&#8217;s <code class="docutils literal"><span class="pre">trac/htdocs</span></code> directory.</p>
+<p>However, do not edit templates or site resources inside the Trac egg -
+installing Trac again can completely delete your modifications. Instead
+use one of two alternatives:</p>
+<ul class="simple">
+<li>For a modification to one project only, copy the template to project
+<code class="docutils literal"><span class="pre">templates</span></code> directory.</li>
+<li>For a modification shared by several projects, copy the template to a
+shared location and have each project point to this location using
+the <code class="docutils literal"><span class="pre">[inherit]</span> <span class="pre">templates_dir</span> <span class="pre">=</span></code> trac.ini option.</li>
+</ul>
+<p>Trac resolves requests for a template by first looking inside the
+project, then in any inherited templates location, and finally inside
+the Trac egg.</p>
+<p>Trac caches templates in memory by default to improve performance. To
+apply a template you need to restart the server.</p>
+<hr class="docutils" />
+<p>See also
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracGuide.html">TracGuide</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">TracIni</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Customizing the Trac Interface</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#project-logo-and-icon">Project Logo and Icon</a><ul>
+<li><a class="reference internal" href="#logo">Logo</a></li>
+<li><a class="reference internal" href="#icon">Icon</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#custom-navigation-entries">Custom Navigation Entries</a></li>
+<li><a class="reference internal" href="#site-appearance">Site Appearance</a></li>
+<li><a class="reference internal" href="#project-list">Project List</a></li>
+<li><a class="reference internal" href="#project-templates">Project Templates</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracInterfaceCustomization.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracInterfaceCustomization.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

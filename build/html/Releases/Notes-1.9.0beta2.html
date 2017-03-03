@@ -1,0 +1,268 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#Highlights">Highlights</a></li>
+<li><a class="reference external" href="#TicketsFixed">Tickets Fixed</a></li>
+<li><a class="reference external" href="#DetailedChangelog">Detailed Changelog</a></li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Add support for the Kerberos DIR cache for storing multiple TGTs
+automatically</li>
+<li>Major performance enhancement when storing large groups in the cache</li>
+<li>Major performance enhancement when performing initgroups() against
+Active Directory</li>
+<li>SSSDConfig data file default locations can now be set during
+configure for easier packaging</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/974">#974</a></dt>
+<dd>[RFE] Support DIR: credential caches for multiple TGT support</dd>
+<dt><a class="reference external" href="/sssd/ticket/984">#984</a></dt>
+<dd>RFE: sssd should support Netscape LDAP password expiration controls</dd>
+<dt><a class="reference external" href="/sssd/ticket/1213">#1213</a></dt>
+<dd>Warn to syslog when dereference requests fail</dd>
+<dt><a class="reference external" href="/sssd/ticket/1240">#1240</a></dt>
+<dd>sudo: contact data provider only once</dd>
+<dt><a class="reference external" href="/sssd/ticket/1255">#1255</a></dt>
+<dd>RFE: change the way we deal with fake users</dd>
+<dt><a class="reference external" href="/sssd/ticket/1256">#1256</a></dt>
+<dd>Document the expectations about ghost users showing in the lookups</dd>
+<dt><a class="reference external" href="/sssd/ticket/1330">#1330</a></dt>
+<dd>Potential NULL dereference in sss_krb5_read_etypes_for_keytab</dd>
+<dt><a class="reference external" href="/sssd/ticket/1336">#1336</a></dt>
+<dd>Please only use named parameters in translatable strings</dd>
+<dt><a class="reference external" href="/sssd/ticket/1337">#1337</a></dt>
+<dd>Minor typos in SSSD messages and man pages</dd>
+<dt><a class="reference external" href="/sssd/ticket/1346">#1346</a></dt>
+<dd>in-memory cache causes nss to segfault if it cannot be initialized
+properly</dd>
+<dt><a class="reference external" href="/sssd/ticket/1367">#1367</a></dt>
+<dd>Optimize AD memberOf lookups with LDAP_MATCHING_RULE_IN_CHAIN</dd>
+</dl>
+</div></div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Ariel Barria (3):</p>
+<ul class="simple">
+<li>Potential NULL dereference in proxy provider</li>
+<li>Warn to syslog when dereference requests fail</li>
+<li>Clarify how comments work in sssd.conf</li>
+</ul>
+<p>Jakub Hrozek (20):</p>
+<ul class="simple">
+<li>NSS: keep a pointer to body after body is reallocated</li>
+<li>Use sized_string correctly in FQDN domains</li>
+<li>Use the sysdb attribute name, not LDAP attribute name</li>
+<li>LDAP nested groups: Do not process callback with _post deep in the
+nested structure</li>
+<li>Send 16bit protocol numbers from the sss_client</li>
+<li>Revert the client packet length, too, after reverting the packet
+protocol</li>
+<li>Fix the default sssd.conf path</li>
+<li>Fix the 0.11 sysdb upgrade</li>
+<li>sss_names_init: Report correct error code if allocation failed</li>
+<li>Two small krb5_child fixes</li>
+<li>Provide more debugging in krb5_child and ldap_child</li>
+<li>Allow redefining the KRB5_CHILD path</li>
+<li>Split parse_krb5_child_response so it can be reused</li>
+<li>Add a krb5_child test tool</li>
+<li>Residual util functions</li>
+<li>Handle trailing slash in the ccname template</li>
+<li>Add a credential cache back end structure</li>
+<li>Add support for storing credential caches in the DIR: back end</li>
+<li>Use Kerberos context in KRB5_DEBUG</li>
+<li>Make krb5_ccname_template and krb5_ccachedir configurable</li>
+</ul>
+<p>Jan Cholasta (3):</p>
+<ul class="simple">
+<li>SSH: Update sss_ssh_knownhostsproxy manual page</li>
+<li>SSH: Supress error message output in sss_ssh_knownhostsproxy</li>
+<li>SSH: Don&#8217;t abort connection in sss_ssh_knownhostsproxy when DNS
+records are missing</li>
+</ul>
+<p>Jan Zeleny (20):</p>
+<ul class="simple">
+<li>Fixed two minor memory leaks</li>
+<li>Fixed issue in SELinux user maps</li>
+<li>Ghost members - add the ghost attribute to sysdb</li>
+<li>Ghost members - support in LDAP provider</li>
+<li>Ghost members - support in proxy provider</li>
+<li>Ghost members - modifications in sysdb</li>
+<li>Ghost members - modifications in memberof plugin</li>
+<li>Ghost members - sysdb upgrade routine</li>
+<li>Ghost members - NSS responder changes</li>
+<li>Ghost members - removed sdap_check_aliases()</li>
+<li>Ghost members - modified sss_groupshow</li>
+<li>Ghost members - various small changes</li>
+<li>Add support for filtering atributes</li>
+<li>Utilize attribute exclusion in LDAP initgroups</li>
+<li>Fixed setting of debug level in test suite</li>
+<li>IPA subdomains - ask for information about master domain</li>
+<li>Allow fast memcache timeout to be configurable</li>
+<li>Fix an issue in ghost users</li>
+<li>Provide &#8220;service filter&#8221; for SELinux context</li>
+<li>Fixed debug message in sdap_save_group()</li>
+</ul>
+<p>Joshua Roys (1):</p>
+<ul class="simple">
+<li>Simple implementation of Netscape password warning expiration control</li>
+</ul>
+<p>Nick Guay (1):</p>
+<ul class="simple">
+<li>added DEBUG messages to krb5_child and ldap_child</li>
+</ul>
+<p>Stef Walter (1):</p>
+<ul class="simple">
+<li>Make re_expression and full_name_format per domain options</li>
+</ul>
+<p>Stephen Gallagher (27):</p>
+<ul class="simple">
+<li>Bumping version ton 1.8.92 for beta 2 development</li>
+<li>RPM: Allow running &#8216;make rpms&#8217; on RHEL 5 machines</li>
+<li>NSS: Expire in-memory netgroup cache before the nowait timeout</li>
+<li>Always use positional arguments in translatable strings</li>
+<li>KRB5: Avoid NULL-dereference with empty keytab</li>
+<li>Update translation sources</li>
+<li>NSS: Fix segfault when mmap cache cannot be initialized</li>
+<li>NSS: Restore original protocol for getservbyport</li>
+<li>SSSDConfig: Make SSSDConfig a package</li>
+<li>SSSDConfig: Make default config and schema file locations
+configurable</li>
+<li>PAM: Better pam_reply message</li>
+<li>SYSDB: Reduce noise level of debug messages in lookups</li>
+<li>LDAP: Remove redundant check</li>
+<li>LDAP: Fix incorrect switch statement in sdap_get_initgr_done()</li>
+<li>LDAP: Add helper function to get list of a user&#8217;s groups from sysdb</li>
+<li>LDAP: Make sdap_initgr_common_store() non-static</li>
+<li>LDAP: Add ldap_*_use_matching_rule_in_chain options</li>
+<li>LDAP: Add support for AD chain matching extension in group lookups</li>
+<li>LDAP: Add support for AD chain matching extension in initgroups</li>
+<li>LDAP: Auto-detect support for the ldap match rule</li>
+<li>LDAP: Fix missing variable in debug message</li>
+<li>SSS_CLIENT: Fix uninitialized value error</li>
+<li>Fix compilation on older little-endian systems</li>
+<li>KRB5: Update DEBUG macros for create_ccache_dir and
+find_ccdir_parent_data</li>
+<li>KRB5: Auto-detect DIR cache support in configure</li>
+<li>KRB5: Avoid shadowing dirname</li>
+<li>Updating translations for 1.9.0 beta 2 release</li>
+</ul>
+<p>Sumit Bose (4):</p>
+<ul class="simple">
+<li>Rename struct dom_sid to struct sss_dom_sid</li>
+<li>Fix libsss_hbac library version</li>
+<li>sss_idmap: add support for samba struct dom_sid</li>
+<li>sss_idmap: fix typo which prevents sub auth larger then 2<sup>31</sup></li>
+</ul>
+<p>Yuri Chornoivan (1):</p>
+<ul class="simple">
+<li>Fix typos in message and man pages.</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.9.0beta2.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.9.0beta2.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

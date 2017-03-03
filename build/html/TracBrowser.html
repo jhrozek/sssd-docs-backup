@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>The Trac Repository Browser &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="the-trac-repository-browser">
+<h1>The Trac Repository Browser<a class="headerlink" href="#the-trac-repository-browser" title="Permalink to this headline">¶</a></h1>
+<div class="system-message"><p><strong>Error: Macro TracGuideToc(None) failed</strong></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;NoneType&#39;</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span> <span class="s1">&#39;find&#39;</span>
+</pre></div>
+</div>
+</div><p>The Trac repository browser can be used to browse specific revisions of
+directories and files stored in the repositories associated with the
+Trac environment.</p>
+<p><em>(since 0.12)</em>: At the top-level of the repository browser is the
+<strong>Repository Index</strong>, listing all the configured repositories. Each
+repository has a name which is used as a path prefix in a &#8220;virtual&#8221; file
+hierarchy encompassing all the available repositories. One of the
+repositories can be configured with an empty name; this is the default
+repository. When such a default repository is present, its top-level
+files and directories are also listed, in a <strong>Default Repository</strong>
+section placed before the repository index. If the default repository is
+the only repository associated with the Trac environment the
+<strong>Repository Index</strong> will be omitted
+:sup:<a href="#id1"><span class="problematic" id="id2">``</span></a>(1) &lt;<a class="reference external" href="https://fedorahosted.org/sssd#note-multirepos">https://fedorahosted.org/sssd#note-multirepos</a>&gt;`__`.</p>
+<p>Directory entries are displayed in a list with sortable columns. The
+list entries can be sorted by <em>Name</em>, <em>Size</em>, <em>Age</em> or <em>Author</em> by
+clicking on the column headers. The sort order can be reversed by
+clicking on a given column header again.</p>
+<p>The browser can be used to navigate through the directory structure by
+clicking on the directory names. Clicking on a file name will show the
+contents of the file. Clicking on the revision number of a file or
+directory will take you to the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracRevisionLog.html">TracRevisionLog</a>
+for that file. Note that there&#8217;s also a <em>Revision Log</em> navigation link
+that will do the same for the path currently being examined. Clicking on
+the <em>diff</em> icon after revision number will display the changes made to
+the files modified in that revision. Clicking on the <em>Age</em> of the file -
+will take you to that changeset in the timeline.</p>
+<p>It&#8217;s also possible to browse directories or files as they were in
+history, at any given repository revision. The default behavior is to
+display the latest revision but another revision number can easily be
+selected using the <em>View revision</em> input field at the top of the page.</p>
+<p>The color bar next to the <em>Age</em> column gives a visual indication of the
+age of the last change to a file or directory, following the convention
+that <strong>blue</strong> is oldest and <strong>red</strong> is newest, but this can be
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#browser-section">configured</a>.</p>
+<p>At the top of the browser page, there&#8217;s a <em>Visit</em> drop-down menu which
+you can use to select some interesting places in the repository, for
+example branches or tags. This is sometimes referred to as the <em>browser
+quickjump</em> facility. The precise meaning and content of this menu
+depends on your repository backend. For Subversion, this list contains
+by default the top-level trunk directory and sub-directories of the
+top-level branches and tags directories (<code class="docutils literal"><span class="pre">/trunk</span></code>, <code class="docutils literal"><span class="pre">/branches/*</span></code>,
+and <code class="docutils literal"><span class="pre">/tags/*</span></code>). This can be
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#svn-section">configured</a>
+for more advanced cases.</p>
+<p>If you&#8217;re using a Javascript enabled browser, you&#8217;ll be able to expand
+and collapse directories in-place by clicking on the arrow head at the
+right side of a directory. Alternatively, the
+<a class="reference external" href="http://trac.edgewall.org/intertrac/TracKeys">​keyboard</a> can also be
+used for this:</p>
+<ul class="simple">
+<li>use <code class="docutils literal"><span class="pre">'j'</span></code> and <code class="docutils literal"><span class="pre">'k'</span></code> to select the next or previous entry,
+starting with the first</li>
+<li><code class="docutils literal"><span class="pre">'o'</span></code> (open) to toggle between expanded and collapsed state of the
+selected directory or for visiting the selected file</li>
+<li><code class="docutils literal"><span class="pre">'v'</span></code> (view, visit) and <code class="docutils literal"><span class="pre">'&lt;Enter&gt;'</span></code>, same as above</li>
+<li><code class="docutils literal"><span class="pre">'r'</span></code> can be used to force the reload of an already expanded
+directory</li>
+<li><code class="docutils literal"><span class="pre">'A'</span></code> can be used to directly visit a file in annotate (blame) mode</li>
+<li><code class="docutils literal"><span class="pre">'L'</span></code> to view the log for the selected entry</li>
+</ul>
+<p>If no row has been selected using <code class="docutils literal"><span class="pre">'j'</span></code> or <code class="docutils literal"><span class="pre">'k'</span></code> these keys will
+operate on the entry under the mouse.</p>
+<p>For the Subversion backend, some advanced additional features are
+available:</p>
+<ul class="simple">
+<li>The <code class="docutils literal"><span class="pre">svn:needs-lock</span></code> property will be displayed</li>
+<li>Support for the <code class="docutils literal"><span class="pre">svn:mergeinfo</span></code> property showing the merged and
+eligible information</li>
+<li>Support for browsing the <code class="docutils literal"><span class="pre">svn:externals</span></code> property (which can be
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#svn:externals-section">configured</a>)</li>
+<li>The <code class="docutils literal"><span class="pre">svn:mime-type</span></code> property is used to select the syntax
+highlighter for rendering the file. For example, setting
+<code class="docutils literal"><span class="pre">svn:mime-type</span></code> to <code class="docutils literal"><span class="pre">text/html</span></code> will ensure the file is
+highlighted as HTML, regardless of the file extension. It also allows
+selecting the character encoding used in the file content. For
+example, if the file content is encoded in UTF-8, set
+<code class="docutils literal"><span class="pre">svn:mime-type</span></code> to <code class="docutils literal"><span class="pre">text/html;charset=utf-8</span></code>. The <code class="docutils literal"><span class="pre">charset=</span></code>
+specification overrides the default encoding defined in the
+<code class="docutils literal"><span class="pre">default_charset</span></code> option of the <code class="docutils literal"><span class="pre">[trac]</span></code> section of
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#trac-section">trac.ini</a>.</li>
+</ul>
+<hr class="docutils" />
+<div class="wikipage" style="font-size:85%"><p>(1) This means that after upgrading a single-repository Trac of version
+0.11 (or below) to a multi-repository Trac (0.12), the repository
+browser will look and feel the same, that single repository becoming
+automatically the &#8220;default&#8221; repository.</p>
+</div><p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracGuide.html">TracGuide</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracChangeset.html">TracChangeset</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracFineGrainedPermissions.html">TracFineGrainedPermissions</a></p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracBrowser.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracBrowser.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

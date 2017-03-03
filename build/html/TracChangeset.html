@@ -1,0 +1,231 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Trac Changeset Module &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="trac-changeset-module">
+<h1>Trac Changeset Module<a class="headerlink" href="#trac-changeset-module" title="Permalink to this headline">¶</a></h1>
+<div class="system-message"><p><strong>Error: Macro TracGuideToc(None) failed</strong></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;NoneType&#39;</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span> <span class="s1">&#39;find&#39;</span>
+</pre></div>
+</div>
+</div><p>Trac has a built-in functionality for visualizing “diffs” - changes to
+files.</p>
+<p>There are different kinds of <em>change sets</em>. Some can correspond to
+revisions made in the repositories, others can aggregate changes made in
+several revisions, but in the end, any kind of differences can be shown.</p>
+<p>The changeset view consists of two parts, the <em>header</em> and the <em>diff
+views</em>.</p>
+<div class="section" id="changeset-header">
+<h2>Changeset Header<a class="headerlink" href="#changeset-header" title="Permalink to this headline">¶</a></h2>
+<p>The header shows an overview of the whole changeset. Here you will find
+information such as:</p>
+<ul class="simple">
+<li>Timestamp — When the changeset was commited</li>
+<li>Author — Who commited the changeset</li>
+<li>Message — A brief description from the author (the commit log
+message)</li>
+<li>Location — Parent directory of all files affected by this changeset</li>
+<li>Files — A list of files affected by this changeset</li>
+</ul>
+<p>If more than one revision is involved in the set of changes being
+displayed, the <em>Timestamp</em>, <em>Author</em> and <em>Message</em> fields won&#8217;t be
+shown.</p>
+<p>In front of each listed file, you&#8217;ll find a colored rectangle. The color
+indicates how the file is affected by the changeset.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><a href="#id1"><span class="problematic" id="id2">``</span></a>&nbsp; `` Green: Added</div>
+<div class="line"><a href="#id3"><span class="problematic" id="id4">``</span></a>&nbsp; `` Red: Removed</div>
+<div class="line"><a href="#id5"><span class="problematic" id="id6">``</span></a>&nbsp; `` Yellow: Modified</div>
+<div class="line"><a href="#id7"><span class="problematic" id="id8">``</span></a>&nbsp; `` Blue: Copied</div>
+<div class="line"><a href="#id9"><span class="problematic" id="id10">``</span></a>&nbsp; `` Gray: Moved</div>
+</div>
+</div></blockquote>
+<p>The color legend is located below the header as a reminder.</p>
+</div>
+<div class="section" id="diff-views">
+<h2>Diff Views<a class="headerlink" href="#diff-views" title="Permalink to this headline">¶</a></h2>
+<p>Below the header is the main part of the changeset, the diff view. Each
+file is shown in a separate section, each of which will contain only the
+regions of the file that are affected by the changeset. There are two
+different styles of displaying the diffs: <em>inline</em> or <em>side-by-side</em>
+(you can switch between those styles using the preferences form):</p>
+<ul class="simple">
+<li>The <em>inline</em> style shows the changed regions of a file underneath
+each other. A region removed from the file will be colored red, an
+added region will be colored green. If a region was modified, the old
+version is displayed above the new version. Line numbers on the left
+side indicate the exact position of the change in both the old and
+the new version of the file.</li>
+<li>The <em>side-by-side</em> style shows the old version on the left and the
+new version on the right (this will typically require more screen
+width than the inline style.) Added and removed regions will be
+colored in the same way as with the inline style (green and red,
+respectively), but modified regions will have a yellow background.</li>
+</ul>
+<p>In addition, various advanced options are available in the preferences
+form for adjusting the display of the diffs:</p>
+<ul class="simple">
+<li>You can set how many lines are displayed before and after every
+change (if the value <em>all</em> is used, then the full file will be shown)</li>
+<li>You can toggle whether blank lines, case changes and white space
+changes are ignored, thereby letting you find the functional changes
+more quickly</li>
+</ul>
+</div>
+<div class="section" id="the-different-ways-to-get-a-diff">
+<h2>The Different Ways to Get a Diff<a class="headerlink" href="#the-different-ways-to-get-a-diff" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="examining-a-changeset">
+<h3>Examining a Changeset<a class="headerlink" href="#examining-a-changeset" title="Permalink to this headline">¶</a></h3>
+<p>When viewing a repository check-in, such as when following a changeset
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracLinks.html">link</a> or a
+changeset event in the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTimeline.html">timeline</a>,
+Trac will display the exact changes made by the check-in.</p>
+<p>There will be also navigation links to the <em>Previous Changeset</em> to and
+<em>Next Changeset</em>.</p>
+</div>
+<div class="section" id="examining-differences-between-revisions">
+<h3>Examining Differences Between Revisions<a class="headerlink" href="#examining-differences-between-revisions" title="Permalink to this headline">¶</a></h3>
+<p>Often you&#8217;ll want to look at changes made on a file or on a directory
+spanning multiple revisions. The easiest way to get there is from the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracRevisionLog.html">TracRevisionLog</a>,
+where you can select the <em>old</em> and the <em>new</em> revisions of the file or
+directory, and then click the <em>View changes</em> button.</p>
+</div>
+<div class="section" id="examining-differences-between-branches">
+<h3>Examining Differences Between Branches<a class="headerlink" href="#examining-differences-between-branches" title="Permalink to this headline">¶</a></h3>
+<p>One of the core features of version control systems is the possibility
+to work simultaneously on different <em>Lines of Developments</em>, commonly
+called “branches”. Trac enables you to examine the exact differences
+between such branches.</p>
+<p>Using the <strong>View changes ...</strong> button in the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracBrowser.html">TracBrowser</a>
+allows you to enter <em>From:</em> and <em>To:</em> path/revision pairs. The resulting
+set of differences consist of the changes that should be applied to the
+<em>From:</em> content in order to get to the <em>To:</em> content.</p>
+<p>For convenience, it is possible to invert the roles of the <em>old</em> and the
+<em>new</em> path/revision pairs by clicking the <em>Reverse Diff</em> link on the
+changeset page.</p>
+</div>
+<div class="section" id="checking-the-last-change">
+<h3>Checking the Last Change<a class="headerlink" href="#checking-the-last-change" title="Permalink to this headline">¶</a></h3>
+<p>The last possibility for examining changes is to use the <em>Last Change</em>
+link provided by the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracBrowser.html">TracBrowser</a>.</p>
+<p>This link will take you to the last change that was made on that path.
+From there, you can use the <em>Previous Change</em> and <em>Next Change</em> links to
+traverse the change history of the file or directory.</p>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracGuide.html">TracGuide</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracBrowser.html">TracBrowser</a></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Trac Changeset Module</a><ul>
+<li><a class="reference internal" href="#changeset-header">Changeset Header</a></li>
+<li><a class="reference internal" href="#diff-views">Diff Views</a></li>
+<li><a class="reference internal" href="#the-different-ways-to-get-a-diff">The Different Ways to Get a Diff</a><ul>
+<li><a class="reference internal" href="#examining-a-changeset">Examining a Changeset</a></li>
+<li><a class="reference internal" href="#examining-differences-between-revisions">Examining Differences Between Revisions</a></li>
+<li><a class="reference internal" href="#examining-differences-between-branches">Examining Differences Between Branches</a></li>
+<li><a class="reference internal" href="#checking-the-last-change">Checking the Last Change</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracChangeset.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracChangeset.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

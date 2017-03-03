@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>D-Bus Interface: Cached Objects &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="d-bus-interface-cached-objects">
+<h1>D-Bus Interface: Cached Objects<a class="headerlink" href="#d-bus-interface-cached-objects" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2338">​https://fedorahosted.org/sssd/ticket/2338</a></li>
+</ul>
+<p>Related design page(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/DesignDocs/DBusResponder.html">​https://fedorahosted.org/sssd/wiki/DesignDocs/DBusResponder</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>This design document describes how objects can be marked as cached.</p>
+</div>
+<div class="section" id="use-cases">
+<h2>Use cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Allow tools like graphical user management to display a list of users
+who recently logged in.</li>
+</ul>
+<div class="section" id="d-bus-interface">
+<h3>D-Bus Interface<a class="headerlink" href="#d-bus-interface" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="org-freedesktop-sssd-infopipe-cache">
+<h2>org.freedesktop.sssd.infopipe.Cache<a class="headerlink" href="#org-freedesktop-sssd-infopipe-cache" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>/org/freedesktop/sssd/infopipe/Users</li>
+<li>/org/freedesktop/sssd/infopipe/Groups</li>
+</ul>
+<ul class="simple">
+<li>ao List()</li>
+<li>ao ListByDomain(s:domain_name)<ul>
+<li>Returns list of objects that contains <em>cached</em> attribute.</li>
+</ul>
+</li>
+</ul>
+<p>None.</p>
+<p>None.</p>
+</div>
+<div class="section" id="org-freedesktop-sssd-infopipe-cache-object">
+<h2>org.freedesktop.sssd.infopipe.Cache.Object<a class="headerlink" href="#org-freedesktop-sssd-infopipe-cache-object" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>/org/freedesktop/sssd/infopipe/Users/*</li>
+<li>/org/freedesktop/sssd/infopipe/Groups/*</li>
+</ul>
+<ul class="simple">
+<li>b Store()</li>
+<li>b Remove()<ul>
+<li>Those methods will add/remove <em>cached</em> attributed to the object
+under <em>path</em> implementing this interface.</li>
+</ul>
+</li>
+</ul>
+<p>None.</p>
+<p>None.</p>
+</div>
+<div class="section" id="overview-of-the-solution">
+<h2>Overview of the solution<a class="headerlink" href="#overview-of-the-solution" title="Permalink to this headline">¶</a></h2>
+<p>New sysdb attribute <em>ifp_cached</em> is created for users and groups
+objects. If this attribute is present, the object is considered to be
+cached on IFP D-Bus. The introspection of an object path <em>/obj/path</em>
+will report all cached objects in the subtree <em>/obj/path/*</em>.</p>
+</div>
+<div class="section" id="how-to-test">
+<h2>How To Test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<p>Call the D-Bus methods and properties. For example with <strong>dbus-send</strong>
+tool. A cached object is supposed to appear in introspection.</p>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Jakub Hrozek &lt;<a class="reference external" href="mailto:jhrozek&#37;&#52;&#48;redhat&#46;com">​jhrozek<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+<li>Pavel Březina &lt;<a class="reference external" href="mailto:pbrezina&#37;&#52;&#48;redhat&#46;com">​pbrezina<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">D-Bus Interface: Cached Objects</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem statement</a></li>
+<li><a class="reference internal" href="#use-cases">Use cases</a><ul>
+<li><a class="reference internal" href="#d-bus-interface">D-Bus Interface</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#org-freedesktop-sssd-infopipe-cache">org.freedesktop.sssd.infopipe.Cache</a></li>
+<li><a class="reference internal" href="#org-freedesktop-sssd-infopipe-cache-object">org.freedesktop.sssd.infopipe.Cache.Object</a></li>
+<li><a class="reference internal" href="#overview-of-the-solution">Overview of the solution</a></li>
+<li><a class="reference internal" href="#how-to-test">How To Test</a></li>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/DBusCachedObjects.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/DBusCachedObjects.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

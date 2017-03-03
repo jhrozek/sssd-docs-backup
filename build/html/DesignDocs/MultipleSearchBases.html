@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Purpose &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#Purpose">Purpose</a></li>
+<li><a class="reference external" href="#ExpectedBehaviour">Expected Behaviour</a><ol class="arabic">
+<li><a class="reference external" href="#IndividualLookups">Individual Lookups</a></li>
+<li><a class="reference external" href="#Enumeration">Enumeration</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#Implementation">Implementation</a><ol class="arabic">
+<li><a class="reference external" href="#Parsing">Parsing</a></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="purpose">
+<h1>Purpose<a class="headerlink" href="#purpose" title="Permalink to this headline">¶</a></h1>
+<p>Some deployments use search bases to limit or extend the set of users
+and groups visible to a system.</p>
+<p>One common example is for applications granting access only to users in
+a hard-coded group name. In this case, the group search base would
+generally be set differently for each machine running this application.
+Other machines running the same application providing access to other
+users would receive a different &#8220;view&#8221; of LDAP through the use of search
+bases.</p>
+</div>
+<div class="section" id="expected-behaviour">
+<h1>Expected Behaviour<a class="headerlink" href="#expected-behaviour" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="individual-lookups">
+<h2>Individual Lookups<a class="headerlink" href="#individual-lookups" title="Permalink to this headline">¶</a></h2>
+<p>For targeted lookups (e.g. <code class="docutils literal"><span class="pre">getpwuid()</span></code>, <code class="docutils literal"><span class="pre">getgrnam()</span></code>) we should try
+each of the search bases in order until one of them returns the entry we
+are looking for, or we have exhausted all of the search bases. Each
+search will be performed with the search scope provided.</p>
+</div>
+<div class="section" id="enumeration">
+<h2>Enumeration<a class="headerlink" href="#enumeration" title="Permalink to this headline">¶</a></h2>
+<p>For enumeration, we will need to iterate through ALL search bases to
+retrieve users, groups, etc. For each search base, we need to examine
+each entry retrieved and compare it against the entries received from
+earlier search bases. If there are conflicts, we will discard the
+conflicting value from the later search base. (Therefore the entry in
+the earlier search bases will always win.</p>
+</div>
+</div>
+<div class="section" id="implementation">
+<h1>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h1>
+<p>We will extend the <code class="docutils literal"><span class="pre">ldap_*_search_base</span></code> options to support behavior
+similar to that of <code class="docutils literal"><span class="pre">nss_base_passwd</span></code> and <code class="docutils literal"><span class="pre">nss_base_group</span></code> from
+nss-ldapd.</p>
+<p>The standard search base (<code class="docutils literal"><span class="pre">ldap_search_base</span></code> will be left alone as a
+single value with scope &#8220;subtree&#8221;.</p>
+<p>The new <code class="docutils literal"><span class="pre">ldap_*_search_base</span></code> options will include a new delimiter,
+&#8216;<code class="docutils literal"><span class="pre">?</span></code>&#8216;. If this is present, we will divide the string up into triples
+as follows:</p>
+<div class="section" id="parsing">
+<h2>Parsing<a class="headerlink" href="#parsing" title="Permalink to this headline">¶</a></h2>
+<p>We will split the input string on the &#8216;?&#8217; delimiter. If the resulting
+array is exactly one, or is a multiple of three, we will continue.
+Otherwise it will fail validation.</p>
+<p>The scope must be one of &#8216;subtree&#8217;, &#8216;onelevel&#8217; or &#8216;base&#8217;
+(case-insensitive).</p>
+<p>The filter will be optional and may be a zero-length string. The filter
+must be pre-sanitized and must pass filter validation with
+<code class="docutils literal"><span class="pre">ldb_parse_tree()</span></code></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Purpose</a></li>
+<li><a class="reference internal" href="#expected-behaviour">Expected Behaviour</a><ul>
+<li><a class="reference internal" href="#individual-lookups">Individual Lookups</a></li>
+<li><a class="reference internal" href="#enumeration">Enumeration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementation">Implementation</a><ul>
+<li><a class="reference internal" href="#parsing">Parsing</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/MultipleSearchBases.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/MultipleSearchBases.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

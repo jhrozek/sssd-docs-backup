@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>&lt;no title&gt; &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <p>(08:40:21 AM) <strong>sgallagh:</strong> Ok, so let&#8217;s talk SSSD Backends 101
+(08:41:02 AM) <strong>sgallagh:</strong> pzuna: I assume you&#8217;re planning to build an
+open-source backend within our existing framework?
+(08:41:23 AM) <strong>pzuna:</strong> sgallagh: you assume right :)
+(08:41:24 AM) <strong>sgallagh:</strong> (Closed-source backends have a completely
+different - and unfinished - interface)
+(08:42:10 AM) <strong>pzuna:</strong> open source backend for winbind, but I just
+read in the design docs, that it&amp;apos;s supposed to be somehow a part of
+the IPA backend... didn&amp;apos;t have time to read the whole wall of text
+there, so I don&amp;apos;t know if I got it right
+(08:42:17 AM) <strong>sgallagh:</strong> Ok, so the first thing to understand is that
+we have a set of generic wrapper code for back-ends
+(08:43:52 AM) <strong>sgallagh:</strong> In the SSSD source tree, this is located in
+src/providers/data_provider_be.c
+(08:44:46 AM) <strong>sgallagh:</strong> There are currently four backend types that
+can be implemented.
+(08:45:09 AM) <strong>sgallagh:</strong> ID, AUTH, ACCESS and CHPASS
+(08:46:59 AM) <strong>sgallagh:</strong> in order to provide these interfaces, a
+plugin must present a function named
+sssm_&lt;backend_name&gt;_&lt;backend_type&gt;_init()
+(08:47:11 AM) <strong>sgallagh:</strong> e.g. sssm_ldap_id_init()
+(08:48:54 AM) <strong>sgallagh:</strong> This init function must take a &#8216;struct
+be_ctx *&#8217; as input and return &#8216;struct bet_ops *&#8217; and &#8216;void *&#8217; to
+the caller.
+(08:49:14 AM) <strong>sgallagh:</strong> The bet_ops are the set of callback points
+that the sssd_be process will invoke to do the heavy lifting
+(08:50:00 AM) <strong>sgallagh:</strong> The definition for &#8216;struct bet_ops&#8217; can be
+found in src/providers/dp_backend.h
+(08:50:41 AM) <strong>sgallagh:</strong> Each backend type can provide up to three
+callbacks: handler, check_online and finalize
+(08:52:06 AM) <strong>sgallagh:</strong> Each of these callbacks receives a single
+argument, a &#8216;struct be_req&#8217; (also described in dp_backend.h)
+(08:54:41 AM) <strong>sgallagh:</strong> The most important piece of the be_req is
+the be_req-&gt;req_data void pointer.
+(08:54:48 AM) <strong>pzuna:</strong> sgallagh: what&amp;apos;s supposed to be returned
+in the third argument of sssm_&lt;backend&gt;_&lt;type&gt;_init? (void
+**pvt_data)
+(08:55:13 AM) <strong>sgallagh:</strong> pzuna: That&#8217;s private data for the provider
+that you may need. Such as an initialized context.
+(08:55:26 AM) <strong>pzuna:</strong> ok
+(08:55:47 AM) <strong>sgallagh:</strong> That will always be passed back to you as
+be_ctx-&gt;bet_info[BET_ID].pvt_bet_data
+(08:56:00 AM) <strong>sgallagh:</strong> Which you can then re-cast into the
+appropriate type
+(08:56:53 AM) <strong>sgallagh:</strong> just a second
+(08:57:07 AM) <strong>pzuna:</strong> ok, I see it in the sssm_ldap_id_init
+function, makes sense
+(08:58:50 AM) <strong>sgallagh:</strong> Ok, so the req_data void pointer
+(08:59:10 AM) <strong>sgallagh:</strong> For ID providers, this needs to be cast to a
+&#8216;struct be_acct_req *&#8217;
+(08:59:48 AM) <strong>sgallagh:</strong> For the other three provider types, this
+would be cast to &#8216;struct pam_data *&#8217;
+(09:01:49 AM) <strong>sgallagh:</strong> So between the pvt_bet_data and the
+req_data, you should have all information necessary to perform a user
+lookup or a PAM action
+(09:03:12 AM) <strong>sgallagh:</strong> The responsibility of the backend is to
+populate the sysdb cache with updated information from the directory
+(09:03:37 AM) <strong>sgallagh:</strong> (I&#8217;ll get into that more in a bit)
+(09:05:06 AM) <strong>sgallagh:</strong> So once the backend performs an identity
+lookup, it needs to do one of two things in the sysdb. If the
+user/group/netgroup existed in the directory, then it needs to update
+the sysdb cache with the latest information. If the entry did NOT exist,
+then the sysdb must be purged of the same entry (if it previously
+existed)
+(09:06:08 AM) <strong>sgallagh:</strong> Once the sysdb is updated, the be_req-&gt;fn()
+should be called with a DP_ERR_OK for the second argument, which
+informs the responders that it&#8217;s okay to return the updated information
+from the cache.
+(09:07:12 AM) <strong>sgallagh:</strong> If for one reason or another the directory
+is unreachable, the provider should be marked offline with the
+be_mark_offline() function and be_req-&gt;fn() should be called with
+DP_ERR_OFFLINE
+(09:08:51 AM) <strong>sgallagh:</strong> Behavior for the auth and chpass providers
+are very similar, except that instead of caching user data, the
+sysdb_cache_password() function would be used to store successful
+passwords (if and only if cache_password = true in sssd.conf)
+(09:09:22 AM) <strong>sgallagh:</strong> (sorry, cache_credentials, not
+cache_password)
+(09:11:04 AM) <strong>sgallagh:</strong> When returning information for AUTH or
+CHPASS, you need to send back both DP_ERR_OK or DP_ERR_OFFLINE as
+well as the pam_result (e.g. PAM_SUCCESS, PAM_PERM_DENIED, etc.).
+(09:11:15 AM) <strong>sgallagh:</strong> (also for ACCESS)
+(09:11:27 AM) <strong>sgallagh:</strong> pzuna: Questions so far?
+(09:12:48 AM) <strong>pzuna:</strong> sgallagh: everything makes sense so far,
+I&amp;apos;ll probably have questions when I start implementing the backend
+:)
+(09:13:05 AM) <strong>sgallagh:</strong> I&#8217;m sure
+(09:13:34 AM) <strong>sgallagh:</strong> The biggest gotcha is that you have to
+remember that the ID provider does NOT return results directly
+(09:13:48 AM) <strong>sgallagh:</strong> It always stores them in the sysdb</p>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Backends101.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/Backends101.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>InterTrac Links &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="intertrac-links">
+<h1><a class="reference external" href="https://docs.pagure.org/sssd-test2/InterTrac.html">InterTrac</a> Links<a class="headerlink" href="#intertrac-links" title="Permalink to this headline">¶</a></h1>
+<p>Trac supports a convenient way to refer to resources of other Trac
+servers, from within the Wiki markup, since version 0.10.</p>
+<div class="section" id="definitions">
+<h2>Definitions<a class="headerlink" href="#definitions" title="Permalink to this headline">¶</a></h2>
+<p>An <a class="reference external" href="https://docs.pagure.org/sssd-test2/InterTrac.html">InterTrac</a>
+link can be seen as a scoped
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracLinks.html">TracLinks</a>. It is
+used for referring to a Trac resource (Wiki page, changeset, ticket,
+...) located in another Trac environment.</p>
+</div>
+<div class="section" id="list-of-active-intertrac-prefixes">
+<h2>List of Active <a class="reference external" href="https://docs.pagure.org/sssd-test2/InterTrac.html">InterTrac</a> Prefixes<a class="headerlink" href="#list-of-active-intertrac-prefixes" title="Permalink to this headline">¶</a></h2>
+<div class="system-message"><p><strong>Error: Macro InterTrac(None) failed</strong></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;unicode&#39;</span> <span class="nb">object</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">support</span> <span class="n">item</span> <span class="n">assignment</span>
+</pre></div>
+</div>
+</div></div>
+<div class="section" id="link-syntax">
+<h2>Link Syntax<a class="headerlink" href="#link-syntax" title="Permalink to this headline">¶</a></h2>
+<p>Simply use the name of the other Trac environment as a prefix, followed
+by a colon, ending with the resource located in the other environment.</p>
+<p>The other resource is specified using a regular
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracLinks.html">TracLinks</a>, of
+any flavor.</p>
+<p>That target environment name is either the real name of the environment,
+or an alias for it. The aliases are defined in <code class="docutils literal"><span class="pre">trac.ini</span></code> (see below).
+The prefix is case insensitive.</p>
+<p>If the <a class="reference external" href="https://docs.pagure.org/sssd-test2/InterTrac.html">InterTrac</a>
+link is enclosed in square brackets (like <code class="docutils literal"><span class="pre">[th:WikiExtrasPlugin]</span></code>),
+the <a class="reference external" href="https://docs.pagure.org/sssd-test2/InterTrac.html">InterTrac</a>
+prefix is removed in the displayed link, like a normal link resolver
+would be (i.e. the above would be displayed as <code class="docutils literal"><span class="pre">WikiExtrasPlugin</span></code>).</p>
+<p>For convenience, there&#8217;s also some alternative short-hand form, where
+one can use an alias as an immediate prefix for the identifier of a
+ticket, changeset or report: (e.g. <code class="docutils literal"><span class="pre">#T234</span></code>, <code class="docutils literal"><span class="pre">[T1508]</span></code>,
+<code class="docutils literal"><span class="pre">[trac</span> <span class="pre">1508]</span></code>, ...)</p>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>It is necessary to setup a configuration for the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InterTrac.html">InterTrac</a>
+facility. This configuration has to be done in the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">TracIni</a> file,
+<code class="docutils literal"><span class="pre">[intertrac]</span></code> section.</p>
+<p>Example configuration:</p>
+<p>The <code class="docutils literal"><span class="pre">.url</span></code> is mandatory and is used for locating the other Trac. This
+can be a relative URL in case that Trac environment is located on the
+same server.</p>
+<p>The <code class="docutils literal"><span class="pre">.title</span></code> information will be used for providing an useful tooltip
+when moving the cursor over an
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InterTrac.html">InterTrac</a> links.</p>
+<p>Finally, the <code class="docutils literal"><span class="pre">.compat</span></code> option can be used to activate or disable a
+<em>compatibility</em> mode:</p>
+<ul class="simple">
+<li>If the targeted Trac is running a version below
+<a class="reference external" href="http://trac.edgewall.org/intertrac/milestone%3A0.10">​0.10</a>
+(<a class="reference external" href="http://trac.edgewall.org/intertrac/r3526">​r3526</a> to be
+precise), then it doesn&#8217;t know how to dispatch an
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InterTrac.html">InterTrac</a>
+link, and it&#8217;s up to the local Trac to prepare the correct link. Not
+all links will work that way, but the most common do. This is called
+the compatibility mode, and is <code class="docutils literal"><span class="pre">true</span></code> by default.</li>
+<li>If you know that the remote Trac knows how to dispatch
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InterTrac.html">InterTrac</a>
+links, you can explicitly disable this compatibility mode and then
+<em>any</em>
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracLinks.html">TracLinks</a> can
+become an
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InterTrac.html">InterTrac</a>
+link.</li>
+</ul>
+<p>Now, given the above configuration, one could create the following
+links:</p>
+<ul class="simple">
+<li>to this
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InterTrac.html">InterTrac</a>
+page:<ul>
+<li><code class="docutils literal"><span class="pre">trac:wiki:InterTrac</span></code>
+<a class="reference external" href="http://trac.edgewall.org/intertrac/wiki%3AInterTrac">​trac:wiki:InterTrac</a></li>
+<li><code class="docutils literal"><span class="pre">t:wiki:InterTrac</span></code> t:wiki:InterTrac</li>
+<li>Keys are case insensitive: <code class="docutils literal"><span class="pre">T:wiki:InterTrac</span></code> T:wiki:InterTrac</li>
+</ul>
+</li>
+<li>to the ticket <a class="reference external" href="https://fedorahosted.org/sssd/ticket/234">#234</a>:<ul>
+<li><code class="docutils literal"><span class="pre">trac:ticket:234</span></code>
+<a class="reference external" href="http://trac.edgewall.org/intertrac/ticket%3A234">​trac:ticket:234</a></li>
+<li><code class="docutils literal"><span class="pre">trac:#234</span></code>
+<a class="reference external" href="http://trac.edgewall.org/intertrac/%23234">​trac:#234</a></li>
+<li><code class="docutils literal"><span class="pre">#T234</span></code> #T234</li>
+</ul>
+</li>
+<li>to the changeset [1912]:<ul>
+<li><code class="docutils literal"><span class="pre">trac:changeset:1912</span></code>
+<a class="reference external" href="http://trac.edgewall.org/intertrac/changeset%3A1912">​trac:changeset:1912</a></li>
+<li><code class="docutils literal"><span class="pre">[T1912]</span></code> [T1912]</li>
+</ul>
+</li>
+<li>to the log range
+<a class="reference external" href="https://fedorahosted.org/sssd/log/?revs=3300-3330">[3300:3330]</a>:
+<strong>(Note: the following ones need ``trac.compat=false``)</strong><ul>
+<li><code class="docutils literal"><span class="pre">trac:log:&#64;3300:3330</span></code>
+<a class="reference external" href="http://trac.edgewall.org/intertrac/log%3A%403300%3A3330">​trac:log:&#64;3300:3330</a></li>
+<li><code class="docutils literal"><span class="pre">[trac</span> <span class="pre">3300:3330]</span></code> <a class="reference external" href="http://trac.edgewall.org/intertrac/log%3A/%403300%3A3330">​[trac
+3300:3330]</a></li>
+</ul>
+</li>
+<li>finally, to link to the start page of a remote trac, simply use its
+prefix followed by &#8216;:&#8217;, inside an explicit link. Example:
+<code class="docutils literal"><span class="pre">[th:</span> <span class="pre">Trac</span> <span class="pre">Hacks]</span></code> (<em>since 0.11; note that the</em> remote <em>Trac has to
+run 0.11 for this to work</em>)</li>
+</ul>
+<p>The generic form <code class="docutils literal"><span class="pre">intertrac_prefix:module:id</span></code> is translated to the
+corresponding URL <code class="docutils literal"><span class="pre">&lt;remote&gt;/module/id</span></code>, shorthand links are specific
+to some modules (e.g. #T234 is processed by the ticket module) and for
+the rest (<code class="docutils literal"><span class="pre">intertrac_prefix:something</span></code>), we rely on the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracSearch.html#quickjump">TracSearch#quickjump</a>
+facility of the remote Trac.</p>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracLinks.html">TracLinks</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InterWiki.html">InterWiki</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">InterTrac Links</a><ul>
+<li><a class="reference internal" href="#definitions">Definitions</a></li>
+<li><a class="reference internal" href="#list-of-active-intertrac-prefixes">List of Active InterTrac Prefixes</a></li>
+<li><a class="reference internal" href="#link-syntax">Link Syntax</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/InterTrac.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/InterTrac.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,407 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Trac Reports &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="trac-reports">
+<h1>Trac Reports<a class="headerlink" href="#trac-reports" title="Permalink to this headline">¶</a></h1>
+<div class="system-message"><p><strong>Error: Macro TracGuideToc(None) failed</strong></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;NoneType&#39;</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span> <span class="s1">&#39;find&#39;</span>
+</pre></div>
+</div>
+</div><p>The Trac reports module provides a simple, yet powerful reporting
+facility to present information about tickets in the Trac database.</p>
+<p>Rather than have its own report definition format,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracReports.html">TracReports</a>
+relies on standard SQL <code class="docutils literal"><span class="pre">SELECT</span></code> statements for custom report
+definition.</p>
+<blockquote>
+<div><p><strong>Note:</strong> <em>The report module is being phased out in its current form
+because it seriously limits the ability of the Trac team to make
+adjustments to the underlying database schema. We believe that the
+`query module &lt;https://docs.pagure.org/sssd-test2/TracQuery.html&gt;`__
+is a good replacement that provides more flexibility and better
+usability. While there are certain reports that cannot yet be
+handled by the query module, we intend to further enhance it so that
+at some point the reports module can be completely removed. This
+also means that there will be no major enhancements to the report
+module anymore.</em></p>
+<p><em>You can already completely replace the reports module by the query
+module simply by disabling the former in
+`trac.ini &lt;https://docs.pagure.org/sssd-test2/TracIni.html&gt;`__:</em></p>
+<p><em>This will make the query module the default handler for the “View
+Tickets” navigation item. We encourage you to try this configuration
+and report back what kind of features of reports you are missing, if
+any.</em></p>
+</div></blockquote>
+<p>A report consists of these basic parts:</p>
+<ul class="simple">
+<li><strong>ID</strong> — Unique (sequential) identifier</li>
+<li><strong>Title</strong> — Descriptive title</li>
+<li><strong>Description</strong> — A brief description of the report, in
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html">WikiFormatting</a>
+text.</li>
+<li><strong>Report Body</strong> — List of results from report query, formatted
+according to the methods described below.</li>
+<li><strong>Footer</strong> — Links to alternative download formats for this report.</li>
+</ul>
+<div class="section" id="changing-sort-order">
+<h2>Changing Sort Order<a class="headerlink" href="#changing-sort-order" title="Permalink to this headline">¶</a></h2>
+<p>Simple reports - ungrouped reports to be specific - can be changed to be
+sorted by any column simply by clicking the column header.</p>
+<p>If a column header is a hyperlink (red), click the column you would like
+to sort by. Clicking the same header again reverses the order.</p>
+</div>
+<div class="section" id="changing-report-numbering">
+<h2>Changing Report Numbering<a class="headerlink" href="#changing-report-numbering" title="Permalink to this headline">¶</a></h2>
+<p>There may be instances where you need to change the ID of the report,
+perhaps to organize the reports better. At present this requires changes
+to the trac database. The <em>report</em> table has the following schema
+<em>(since 0.10)</em>:</p>
+<ul class="simple">
+<li>id integer PRIMARY KEY</li>
+<li>author text</li>
+<li>title text</li>
+<li>query text</li>
+<li>description text</li>
+</ul>
+<p>Changing the ID changes the shown order and number in the <em>Available
+Reports</em> list and the report&#8217;s perma-link. This is done by running
+something like:</p>
+<p>Keep in mind that the integrity has to be maintained (i.e., ID has to be
+unique, and you don&#8217;t want to exceed the max, since that&#8217;s managed by
+SQLite someplace).</p>
+<p>You may also need to update or remove the report number stored in the
+report or query.</p>
+</div>
+<div class="section" id="navigating-tickets">
+<h2>Navigating Tickets<a class="headerlink" href="#navigating-tickets" title="Permalink to this headline">¶</a></h2>
+<p>Clicking on one of the report results will take you to that ticket. You
+can navigate through the results by clicking the <em>Next Ticket</em> or
+<em>Previous Ticket</em> links just below the main menu bar, or click the <em>Back
+to Report</em> link to return to the report page.</p>
+<p>You can safely edit any of the tickets and continue to navigate through
+the results using the <em>Next/Previous/Back to Report</em> links after saving
+your results, but when you return to the report, there will be no hint
+about what has changed, as would happen if you were navigating a list of
+tickets obtained from a query (see
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracQuery.html#NavigatingTickets">TracQuery#NavigatingTickets</a>).
+<em>(since 0.11)</em></p>
+</div>
+<div class="section" id="alternative-download-formats">
+<h2>Alternative Download Formats<a class="headerlink" href="#alternative-download-formats" title="Permalink to this headline">¶</a></h2>
+<p>Aside from the default HTML view, reports can also be exported in a
+number of alternative formats. At the bottom of the report page, you
+will find a list of available data formats. Click the desired link to
+download the alternative report format.</p>
+<div class="section" id="comma-delimited-csv-comma-separated-values">
+<h3>Comma-delimited - CSV (Comma Separated Values)<a class="headerlink" href="#comma-delimited-csv-comma-separated-values" title="Permalink to this headline">¶</a></h3>
+<p>Export the report as plain text, each row on its own line, columns
+separated by a single comma (&#8216;,&#8217;). <strong>Note:</strong> The output is fully escaped
+so carriage returns, line feeds, and commas will be preserved in the
+output.</p>
+</div>
+<div class="section" id="tab-delimited">
+<h3>Tab-delimited<a class="headerlink" href="#tab-delimited" title="Permalink to this headline">¶</a></h3>
+<p>Like above, but uses tabs (\t) instead of comma.</p>
+</div>
+<div class="section" id="rss-xml-content-syndication">
+<h3>RSS - XML Content Syndication<a class="headerlink" href="#rss-xml-content-syndication" title="Permalink to this headline">¶</a></h3>
+<p>All reports support syndication using XML/RSS 2.0. To subscribe to an
+RSS feed, click the orange &#8216;XML&#8217; icon at the bottom of the page. See
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracRss.html">TracRss</a> for
+general information on RSS support in Trac.</p>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="creating-custom-reports">
+<h2>Creating Custom Reports<a class="headerlink" href="#creating-custom-reports" title="Permalink to this headline">¶</a></h2>
+<p><em>Creating a custom report requires a comfortable knowledge of SQL.</em></p>
+<p>A report is basically a single named SQL query, executed and presented
+by Trac. Reports can be viewed and created from a custom SQL expression
+directly in the web interface.</p>
+<p>Typically, a report consists of a SELECT-expression from the &#8216;ticket&#8217;
+table, using the available columns and sorting the way you want it.</p>
+</div>
+<div class="section" id="ticket-columns">
+<h2>Ticket columns<a class="headerlink" href="#ticket-columns" title="Permalink to this headline">¶</a></h2>
+<p>The <em>ticket</em> table has the following columns:</p>
+<ul class="simple">
+<li>id</li>
+<li>type</li>
+<li>time</li>
+<li>changetime</li>
+<li>component</li>
+<li>severity</li>
+<li>priority</li>
+<li>owner</li>
+<li>reporter</li>
+<li>cc</li>
+<li>version</li>
+<li>milestone</li>
+<li>status</li>
+<li>resolution</li>
+<li>summary</li>
+<li>description</li>
+<li>keywords</li>
+</ul>
+<p>See
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTickets.html">TracTickets</a>
+for a detailed description of the column fields.</p>
+<p>Example: <strong>All active tickets, sorted by priority and time</strong></p>
+<p>&#8212;</p>
+</div>
+<div class="section" id="advanced-reports-dynamic-variables">
+<h2>Advanced Reports: Dynamic Variables<a class="headerlink" href="#advanced-reports-dynamic-variables" title="Permalink to this headline">¶</a></h2>
+<p>For more flexible reports, Trac supports the use of <em>dynamic variables</em>
+in report SQL statements. In short, dynamic variables are <em>special</em>
+strings that are replaced by custom data before query execution.</p>
+<div class="section" id="using-variables-in-a-query">
+<h3>Using Variables in a Query<a class="headerlink" href="#using-variables-in-a-query" title="Permalink to this headline">¶</a></h3>
+<p>The syntax for dynamic variables is simple, any upper case word
+beginning with &#8216;$&#8217; is considered a variable.</p>
+<p>Example:</p>
+<p>To assign a value to $PRIORITY when viewing the report, you must define
+it as an argument in the report URL, leaving out the leading &#8216;$&#8217;.</p>
+<p>Example:</p>
+<p>To use multiple variables, separate them with an &#8216;&amp;&#8217;.</p>
+<p>Example:</p>
+</div>
+<div class="section" id="special-constant-variables">
+<h3>Special/Constant Variables<a class="headerlink" href="#special-constant-variables" title="Permalink to this headline">¶</a></h3>
+<p>There is one dynamic variable whose value is set automatically (the URL
+does not have to be changed) to allow practical reports.</p>
+<ul class="simple">
+<li>$USER — Username of logged in user.</li>
+</ul>
+<p>Example (<em>List all tickets assigned to me</em>):</p>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="advanced-reports-custom-formatting">
+<h2>Advanced Reports: Custom Formatting<a class="headerlink" href="#advanced-reports-custom-formatting" title="Permalink to this headline">¶</a></h2>
+<p>Trac is also capable of more advanced reports, including custom layouts,
+result grouping and user-defined CSS styles. To create such reports,
+we&#8217;ll use specialized SQL statements to control the output of the Trac
+report engine.</p>
+</div>
+<div class="section" id="special-columns">
+<h2>Special Columns<a class="headerlink" href="#special-columns" title="Permalink to this headline">¶</a></h2>
+<p>To format reports,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracReports.html">TracReports</a>
+looks for &#8216;magic&#8217; column names in the query result. These &#8216;magic&#8217; names
+are processed and affect the layout and style of the final report.</p>
+<div class="section" id="automatically-formatted-columns">
+<h3>Automatically formatted columns<a class="headerlink" href="#automatically-formatted-columns" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><strong>ticket</strong> — Ticket ID number. Becomes a hyperlink to that ticket.</li>
+<li><strong>id</strong> — same as <strong>ticket</strong> above when <strong>realm</strong> is not set</li>
+<li><strong>realm</strong> — together with <strong>id</strong>, can be used to create links to
+other resources than tickets (e.g. a realm of <em>wiki</em> and an <em>id</em> to a
+page name will create a link to that wiki page)</li>
+<li><strong>created, modified, date, time</strong> — Format cell as a date and/or
+time.</li>
+<li><strong>description</strong> — Ticket description field, parsed through the wiki
+engine.</li>
+</ul>
+<p><strong>Example:</strong></p>
+<p>Those columns can also be defined but marked as hidden, see
+<a class="reference external" href="https://fedorahosted.org/sssd#column-syntax">below</a>.</p>
+<p>See
+<a class="reference external" href="http://trac.edgewall.org/intertrac/wiki/CookBook/Configuration/Reports">​trac:wiki/CookBook/Configuration/Reports</a>
+for some example of creating reports for realms other than <em>ticket</em>.</p>
+</div>
+<div class="section" id="custom-formatting-columns">
+<h3>Custom formatting columns<a class="headerlink" href="#custom-formatting-columns" title="Permalink to this headline">¶</a></h3>
+<p>Columns whose names begin and end with 2 underscores (Example:
+<strong>``__color__``</strong>) are assumed to be <em>formatting hints</em>, affecting the
+appearance of the row.</p>
+<ul>
+<li><p class="first"><strong>``__group__``</strong> — Group results based on values in this column.
+Each group will have its own header and table.</p>
+</li>
+<li><p class="first"><strong>``__grouplink__``</strong> — Make the header of each group a link to the
+specified URL. The URL is taken from the first row of each group.</p>
+</li>
+<li><p class="first"><strong>``__color__``</strong> — Should be a numeric value ranging from 1 to 5 to
+select a pre-defined row color. Typically used to color rows by issue
+priority.</p>
+<div style="margin-left:7.5em"><p>Defaults: Color 1 Color 2 Color 3 Color 4 Color 5</p>
+</div></li>
+<li><p class="first"><strong>``__style__``</strong> — A custom CSS style expression to use for the
+current row.</p>
+</li>
+</ul>
+<p><strong>Example:</strong> <em>List active tickets, grouped by milestone, group header
+linked to milestone page, colored by priority</em></p>
+<p><strong>Note:</strong> A table join is used to match <em>ticket</em> priorities with their
+numeric representation from the <em>enum</em> table.</p>
+</div>
+<div class="section" id="changing-layout-of-report-rows">
+<h3>Changing layout of report rows<a class="headerlink" href="#changing-layout-of-report-rows" title="Permalink to this headline">¶</a></h3>
+<p>By default, all columns on each row are display on a single row in the
+HTML report, possibly formatted according to the descriptions above.
+However, it&#8217;s also possible to create multi-line report entries.</p>
+<ul class="simple">
+<li><strong>``column_``</strong> — <em>Break row after this</em>. By appending an underscore
+(&#8216;_&#8217;) to the column name, the remaining columns will be continued on
+a second line.</li>
+<li><strong>``_column_``</strong> — <em>Full row</em>. By adding an underscore (&#8216;_&#8217;) both at
+the beginning and the end of a column name, the data will be shown on
+a separate row.</li>
+<li><strong>``_column``</strong> — <em>Hide data</em>. Prepending an underscore (&#8216;_&#8217;) to a
+column name instructs Trac to hide the contents from the HTML output.
+This is useful for information to be visible only if downloaded in
+other formats (like CSV or RSS/XML). This can be used to hide any
+kind of column, even important ones required for identifying the
+resource, e.g. <code class="docutils literal"><span class="pre">id</span> <span class="pre">as</span> <span class="pre">_id</span></code> will hide the <strong>Id</strong> column but the link
+to the ticket will be present.</li>
+</ul>
+<p><strong>Example:</strong> <em>List active tickets, grouped by milestone, colored by
+priority, with description and multi-line layout</em></p>
+</div>
+<div class="section" id="reporting-on-custom-fields">
+<h3>Reporting on custom fields<a class="headerlink" href="#reporting-on-custom-fields" title="Permalink to this headline">¶</a></h3>
+<p>If you have added custom fields to your tickets (a feature since v0.8,
+see
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTicketsCustomFields.html">TracTicketsCustomFields</a>),
+you can write a SQL query to cover them. You&#8217;ll need to make a join on
+the ticket_custom table, but this isn&#8217;t especially easy.</p>
+<p>If you have tickets in the database <em>before</em> you declare the extra
+fields in trac.ini, there will be no associated data in the
+ticket_custom table. To get around this, use SQL&#8217;s &#8220;LEFT OUTER JOIN&#8221;
+clauses. See
+<a class="reference external" href="http://trac.edgewall.org/intertrac/TracIniReportCustomFieldSample">​TracIniReportCustomFieldSample</a>
+for some examples.</p>
+<p><strong>Note that you need to set up permissions in order to see the buttons
+for adding or editing reports.</strong></p>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTickets.html">TracTickets</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracQuery.html">TracQuery</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracGuide.html">TracGuide</a>,
+<a class="reference external" href="http://www.sqlite.org/lang_expr.html">​Query Language Understood by
+SQLite</a></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Trac Reports</a><ul>
+<li><a class="reference internal" href="#changing-sort-order">Changing Sort Order</a></li>
+<li><a class="reference internal" href="#changing-report-numbering">Changing Report Numbering</a></li>
+<li><a class="reference internal" href="#navigating-tickets">Navigating Tickets</a></li>
+<li><a class="reference internal" href="#alternative-download-formats">Alternative Download Formats</a><ul>
+<li><a class="reference internal" href="#comma-delimited-csv-comma-separated-values">Comma-delimited - CSV (Comma Separated Values)</a></li>
+<li><a class="reference internal" href="#tab-delimited">Tab-delimited</a></li>
+<li><a class="reference internal" href="#rss-xml-content-syndication">RSS - XML Content Syndication</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#creating-custom-reports">Creating Custom Reports</a></li>
+<li><a class="reference internal" href="#ticket-columns">Ticket columns</a></li>
+<li><a class="reference internal" href="#advanced-reports-dynamic-variables">Advanced Reports: Dynamic Variables</a><ul>
+<li><a class="reference internal" href="#using-variables-in-a-query">Using Variables in a Query</a></li>
+<li><a class="reference internal" href="#special-constant-variables">Special/Constant Variables</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#advanced-reports-custom-formatting">Advanced Reports: Custom Formatting</a></li>
+<li><a class="reference internal" href="#special-columns">Special Columns</a><ul>
+<li><a class="reference internal" href="#automatically-formatted-columns">Automatically formatted columns</a></li>
+<li><a class="reference internal" href="#custom-formatting-columns">Custom formatting columns</a></li>
+<li><a class="reference internal" href="#changing-layout-of-report-rows">Changing layout of report rows</a></li>
+<li><a class="reference internal" href="#reporting-on-custom-fields">Reporting on custom fields</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracReports.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracReports.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

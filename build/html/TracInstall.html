@@ -1,0 +1,693 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Trac Installation Guide for 0.12 &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="trac-installation-guide-for-0-12">
+<h1>Trac Installation Guide for 0.12<a class="headerlink" href="#trac-installation-guide-for-0-12" title="Permalink to this headline">¶</a></h1>
+<div class="system-message"><p><strong>Error: Macro TracGuideToc(None) failed</strong></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;NoneType&#39;</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span> <span class="s1">&#39;find&#39;</span>
+</pre></div>
+</div>
+</div><p>Trac is written in the Python programming language and needs a database,
+<a class="reference external" href="http://sqlite.org/">​SQLite</a>,
+<a class="reference external" href="http://www.postgresql.org/">​PostgreSQL</a>, or
+<a class="reference external" href="http://mysql.com/">​MySQL</a>. For HTML rendering, Trac uses the
+<a class="reference external" href="http://genshi.edgewall.org">​Genshi</a> templating system.</p>
+<p>Since version 0.12, Trac can also be localized, and there&#8217;s probably a
+translation available for your language. If you want to be able to use
+the Trac interface in other languages, then make sure you <strong>first</strong> have
+installed the optional package
+<a class="reference external" href="https://fedorahosted.org/sssd#OtherPythonPackages">Babel</a>. Lacking
+Babel, you will only get the default English version, as usual. If you
+install Babel later on, you will need to re-install Trac.</p>
+<p>If you&#8217;re interested in contributing new translations for other
+languages or enhance the existing translations, then please have a look
+at <a class="reference external" href="http://trac.edgewall.org/intertrac/wiki%3ATracL10N">​TracL10N</a>.</p>
+<p>What follows are generic instructions for installing and setting up Trac
+and its requirements. While you may find instructions for installing
+Trac on specific systems at
+<a class="reference external" href="http://trac.edgewall.org/intertrac/wiki%3ATracInstallPlatforms">​TracInstallPlatforms</a>
+on the main Trac site, please be sure to <strong>first read through these
+general instructions</strong> to get a good understanding of the tasks
+involved.</p>
+<div class="section" id="installation-steps">
+<h2>Installation Steps<a class="headerlink" href="#installation-steps" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><a class="reference external" href="#Dependencies">Dependencies</a><ol class="arabic">
+<li><a class="reference external" href="#MandatoryDependencies">Mandatory Dependencies</a></li>
+<li><a class="reference external" href="#OptionalDependencies">Optional Dependencies</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#InstallingTrac">Installing Trac</a><ol class="arabic">
+<li><cite>Using ``easy_install`</cite> &lt;#Usingeasy_install&gt;`__</li>
+<li><a class="reference external" href="#Fromsource">From source</a></li>
+<li><a class="reference external" href="#AdvancedOptions">Advanced Options</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#CreatingaProjectEnvironment">Creating a Project Environment</a></li>
+<li><a class="reference external" href="#DeployingTrac">Deploying Trac</a><ol class="arabic">
+<li><a class="reference external" href="#RunningtheStandaloneServer">Running the Standalone Server</a></li>
+<li><a class="reference external" href="#RunningTraconaWebServer">Running Trac on a Web Server</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#ConfiguringAuthentication">Configuring Authentication</a></li>
+<li><a class="reference external" href="#Grantingadminrightstotheadminuser">Granting admin rights to the admin
+user</a></li>
+<li><a class="reference external" href="#Finishingtheinstall">Finishing the install</a><ol class="arabic">
+<li><a class="reference external" href="#AutomaticreferencetotheSVNchangesetsinTractickets">Automatic reference to the SVN changesets in Trac
+tickets</a></li>
+<li><a class="reference external" href="#UsingTrac">Using Trac</a></li>
+</ol>
+</li>
+</ol>
+<div class="section" id="dependencies">
+<h3>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="mandatory-dependencies">
+<h4>Mandatory Dependencies<a class="headerlink" href="#mandatory-dependencies" title="Permalink to this headline">¶</a></h4>
+<p>To install Trac, the following software packages must be installed:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.python.org/">​Python</a>, version &gt;= 2.4 and &lt; 3.0 <em>(note
+that we dropped the support for Python 2.3 in this release and that
+this will be the last Trac release supporting Python 2.4)</em></li>
+<li><a class="reference external" href="http://peak.telecommunity.com/DevCenter/setuptools">​setuptools</a>,
+version &gt;= 0.6</li>
+<li><a class="reference external" href="http://genshi.edgewall.org/wiki/Download">​Genshi</a>, version &gt;=
+0.6 (but &lt; 0.7dev, i.e. don&#8217;t use Genshi trunk)</li>
+</ul>
+<p>You also need a database system and the corresponding python bindings.
+The database can be either SQLite, PostgreSQL or MySQL.</p>
+</div>
+</div>
+</div>
+<div class="section" id="for-the-sqlite-database">
+<h2>For the SQLite database<a class="headerlink" href="#for-the-sqlite-database" title="Permalink to this headline">¶</a></h2>
+<p>If you&#8217;re using Python 2.5 or 2.6, you already have everything you need.</p>
+<p>If you&#8217;re using Python 2.4 and need pysqlite, you can download from
+<a class="reference external" href="http://code.google.com/p/pysqlite/downloads/list">​google code</a> the
+Windows installers or the tar.gz archive for building from source:</p>
+<p>This will extract the SQLite code and build the bindings.</p>
+<p>To install SQLite, your system may require the development headers.
+Without these you will get various GCC related errors when attempting to
+build:</p>
+<p>SQLite 2.x is no longer supported, and neither is PySqlite 1.1.x.</p>
+<p>A known bug PySqlite versions 2.5.2-4 prohibits upgrade of trac
+databases from 0.11.x to 0.12. Please use versions 2.5.5 and newer or
+2.5.1 and older. See
+<a class="reference external" href="http://trac.edgewall.org/intertrac/%239434">​#9434</a> for more detail.</p>
+<p>See additional information in
+<a class="reference external" href="http://trac.edgewall.org/intertrac/PySqlite">​PySqlite</a>.</p>
+</div>
+<div class="section" id="for-the-postgresql-database">
+<h2>For the PostgreSQL database<a class="headerlink" href="#for-the-postgresql-database" title="Permalink to this headline">¶</a></h2>
+<p>You need to install the database and its Python bindings:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.postgresql.org/">​PostgreSQL</a>, version 8.0 or later</li>
+<li><a class="reference external" href="http://pypi.python.org/pypi/psycopg2">​psycopg2</a></li>
+</ul>
+<p>See
+<a class="reference external" href="http://trac.edgewall.org/intertrac/DatabaseBackend%23Postgresql">​DatabaseBackend</a>
+for details.</p>
+</div>
+<div class="section" id="for-the-mysql-database">
+<h2>For the MySQL database<a class="headerlink" href="#for-the-mysql-database" title="Permalink to this headline">¶</a></h2>
+<p>Trac can now work quite well with MySQL, provided you follow the
+guidelines.</p>
+<ul class="simple">
+<li><a class="reference external" href="http://mysql.com/">​MySQL</a>, version 5.0 or later</li>
+<li><a class="reference external" href="http://sf.net/projects/mysql-python">​MySQLdb</a>, version 1.2.2 or
+later</li>
+</ul>
+<p>It is <strong>very</strong> important to read carefully the
+<a class="reference external" href="http://trac.edgewall.org/intertrac/MySqlDb">​MySqlDb</a> page before
+creating the database.</p>
+</div>
+<div class="section" id="version-control-system">
+<h2>Version Control System<a class="headerlink" href="#version-control-system" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://subversion.apache.org/">​Subversion</a> 1.5.x or 1.6.x and the
+<strong>*corresponding*</strong> Python bindings.</p>
+<p>There are <a class="reference external" href="http://subversion.apache.org/packages.html">​pre-compiled SWIG
+bindings</a> available for
+various platforms. See also the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracSubversion.html">TracSubversion?</a>
+page for details about Windows packages.</p>
+<p>Older versions starting from 1.4.0, etc. should still work. For
+troubleshooting information, check the
+<a class="reference external" href="http://trac.edgewall.org/intertrac/TracSubversion%23Troubleshooting">​TracSubversion</a>
+page. Versions prior to 1.4.0 won&#8217;t probably work since trac uses svn
+core functionality (e.g. svn_path_canonicalize) that is not
+implemented in the python swig wrapper in svn &lt;= 1.3.x (although it
+exists in the svn lib itself).</p>
+<p>Note that Trac <strong>doesn&#8217;t</strong> use <a class="reference external" href="http://pysvn.tigris.org/">​PySVN</a>,
+neither does it work yet with the newer <code class="docutils literal"><span class="pre">ctype</span></code>-style bindings.</p>
+<p><strong>Please note:</strong> if using Subversion, Trac must be installed on the
+<strong>same machine</strong>. Remote repositories are currently <a class="reference external" href="http://trac.edgewall.org/intertrac/%23493">​not
+supported</a>.</p>
+<p>Support for other version control systems is provided via third-parties.
+See <a class="reference external" href="http://trac.edgewall.org/intertrac/PluginList">​PluginList</a> and
+<a class="reference external" href="http://trac.edgewall.org/intertrac/VersionControlSystem">​VersionControlSystem</a>.</p>
+</div>
+<div class="section" id="web-server">
+<h2>Web Server<a class="headerlink" href="#web-server" title="Permalink to this headline">¶</a></h2>
+<p>A web server is optional because Trac is shipped with a server included,
+see the <a class="reference external" href="https://fedorahosted.org/sssd#RunningtheStandaloneServer">Running the Standalone
+Server</a>
+section below.</p>
+<p>Alternatively you configure Trac to run in any of the following
+environments.</p>
+<ul class="simple">
+<li><a class="reference external" href="http://httpd.apache.org/">​Apache</a> with<ul>
+<li><a class="reference external" href="http://code.google.com/p/modwsgi/">​mod_wsgi</a>, see
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracModWSGI.html">TracModWSGI</a>
+(preferred)</li>
+<li><em>`​mod_python 3.3.1 &lt;http://modpython.org/&gt;`__, see
+`TracModPython &lt;https://docs.pagure.org/sssd-test2/TracModPython.html&gt;`__
+(deprecated)</em></li>
+</ul>
+</li>
+<li>any <a class="reference external" href="http://www.fastcgi.com/">​FastCGI</a>-capable web server, see
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracFastCgi.html">TracFastCgi</a></li>
+<li>any
+<a class="reference external" href="http://tomcat.apache.org/connectors-doc/ajp/ajpv13a.html">​AJP</a>-capable
+web server, see
+<a class="reference external" href="http://trac.edgewall.org/intertrac/TracOnWindowsIisAjp">​TracOnWindowsIisAjp</a></li>
+<li>IIS with <a class="reference external" href="http://code.google.com/p/isapi-wsgi/">​Isapi-wsgi</a>, see
+<a class="reference external" href="http://trac.edgewall.org/intertrac/TracOnWindowsIisIsapi">​TracOnWindowsIisIsapi</a></li>
+<li><em>as a last resort, a CGI-capable web server (see
+`TracCgi &lt;https://docs.pagure.org/sssd-test2/TracCgi.html&gt;`__), but
+usage of Trac as a cgi script is highly discouraged, better use one
+of the previous options.</em></li>
+</ul>
+</div>
+<div class="section" id="other-python-packages">
+<h2>Other Python Packages<a class="headerlink" href="#other-python-packages" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://babel.edgewall.org">​Babel</a>, version 0.9.5, needed for
+localization support
+<em>Note:</em> If you want to be able to use the Trac interface in other
+languages, then make sure you first have installed the optional
+package Babel. Lacking Babel, you will only get the default english
+version, as usual. If you install Babel later on, you will need to
+re-install Trac.</li>
+<li><a class="reference external" href="http://docutils.sourceforge.net/">​docutils</a>, version &gt;= 0.3.9
+for
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiRestructuredText.html">WikiRestructuredText</a>.</li>
+<li><a class="reference external" href="http://pygments.pocoo.org">​Pygments</a> for <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracSyntaxColoring.html">syntax
+highlighting</a>.
+<a class="reference external" href="http://silvercity.sourceforge.net/">​SilverCity</a> and/or
+<a class="reference external" href="http://gnu.org/software/enscript/enscript.html">​Enscript</a> may
+still be used but are deprecated and you really should be using
+Pygments.</li>
+<li><a class="reference external" href="http://pytz.sf.net">​pytz</a> to get a complete list of time zones,
+otherwise Trac will fall back on a shorter list from an internal time
+zone implementation.</li>
+</ul>
+<p><strong>Attention</strong>: The various available versions of these dependencies are
+not necessarily interchangable, so please pay attention to the version
+numbers above. If you are having trouble getting Trac to work please
+double-check all the dependencies before asking for help on the
+<a class="reference external" href="http://trac.edgewall.org/intertrac/MailingList">​MailingList</a> or
+<a class="reference external" href="http://trac.edgewall.org/intertrac/IrcChannel">​IrcChannel</a>.</p>
+<p>Please refer to the documentation of these packages to find out how they
+are best installed. In addition, most of the <a class="reference external" href="http://trac.edgewall.org/intertrac/TracInstallPlatforms">​platform-specific
+instructions</a>
+also describe the installation of the dependencies. Keep in mind however
+that the information there <em>probably concern older versions of Trac than
+the one you&#8217;re installing</em> (there are even some pages that are still
+talking about Trac 0.8!).</p>
+<div class="section" id="installing-trac">
+<h3>Installing Trac<a class="headerlink" href="#installing-trac" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="using-easy-install">
+<h4>Using <code class="docutils literal"><span class="pre">easy_install</span></code><a class="headerlink" href="#using-easy-install" title="Permalink to this headline">¶</a></h4>
+<p>One way to install Trac is using
+<a class="reference external" href="http://pypi.python.org/pypi/setuptools">​setuptools</a>. With
+setuptools you can install Trac from the subversion repository;</p>
+<p>A few examples:</p>
+<ul>
+<li><p class="first">first install of the latest stable version Trac 0.12.3, with i18n
+support:</p>
+<p><em>It&#8217;s very important to run the two ``easy_install`` commands
+separately, otherwise the message catalogs won&#8217;t be generated.</em></p>
+</li>
+<li><p class="first">upgrade to the latest stable version of Trac:</p>
+</li>
+<li><p class="first">upgrade to the latest trunk development version:</p>
+</li>
+</ul>
+<p>For upgrades, reading the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracUpgrade.html">TracUpgrade</a>
+page is mandatory, of course.</p>
+</div>
+<div class="section" id="from-source">
+<h4>From source<a class="headerlink" href="#from-source" title="Permalink to this headline">¶</a></h4>
+<p>If you want more control, you can download the source in archive form,
+or do a checkout from one of the official
+[[Trac:TracRepositories|source code repositories]].</p>
+<p>Be sure to have the prerequisites already installed. You can also obtain
+the Genshi and Babel source packages from
+<a class="reference external" href="http://www.edgewall.org">​http://www.edgewall.org</a> and follow for
+them a similar installation procedure, or you can just <code class="docutils literal"><span class="pre">easy_install</span></code>
+those, see <a class="reference external" href="https://fedorahosted.org/sssd#Usingeasy_install">above</a>.</p>
+<p>Once you&#8217;ve unpacked the Trac archive or performed the checkout, move in
+the top-level folder and do:</p>
+<p>You&#8217;ll need root permissions or equivalent for this step.</p>
+<p>This will byte-compile the python source code and install it as an .egg
+file or folder in the <code class="docutils literal"><span class="pre">site-packages</span></code> directory of your Python
+installation. The .egg will also contain all other resources needed by
+standard Trac, such as htdocs and templates.</p>
+<p>The script will also install the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracAdmin.html">trac-admin</a>
+command-line tool, used to create and maintain <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracEnvironment.html">project
+environments</a>,
+as well as the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracStandalone.html">tracd</a>
+standalone server.</p>
+<p>If you install from source and want to make Trac available in other
+languages, make sure Babel is installed. Only then, perform the
+<code class="docutils literal"><span class="pre">install</span></code> (or simply redo the <code class="docutils literal"><span class="pre">install</span></code> once again afterwards if you
+realize Babel was not yet installed):</p>
+<p>Alternatively, you can do a <code class="docutils literal"><span class="pre">bdist_egg</span></code> and copy the .egg from dist/
+to the place of your choice, or you can create a Windows installer
+(<code class="docutils literal"><span class="pre">bdist_wininst</span></code>).</p>
+</div>
+<div class="section" id="advanced-options">
+<h4>Advanced Options<a class="headerlink" href="#advanced-options" title="Permalink to this headline">¶</a></h4>
+</div>
+</div>
+</div>
+<div class="section" id="custom-location-with-easy-install">
+<h2>Custom location with <code class="docutils literal"><span class="pre">easy_install</span></code><a class="headerlink" href="#custom-location-with-easy-install" title="Permalink to this headline">¶</a></h2>
+<p>To install Trac to a custom location, or find out about other advanced
+installation options, run:</p>
+<p>Also see <a class="reference external" href="http://docs.python.org/inst/inst.html">​Installing Python
+Modules</a> for detailed
+information.</p>
+<p>Specifically, you might be interested in:</p>
+<p>or, if installing Trac to a Mac OS X system:</p>
+<p>Note: If installing on Mac OS X 10.6 running
+`` easy_install <a class="reference external" href="http://svn.edgewall.org/repos/trac/trunk">http://svn.edgewall.org/repos/trac/trunk</a> `` will install
+into `` /usr/local `` and `` /Library/Python/2.6/site-packages `` by
+default</p>
+<p>The above will place your <code class="docutils literal"><span class="pre">tracd</span></code> and <code class="docutils literal"><span class="pre">trac-admin</span></code> commands into
+<code class="docutils literal"><span class="pre">/usr/local/bin</span></code> and will install the Trac libraries and dependencies
+into <code class="docutils literal"><span class="pre">/Library/Python/2.5/site-packages</span></code>, which is Apple&#8217;s preferred
+location for third-party Python application installations.</p>
+</div>
+<div class="section" id="using-pip">
+<h2>Using <code class="docutils literal"><span class="pre">pip</span></code><a class="headerlink" href="#using-pip" title="Permalink to this headline">¶</a></h2>
+<p>&#8216;pip&#8217; is an easy_install replacement that is very useful to quickly
+install python packages. To get a trac installation up and running in
+less than 5 minutes:</p>
+<p>Assuming you want to have your entire pip installation in
+/opt/user/trac:</p>
+<ul class="simple">
+<li></li>
+</ul>
+<p>or</p>
+<ul class="simple">
+<li></li>
+</ul>
+<p>Make sure your OS specific headers are available for pip to
+automatically build PostgreSQL (libpq-dev) or MySQL (libmysqlclient-dev)
+bindings.</p>
+<p>pip will automatically resolve all dependencies (like Genshi, pygments,
+etc.) and download the latest packages on pypi.python.org and create a
+self contained installation in /opt/user/trac .</p>
+<p>All commands (tracd, trac-admin) are available in /opt/user/trac/bin.
+This can also be leveraged for mod_python (using PythonHandler
+directive) and mod_wsgi (using WSGIDaemonProcess directive)</p>
+<p>Additionally, you can install several trac plugins (listed
+<a class="reference external" href="http://pypi.python.org/pypi?:action=search&amp;term=trac&amp;submit=search">​here</a>)
+through pip.</p>
+<div class="section" id="creating-a-project-environment">
+<h3>Creating a Project Environment<a class="headerlink" href="#creating-a-project-environment" title="Permalink to this headline">¶</a></h3>
+<p>A <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracEnvironment.html">Trac
+environment</a>
+is the backend storage where Trac stores information like wiki pages,
+tickets, reports, settings, etc. An environment is basically a directory
+that contains a human-readable <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">configuration
+file</a>, and various
+other files and directories.</p>
+<p>A new environment is created using
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracAdmin.html">trac-admin</a>:</p>
+<p><a class="reference external" href="https://docs.pagure.org/sssd-test2/TracAdmin.html">trac-admin</a> will
+prompt you for the information it needs to create the environment, such
+as the name of the project and the <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracEnvironment.html#DatabaseConnectionStrings">database connection
+string</a>.
+If you&#8217;re not sure what to specify for one of these options, just press
+<code class="docutils literal"><span class="pre">&lt;Enter&gt;</span></code> to use the default value.</p>
+<p>Using the default database connection string in particular will always
+work as long as you have SQLite installed. For the other <a class="reference external" href="https://docs.pagure.org/sssd-test2/DatabaseBackend.html">database
+backends?</a>
+you should plan ahead and already have a database ready to use at this
+point.</p>
+<p>Since 0.12, Trac doesn&#8217;t ask for a <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracEnvironment.html#SourceCodeRepository">source code
+repository</a>
+anymore when creating an environment. Repositories can be
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracRepositoryAdmin.html">added</a>
+afterward, or the version control support can be disabled completely if
+you don&#8217;t need it.</p>
+<p>Also note that the values you specify here can be changed later by
+directly editing the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">conf/trac.ini</a>
+configuration file.</p>
+<p>Finally, make sure the user account under which the web front-end runs
+will have <strong>write permissions</strong> to the environment directory and all the
+files inside. This will be the case if you run
+<code class="docutils literal"><span class="pre">trac-admin</span> <span class="pre">...</span> <span class="pre">initenv</span></code> as this user. If not, you should set the
+correct user afterwards. For example on Linux, with the web server
+running as user <code class="docutils literal"><span class="pre">apache</span></code> and group <code class="docutils literal"><span class="pre">apache</span></code>, enter:</p>
+<div class="important"><p><strong>Warning:</strong> Please only use ASCII-characters for account name and
+project path, unicode characters are not supported there.</p>
+</div></div>
+<div class="section" id="deploying-trac">
+<h3>Deploying Trac<a class="headerlink" href="#deploying-trac" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="running-the-standalone-server">
+<h4>Running the Standalone Server<a class="headerlink" href="#running-the-standalone-server" title="Permalink to this headline">¶</a></h4>
+<p>After having created a Trac environment, you can easily try the web
+interface by running the standalone server
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracStandalone.html">tracd</a>:</p>
+<p>Then, fire up a browser and visit <code class="docutils literal"><span class="pre">http://localhost:8000/</span></code>. You should
+get a simple listing of all environments that <code class="docutils literal"><span class="pre">tracd</span></code> knows about.
+Follow the link to the environment you just created, and you should see
+Trac in action. If you only plan on managing a single project with Trac
+you can have the standalone server skip the environment list by starting
+it like this:</p>
+</div>
+<div class="section" id="running-trac-on-a-web-server">
+<h4>Running Trac on a Web Server<a class="headerlink" href="#running-trac-on-a-web-server" title="Permalink to this headline">¶</a></h4>
+<p>Trac provides various options for connecting to a &#8220;real&#8221; web server:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/TracFastCgi.html">FastCGI</a></li>
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/TracModWSGI.html">mod_wsgi</a></li>
+<li><em>`mod_python &lt;https://docs.pagure.org/sssd-test2/TracModPython.html&gt;`__
+(no longer recommended, as mod_python is not actively maintained
+anymore)</em></li>
+<li><em>`CGI &lt;https://docs.pagure.org/sssd-test2/TracCgi.html&gt;`__ (should
+not be used, as the performance is far from optimal)</em></li>
+</ul>
+<p>Trac also supports
+<a class="reference external" href="http://trac.edgewall.org/intertrac/TracOnWindowsIisAjp">​AJP</a> which
+may be your choice if you want to connect to IIS. Other deployment
+scenarios are possible:
+<a class="reference external" href="http://trac.edgewall.org/intertrac/TracNginxRecipe">​nginx</a>,
+<a class="reference external" href="http://projects.unbit.it/uwsgi/wiki/Example#Traconapacheinasub-uri">​uwsgi</a>,
+<a class="reference external" href="http://trac.edgewall.org/intertrac/TracOnWindowsIisIsapi">​Isapi-wsgi</a>
+etc.</p>
+</div>
+</div>
+</div>
+<div class="section" id="generating-the-trac-cgi-bin-directory">
+<h2>Generating the Trac cgi-bin directory<a class="headerlink" href="#generating-the-trac-cgi-bin-directory" title="Permalink to this headline">¶</a></h2>
+<p>In order for Trac to function properly with FastCGI you need to have a
+<code class="docutils literal"><span class="pre">trac.fcgi</span></code> file and for mod_wsgi a <code class="docutils literal"><span class="pre">trac.wsgi</span></code> file. These are
+Python scripts which load the appropriate Python code. They can be
+generated using the <code class="docutils literal"><span class="pre">deploy</span></code> option of
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracAdmin.html">trac-admin</a>.</p>
+<p>There is, however, a bit of a chicken-and-egg problem. The
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracAdmin.html">trac-admin</a>
+command requires an existing environment to function, but complains if
+the deploy directory already exists. This is a problem, because
+environments are often stored in a subdirectory of the deploy. The
+solution is to do something like this:</p>
+</div>
+<div class="section" id="mapping-static-resources">
+<h2>Mapping Static Resources<a class="headerlink" href="#mapping-static-resources" title="Permalink to this headline">¶</a></h2>
+<p>Out of the box, Trac will pass static resources such as style sheets or
+images through itself. For anything but a tracd only based deployment,
+this is far from optimal as the web server could be set up to directly
+serve those static resources (for CGI setup, this is <strong>highly
+undesirable</strong> and will cause abysmal performance).</p>
+<p>Web servers such as <a class="reference external" href="http://httpd.apache.org/">​Apache</a> allow you to
+create “Aliases” to resources, giving them a virtual URL that doesn&#8217;t
+necessarily reflect the layout of the servers file system. We also can
+map requests for static resources directly to the directory on the file
+system, avoiding processing these requests by Trac itself.</p>
+<p>There are two primary URL paths for static resources -
+<code class="docutils literal"><span class="pre">/chrome/common</span></code> and <code class="docutils literal"><span class="pre">/chrome/site</span></code>. Plugins can add their own
+resources, usually accessible by <code class="docutils literal"><span class="pre">/chrome/&lt;plugin&gt;</span></code> path, so its
+important to override only known paths and not try to make universal
+<code class="docutils literal"><span class="pre">/chrome</span></code> alias for everything.</p>
+<p>Note that in order to get those static resources on the filesystem, you
+need first to extract the relevant resources from Trac using the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracAdmin.html">trac-admin</a>`` &lt;environment&gt; deploy``
+command:</p>
+<p>The target <code class="docutils literal"><span class="pre">&lt;directory&gt;</span></code> will then contain an <code class="docutils literal"><span class="pre">htdocs</span></code> directory
+with:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">site/</span></code> - a copy of the environment&#8217;s directory <code class="docutils literal"><span class="pre">htdocs/</span></code></li>
+<li><code class="docutils literal"><span class="pre">common/</span></code> - the static resources of Trac itself</li>
+<li><code class="docutils literal"><span class="pre">&lt;plugins&gt;/</span></code> - one directory for each resource directory managed by
+the plugins enabled for this environment</li>
+</ul>
+<p>Assuming the deployment has been done this way:</p>
+<p>Add the following snippet to Apache configuration <em>before</em> the
+<code class="docutils literal"><span class="pre">ScriptAlias</span></code> or <code class="docutils literal"><span class="pre">WSGIScriptAlias</span></code> (which map all the other requests
+to the Trac application), changing paths to match your deployment:</p>
+<p>If using mod_python, you might want to add this too (otherwise, the
+alias will be ignored):</p>
+<p>Note that we mapped <code class="docutils literal"><span class="pre">/trac</span></code> part of the URL to the <code class="docutils literal"><span class="pre">trac.*cgi</span></code>
+script, and the path <code class="docutils literal"><span class="pre">/trac/chrome/common</span></code> is the path you have to
+append to that location to intercept requests to the static resources.</p>
+<p>Similarly, if you have static resources in a project&#8217;s <code class="docutils literal"><span class="pre">htdocs</span></code>
+directory (which is referenced by <code class="docutils literal"><span class="pre">/trac/chrome/site</span></code> URL in themes),
+you can configure Apache to serve those resources (again, put this
+<em>before</em> the <code class="docutils literal"><span class="pre">ScriptAlias</span></code> or <code class="docutils literal"><span class="pre">WSGIScriptAlias</span></code> for the .*cgi
+scripts, and adjust names and locations to match your installation):</p>
+<p>Alternatively to aliasing <code class="docutils literal"><span class="pre">/trac/chrome/common</span></code>, you can tell Trac to
+generate direct links for those static resources (and only those), using
+the <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#trac-section">[trac]
+htdocs_location</a>
+configuration setting:</p>
+<p>Note that this makes it easy to have a dedicated domain serve those
+static resources (preferentially
+<a class="reference external" href="http://code.google.com/speed/page-speed/docs/request.html#ServeFromCookielessDomain">​cookie-less</a>).</p>
+<p>Of course, you still need to make the Trac <code class="docutils literal"><span class="pre">htdocs/common</span></code> directory
+available through the web server at the specified URL, for example by
+copying (or linking) the directory into the document root of the web
+server:</p>
+</div>
+<div class="section" id="setting-up-the-plugin-cache">
+<h2>Setting up the Plugin Cache<a class="headerlink" href="#setting-up-the-plugin-cache" title="Permalink to this headline">¶</a></h2>
+<p>Some Python plugins need to be extracted to a cache directory. By
+default the cache resides in the home directory of the current user.
+When running Trac on a Web Server as a dedicated user (which is highly
+recommended) who has no home directory, this might prevent the plugins
+from starting. To override the cache location you can set the
+PYTHON_EGG_CACHE environment variable. Refer to your server
+documentation for detailed instructions on how to set environment
+variables.</p>
+<div class="section" id="configuring-authentication">
+<h3>Configuring Authentication<a class="headerlink" href="#configuring-authentication" title="Permalink to this headline">¶</a></h3>
+<p>Trac uses HTTP authentication. You&#8217;ll need to configure your webserver
+to request authentication when the <code class="docutils literal"><span class="pre">.../login</span></code> URL is hit (the virtual
+path of the &#8220;login&#8221; button). Trac will automatically pick the
+REMOTE_USER variable up after you provide your credentials. Therefore,
+all user management goes through your web server configuration. Please
+consult the documentation of your web server for more info.</p>
+<p>The process of adding, removing, and configuring user accounts for
+authentication depends on the specific way you run Trac.</p>
+<p>Please refer to one of the following sections:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/TracStandalone.html#UsingAuthentication">TracStandalone#UsingAuthentication</a>
+if you use the standalone server, <code class="docutils literal"><span class="pre">tracd</span></code>.</li>
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/TracModWSGI.html#ConfiguringAuthentication">TracModWSGI#ConfiguringAuthentication</a>
+if you use the Apache web server, with any of its front end:
+<code class="docutils literal"><span class="pre">mod_wsgi</span></code> of course, but the same instructions applies also for
+<code class="docutils literal"><span class="pre">mod_python</span></code>, <code class="docutils literal"><span class="pre">mod_fcgi</span></code> or <code class="docutils literal"><span class="pre">mod_fastcgi</span></code>.</li>
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/TracFastCgi.html">TracFastCgi</a>
+if you&#8217;re using another web server with FCGI support (Cherokee,
+Lighttpd, LiteSpeed, nginx)</li>
+</ul>
+</div>
+<div class="section" id="granting-admin-rights-to-the-admin-user">
+<h3>Granting admin rights to the admin user<a class="headerlink" href="#granting-admin-rights-to-the-admin-user" title="Permalink to this headline">¶</a></h3>
+<p>Grant admin rights to user admin:</p>
+<p>This user will have an &#8220;Admin&#8221; entry menu that will allow you to admin
+your trac project.</p>
+</div>
+<div class="section" id="finishing-the-install">
+<h3>Finishing the install<a class="headerlink" href="#finishing-the-install" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="automatic-reference-to-the-svn-changesets-in-trac-tickets">
+<h4>Automatic reference to the SVN changesets in Trac tickets<a class="headerlink" href="#automatic-reference-to-the-svn-changesets-in-trac-tickets" title="Permalink to this headline">¶</a></h4>
+<p>You can configure SVN to automatically add a reference to the changeset
+into the ticket comments, whenever changes are committed to the
+repository. The description of the commit needs to contain one of the
+following formulas:</p>
+<ul class="simple">
+<li><strong>``Refs #123``</strong> - to reference this changeset in <code class="docutils literal"><span class="pre">#123</span></code> ticket</li>
+<li><strong>``Fixes #123``</strong> - to reference this changeset and close <code class="docutils literal"><span class="pre">#123</span></code>
+ticket with the default status <em>fixed</em></li>
+</ul>
+<p>This functionality requires a post-commit hook to be installed as
+described in
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracRepositoryAdmin.html#ExplicitSync">TracRepositoryAdmin</a>,
+and enabling the optional commit updater components by adding the
+following line to the <code class="docutils literal"><span class="pre">[components]</span></code> section of your
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#components-section">trac.ini</a>,
+or enabling the components in the &#8220;Plugins&#8221; admin panel.</p>
+<p>For more information, see the documentation of the
+<code class="docutils literal"><span class="pre">CommitTicketUpdater</span></code> component in the &#8220;Plugins&#8221; admin panel.</p>
+</div>
+<div class="section" id="using-trac">
+<h4>Using Trac<a class="headerlink" href="#using-trac" title="Permalink to this headline">¶</a></h4>
+<p>Once you have your Trac site up and running, you should be able to
+create tickets, view the timeline, browse your version control
+repository if configured, etc.</p>
+<p>Keep in mind that <em>anonymous</em> (not logged in) users can by default
+access only a few of the features, in particular they will have a
+read-only access to the resources. You will need to configure
+authentication and grant additional
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracPermissions.html">permissions</a>
+to authenticated users to see the full set of features.</p>
+<p><em>Enjoy!</em></p>
+<p><a class="reference external" href="http://trac.edgewall.org/intertrac/TracTeam">​The Trac Team</a></p>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="http://trac.edgewall.org/intertrac/TracInstallPlatforms">​TracInstallPlatforms</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracGuide.html">TracGuide</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracUpgrade.html">TracUpgrade</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracPermissions.html">TracPermissions</a></p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Trac Installation Guide for 0.12</a><ul>
+<li><a class="reference internal" href="#installation-steps">Installation Steps</a><ul>
+<li><a class="reference internal" href="#dependencies">Dependencies</a><ul>
+<li><a class="reference internal" href="#mandatory-dependencies">Mandatory Dependencies</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#for-the-sqlite-database">For the SQLite database</a></li>
+<li><a class="reference internal" href="#for-the-postgresql-database">For the PostgreSQL database</a></li>
+<li><a class="reference internal" href="#for-the-mysql-database">For the MySQL database</a></li>
+<li><a class="reference internal" href="#version-control-system">Version Control System</a></li>
+<li><a class="reference internal" href="#web-server">Web Server</a></li>
+<li><a class="reference internal" href="#other-python-packages">Other Python Packages</a><ul>
+<li><a class="reference internal" href="#installing-trac">Installing Trac</a><ul>
+<li><a class="reference internal" href="#using-easy-install">Using <code class="docutils literal"><span class="pre">easy_install</span></code></a></li>
+<li><a class="reference internal" href="#from-source">From source</a></li>
+<li><a class="reference internal" href="#advanced-options">Advanced Options</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#custom-location-with-easy-install">Custom location with <code class="docutils literal"><span class="pre">easy_install</span></code></a></li>
+<li><a class="reference internal" href="#using-pip">Using <code class="docutils literal"><span class="pre">pip</span></code></a><ul>
+<li><a class="reference internal" href="#creating-a-project-environment">Creating a Project Environment</a></li>
+<li><a class="reference internal" href="#deploying-trac">Deploying Trac</a><ul>
+<li><a class="reference internal" href="#running-the-standalone-server">Running the Standalone Server</a></li>
+<li><a class="reference internal" href="#running-trac-on-a-web-server">Running Trac on a Web Server</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#generating-the-trac-cgi-bin-directory">Generating the Trac cgi-bin directory</a></li>
+<li><a class="reference internal" href="#mapping-static-resources">Mapping Static Resources</a></li>
+<li><a class="reference internal" href="#setting-up-the-plugin-cache">Setting up the Plugin Cache</a><ul>
+<li><a class="reference internal" href="#configuring-authentication">Configuring Authentication</a></li>
+<li><a class="reference internal" href="#granting-admin-rights-to-the-admin-user">Granting admin rights to the admin user</a></li>
+<li><a class="reference internal" href="#finishing-the-install">Finishing the install</a><ul>
+<li><a class="reference internal" href="#automatic-reference-to-the-svn-changesets-in-trac-tickets">Automatic reference to the SVN changesets in Trac tickets</a></li>
+<li><a class="reference internal" href="#using-trac">Using Trac</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracInstall.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracInstall.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

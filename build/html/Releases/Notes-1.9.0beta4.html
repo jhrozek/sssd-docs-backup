@@ -1,0 +1,290 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#Highlights">Highlights</a></li>
+<li><a class="reference external" href="#TicketsFixed">Tickets Fixed</a></li>
+<li><a class="reference external" href="#DetailedChangelog">Detailed Changelog</a></li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Add a new AD provider to improve integration with Active Directory
+2008 R2 or later servers</li>
+<li>SUDO integration was completely rewritten. The new implementation
+works with multiple domains and uses an improved refresh mechanism to
+download only the necessary rules</li>
+<li>The IPA authentication provider now supports subdomains</li>
+<li>Fixed regression for setups that were setting default_tkt_enctypes
+manually by reverting a previous workaround.</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/1239">#1239</a></dt>
+<dd>[RFE] sudo: send username and uid while requesting default options</dd>
+<dt><a class="reference external" href="/sssd/ticket/1299">#1299</a></dt>
+<dd>Per domain formats for qualified user names</dd>
+<dt><a class="reference external" href="/sssd/ticket/1352">#1352</a></dt>
+<dd>[RFE] Add the subdomain functionality to IPA auth provider</dd>
+<dt><a class="reference external" href="/sssd/ticket/1377">#1377</a></dt>
+<dd>[RFE] Add AD provider</dd>
+<dt><a class="reference external" href="/sssd/ticket/1382">#1382</a></dt>
+<dd>pac responder interface needs checks</dd>
+<dt><a class="reference external" href="/sssd/ticket/1385">#1385</a></dt>
+<dd>heimdal: compile time diference</dd>
+<dt><a class="reference external" href="/sssd/ticket/1398">#1398</a></dt>
+<dd>Dependency issue while &#8220;yum update libsss_sudo&#8221;</dd>
+<dt><a class="reference external" href="/sssd/ticket/1403">#1403</a></dt>
+<dd>Combine keytab options for AD provider</dd>
+<dt><a class="reference external" href="/sssd/ticket/1404">#1404</a></dt>
+<dd>AD provider should default to case-insensitive operation</dd>
+<dt><a class="reference external" href="/sssd/ticket/1407">#1407</a></dt>
+<dd>Revert sssd patch for limiting enctypes to keytab</dd>
+<dt><a class="reference external" href="/sssd/ticket/1409">#1409</a></dt>
+<dd>Resource leak in sssdpac_import_authdata</dd>
+<dt><a class="reference external" href="/sssd/ticket/1410">#1410</a></dt>
+<dd>Dead code in ipa_subdomains_handler_done()</dd>
+<dt><a class="reference external" href="/sssd/ticket/1412">#1412</a></dt>
+<dd>Starting SSSD with a domain using the LOCAL provider segfaults the
+responders</dd>
+</dl>
+</div></div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>George McCollister (1):</p>
+<ul class="simple">
+<li>libcrypto fully implemented</li>
+</ul>
+<p>Jakub Hrozek (3):</p>
+<ul class="simple">
+<li>Print based on pointer contents not address</li>
+<li>Cast uid_t to unsigned long long in DEBUG messages</li>
+<li>Update translations for 1.9.0 beta 4 release</li>
+</ul>
+<p>Pavel Březina (53):</p>
+<ul class="simple">
+<li>sudo api: remove EOK</li>
+<li>sudo responder: remove code duplication in commands</li>
+<li>sudo responder: get rid of dctx where possible</li>
+<li>sudo sysdb: make sysdb_get_sudo_user_info more configurable</li>
+<li>sudo api: send uid, username and domainname</li>
+<li>sudo responder: change protocol version to 1</li>
+<li>libsss_sudo: bump version to 2:0:1</li>
+<li>sudo responder: discard in-memory cache</li>
+<li>sudo ldap provider: move async routines to sdap_async_sudo.c</li>
+<li>sudo ldap provider: give sdap_sudo_refresh_send() search and purge
+filters</li>
+<li>confdb: add entry_cache_sudo_timeout option</li>
+<li>sudo ldap provider: add sysdb ctx in sdap_sudo_refresh_state</li>
+<li>sudo ldap provider: add domain info in sdap_sudo_refresh_state</li>
+<li>sudo ldap provider: add expiration time to each rule</li>
+<li>sysdb: add getter/setter for last sudo full refresh time</li>
+<li>sudo ldap provider: provide API for full refresh</li>
+<li>sudo ldap provider: add support for on demand full refresh</li>
+<li>sudo ldap provider: provide API for refresh of specific rules</li>
+<li>sudo ldap provider: add support for on demand refresh of specific
+rules</li>
+<li>sudo backend - support only on demand full refresh</li>
+<li>sudo backend - add support for on demand refresh of specific rules</li>
+<li>sudo provider: add ldap_sudo_full_refresh_interval</li>
+<li>sudo provider: remove old timer</li>
+<li>sudo ldap provider: add new timer API</li>
+<li>sysdb: remove sudo_set/get_refreshed</li>
+<li>sudo ldap provider: support periodical full refresh</li>
+<li>ldap provider: add sudo usn value</li>
+<li>sudo ldap provider: find highest USN</li>
+<li>sudo ldap provider: add sdap_sudo_set_usn()</li>
+<li>sudo ldap provider: remember highest usn after full refresh</li>
+<li>sudo ldap provider: add smart refresh API</li>
+<li>sudo ldap provider: when sysdb filter is NULL remove downloaded rules</li>
+<li>sudo provider: add ldap_sudo_smart_refresh_interval</li>
+<li>sudo ldap provider: add periodical smart refresh API</li>
+<li>sudo ldap provider: support periodical smart refresh</li>
+<li>sudo responder: new request enum type</li>
+<li>sudo sysdb: add expiration time to the filter</li>
+<li>sudo responder: allow fetching only expired rules in
+sudosrv_get_sudorules_query_cache()</li>
+<li>sudo responder: update dp interface</li>
+<li>sudo responder: refresh expired rules</li>
+<li>sudo ldap provider: return number of downloaded rules in
+sdap_sudo_refresh_recv()</li>
+<li>sudo ldap provider: notify responder when an expired rule has been
+deleted</li>
+<li>sudo responder: schedule OOB full refresh when expired rule is
+deleted</li>
+<li>sudo: clean up</li>
+<li>sudo ldap provider: modify highest USN in
+sdap_sudo_rules_refresh_done()</li>
+<li>sdap_sudo.c: move _recv after _done</li>
+<li>sudo ldap provider: pass sudo_ctx instead of id_ctx</li>
+<li>sudo: add host info options</li>
+<li>sudo ldap provider: load host filter configuration on init</li>
+<li>sudo ldap provider: mark sdap_sudo_setup_periodical_refresh() as
+static</li>
+<li>sudo ldap provider: do per-host updates</li>
+<li>sudo ldap provider: support autoconfiguration of IP addresses</li>
+<li>sudo: manpage updated</li>
+</ul>
+<p>Rambaldi (2):</p>
+<ul class="simple">
+<li>heimdal: fix compile error in krb5-child-test</li>
+<li>heimdal: use sss_krb5_princ_realm to access realm</li>
+</ul>
+<p>Simo Sorce (1):</p>
+<ul class="simple">
+<li>Fix segfault when sudo is not configured.</li>
+</ul>
+<p>Stef Walter (2):</p>
+<ul class="simple">
+<li>Fix crash when interface doesn&#8217;t have an address</li>
+<li>Revert commit
+<a class="reference external" href="https://fedorahosted.org/sssd/changeset/4c157ecedd52602f75574605ef48d0c48e9bfbe8/">4c157ecedd52602f75574605ef48d0c48e9bfbe8</a></li>
+</ul>
+<p>Stephen Gallagher (33):</p>
+<ul class="simple">
+<li>Bumping version to 1.9.0 beta 4</li>
+<li>TESTS: Print messages when LDAP options do not match</li>
+<li>DEBUG: Log to syslog if we are unable to open a debug fd</li>
+<li>KRB5: Initialize the credential cache type properly</li>
+<li>IPA: Don&#8217;t hang onto memory longer than necessary</li>
+<li>LDAP: Print extended failure message for SASL bind</li>
+<li>MAN: Unify &#8220;SEE ALSO&#8221; sections</li>
+<li>KRB5: Some logging enhancements for krb5_child</li>
+<li>KRB5_LOCATOR: Print the filename that couldn&#8217;t be opened</li>
+<li>KRB5: Drop memctx parameter of krb5_try_kdcip</li>
+<li>KRB5: Create a common init routine for krb5_child options</li>
+<li>LDAP: Rename user and group maps for AD</li>
+<li>AD: Add AD identity provider</li>
+<li>AD: Add AD auth and chpass providers</li>
+<li>AD: Add AD access-control provider</li>
+<li>AD: Add AD provider to the spec file</li>
+<li>AD: use krb5_keytab for validation and GSSAPI</li>
+<li>AD: Add manpages and SSSDConfig entries</li>
+<li>CONFDB: Add the ability to set a boolean value in the confdb</li>
+<li>AD: Force case-insensitive operation in AD provider</li>
+<li>Fix use-after-free</li>
+<li>Fix uninitialized variable</li>
+<li>Fix potential NULL-dereference</li>
+<li>Fix potential NULL-dereference</li>
+<li>Fix incorrect return value in tests</li>
+<li>Fix potential NULL-dereference</li>
+<li>Fix uninitialized value return</li>
+<li>Fix uninitialized memcpy error</li>
+<li>Avoid NULL-dereference in error-handling</li>
+<li>Add missing return value check</li>
+<li>Check for errors from krb5_unparse_name</li>
+<li>Fix incorrect error-check</li>
+<li>Fix segfault when using local provider</li>
+</ul>
+<p>Sumit Bose (5):</p>
+<ul class="simple">
+<li>Fix SSSDConfigTest for separate build directories</li>
+<li>Set file descriptor limits in pac responder</li>
+<li>Remove resource leak in sssdpac_import_authdata</li>
+<li>Remove dead code in ipa_subdomains_handler_done()</li>
+<li>pac responder: limit access by checking UIDs</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.9.0beta4.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.9.0beta4.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

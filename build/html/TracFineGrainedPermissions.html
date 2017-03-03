@@ -1,0 +1,350 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Fine grained permissions &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><p class="rubric" id="contents">Contents</p>
+<ol class="arabic simple">
+<li><a class="reference external" href="#PermissionPolicies">Permission Policies</a><ol class="arabic">
+<li><a class="reference external" href="#AuthzPolicy">AuthzPolicy</a><ol class="arabic">
+<li><a class="reference external" href="#Configuration">Configuration</a></li>
+<li><a class="reference external" href="#UsageNotes">Usage Notes</a></li>
+<li><a class="reference external" href="#MissingFeatures">Missing Features</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#AuthzSourcePolicy">AuthzSourcePolicy (mod_authz_svn-like permission
+policy)</a><ol class="arabic">
+<li><a class="reference external" href="#TracConfiguration">Trac Configuration</a></li>
+<li><a class="reference external" href="#SubversionConfiguration">Subversion Configuration</a></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><a class="reference external" href="#Debuggingpermissions">Debugging permissions</a></li>
+</ol>
+</div><div class="section" id="fine-grained-permissions">
+<h1>Fine grained permissions<a class="headerlink" href="#fine-grained-permissions" title="Permalink to this headline">¶</a></h1>
+<p>Before Trac 0.11, it was only possible to define fine-grained
+permissions checks on the repository browser sub-system.</p>
+<p>Since 0.11, there&#8217;s a general mechanism in place that allows custom
+<strong>permission policy plugins</strong> to grant or deny any action on any kind of
+Trac resources, even at the level of specific versions of such
+resources.</p>
+<p>Note that for Trac 0.12, <code class="docutils literal"><span class="pre">authz_policy</span></code> has been integrated as an
+optional module (in <code class="docutils literal"><span class="pre">tracopt.perm.authz_policy.*</span></code>), so it&#8217;s installed
+by default and can simply be activated via the <em>Plugins</em> panel in the
+Trac administration module.</p>
+<div class="section" id="permission-policies">
+<h2>Permission Policies<a class="headerlink" href="#permission-policies" title="Permalink to this headline">¶</a></h2>
+<p>A great diversity of permission policies can be implemented, and Trac
+comes with a few examples.</p>
+<p>Which policies are currently active is determined by a configuration
+setting in
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">TracIni</a>: e.g.</p>
+<p>This lists the
+<a class="reference external" href="https://fedorahosted.org/sssd#AuthzSourcePolicy">#AuthzSourcePolicy</a>
+described below as the first policy, followed by the
+DefaultPermissionPolicy which checks for the traditional coarse grained
+style permissions described in
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracPermissions.html">TracPermissions</a>,
+and the LegacyAttachmentPolicy which knows how to use the coarse grained
+permissions for checking the permissions available on attachments.</p>
+<p>Among the possible optional choices, there is
+<a class="reference external" href="https://fedorahosted.org/sssd#AuthzPolicy">#AuthzPolicy</a>, a very
+generic permission policy, based on an Authz-style system. See
+<a class="reference external" href="http://trac.edgewall.org/intertrac/source%3Abranches/0.12-stable/tracopt/perm/authz_policy.py">​authz_policy.py</a>
+for details.</p>
+<p>Another popular permission policy
+<a class="reference external" href="https://fedorahosted.org/sssd#AuthzSourcePolicy">#AuthzSourcePolicy</a>,
+re-implements the pre-0.12 support for checking fine-grained permissions
+limited to Subversion repositories in terms of the new system.</p>
+<p>See also
+<a class="reference external" href="http://trac.edgewall.org/intertrac/source%3Abranches/0.12-stable/sample-plugins/permissions">​sample-plugins/permissions</a>
+for more examples.</p>
+<div class="section" id="authzpolicy">
+<h3>AuthzPolicy<a class="headerlink" href="#authzpolicy" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="configuration">
+<h4>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>Install
+<a class="reference external" href="http://www.voidspace.org.uk/python/configobj.html">​ConfigObj</a>
+(still needed for 0.12).</li>
+<li>Copy authz_policy.py into your plugins directory (only for Trac
+0.11).</li>
+<li>Put a
+<a class="reference external" href="http://swapoff.org/files/authzpolicy.conf">​authzpolicy.conf</a>
+file somewhere, preferably on a secured location on the server, not
+readable for others than the webuser. If the file contains non-ASCII
+characters, the UTF-8 encoding should be used.</li>
+<li>Update your <code class="docutils literal"><span class="pre">trac.ini</span></code>:<ol class="arabic">
+<li>modify the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#trac-section">permission_policies</a>
+entry in the <code class="docutils literal"><span class="pre">[trac]</span></code> section</li>
+<li>add a new <code class="docutils literal"><span class="pre">[authz_policy]</span></code> section</li>
+<li>enable the plugin through
+<a class="reference external" href="https://fedorahosted.org/sssd/admin/general/plugin">WebAdmin</a>
+or by editing the <code class="docutils literal"><span class="pre">[components]</span></code> section</li>
+</ol>
+</li>
+</ul>
+</div>
+<div class="section" id="usage-notes">
+<h4>Usage Notes<a class="headerlink" href="#usage-notes" title="Permalink to this headline">¶</a></h4>
+<p>Note that the order in which permission policies are specified is quite
+critical, as policies will be examined in the sequence provided.</p>
+<p>A policy will return either <code class="docutils literal"><span class="pre">True</span></code>, <code class="docutils literal"><span class="pre">False</span></code> or <code class="docutils literal"><span class="pre">None</span></code> for a given
+permission check. <code class="docutils literal"><span class="pre">True</span></code> is returned if the policy explicitly grants
+the permission. <code class="docutils literal"><span class="pre">False</span></code> is returned if the policy explicitly denies
+the permission. <code class="docutils literal"><span class="pre">None</span></code> is returned if the policy is unable to either
+grant or deny the permission.</p>
+<p>NOTE: Only if the return value is <code class="docutils literal"><span class="pre">None</span></code> will the <em>next</em> permission
+policy be consulted. If none of the policies explicitly grants the
+permission, the final result will be <code class="docutils literal"><span class="pre">False</span></code> (i.e. permission denied).</p>
+<p>The <code class="docutils literal"><span class="pre">authzpolicy.conf</span></code> file is a <code class="docutils literal"><span class="pre">.ini</span></code> style configuration file:</p>
+<ul>
+<li><p class="first">Each section of the config is a glob pattern used to match against a
+Trac resource descriptor. These descriptors are in the form:</p>
+<p>Resources are ordered left to right, from parent to child. If any
+component is inapplicable, <code class="docutils literal"><span class="pre">*</span></code> is substituted. If the version
+pattern is not specified explicitely, all versions (<code class="docutils literal"><span class="pre">&#64;*</span></code>) is added
+implicitly</p>
+<blockquote>
+<div><p>Example: Match the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiStart.html">WikiStart</a>
+page</p>
+<p>Example: Match the attachment
+<code class="docutils literal"><span class="pre">wiki:WikiStart&#64;117/attachment/FOO.JPG&#64;*</span></code> on
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiStart.html">WikiStart</a></p>
+</div></blockquote>
+</li>
+<li><p class="first">Sections are checked against the current Trac resource descriptor
+<strong>IN ORDER</strong> of appearance in the configuration file. <strong>ORDER IS
+CRITICAL</strong>.</p>
+</li>
+<li><p class="first">Once a section matches, the current username is matched against the
+keys (usernames) of the section, <strong>IN ORDER</strong>.</p>
+<ul class="simple">
+<li>If a key (username) is prefixed with a <code class="docutils literal"><span class="pre">&#64;</span></code>, it is treated as a
+group.</li>
+<li>If a value (permission) is prefixed with a <code class="docutils literal"><span class="pre">!</span></code>, the permission
+is denied rather than granted.</li>
+</ul>
+<blockquote>
+<div><p>The username will match any of &#8216;anonymous&#8217;, &#8216;authenticated&#8217;,
+&lt;username&gt; or &#8216;*&#8217;, using normal Trac permission rules.
+<strong>Note:</strong> Other groups which are created by user (e.g. by &#8216;adding
+subjects to groups&#8217; on web interface page <em>Admin / Permissions</em>)
+cannot be used. See
+<a class="reference external" href="http://trac.edgewall.org/intertrac/ticket%3A5648">​#5648</a> for
+details about this missing feature</p>
+</div></blockquote>
+</li>
+</ul>
+<p>For example, if the <code class="docutils literal"><span class="pre">authz_file</span></code> contains:</p>
+<p>and the default permissions are set like this:</p>
+<p>Then:</p>
+<ul class="simple">
+<li>All versions of
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiStart.html">WikiStart</a>
+will be viewable by everybody (including anonymous)</li>
+<li>PrivatePage will be viewable only by john</li>
+<li>other pages will be viewable only by john and jack</li>
+</ul>
+<p>Groups:</p>
+<p>Then:</p>
+<ul class="simple">
+<li>everything is blocked (whitelist approach), but</li>
+<li>admins get all TRAC_ADMIN everywhere and</li>
+<li>devs can view wiki pages.</li>
+</ul>
+<p>Some repository examples (Browse Source specific):</p>
+<p>Very fine grain repository access:</p>
+<p>Note: In order for Timeline to work/visible for John, we must add
+CHANGESET_VIEW to the above permission list.</p>
+</div>
+<div class="section" id="missing-features">
+<h4>Missing Features<a class="headerlink" href="#missing-features" title="Permalink to this headline">¶</a></h4>
+<p>Although possible with the DefaultPermissionPolicy handling (see Admin
+panel), fine-grained permissions still miss those grouping features (see
+<a class="reference external" href="http://trac.edgewall.org/intertrac/ticket%3A9573">​#9573</a>,
+<a class="reference external" href="http://trac.edgewall.org/intertrac/ticket%3A5648">​#5648</a>). Patches
+are partially available, see forgotten authz_policy.2.patch part of
+<a class="reference external" href="http://trac.edgewall.org/intertrac/ticket%3A6680">​#6680</a>).</p>
+<p>You cannot do the following:</p>
+<p>Permission groups are not supported either. You cannot do the following:</p>
+</div>
+</div>
+<div class="section" id="authzsourcepolicy-mod-authz-svn-like-permission-policy">
+<h3>AuthzSourcePolicy (mod_authz_svn-like permission policy)<a class="headerlink" href="#authzsourcepolicy-mod-authz-svn-like-permission-policy" title="Permalink to this headline">¶</a></h3>
+<p>At the time of this writing, the old fine grained permissions system
+from Trac 0.11 and before used for restricting access to the repository
+has been converted to a permission policy component, but from the user
+point of view, this makes little if no difference.</p>
+<p>That kind of fine-grained permission control needs a definition file,
+which is the one used by Subversion&#8217;s mod_authz_svn. More information
+about this file format and about its usage in Subversion is available in
+the <a class="reference external" href="http://svnbook.red-bean.com/en/1.5/svn.serverconfig.pathbasedauthz.html">​Path-Based
+Authorization</a>
+section in the Server Configuration chapter of the svn book.</p>
+<p>Example:</p>
+<ul class="simple">
+<li><strong>/</strong> = <em>Everyone has read access by default</em></li>
+<li><strong>/branches/calc/bug-142</strong> = <em>harry has read/write access, sally read
+only</em></li>
+<li><strong>/branches/calc/bug-142/secret</strong> = <em>harry has no access, sally has
+read access (inherited as a sub folder permission)</em></li>
+</ul>
+<div class="section" id="trac-configuration">
+<h4>Trac Configuration<a class="headerlink" href="#trac-configuration" title="Permalink to this headline">¶</a></h4>
+<p>To activate fine grained permissions you must specify the <code class="docutils literal"><span class="pre">authz_file</span></code>
+option in the <code class="docutils literal"><span class="pre">[trac]</span></code> section of trac.ini. If this option is set to
+null or not specified the permissions will not be used.</p>
+<p>If you want to support the use of the
+<code class="docutils literal"><span class="pre">[</span></code><em>modulename</em><code class="docutils literal"><span class="pre">:/</span></code><em>some</em><code class="docutils literal"><span class="pre">/</span></code><em>path</em><code class="docutils literal"><span class="pre">]</span></code> syntax within
+the <code class="docutils literal"><span class="pre">authz_file</span></code>, add</p>
+<p>where <em>modulename</em> refers to the same repository indicated by the
+<code class="docutils literal"><span class="pre">repository_dir</span></code> entry in the <code class="docutils literal"><span class="pre">[trac]</span></code> section. As an example, if
+the <code class="docutils literal"><span class="pre">repository_dir</span></code> entry in the <code class="docutils literal"><span class="pre">[trac]</span></code> section is
+<code class="docutils literal"><span class="pre">/srv/active/svn/blahblah</span></code>, that would yield the following:</p>
+<p>where the svn access file, <code class="docutils literal"><span class="pre">/path/to/svnaccessfile</span></code>, contains entries
+such as <code class="docutils literal"><span class="pre">[blahblah:/some/path]</span></code>.</p>
+<p><strong>Note:</strong> Usernames inside the Authz file must be the same as those used
+inside trac.</p>
+<p>As of version 0.12, make sure you have <em>AuthzSourcePolicy</em> included in
+the permission_policies list in trac.ini, otherwise the authz
+permissions file will be ignored.</p>
+</div>
+<div class="section" id="subversion-configuration">
+<h4>Subversion Configuration<a class="headerlink" href="#subversion-configuration" title="Permalink to this headline">¶</a></h4>
+<p>The same access file is typically applied to the corresponding
+Subversion repository using an Apache directive like this:</p>
+<p>For information about how to restrict access to entire projects in a
+multiple project environment see
+<a class="reference external" href="http://trac.edgewall.org/intertrac/wiki%3ATracMultipleProjectsSVNAccess">​wiki:TracMultipleProjectsSVNAccess</a></p>
+</div>
+</div>
+</div>
+<div class="section" id="debugging-permissions">
+<h2>Debugging permissions<a class="headerlink" href="#debugging-permissions" title="Permalink to this headline">¶</a></h2>
+<p>In trac.ini set:</p>
+<p>And watch:</p>
+<p>to understand what checks are being performed. See the sourced
+documentation of the plugin for more info.</p>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracPermissions.html">TracPermissions</a>,
+<a class="reference external" href="http://trac-hacks.org/wiki/FineGrainedPageAuthzEditorPlugin">​TracHacks:FineGrainedPageAuthzEditorPlugin</a>
+for a simple editor plugin.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Fine grained permissions</a><ul>
+<li><a class="reference internal" href="#permission-policies">Permission Policies</a><ul>
+<li><a class="reference internal" href="#authzpolicy">AuthzPolicy</a><ul>
+<li><a class="reference internal" href="#configuration">Configuration</a></li>
+<li><a class="reference internal" href="#usage-notes">Usage Notes</a></li>
+<li><a class="reference internal" href="#missing-features">Missing Features</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#authzsourcepolicy-mod-authz-svn-like-permission-policy">AuthzSourcePolicy (mod_authz_svn-like permission policy)</a><ul>
+<li><a class="reference internal" href="#trac-configuration">Trac Configuration</a></li>
+<li><a class="reference internal" href="#subversion-configuration">Subversion Configuration</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#debugging-permissions">Debugging permissions</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracFineGrainedPermissions.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracFineGrainedPermissions.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

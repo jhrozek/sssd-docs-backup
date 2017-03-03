@@ -1,0 +1,434 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>This release focused mainly on fixing regressions compared to the 1.8
+series and bugfixes for features introduced in the 1.9 release cycle</li>
+<li>Many fixes related to deployments where the SSSD is running as a
+client of IPA server with trust relation established with an Active
+Directory server</li>
+<li>Multiple fixes related to correct reporting of group memberships,
+especially in setups that use nested groups</li>
+<li>Fixed a bug that prevented upgrade from the 1.8 series if the cache
+contained nested groups before the upgrade</li>
+<li>Restarting the responders is more robust for cases where the machine
+is under heavy load during back end restart</li>
+<li>The default_shell option can now be also set per-domain in addition
+to global setting</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/1345">#1345</a></dt>
+<dd>sssd does not warn into sssd.log for broken configurations</dd>
+<dt><a class="reference external" href="/sssd/ticket/1357">#1357</a></dt>
+<dd>Init script reports complete before sssd is actually working</dd>
+<dt><a class="reference external" href="/sssd/ticket/1437">#1437</a></dt>
+<dd>upstream spec should use systemd where available</dd>
+<dt><a class="reference external" href="/sssd/ticket/1482">#1482</a></dt>
+<dd>&#8220;fullName&#8221; in sysdb doesn&#8217;t match with the &#8220;name&#8221; ldap attribute on
+AD Server</dd>
+<dt><a class="reference external" href="/sssd/ticket/1528">#1528</a></dt>
+<dd>SSSD_NSS failure to gracefully restart after sbus failure</dd>
+<dt><a class="reference external" href="/sssd/ticket/1581">#1581</a></dt>
+<dd>sssd_be crashes while looking up users</dd>
+<dt><a class="reference external" href="/sssd/ticket/1583">#1583</a></dt>
+<dd>Allow setting the default_shell per-domain</dd>
+<dt><a class="reference external" href="/sssd/ticket/1584">#1584</a></dt>
+<dd>invalidating the memcache with sss_cache doesn&#8217;t work if the sssd
+is not running</dd>
+<dt><a class="reference external" href="/sssd/ticket/1589">#1589</a></dt>
+<dd>sss_cache says &#8216;Wrong DB version&#8217;</dd>
+<dt><a class="reference external" href="/sssd/ticket/1590">#1590</a></dt>
+<dd>sssd does not resolve group names from AD</dd>
+<dt><a class="reference external" href="/sssd/ticket/1593">#1593</a></dt>
+<dd>Silence the DEBUG messages when ID mapping code skips a built-in
+group</dd>
+<dt><a class="reference external" href="/sssd/ticket/1594">#1594</a></dt>
+<dd>ldap_child crashes on using invalid keytab during gssapi connection</dd>
+<dt><a class="reference external" href="/sssd/ticket/1595">#1595</a></dt>
+<dd>Password authentication with users coming via AD trust</dd>
+<dt><a class="reference external" href="/sssd/ticket/1596">#1596</a></dt>
+<dd>Sudo smart refresh doesn&#8217;t occur on time</dd>
+<dt><a class="reference external" href="/sssd/ticket/1600">#1600</a></dt>
+<dd>The sssd_nss process grows the memory consumption over time</dd>
+<dt><a class="reference external" href="/sssd/ticket/1601">#1601</a></dt>
+<dd>A wrong callback used causes getgrgid to not work for trusted
+domains</dd>
+<dt><a class="reference external" href="/sssd/ticket/1602">#1602</a></dt>
+<dd>provider is forcibly killed with SIGKILL instead of SIGTERM if it&#8217;s
+not responding</dd>
+<dt><a class="reference external" href="/sssd/ticket/1604">#1604</a></dt>
+<dd>sssd not granting access for AD trusted user in HBAC rule</dd>
+<dt><a class="reference external" href="/sssd/ticket/1606">#1606</a></dt>
+<dd>SSSD starts multiple processes due to syntax error in ldap_uri</dd>
+<dt><a class="reference external" href="/sssd/ticket/1608">#1608</a></dt>
+<dd>sss_cache: Multiple domains not handled properly</dd>
+<dt><a class="reference external" href="/sssd/ticket/1610">#1610</a></dt>
+<dd>subdomains: Invalid sub-domain request type.</dd>
+<dt><a class="reference external" href="/sssd/ticket/1611">#1611</a></dt>
+<dd>authconfig chokes on sssd.conf with chpass_provider directive</dd>
+<dt><a class="reference external" href="/sssd/ticket/1612">#1612</a></dt>
+<dd>Nested groups are not retrieved appropriately from cache</dd>
+<dt><a class="reference external" href="/sssd/ticket/1613">#1613</a></dt>
+<dd>ipa client setup should configure host properly in a trust is in
+place</dd>
+<dt><a class="reference external" href="/sssd/ticket/1614">#1614</a></dt>
+<dd>User appears twice on looking up a nested group</dd>
+<dt><a class="reference external" href="/sssd/ticket/1615">#1615</a></dt>
+<dd>IPA client cannot change AD Trusted User password</dd>
+<dt><a class="reference external" href="/sssd/ticket/1616">#1616</a></dt>
+<dd>sudo failing for ad trusted user in IPA environment</dd>
+<dt><a class="reference external" href="/sssd/ticket/1619">#1619</a></dt>
+<dd>pam: fd leak when writing the selinux login file in the pam
+responder</dd>
+<dt><a class="reference external" href="/sssd/ticket/1623">#1623</a></dt>
+<dd>Man page issue to list &#8216;force_timeout&#8217; as an option for the [sssd]
+section</dd>
+<dt><a class="reference external" href="/sssd/ticket/1628">#1628</a></dt>
+<dd>user id lookup fails using proxy provider</dd>
+<dt><a class="reference external" href="/sssd/ticket/1629">#1629</a></dt>
+<dd>subdomains code does not save the proper user/group name</dd>
+<dt><a class="reference external" href="/sssd/ticket/1631">#1631</a></dt>
+<dd>sysdb upgrade failed converting db to 0.11</dd>
+<dt><a class="reference external" href="/sssd/ticket/1636">#1636</a></dt>
+<dd>offline authentication failure always returns System Error</dd>
+<dt><a class="reference external" href="/sssd/ticket/1638">#1638</a></dt>
+<dd>password expiry warning message doesn&#8217;t appear during auth</dd>
+<dt><a class="reference external" href="/sssd/ticket/1640">#1640</a></dt>
+<dd>&#8220;defaults&#8221; entry ignored</dd>
+<dt><a class="reference external" href="/sssd/ticket/1647">#1647</a></dt>
+<dd>LDAP provider fails to save empty groups</dd>
+<dt><a class="reference external" href="/sssd/ticket/1649">#1649</a></dt>
+<dd>ldap_connection_expire_timeout doesn&#8217;t expire ldap connections</dd>
+<dt><a class="reference external" href="/sssd/ticket/1650">#1650</a></dt>
+<dd>Wrong variable check in sudosrv_parse_query_send</dd>
+<dt><a class="reference external" href="/sssd/ticket/1651">#1651</a></dt>
+<dd>Unchecked return value from waitpid()</dd>
+<dt><a class="reference external" href="/sssd/ticket/1652">#1652</a></dt>
+<dd>updating top-level group does not reflect ghost members correctly</dd>
+<dt><a class="reference external" href="/sssd/ticket/1657">#1657</a></dt>
+<dd>SIGSEGV in IPA provider when ldap_sasl_authid is not set</dd>
+<dt><a class="reference external" href="/sssd/ticket/1658">#1658</a></dt>
+<dd>ipa password auth failing for user principal name when shorter than
+IPA Realm name</dd>
+<dt><a class="reference external" href="/sssd/ticket/1661">#1661</a></dt>
+<dd>Allow backward compatible regex for domain / realm search in sssd
+1.9</dd>
+<dt><a class="reference external" href="/sssd/ticket/1668">#1668</a></dt>
+<dd>delete operation is not implemented for ghost users</dd>
+<dt><a class="reference external" href="/sssd/ticket/1669">#1669</a></dt>
+<dd>sssd hangs at startup with broken configurations</dd>
+<dt><a class="reference external" href="/sssd/ticket/1671">#1671</a></dt>
+<dd>mmap cache needs update after db changes</dd>
+<dt><a class="reference external" href="/sssd/ticket/1674">#1674</a></dt>
+<dd>Explicit null dereferenced</dd>
+<dt><a class="reference external" href="/sssd/ticket/1675">#1675</a></dt>
+<dd>SSSD crashes when c-ares returns success but an empty hostent during
+the DNS update</dd>
+<dt><a class="reference external" href="/sssd/ticket/1683">#1683</a></dt>
+<dd>arithmetic bug in the SSSD causes netgroup midpoint refresh to be
+always set to 10 seconds</dd>
+<dt><a class="reference external" href="/sssd/ticket/1684">#1684</a></dt>
+<dd>Dereference after null check in sss_idmap_sid_to_unix</dd>
+<dt><a class="reference external" href="/sssd/ticket/1686">#1686</a></dt>
+<dd>sssd crashes during start if id_provider is not mentioned</dd>
+<dt><a class="reference external" href="/sssd/ticket/1688">#1688</a></dt>
+<dd>sssd_sudo prints wrong debug message when notBefore or notAfter
+attribute is missing</dd>
+<dt><a class="reference external" href="/sssd/ticket/1695">#1695</a></dt>
+<dd>user is not removed from group membership during initgroups</dd>
+</dl>
+</div></div>
+<div class="section" id="packaging-changes">
+<h1>Packaging Changes<a class="headerlink" href="#packaging-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>The sss_cache has been moved from sss-tools subpackage to the main
+sssd package</li>
+<li>The upstream RPM uses a systemd unit file by default, rather than a
+SystemV init script</li>
+<li>Several rpmlint warnings have been fixed in the upstream spec file</li>
+</ul>
+</div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Ariel O. Barria (1):</p>
+<ul class="simple">
+<li>Monitor quit when not exists no process no stops</li>
+</ul>
+<p>Jakub Hrozek (42):</p>
+<ul class="simple">
+<li>Updating the version for the 1.9.3 release</li>
+<li>LDAP: Check validity of naming_context</li>
+<li>Allow setting the default_shell option per-domain as well</li>
+<li>KRB5: Return error when principal selection fails</li>
+<li>Free the internal DP request</li>
+<li>LDAP: Fix off-by-one error when saving ghost users</li>
+<li>Monitor: read the correct SIGKILL timeout for providers, too</li>
+<li>PAM: Do not leak fd after SELinux context file is written</li>
+<li>Do not always return PAM_SYSTEM_ERR when offline krb5
+authentication fails</li>
+<li>KRB5: Rename variable to avoid shadowing a global declaration</li>
+<li>Only build extract_and_send_pac on platforms that support it</li>
+<li>Include the auth_utils.h header in the distribution</li>
+<li>SYSDB: Do not touch the member attribute during conversion to ghost
+users</li>
+<li>Provide AM_COND_IF-combatible implementation for old automake
+systems</li>
+<li>LDAP: Expire even non authenticated connections</li>
+<li>SUDO: Fix wrong variable check</li>
+<li>SERVER: Check the return value of waitpid</li>
+<li>LDAP: Allocate the temporary context on NULL, not memctx</li>
+<li>LDAP: Fix saving empty groups</li>
+<li>LDAP: use the correct memory context</li>
+<li>LDAP: Refactor saving ghost users</li>
+<li>Restart services with a delay in case they are restarted too often</li>
+<li>MAN: document the ldap_sasl_realm option</li>
+<li>LDAP: Provide a common sdap_set_sasl_options init function</li>
+<li>LDAP: Checking the principal should not be considered fatal</li>
+<li>LDAP: Make it possible to use full principal in ldap_sasl_authid
+again</li>
+<li>SYSDB: Use the add_string convenience functions for managing ghost
+user attribute</li>
+<li>LDAP: Only convert direct parents&#8217; ghost attribute to member</li>
+<li>MONITOR: Fix off-by-one error in add_string_to_list</li>
+<li>Handle compiling FQDN regular expression with old pcre gracefully</li>
+<li>MEMBEROF: Do not add the ghost attribute to self</li>
+<li>TESTS: Test ghosts users in the RFC2307 schema</li>
+<li>NSS: Fix netgroup midpoint cache refresh</li>
+<li>LDAP: Continue adjusting group membership even if there is nothing to
+add</li>
+<li>MEMBEROF: Implement delete operation for ghost users</li>
+<li>MEMBEROF: split processing the member modify into a separate function</li>
+<li>MEMBEROF: Split the del ghost attribute op into a reusable function</li>
+<li>MEMBEROF: Split the add ghost operation into a separate function</li>
+<li>MEMBEROF: Implement the modify operation for ghost users</li>
+<li>MEMBEROF: Keep inherited ghost users around on modify operation</li>
+<li>RESOLV: return ENOENT if the address list is empty</li>
+<li>Updating the translations for the 1.9.3 release</li>
+</ul>
+<p>Jan Cholasta (3):</p>
+<ul class="simple">
+<li>Use systemd by default on Fedora 16+</li>
+<li>Fix errors reported by rpmlint</li>
+<li>MAN: Move ssh_known_hosts_timeout documentation to the correct
+section</li>
+</ul>
+<p>Michal Zidek (11):</p>
+<ul class="simple">
+<li>sss_cache: Multiple domains not handled properly</li>
+<li>util: Added new file util_lock.c</li>
+<li>sss_cache: Remove fastcache even if sssd is not running.</li>
+<li>util_lock.c: sss_br_lock_file accepted invalid parameter value</li>
+<li>debug: print fatal and critical errors if debug level is unresolved</li>
+<li>sss_cache: Small refactor.</li>
+<li>Uninitialized pointer read</li>
+<li>idmap: Silence DEBUG messages when dealing with built-in SIDs.</li>
+<li>Null pointer dereferenced.</li>
+<li>Dereference after null check in sss_idmap_sid_to_unix</li>
+<li>Missing parameter in DEBUG message.</li>
+</ul>
+<p>Ondrej Kos (4):</p>
+<ul class="simple">
+<li>MAN: sssd-simple - suggest awarness of empty rules</li>
+<li>Display more information on DB version crash</li>
+<li>LDAP: fix uninitialized variable</li>
+<li>SYSDB: Don&#8217;t operate with aliases same as name</li>
+</ul>
+<p>Pavel Březina (23):</p>
+<ul class="simple">
+<li>sudo: do not fail if usn value is zero but full refresh is completed</li>
+<li>sudo refresh: handle errors properly</li>
+<li>authconfig: allow chpass_provider = proxy</li>
+<li>add SSSDBG_IMPORTANT_INFO macro</li>
+<li>fix indendation, coding style and debug levels in server.c</li>
+<li>make monitor_quit() usable outside signal handler</li>
+<li>exit original process after sssd is initialized</li>
+<li>create pid file immediately after fork again</li>
+<li>do not default fullname to gecos when schema = ad</li>
+<li>sss_dp_get_domains_send(): handle subreq error correctly</li>
+<li>subdomains: check request type on one place only</li>
+<li>backend: add PAC to the list of known clients</li>
+<li>sudo: fix missing parameter in two debug messages</li>
+<li>use tmp_ctx in sudosrv_get_sudorules_from_cache()</li>
+<li>sudo: support users from subdomains</li>
+<li>sudo: do not send domain name with username</li>
+<li>sudo: print how many rules we are refreshing or returning</li>
+<li>sudo: store rules with no sudoHost attribute</li>
+<li>fix SIGSEGV in IPA provider when ldap_sasl_authid is not set</li>
+<li>avoid versioning libsss_sudo</li>
+<li>warn user if password is about to expire</li>
+<li>do not crash when id_provider is not set</li>
+<li>sudo: print rule name if notBefore or notAfter attribute is missing</li>
+</ul>
+<p>Simo Sorce (9):</p>
+<ul class="simple">
+<li>Simplify writing db update functions</li>
+<li>Refactor the way subdomain accounts are saved</li>
+<li>Handle conversion to fully qualified usernames</li>
+<li>mmap cache: public functions to invalidate records</li>
+<li>Hook to perform a mmap cache update from sssd_nss</li>
+<li>Hook for mmap cache update on initgroup calls</li>
+<li>Add backchannel NSS provider query on initgr calls</li>
+<li>Always append rctx as private data</li>
+<li>Add memory barrier to mmap cache client code loop</li>
+</ul>
+<p>Stephen Gallagher (9):</p>
+<ul class="simple">
+<li>LDAP: Better debug logging when saving groups</li>
+<li>RPMS: Move sss_cache tool to main package</li>
+<li>Monitor: Better debugging for ping timeouts</li>
+<li>MAN: Specify the correct location for the force_timeout option</li>
+<li>SSSDConfig: Locate the force_timeout option in the correct sections</li>
+<li>MAN: Fix validation error caused by bad &#8216;ca&#8217; translation</li>
+<li>SUDO: Remove unused variable</li>
+<li>BUILD: Temporary workaround for Kerberos build</li>
+<li>IPA: Handle bad results from c-ares lookup</li>
+</ul>
+<p>Sumit Bose (34):</p>
+<ul class="simple">
+<li>Fix two errors in the nss responder</li>
+<li>subdomain-id: Generate homedir only for users not groups</li>
+<li>pac responder: fix copy-and-paste error</li>
+<li>sysdb: look for ranges in the parent tree</li>
+<li>pac responder: use only lower case user name</li>
+<li>pac responder: add user principal and name alias to cached user
+object</li>
+<li>krb5_auth_send: check for sub-domains</li>
+<li>sysdb: add sysdb_base_dn()</li>
+<li>check_ccache_files: search sub-domains as well</li>
+<li>Add replacement for krb5_find_authdata()</li>
+<li>krb5_auth: check if principal belongs to a different realm</li>
+<li>krb5_auth: send different_realm flag to krb5_child</li>
+<li>krb5_child: send PAC to PAC responder</li>
+<li>krb5_mod_ccname: replace wrong memory context</li>
+<li>krb5_child: send back the client principal</li>
+<li>Add new call find_or_guess_upn()</li>
+<li>Use find_or_guess_upn() where needed</li>
+<li>krb5_auth: update with correct UPN if needed</li>
+<li>sss_parse_name_for_domains: always return the canonical domain
+name</li>
+<li>Make sub-domains case-insensitive</li>
+<li>Clarify debug message about initgroups and subdomains</li>
+<li>Do not remove a group if it has members from subdomains</li>
+<li>Add diff_gid_lists() with test</li>
+<li>Add pac_user_get_grp_info() to read current group memberships</li>
+<li>Get lists of GIDs to be added and deleted and use them</li>
+<li>Store the original group DN in the subdomain user object</li>
+<li>Add string_in_list() and add_string_to_list() with tests</li>
+<li>Always start PAC responder if IPA ID provider is configured</li>
+<li>Run IPA subdomain provider if IPA ID provider is configured</li>
+<li>Do not save HBAC rules in subdomain subtree</li>
+<li>Just use the service name with krb5_get_init_creds_password()</li>
+<li>Fix compare_principal_realm() check</li>
+<li>Disable canonicalization during password changes</li>
+<li>KRB5: Work around const warning for krb5 releases older than 1.11</li>
+</ul>
+<p>Timo Aaltonen (1):</p>
+<ul class="simple">
+<li>link sss_ssh_authorizedkeys and sss_ssh_knownhostsproxy with
+-lpthread</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#packaging-changes">Packaging Changes</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.9.3.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.9.3.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

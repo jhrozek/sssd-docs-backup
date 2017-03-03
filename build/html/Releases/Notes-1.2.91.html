@@ -1,0 +1,409 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Rewrote the internal LDB cache API. As a synchronous API it is now
+faster to access and easier to work with</li>
+<li>Eugene Indenbom contributed a sizeable amount of code to the LDAP
+provider<ul>
+<li>We now handle failover situations much more reliably than we did
+previously</li>
+<li>If a request fails partway through (due to a remote server ceasing
+to function) we will now restart the conversation with the next
+server in the failover list</li>
+<li>We also will now monitor the GSSAPI kerberos ticket and
+automatically renew it when appropriate, instead of waiting for a
+connection to fail</li>
+</ul>
+</li>
+<li>Support for netlink now allows us to more quickly detect situations
+where we may have come online</li>
+<li>New option <code class="docutils literal"><span class="pre">dns_discovery_domain</span></code> allows better configuration for
+using SRV records for failover</li>
+</ul>
+</div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Alexander Gordeev (1):</p>
+<ul class="simple">
+<li>Add explicit requests for several operational attrs</li>
+</ul>
+<p>David O&#8217;Brien (1):</p>
+<ul class="simple">
+<li>Copy-edit and format review sssd.conf</li>
+</ul>
+<p>Dmitri Pal (16):</p>
+<ul class="simple">
+<li>Adding metadata interface</li>
+<li>Adding content to the metadata</li>
+<li>Resolve paths for reporting purposes</li>
+<li>Acess control and config change checks</li>
+<li>Add ability to trace 64bit numbers</li>
+<li>Fixing spec file to match version.</li>
+<li>Fixing build</li>
+<li>Code restructuring</li>
+<li>Extending refarray interface</li>
+<li>Introducing a comment object</li>
+<li>Adding support for explicit 32/64 types (attempt 2).</li>
+<li>Addressing initialization issues.</li>
+<li>Fixing types in queue and stack interfaces</li>
+<li>Fixing memory leaks in the unit test.</li>
+<li>Fixing NULL dereferencing in ini_config</li>
+<li>Memory leak in case of empty value</li>
+</ul>
+<p>Héctor Daniel Cabrera (1):</p>
+<ul class="simple">
+<li>Updating ES translation</li>
+</ul>
+<p>Jakub Hrozek (32):</p>
+<ul class="simple">
+<li>Treat server names as case-insensitive in failover code</li>
+<li>Do not mark a request as failed twice</li>
+<li>Sort SRV replies according to RFC 2782</li>
+<li>Remove freed server_common entities from list</li>
+<li>Support SRV servers in failover</li>
+<li>Silence warnings with -O2</li>
+<li>Fix uninitialized variable</li>
+<li>Add a README file</li>
+<li>Use all available servers in LDAP provider</li>
+<li>Improve the offline authentication message</li>
+<li>Fix memory hierarchy in the ipa timerules</li>
+<li>Use service discovery in backends</li>
+<li>SSSDConfigAPI fixes</li>
+<li>Try all servers during Kerberos auth</li>
+<li>Remove dead code from the PAM responder</li>
+<li>Man page fixes</li>
+<li>Don&#8217;t return uninitialized value in proxy provider</li>
+<li>Skip empty attributes with warning</li>
+<li>Fix realm_str dereference</li>
+<li>Fix potential NULL dereference in fail_over.c</li>
+<li>Fix Incorrect NULL check in get_server_common()</li>
+<li>Add missing break to switch statement</li>
+<li>get_uid_from_pid should use fstat rather than lstat</li>
+<li>Remove krb5_changepw_principal option</li>
+<li>Remove the -g option from useradd</li>
+<li>Fix potential resource leak in copy_tree_ctx()</li>
+<li>Potential memory leak in _nss_sss_*_r()</li>
+<li>Check closedir call in find_uid</li>
+<li>Print correct return code</li>
+<li>Resend SIGINT as SIGTERM in services</li>
+<li>Add dns_discovery_domain option</li>
+<li>Use netlink to detect going online</li>
+</ul>
+<p>Petter Reinholdtsen (2):</p>
+<ul class="simple">
+<li>Allow
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Debian/Ubuntu.html">Debian/Ubuntu?</a>
+build to pass &#8211;install-layout=deb to setup.py</li>
+<li>Remove bash-isms from configure macros</li>
+</ul>
+<p>Piotr Drąg (1):</p>
+<ul class="simple">
+<li>Update Polish translation</li>
+</ul>
+<p>Rui Gouveia (2):</p>
+<ul class="simple">
+<li>Updating pt translation</li>
+<li>Update pt translation</li>
+</ul>
+<p>Simo Sorce (45):</p>
+<ul class="simple">
+<li>sysdb: start conversion from async to sync</li>
+<li>sysdb: use sysdb_delete_entry in recursive delete</li>
+<li>sysdb: convert sysdb_delete_custom</li>
+<li>sysdb: convert sysdb_search_entry and sysdb_delete_recursive</li>
+<li>sysdb: convert sysdb_search_user_by_name/uid</li>
+<li>sysdb: convert sysdb_search_group_by_name/gid</li>
+<li>sysdb: convert sysdb_set_entry/user/group_attr</li>
+<li>sysdb: convert sysdb_get_new_id</li>
+<li>sysdb: convert sysdb_store/add(_basic)_user</li>
+<li>sysdb: convert sysdb_store/add(_basic)_group</li>
+<li>sysdb: convert sysdb_mod/add/remove_group_member</li>
+<li>sysdb: convert sysdb_cache_password</li>
+<li>sysdb: convert sysdb_search_custom</li>
+<li>sysdb: convert sysdb_store_custom</li>
+<li>sysdb: convert sysdb_asq_search</li>
+<li>sysdb remove sldb_request_send, not used anymore</li>
+<li>sysdb: convert sysdb_search_users</li>
+<li>sysdb: convert sysdb_delete_user</li>
+<li>sysdb: delete sysdb_delete_group</li>
+<li>sysdb: convert sysdb_search_groups</li>
+<li>sysdb: convert sysdb_cache_auth</li>
+<li>sysdb: remove sysdb_check_handle</li>
+<li>tests: remove use of asynchronus transactions</li>
+<li>sysdb: add synchronous transaction functions</li>
+<li>proxy: complete conversion to synchronous sysdb</li>
+<li>Use the sysdb synchronous transaction functions</li>
+<li>Remove remaining use of sysdb_transaction_send</li>
+<li>sysdb: remove async transactions</li>
+<li>sysdb: add automatic transactions where needed</li>
+<li>sysdb: convert sysdb_getpwnam</li>
+<li>sysdb: convert sysdb_getpwuid</li>
+<li>sysdb: convert sysdb_getgrnam</li>
+<li>sysdb: convert sysdb_getgrgid</li>
+<li>sysdb: convert sysdb_get_user_attr</li>
+<li>sysdb: convert sysdb_enumpwent</li>
+<li>sysdb: convert sysdb_enumgrent</li>
+<li>Adjust fill_pwent and fill_grent</li>
+<li>sysdb: convert sysdb_initgroups</li>
+<li>sysdb: remove obsolete helpers from sysdb</li>
+<li>sysdb: remove remaining traces of sysdb_handle</li>
+<li>sysydb: Finally stop using a common event context</li>
+<li>Make groupshow synchronous.</li>
+<li>tools: remove creation of event_context</li>
+<li>Better handle sdap_handle memory from callers.</li>
+<li>Avoid freeing sdap_handle too early</li>
+</ul>
+<p>Stephen Gallagher (68):</p>
+<ul class="simple">
+<li>Support docdir and abs_builddir</li>
+<li>sysdb: convert sysdb_delete_entry</li>
+<li>Bumping version on master to 1.2.90</li>
+<li>Update translations for master branch</li>
+<li>Fix merge error for sss_userdel.c</li>
+<li>Remove unused configure macro</li>
+<li>Fix warning in sysdb-tests.c</li>
+<li>Fix ini_config unit test</li>
+<li>Give information about ldap_schema in the sample config</li>
+<li>Make ID provider init functions clearer</li>
+<li>Remove the NSS_LIBS and KRB5_LIBS variables from sssd.spec</li>
+<li>Add dns_resolver_timeout option</li>
+<li>Fix segfault in GSSAPI reconnect code</li>
+<li>Make krb5_kpasswd available for any krb5 provider</li>
+<li>Clean up kdcinfo and kpasswdinfo files when exiting</li>
+<li>Add callback when the ID provider switches from offline to online</li>
+<li>Add dynamic DNS updates to FreeIPA</li>
+<li>Revert &#8220;Add dynamic DNS updates to FreeIPA&#8221;</li>
+<li>Properly set up SIGCHLD handlers</li>
+<li>Add dynamic DNS updates to FreeIPA</li>
+<li>Don&#8217;t report a fatal error for an HBAC denial</li>
+<li>Add a better error message for TLS failures</li>
+<li>Add enumerate details to the manpage and examples</li>
+<li>Revert &#8220;Copy pam data from DBus message&#8221;</li>
+<li>Display name of PAM action in pam_print_data()</li>
+<li>Make data provider id_callback public</li>
+<li>Fix error reporting for be_pam_handler</li>
+<li>Proxy provider PAM handling in child process</li>
+<li>Support password changes in chpass_provider = proxy</li>
+<li>Add ldap_access_filter option</li>
+<li>Fix typo in Makefile</li>
+<li>Fix broken build against older versions of OpenLDAP</li>
+<li>Fix typo in Makefile.am</li>
+<li>Disable connection callbacks when going online</li>
+<li>Change default min_id to 1</li>
+<li>Allow ldap_access_filter values wrapped in parentheses</li>
+<li>Properly handle read() and write() throughout the SSSD</li>
+<li>Fix misuse of errno in find_uid.c</li>
+<li>Avoid potential NULL dereference</li>
+<li>Properly handle missing originalMemberOf entry in initgroups</li>
+<li>Don&#8217;t leak directory access resources on errors in directory_list()</li>
+<li>Check the correct variable for NULL after creating timer</li>
+<li>Properly check that the timeout event was created for cleanup/enum</li>
+<li>Check return code of hash_delete in proxy_child_destructor</li>
+<li>Eliminate unused variable from pc_init_timeout()</li>
+<li>Make sure to close varargs before returning from a function</li>
+<li>Properly null-terminate socket path</li>
+<li>Add ldap_force_upper_case_realm to example AD config</li>
+<li>Don&#8217;t segfault if ldap_access_filter is unspecified</li>
+<li>Handle (ignore) unknown options in get_domain() and get_service()</li>
+<li>Remove references to the DP service from the SSSDConfig API tests</li>
+<li>Standardize on correct spelling of &#8220;principal&#8221; for krb5</li>
+<li>Initialize len before looping to read the pidfile</li>
+<li>Ensure that all domains are checked for users/groups</li>
+<li>Refactor the negative cache</li>
+<li>Move setup of filter_users and filter_groups to negcache.c</li>
+<li>Honor filter_users in PAM</li>
+<li>Fix potential resource leak in remove_tree_with_ctx()</li>
+<li>Fix return value from remove_connection_callback() destructor</li>
+<li>Protect against segfault in remove_ldap_connection_callbacks</li>
+<li>Drop release requirement from versions</li>
+<li>Bump libini_config version to 0.6.0</li>
+<li>Replace %define with %global in example spec</li>
+<li>Make RootDSE optional</li>
+<li>Rename proxy_ctx to proxy_id_ctx for clarity</li>
+<li>Split proxy.c into smaller files</li>
+<li>Add try_inotify option</li>
+<li>Release SSSD 1.2.91 (1.3.0rc1)</li>
+</ul>
+<p>Sumit Bose (50):</p>
+<ul class="simple">
+<li>Revert &#8220;Add better checks on PAM socket&#8221;</li>
+<li>Use SO_PEERCRED on the PAM socket</li>
+<li>Set LDAP_OPT_RESTART for all LDAP connections</li>
+<li>Fix a potential memory violation</li>
+<li>Make the handling of fd events opaque</li>
+<li>Unset authentication tokens if password change fails</li>
+<li>Display a message if a password reset by root fails</li>
+<li>Fix wrong return value</li>
+<li>Fix a wrong return value in IPA HBAC</li>
+<li>Split pam_data utilities into a separate file</li>
+<li>Create kdcinfo and kpasswdinfo file at startup</li>
+<li>Compare the full service name</li>
+<li>Add retry option to pam_sss</li>
+<li>Add more warnings about nearly expired passwords</li>
+<li>Make Kerberos authentication a tevent_req</li>
+<li>New version of IPA auth and password migration</li>
+<li>Add ldap_krb5_ticket_lifetime option</li>
+<li>Defer sbus_dispatch() for 30ms during reconnect</li>
+<li>Copy pam data from DBus message</li>
+<li>Do not modify IPA_DOMAIN when setting Kerberos realm</li>
+<li>Handle Krb5 password expiration warning</li>
+<li>Add support for delayed kinit if offline</li>
+<li>Fix handling of ccache file when going offline</li>
+<li>Move parse_args() to util</li>
+<li>Copy pam data from DBus message</li>
+<li>Revert &#8220;Create kdcinfo and kpasswdinfo file at startup&#8221;</li>
+<li>Refactor data provider callbacks</li>
+<li>Add offline callbacks</li>
+<li>Refactor krb5_finalize()</li>
+<li>Add run_callbacks flag</li>
+<li>Add callback to remove krb5 info files when going offline</li>
+<li>Krb5 locator plugin returns KRB5_PLUGIN_NO_HANDLE</li>
+<li>Refactor krb5 SIGTERM handler installation</li>
+<li>Add krb5 SIGTERM handler to ipa auth provider</li>
+<li>Add offline callback to disconnect global SDAP handle</li>
+<li>Reset run_online_cb flag even if there are no callbacks</li>
+<li>Fix check if LDAP id provider is already initialized</li>
+<li>Remove signal event if child was terminated by a signal</li>
+<li>Check ipaEnabledFlag</li>
+<li>Add sysdb_attrs_get_string_array()</li>
+<li>Use sysdb_attrs_get_string_array() instead of
+sysdb_attrs_get_el()</li>
+<li>Use new schema for HBAC service checks</li>
+<li>Remove service groups</li>
+<li>Compare full service name</li>
+<li>Unify sdap and sysdb data handling</li>
+<li>Initialize pam_data in Kerberos child.</li>
+<li>Avoid a potential double-free</li>
+<li>Add a missing initializer</li>
+<li>Add a missing free()</li>
+<li>Fix SASL authentication</li>
+</ul>
+<p>Yuri Chornoivan (1):</p>
+<ul class="simple">
+<li>Update Ukrainian translation</li>
+</ul>
+<p>eindenbom (14):</p>
+<ul class="simple">
+<li>Avoid accessing half-deallocated memory when using talloc_zfree
+macro.</li>
+<li>GSSAPI ticket expiry time is returned from ldap_child and stored in
+sdap_handle for future reference.</li>
+<li>Added an interface to query number of configured (and currently
+resolved through SRV records) failover servers.</li>
+<li>LDAP connection usage tracking, sharing and failover retry framework.</li>
+<li>Add an interface to try next fail-over server after connection to the
+active server was unexpectedly dropped.</li>
+<li>Use new LDAP connection framework to get user account info from LDAP.</li>
+<li>Use new LDAP connection framework to get group account info from
+LDAP.</li>
+<li>Use new LDAP connection framework to get user account groups from
+LDAP.</li>
+<li>Use new LDAP connection framework for LDAP user and group
+enumeration.</li>
+<li>Use new LDAP connection framework in LDAP access backend.</li>
+<li>Use new LDAP connection framework in IPA access backend.</li>
+<li>Use new LDAP connection framework in IPA dynamic DNS forwarder.</li>
+<li>Remove remainder of now unused global LDAP connection handle.</li>
+<li>Eliminate delayed sdap_handle destruction after fail-over retry.</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.2.91.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.2.91.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

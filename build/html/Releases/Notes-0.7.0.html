@@ -1,0 +1,236 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Removed the Data Provider process. All Data Provider backends will
+now speak directly to the responders.</li>
+<li>Remove the MagicPrivateGroups option. This will be an internal
+feature of backends that support it.</li>
+<li>Add first steps towards a native FreeIPA data provider.</li>
+<li>Support password changing in LDAP and Kerberos providers.</li>
+<li>Added Python API for managing SSSD configuration.</li>
+</ul>
+</div>
+<div class="section" id="detailed-changes-since-0-6-0">
+<h1>Detailed changes since 0.6.0<a class="headerlink" href="#detailed-changes-since-0-6-0" title="Permalink to this headline">¶</a></h1>
+<p>Dmitri Pal (10):</p>
+<ul class="simple">
+<li>COLLECTION Adding item comparison and sorting</li>
+<li>COLLECTION Realigning collection code</li>
+<li>COLLECTION Making iterations pinnable</li>
+<li>COLLECTION Enhancing hashing and iteration functions</li>
+<li>ELAPI Event resolver</li>
+<li>ELAPI Resolving message attribute</li>
+<li>ELAPI Fixing warnings in the example</li>
+<li>ELAPI Rename variables and functions not to use word template</li>
+<li>ELAPI Fixed the host name resolution</li>
+<li>ELAPI Compatibility code for getifaddr()</li>
+</ul>
+<p>Jakub Hrozek (3):</p>
+<ul class="simple">
+<li>Fix python sync operations and mem hierarchy</li>
+<li>Fix error messages in tools</li>
+<li>User home directories management</li>
+</ul>
+<p>Martin Nagy (7):</p>
+<ul class="simple">
+<li>Use correct talloc context in sss_names_init()</li>
+<li>Fix potential memory leaks in the data provider</li>
+<li>Resolver: Use talloc_get_type() for type safety</li>
+<li>Use talloc to copy data from c-ares</li>
+<li>Add a new set of helpful common functions for tests</li>
+<li>Various improvements to the resolv test suite</li>
+<li>Delete sssd-i18n.h and put it&#8217;s old contents into util.h</li>
+</ul>
+<p>Piotr Drąg (1):</p>
+<ul class="simple">
+<li>Update polish translation for 0.6.0</li>
+</ul>
+<p>Ralf Haferkamp (2):</p>
+<ul class="simple">
+<li>LDAP provider needs to link against krb libraries</li>
+<li>SUSE specific init script</li>
+</ul>
+<p>Simo Sorce (21):</p>
+<ul class="simple">
+<li>Tighten up permission.</li>
+<li>Initial implementation of sasl bind support</li>
+<li>Fix tools sync operations and mem hierarchy</li>
+<li>Fix long timeout on ldap operation</li>
+<li>Make dp requests more robust</li>
+<li>Differentiate between search and network timeouts</li>
+<li>Remove DP process</li>
+<li>Start responders predictably after providers</li>
+<li>Remove magicPrivateGroups option</li>
+<li>Fix services startup when only LOCAL is configured</li>
+<li>Make options parser available to all providers</li>
+<li>Move ldap provider configuration into its own file</li>
+<li>Fix offline authentication</li>
+<li>Return the dp error from the providers</li>
+<li>Move all ldap provider init functions</li>
+<li>Move all krb5 provider init functions</li>
+<li>Add first basic IPA provider</li>
+<li>Always list inputs before outputs</li>
+<li>Start implementing ipa specific options.</li>
+<li>Better offline/enumeration behavior</li>
+<li>Fix setting the schema in the ipa provider</li>
+</ul>
+<p>Stephen Gallagher (24):</p>
+<ul class="simple">
+<li>Update version to 0.6.0</li>
+<li>Fix infinite loop with empty group enumeration</li>
+<li>Updating release script to use the VERSION file</li>
+<li>Change requirement on libldb to libldb &gt;= 0.9.3</li>
+<li>INI Add config_from_fd() to ini_config</li>
+<li>Remove unused btreemap code</li>
+<li>Add new SSSDConfig python API</li>
+<li>Add plugin configuration schema for proxy provider</li>
+<li>Package SSSDConfig API</li>
+<li>Clean up warnings in pysss.c</li>
+<li>Remove warnings caused by
+<a class="reference external" href="https://fedorahosted.org/sssd/changeset/5e2301b8a75d10e5cbbe11e26e5192b894af6ad7/">5e2301b8a75d10e5cbbe11e26e5192b894af6ad7</a></li>
+<li>Remove two unused functions.</li>
+<li>Fix segfault when using SSS tools with no local provider</li>
+<li>Do not allow setting auth, access or chpass providers for LOCAL</li>
+<li>Add krb5_common.h to the list of headers to &#8216;make dist&#8217;</li>
+<li>Use Python 3-compatible sitearch and sitelib</li>
+<li>Better detect installed language files</li>
+<li>Clean up rpmlint errors and warnings in sssd-client package</li>
+<li>Set the Default-Stop LSB option for the SSSD sysv init script</li>
+<li>Fix RPM builds on older versions of rpmbuild</li>
+<li>Bring SSSDConfig API options up-to-date</li>
+<li>Add pam_ctx (similar to nss_ctx) for storing global PAM config</li>
+<li>Add support for offline auth cache timeout</li>
+<li>Update version to 0.7.0</li>
+</ul>
+<p>Sumit Bose (28):</p>
+<ul class="simple">
+<li>update sysdb tests to new config file version</li>
+<li>add utility call check_and_open_readonly</li>
+<li>more documentation and test for sssd.conf</li>
+<li>handle expired password during authentication</li>
+<li>move password handling into subroutines</li>
+<li>ask for new password if password is expired</li>
+<li>remove redundant talloc_free</li>
+<li>add description of chpass_provider option to sssd.conf man page</li>
+<li>add support for server side LDAP password policies</li>
+<li>add syslog message similar to pam_unix</li>
+<li>use the correct kerberos context for each target</li>
+<li>fix a wrong argument to unpack_buffer</li>
+<li>add -Werror-implicit-function-declaration to default gcc flags</li>
+<li>add a replacement if ldap_control_create is missing</li>
+<li>use PYTHON_PREFIX to install SSSDConfig python API</li>
+<li>add missing %defattr to the filelist of the client package</li>
+<li>make sdap_id_connect_* independent of sdap_id_ctx</li>
+<li>send a message if a backend target is not configured</li>
+<li>use old password if available during password change</li>
+<li>set chpass_provider implicit if not set explicit</li>
+<li>more implicit provider target settings</li>
+<li>enable debugging of krb5_child</li>
+<li>Check for expired passwords in LDAP provider</li>
+<li>added generic LDAP search sdap_get_generic_send/_recv</li>
+<li>add store/search/delete interface for custom sysdb objects</li>
+<li>update krb5 option handling to new option scheme</li>
+<li>update ipa auth options to new option scheme</li>
+<li>fix a compiler warning about redefinition of DEBUG</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#detailed-changes-since-0-6-0">Detailed changes since 0.6.0</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-0.7.0.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-0.7.0.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

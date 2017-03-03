@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#Highlights">Highlights</a><ol class="arabic">
+<li><a class="reference external" href="#NewFeatures">New Features</a></li>
+<li><a class="reference external" href="#ImportantBugfixes">Important Bugfixes</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#DetailedChangelog">Detailed Changelog</a></li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="new-features">
+<h2>New Features<a class="headerlink" href="#new-features" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Support for overriding home directory, shell and primary GID locally</li>
+<li>Properly honor TTL values from SRV record lookups</li>
+<li>Support non-POSIX groups in nested group chains (for RFC2307bis LDAP
+servers)</li>
+</ul>
+</div>
+<div class="section" id="important-bugfixes">
+<h2>Important Bugfixes<a class="headerlink" href="#important-bugfixes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Properly escape IPv6 addresses in the failover code</li>
+<li>Do not crash if inotify fails (e.g. resource exhaustion)</li>
+<li>Don&#8217;t add multiple TGT renewal callbacks (too many log messages)</li>
+</ul>
+</div>
+</div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Jakub Hrozek (15):</p>
+<ul class="simple">
+<li>Add utility function to return IP address as string</li>
+<li>Add a utility function to escape IPv6 address for use in URIs</li>
+<li>Use escaped IP addresses in LDAP provider</li>
+<li>Escape IPv6 IP addresses in the IPA provider</li>
+<li>Add a new option to override primary GID number</li>
+<li>Add a new option to override home directory value</li>
+<li>Add new options to override shell value</li>
+<li>Add new resolv_hostent data structure and utility functions</li>
+<li>Resolve hosts by name from files into resolv_hostent</li>
+<li>Resolve hosts by name from DNS into resolv_hostent</li>
+<li>Switch resolver to using resolv_hostent and honor TTL</li>
+<li>Provide TTL structure names for c-ares &lt; 1.7</li>
+<li>Test NULL server hostname in fail over tests</li>
+<li>Log nsupdate message</li>
+<li>Don&#8217;t pass NULL to printf for TLS errors</li>
+</ul>
+<p>Jan Zeleny (4):</p>
+<ul class="simple">
+<li>Added sysdb_attrs_get_bool() function</li>
+<li>Non-posix group processing - sysdb changes</li>
+<li>Non-posix group processing - ldap provider and nss responder</li>
+<li>Fall back to polling when inotify fails</li>
+</ul>
+<p>Kaushik Banerjee (1):</p>
+<ul class="simple">
+<li>Changing default to Default for consistency</li>
+</ul>
+<p>Stephen Gallagher (6):</p>
+<ul class="simple">
+<li>Update version to 1.5.9</li>
+<li>Fix typo in initgroups negative cache check</li>
+<li>Ensure that SSSD always Requires: the primary-arch sssd-client</li>
+<li>Fix bad merge</li>
+<li>Clear up -Wunused-but-set-variable warnings</li>
+<li>Updating translation files for SSSD 1.5.9</li>
+</ul>
+<p>Sumit Bose (7):</p>
+<ul class="simple">
+<li>Add online callback only once for TGT renewal</li>
+<li>Delete cached ccache file if password is expired</li>
+<li>Do not check pwdAttribute</li>
+<li>Add sockaddr_storage to sdap_service</li>
+<li>Add sdap_call_conn_cb() to call add connection callback directly</li>
+<li>Use name based URI instead of IP address based URIs</li>
+<li>Use ldap_init_fd() instead of ldap_initialize() if available</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a><ul>
+<li><a class="reference internal" href="#new-features">New Features</a></li>
+<li><a class="reference internal" href="#important-bugfixes">Important Bugfixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.5.9.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.5.9.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

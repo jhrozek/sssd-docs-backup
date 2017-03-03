@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Resolve issue where we could enter an infinite loop trying to connect
+to an auth server</li>
+<li>Fix serious issue with complex (3+ levels) nested groups</li>
+<li>Fix netgroup support for case-insensitivity and aliases</li>
+<li>Fix serious issue with lookup bundling resulting in requests never
+completing</li>
+<li>IPA provider will now check the value of nsAccountLock during
+pam_acct_mgmt in addition to pam_authenticate</li>
+<li>Fix several regressions in the proxy provider</li>
+</ul>
+</div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Jakub Hrozek (12):</p>
+<ul class="simple">
+<li>Use proper errno code</li>
+<li>Only do one cycle when resolving a server</li>
+<li>krb5_child: set debugging sooner</li>
+<li>Search netgroups by alias, too</li>
+<li>Detect cycle in the fail over on subsequent resolve requests only</li>
+<li>Autofs: operate on contents of double-pointer, not address</li>
+<li>Only free returned values on success</li>
+<li>Save original name into the in-memory cache</li>
+<li>Handle errors from lookup_netgr_step gracefully</li>
+<li>Fix nested groups processing</li>
+<li>Fix netgroup error handling</li>
+<li>Handle empty elements in proxy netgroups:</li>
+</ul>
+<p>Jan Cholasta (1):</p>
+<ul class="simple">
+<li>Include missing source files to the list of source files which
+contain translatable strings</li>
+</ul>
+<p>Jan Zeleny (5):</p>
+<ul class="simple">
+<li>Fix the script path</li>
+<li>Fixed uninitialized pointer in SSH known host proxy</li>
+<li>Fixed uninitialized pointer in SSH authorized keys client</li>
+<li>Add umask before mkstemp() call in SSH responder</li>
+<li>Fixed resource leak in ssh client code</li>
+</ul>
+<p>Pavel Březina (6):</p>
+<ul class="simple">
+<li>Hide &#8211;debug option in sss_debuglevel</li>
+<li>Two memory leaks in sss_sudo_get_values</li>
+<li>Missing debug message if sdap_sudo_refresh_set_timer fails</li>
+<li>Use of unininitialized value in sudosrv_cache_set_entry and
+sudosrv_cache_lookup_internal</li>
+<li>Use of unininitialized value in sss_sudo_parse_response</li>
+<li>Potential NULL-dereference in sudosrv_cmd_get_sudorules</li>
+</ul>
+<p>Simo Sorce (1):</p>
+<ul class="simple">
+<li>Use the correct hash table for pending requests</li>
+</ul>
+<p>Stephen Gallagher (20):</p>
+<ul class="simple">
+<li>Bump version to 1.8.1</li>
+<li>Fix typo in autofs option description</li>
+<li>Include the debug_level upgrade tool in the tarball</li>
+<li>Include new manpages in translations</li>
+<li>Updating translations for SSSD 1.8.1</li>
+<li>Fix typo in script name</li>
+<li>Handle cases where UID is -1</li>
+<li>IPA: Set the DNS discovery domain to match ipa_domain</li>
+<li>IPA: Fix segfault with srchost functionality enabled</li>
+<li>DP: Reorganize memory hierarchy of requests</li>
+<li>Prune python provides correctly</li>
+<li>Make RPM spec more explicit</li>
+<li>Build experimental features by default in RPMs</li>
+<li>Properly terminate GIT_CHECKOUT</li>
+<li>LDAP: Make sdap_access_send/recv public</li>
+<li>IPA: Check nsAccountLock during PAM_ACCT_MGMT</li>
+<li>PROXY: Create fake user entries for group lookups</li>
+<li>SSH: Fix missing semicolon</li>
+<li>IPA: Initialize hbac_ctx to NULL</li>
+<li>i18n: Remove empty translations</li>
+</ul>
+<p>Yuri Chornoivan (1):</p>
+<ul class="simple">
+<li>fix typos in manual</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.8.1.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.8.1.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

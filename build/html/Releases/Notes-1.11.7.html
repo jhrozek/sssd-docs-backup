@@ -1,0 +1,338 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>This release focuses on delivering bug fixes and smaller features
+backported from the 1.12 line</li>
+<li>Several fixes related to retrieving the correct group memberships in
+the AD provider configured to use POSIX attributes were fixed.</li>
+<li>The Active Directory provider now correctly detects Windows Server
+2012 R2. Previous versions would fall back to the slower non-AD path
+with 2012 R2.</li>
+<li>Groups without full POSIX information can now be used to enroll group
+membership (fixes
+<a class="reference external" href="http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2014-0249">​CVE-2014-0249</a>)</li>
+<li>Detection of transition from offline to online state was improved,
+resulting in fewer timeouts when SSSD is offline.</li>
+<li>If referrals are disabled with a config option (or by default in the
+AD provider), any returned referral would be ignored. Previously, the
+back end would switch to offline mode on encountering a referral.</li>
+</ul>
+</div>
+<div class="section" id="documentation-changes">
+<h1>Documentation Changes<a class="headerlink" href="#documentation-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>A new option override_space was added. When this option is set, a
+space character in user or group names is replaced by the character
+specified in this option</li>
+<li>A small random value is now added to the offline_timeout parameter
+value to avoid flooding servers with periodical online checks</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/1854">#1854</a></dt>
+<dd>[RFE] Add option for sssd to replace space with specified character
+in LDAP group</dd>
+<dt><a class="reference external" href="/sssd/ticket/2212">#2212</a></dt>
+<dd>[RFE] Add fallback to sudoRunAs when sudoRunAsUser is not defined
+and no ldap_sudorule_runasuser mapping has been defined in SSSD</dd>
+<dt><a class="reference external" href="/sssd/ticket/2323">#2323</a></dt>
+<dd>Expired shadow policy user(shadowLastChange=0) is not prompted for
+password change</dd>
+<dt><a class="reference external" href="/sssd/ticket/2343">#2343</a></dt>
+<dd>CVE-2014-0249 sssd: incorrect expansion of group membership when
+encountering a non-POSIX group [fedora-all]</dd>
+<dt><a class="reference external" href="/sssd/ticket/2345">#2345</a></dt>
+<dd>tokengroups do not work with id_provider=ldap</dd>
+<dt><a class="reference external" href="/sssd/ticket/2349">#2349</a></dt>
+<dd>public key validator is too strict and does not allow newlines
+anywhere in the public key string, not even at the end</dd>
+<dt><a class="reference external" href="/sssd/ticket/2355">#2355</a></dt>
+<dd>Requests queued during transition from offline to online mode</dd>
+<dt><a class="reference external" href="/sssd/ticket/2360">#2360</a></dt>
+<dd>The SSSD dbus service should retry system bus connection if it fails</dd>
+<dt><a class="reference external" href="/sssd/ticket/2364">#2364</a></dt>
+<dd>RFE: Be able to configure sssd to honor openldap account lock to
+restrict access via ssh key</dd>
+<dt><a class="reference external" href="/sssd/ticket/2377">#2377</a></dt>
+<dd>sudo: invalid sudoHost filter with asterisk</dd>
+<dt><a class="reference external" href="/sssd/ticket/2380">#2380</a></dt>
+<dd>Race condition in the client code</dd>
+<dt><a class="reference external" href="/sssd/ticket/2383">#2383</a></dt>
+<dd>dereferencing control failure against openldap server</dd>
+<dt><a class="reference external" href="/sssd/ticket/2385">#2385</a></dt>
+<dd>ad: group membership is empty when id mapping is off and tokengroups
+are enabled</dd>
+<dt><a class="reference external" href="/sssd/ticket/2389">#2389</a></dt>
+<dd>Problems with tokengroups and ldap_group_search_base</dd>
+<dt><a class="reference external" href="/sssd/ticket/2390">#2390</a></dt>
+<dd>Failover does not always happen from SRV to hostname resolution(via
+/etc/hosts)</dd>
+<dt><a class="reference external" href="/sssd/ticket/2391">#2391</a></dt>
+<dd>sssd_be segfaults in ldb_msg_find_element</dd>
+<dt><a class="reference external" href="/sssd/ticket/2397">#2397</a></dt>
+<dd>Auth fails when space in username is replaced with character set by
+override_default_whitespace</dd>
+<dt><a class="reference external" href="/sssd/ticket/2399">#2399</a></dt>
+<dd>RHEL6.6 sssd not running after upgrade</dd>
+<dt><a class="reference external" href="/sssd/ticket/2400">#2400</a></dt>
+<dd>sssd can&#8217;t retrieve sudo rules when using the
+&#8220;default_domain_suffix&#8221; option</dd>
+<dt><a class="reference external" href="/sssd/ticket/2401">#2401</a></dt>
+<dd>clarify the offline timeout in man page</dd>
+<dt><a class="reference external" href="/sssd/ticket/2402">#2402</a></dt>
+<dd>IFP: FQDN lookups are broken</dd>
+<dt><a class="reference external" href="/sssd/ticket/2405">#2405</a></dt>
+<dd>use-after-free in dyndns code</dd>
+<dt><a class="reference external" href="/sssd/ticket/2406">#2406</a></dt>
+<dd>Saving group membership fails if provider is AD, POSIX attributes
+are used and primary group contains the user as a member</dd>
+<dt><a class="reference external" href="/sssd/ticket/2407">#2407</a></dt>
+<dd>simple_allow_groups does not lookup groups from other AD domains</dd>
+<dt><a class="reference external" href="/sssd/ticket/2409">#2409</a></dt>
+<dd>On error, libnss_sss can mistakenly close descriptors it doesn&#8217;t
+&#8220;own&#8221;</dd>
+<dt><a class="reference external" href="/sssd/ticket/2410">#2410</a></dt>
+<dd>Race condition between sudo refresh</dd>
+<dt><a class="reference external" href="/sssd/ticket/2418">#2418</a></dt>
+<dd>sssd does not recognize Windows server 2012 R2&#8217;s LDAP as AD</dd>
+<dt><a class="reference external" href="/sssd/ticket/2421">#2421</a></dt>
+<dd>Dereference code errors out when dereferencing entries protected by
+ACIs</dd>
+<dt><a class="reference external" href="/sssd/ticket/2436">#2436</a></dt>
+<dd>ipa user private group not found</dd>
+</dl>
+</div></div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Ian Lee (1):</p>
+<ul class="simple">
+<li>Add user lookup and session dependencies to systemd service file.</li>
+</ul>
+<p>Jakub Hrozek (32):</p>
+<ul class="simple">
+<li>Updating the version for the 1.11.7 release</li>
+<li>BUILD: dbusintrospectdir is not used anymore</li>
+<li>IFP: Fix DEBUG messages</li>
+<li>IFP: Return a specific value on failure connecting to the system bus</li>
+<li>IFP: Provide a SBUS method to reconnect to sysbus</li>
+<li>MONITOR: Signal
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InfoPipe.html">InfoPipe?</a> to
+reconnect on SIGUSR2</li>
+<li>TOOLS: New helper tool sss_signal</li>
+<li>BUILD: Add the DBus service activation</li>
+<li>IFP: Fix lookups with fully-qualified names</li>
+<li>RPM: Restart service in %posttrans, not %post</li>
+<li>NSS: Ignore default_domain for netgroups</li>
+<li>Only replace space with the specified substitution</li>
+<li>Make the space override responder-agnostic</li>
+<li>PAM: Use the override_space option</li>
+<li>IFP: Use the override_space option</li>
+<li>SUDO: Use the override_space option</li>
+<li>IPA: handle searches by SID in apply_subdomain_homedir</li>
+<li>Revert &#8220;IPA: new attribute map for non-posix groups&#8221;</li>
+<li>Revert &#8220;IPA: process non-posix nested groups&#8221;</li>
+<li>Revert &#8220;IPA: try to resolve nested groups as poxix group&#8221;</li>
+<li>LDAP: Do not shortcut on ret != EOK during password expiry check</li>
+<li>LDAP: Split out linking primary group members into a separate
+function</li>
+<li>LDAP: Don&#8217;t add a user member twice when adding a primary group</li>
+<li>LDAP: Use tmp_ctx in ldap_child for temporary data</li>
+<li>LDAP: Use randomized ccname for storing credentials</li>
+<li>LDAP: Add Windows Server 2012 R2 functional level</li>
+<li>LDAP: Fall back to functional level of Windows Server 2003</li>
+<li>LDAP: Enable tokenGroups with Windows Server 2003</li>
+<li>LDAP: Ignore returned referrals if referral support is disabled</li>
+<li>LDAP: Skip dereferenced entries that we are not permitted to read</li>
+<li>Ignore referrals in deref and ASQ, too</li>
+<li>Updating the translations for the 1.11.7 release</li>
+</ul>
+<p>Jan Cholasta (1):</p>
+<ul class="simple">
+<li>SSH: Allow newline at the end of public key values in LDAP</li>
+</ul>
+<p>Lukas Slebodnik (19):</p>
+<ul class="simple">
+<li>Don&#8217;t use macro _XOPEN_SOURCE for function strptime</li>
+<li>sss_client: thread safe initialisation of sss_cli_mc_ctx</li>
+<li>sss_client: Fix memory leak in nss_mc_{group,passwd}</li>
+<li>LDAP: Remove unused option ldap_netgroup_uuid</li>
+<li>LDAP: Remove unused option ldap_group_uuid</li>
+<li>LDAP: Remove unused option ldap_user_uuid</li>
+<li>test_utils: Use common header file for libsss_util tests.</li>
+<li>UTIL: Add functions for replacing whitespaces.</li>
+<li>NSS: Replace spaces with specified string in names.</li>
+<li>dyndns_test: Use right socket length of for IPv4 address.</li>
+<li>responder-get-domains-tests: fix checking of leaks</li>
+<li>test_dyndns: Use different talloc context in wrapped functions.</li>
+<li>TESTS: leak_check functions shouldn&#8217;t be called with NULL context</li>
+<li>dyndns: Fix talloc hierarchy of &#8220;struct sss_iface_addr&#8221;</li>
+<li>test_dyndns: sss_iface_addr_list_get can return more values</li>
+<li>SDAP: free subrequest in sdap_dyndns_update_addrs_done</li>
+<li>SDAP: Immediately finish request for empty array</li>
+<li>SDAP: Use different talloc_context for array of names</li>
+<li>SDAP: Update groups for user just once.</li>
+</ul>
+<p>Michal Zidek (6):</p>
+<ul class="simple">
+<li>ptask: Allow adding random_offset to scheduled execution time</li>
+<li>ptask: Add backoff feature to the ptask api.</li>
+<li>Exit offline mode only if server is available.</li>
+<li>MAN: How much time sssd spends offline</li>
+<li>Add alternative objectClass to group attribute maps</li>
+<li>Use the alternative objectclass in group maps.</li>
+</ul>
+<p>Michal Šrubař (1):</p>
+<ul class="simple">
+<li>LDAP SUDO: sudo provider doesn&#8217;t fetch &#8216;EntryUSN&#8217;</li>
+</ul>
+<p>Nalin Dahyabhai (1):</p>
+<ul class="simple">
+<li>sss_client: Fix &#8220;struct sss_cli_mc_ctx&#8221; reinitialize-on-errors</li>
+</ul>
+<p>Nikolai Kondrashov (1):</p>
+<ul class="simple">
+<li>build: Switch back to DISTCHECK_CONFIGURE_FLAGS</li>
+</ul>
+<p>Pavel Březina (9):</p>
+<ul class="simple">
+<li>sbus_request: fix potential NULL dereference</li>
+<li>ad: comment ENOENT when id mapping is disabled</li>
+<li>ad: update membership after SIDs are resolved</li>
+<li>sudo: fetch sudoRunAs attribute</li>
+<li>sudo: use dbus array for rules refresh</li>
+<li>sudo: replace asterisk with escape sequence in host filter</li>
+<li>failover: set port status to not working if previous srv lookup
+failed</li>
+<li>ad initgroups: continue if resolved SID is still missing</li>
+<li>sudo: work with correct D-Bus iterator</li>
+</ul>
+<p>Pavel Reichl (18):</p>
+<ul class="simple">
+<li>TESTS: sss_ssh - textual public key format</li>
+<li>LDAP: tokengroups do not work with id_provider=ldap</li>
+<li>SDAP: Continue resolving SID even if some fail</li>
+<li>IPA: new attribute map for non-posix groups</li>
+<li>IPA: process non-posix nested groups</li>
+<li>IPA: try to resolve nested groups as poxix group</li>
+<li>SDAP: split sdap_access_filter_get_access_done</li>
+<li>SDAP: refactor sdap_access_filter_send</li>
+<li>SDAP: nitpicks in sdap_access_filter_get_access_done</li>
+<li>SDAP: refactor sdap_access_filter_done</li>
+<li>SDAP: don&#8217;t log error on access denied</li>
+<li>SDAP: refactor AC offline checks</li>
+<li>SDAP: new option - DN to ppolicy on LDAP</li>
+<li>SDAP: account lockout to restrict access via ssh key</li>
+<li>MAN: options &#8216;lockout&#8217; and &#8216;ldap_pwdlockout_dn&#8217;</li>
+<li>IPA: process non-posix nested groups</li>
+<li>AD: process non-posix nested groups w/o tokenGroups</li>
+<li>AD: process non-posix nested groups using tokenGroups</li>
+</ul>
+<p>Sumit Bose (1):</p>
+<ul class="simple">
+<li>Replace space: add some checks</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#documentation-changes">Documentation Changes</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.11.7.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.11.7.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,297 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>class SSSDService &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><a class="reference external" href="#classSSSDService">class SSSDService</a><ol class="arabic">
+<li><code class="docutils literal"><span class="pre">`__init__(name,</span> <span class="pre">apischema)</span></code> &lt;#__init__nameapischema&gt;`__<ol class="arabic">
+<li><a class="reference external" href="#Returns">Returns</a></li>
+<li><a class="reference external" href="#Errors">Errors</a></li>
+</ol>
+</li>
+<li><code class="docutils literal"><span class="pre">`list_options()</span></code> &lt;#list_options&gt;`__<ol class="arabic">
+<li><a class="reference external" href="#Returns1">Returns</a></li>
+<li><a class="reference external" href="#Errors1">Errors</a></li>
+</ol>
+</li>
+<li><code class="docutils literal"><span class="pre">`set_option(optionname,</span> <span class="pre">value)</span></code> &lt;#set_optionoptionnamevalue&gt;`__<ol class="arabic">
+<li><a class="reference external" href="#Returns2">Returns</a></li>
+<li><a class="reference external" href="#Errors2">Errors</a></li>
+</ol>
+</li>
+<li><code class="docutils literal"><span class="pre">`get_option(optionname)</span></code> &lt;#get_optionoptionname&gt;`__<ol class="arabic">
+<li><a class="reference external" href="#Returns3">Returns</a></li>
+<li><a class="reference external" href="#Errors3">Errors</a></li>
+</ol>
+</li>
+<li><code class="docutils literal"><span class="pre">`get_all_options()</span></code> &lt;#get_all_options&gt;`__<ol class="arabic">
+<li><a class="reference external" href="#Returns4">Returns</a></li>
+<li><a class="reference external" href="#Errors4">Errors</a></li>
+</ol>
+</li>
+<li><code class="docutils literal"><span class="pre">`remove_option(optionname)</span></code> &lt;#remove_optionoptionname&gt;`__<ol class="arabic">
+<li><a class="reference external" href="#Returns5">Returns</a></li>
+<li><a class="reference external" href="#Errors5">Errors</a></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="class-sssdservice">
+<h1>class SSSDService<a class="headerlink" href="#class-sssdservice" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="init-name-apischema">
+<h2><code class="docutils literal"><span class="pre">__init__(name,</span> <span class="pre">apischema)</span></code><a class="headerlink" href="#init-name-apischema" title="Permalink to this headline">¶</a></h2>
+<p><em>Create a new
+`SSSDService &lt;https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDService.html#classSSSDService&gt;`__,
+setting its defaults to those found in the scema. This constructor
+should not be used directly. Use
+`SSSDConfig.new_service() &lt;https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#new_servicename&gt;`__
+instead.</em></p>
+<dl class="docutils">
+<dt><strong>name</strong></dt>
+<dd>The service name</dd>
+<dt><strong>apischema</strong></dt>
+<dd>An
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfigSchema.html">SSSDConfigSchema?</a>
+object created by
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#__init__schemafileschemaplugindir">SSSDConfig.__init__()</a></dd>
+</dl>
+<div class="section" id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Permalink to this headline">¶</a></h3>
+<p>The newly-created
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDService.html#classSSSDService">SSSDService</a>
+object.</p>
+</div>
+<div class="section" id="errors">
+<h3>Errors<a class="headerlink" href="#errors" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>TypeError</strong></dt>
+<dd>The API schema passed in was unusable or the name was not a string.</dd>
+<dt><strong>ServiceNotRecognizedError</strong></dt>
+<dd>The service was not listed in the schema</dd>
+</dl>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="list-options">
+<h2><code class="docutils literal"><span class="pre">list_options()</span></code><a class="headerlink" href="#list-options" title="Permalink to this headline">¶</a></h2>
+<p><em>List all options that apply to this service</em></p>
+<div class="section" id="id1">
+<h3>Returns<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>A dictionary of configurable options. This dictionary is keyed on the
+option name with a tuple of the variable type and subtype (if the type
+is a collection type) as the value.</p>
+</div>
+<div class="section" id="id2">
+<h3>Errors<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">No Errors</div>
+</div>
+</div>
+</div>
+<div class="section" id="set-option-optionname-value">
+<h2><code class="docutils literal"><span class="pre">set_option(optionname,</span> <span class="pre">value)</span></code><a class="headerlink" href="#set-option-optionname-value" title="Permalink to this headline">¶</a></h2>
+<p><em>Set a service option to the specified value (or values)</em></p>
+<dl class="docutils">
+<dt><strong>optionname</strong></dt>
+<dd>The option to change</dd>
+<dt><strong>value</strong></dt>
+<dd>The value to set. This may be a single value or a list of values. If
+it is set to None, it resets the option to its default.</dd>
+</dl>
+<div class="section" id="id3">
+<h3>Returns<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>No return value</p>
+</div>
+<div class="section" id="id4">
+<h3>Errors<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>NoOptionError</strong></dt>
+<dd>The specified option is not listed in the schema</dd>
+<dt><strong>TypeError</strong></dt>
+<dd>The value specified was not of the expected type</dd>
+</dl>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="get-option-optionname">
+<h2><code class="docutils literal"><span class="pre">get_option(optionname)</span></code><a class="headerlink" href="#get-option-optionname" title="Permalink to this headline">¶</a></h2>
+<p><em>Return the value of a service option</em></p>
+<dl class="docutils">
+<dt><strong>optionname</strong></dt>
+<dd>The option to get.</dd>
+</dl>
+<div class="section" id="id5">
+<h3>Returns<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>The value for the requested option.</p>
+</div>
+<div class="section" id="id6">
+<h3>Errors<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>NoOptionError</strong></dt>
+<dd>The specified option was not listed in the service</dd>
+</dl>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="get-all-options">
+<h2><code class="docutils literal"><span class="pre">get_all_options()</span></code><a class="headerlink" href="#get-all-options" title="Permalink to this headline">¶</a></h2>
+<p><em>Return a dictionary of name/value pairs for this service</em></p>
+<div class="section" id="id7">
+<h3>Returns<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<p>A dictionary of name/value pairs currently in use for this service</p>
+</div>
+<div class="section" id="id8">
+<h3>Errors<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="remove-option-optionname">
+<h2><code class="docutils literal"><span class="pre">remove_option(optionname)</span></code><a class="headerlink" href="#remove-option-optionname" title="Permalink to this headline">¶</a></h2>
+<p><em>Remove an option from the service. If the option does not exist, it is
+ignored.</em></p>
+<div class="section" id="id9">
+<h3>Returns<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<p>No return value.</p>
+</div>
+<div class="section" id="id10">
+<h3>Errors<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<p>No errors</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">class SSSDService</a><ul>
+<li><a class="reference internal" href="#init-name-apischema"><code class="docutils literal"><span class="pre">__init__(name,</span> <span class="pre">apischema)</span></code></a><ul>
+<li><a class="reference internal" href="#returns">Returns</a></li>
+<li><a class="reference internal" href="#errors">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#list-options"><code class="docutils literal"><span class="pre">list_options()</span></code></a><ul>
+<li><a class="reference internal" href="#id1">Returns</a></li>
+<li><a class="reference internal" href="#id2">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#set-option-optionname-value"><code class="docutils literal"><span class="pre">set_option(optionname,</span> <span class="pre">value)</span></code></a><ul>
+<li><a class="reference internal" href="#id3">Returns</a></li>
+<li><a class="reference internal" href="#id4">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#get-option-optionname"><code class="docutils literal"><span class="pre">get_option(optionname)</span></code></a><ul>
+<li><a class="reference internal" href="#id5">Returns</a></li>
+<li><a class="reference internal" href="#id6">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#get-all-options"><code class="docutils literal"><span class="pre">get_all_options()</span></code></a><ul>
+<li><a class="reference internal" href="#id7">Returns</a></li>
+<li><a class="reference internal" href="#id8">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#remove-option-optionname"><code class="docutils literal"><span class="pre">remove_option(optionname)</span></code></a><ul>
+<li><a class="reference internal" href="#id9">Returns</a></li>
+<li><a class="reference internal" href="#id10">Errors</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/SSSDPythonConfigApi/SSSDService.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/SSSDPythonConfigApi/SSSDService.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
