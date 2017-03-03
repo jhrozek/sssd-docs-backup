@@ -1,0 +1,710 @@
+Matching and Mapping Certificates {#MatchingandMappingCertificates}
+=================================
+
+Related ticket(s):
+
+-   [[​]{.icon}http://www.freeipa.org/page/V4/User\_Certificates\#Certificate\_Identity\_Mapping](http://www.freeipa.org/page/V4/User_Certificates#Certificate_Identity_Mapping){.ext-link}
+
+### Problem statement {#Problemstatement}
+
+#### Mapping {#Mapping}
+
+Currently it is required that a certificate used for authentication is
+either stored in the LDAP user entry or in a matching override. This
+might not always be applicable and other ways are needed to relate a
+user with a certificate.
+
+#### Matching {#Matching}
+
+Even if SSSD will support multiple certificates on a Smartcard in the
+context of
+[[​]{.icon}https://fedorahosted.org/sssd/ticket/3050](https://fedorahosted.org/sssd/ticket/3050){.ext-link}
+it might be necessary to restrict (or relax) the current certificate
+selection in certain environments.
+
+### Use cases {#Usecases}
+
+#### Mapping {#Mapping1}
+
+In some environments it might not be possible or would cause unwanted
+effort to add certificates to the LDAP entry of the users to allow
+Smartcard based authentication. Reasons might be:
+
+-   [Certificates/Smartcards?](https://docs.pagure.org/sssd-test2/Certificates/Smartcards.html){.missing
+    .wiki} are issued externally
+-   LDAP schema extension is not possible or not allowed
+
+#### Matching {#Matching1}
+
+A user might have multiple certificate on a Smartcard which are suitable
+for authentication. But on some host in the environment only
+certificates from a specific CA (while all other CAs are trusted as
+well) or with some special extension should be valid for login.
+
+### Overview of the solution {#Overviewofthesolution}
+
+To match a certificate a language/syntax has to be defined which allows
+to reference items from the certificate and compare the values with the
+expected data. To map the certificates to a user the language/syntax
+should allow to relate certificate items with LDAP attributes so that
+the value(s) from the certificate item can be used in a LDAP search
+filter.
+
+### Implementation details {#Implementationdetails}
+
+Since certificates form different CAs (i.e. a different issuer) might
+have different properties and might be used in different domains mapping
+rules cannot be applied unconditionally but only to "matching"
+certificates. On the other hand it is not sufficient to know that a
+certificate is valid for authentication if it cannot be determine which
+users should be authenticated. This illustrates that mapping and
+matching rules should be used together.
+
+Besides the two rules there are two additional optional items to improve
+mapping and matching. Mapping rules should be accompanied by a domain
+list which contains a list of DNS domain names in which the user should
+be searched. This will help to speed up searches and to avoid to leak
+information to unrelated (but trusted) domains. In a complex environment
+with many trusted domains a certificate might be assigned to any user.
+And since it might be possible that the certificate is assigned to
+multiple users searching cannot be stop after one matching user was
+found. This means that without a domain list every single trusted domain
+has to be checked. If the domain list a missing the default should be to
+only search the local domain.
+
+If certificates from many different issuers are used in an environment
+might might be useful to have a matching rules which defines the minimal
+requirements at a certificate. This rule will of courses not restrict
+the issuer but will match all issuers. On the other hand there might be
+issuers where the certificates needs special attention and more than the
+minimal requirement are needed. To make sure that for this issuer there
+is no fallback to the catch-all rules an extra issuer attribute would
+make sure that for the given issuer only those rules will be applied and
+there is no fallback to other rules.
+
+As a result there four item which build certificate authentication rule,
+the mapping and matching rule, a domain list and the issuer. All items
+are optional. If there is no rule at all the current behavior is used as
+default.
+
+Coming use-case might require and extension of the current mapping and
+matching rule or a completely different syntax is needed to cover a use
+case. To make it possible to add new rule styles there should be a tag
+prefix to indicate what style is expected to follow. For the tag I would
+suggest a strings of upper-case ASCII characters (A(0x41)-Z(0x5a) and
+numbers (0(0x30)-9(0x39) with a trailing colon (:(0x3a)). E.g. 'KRB5:',
+'RFC4523:', 'LDAP:'.
+
+SSSD will provide a library which will consume the rules to generate
+LDAP search filters for its own usages to server matching users on
+remote LDAP servers or in the local cache. Additionally it will provide
+an interface to check if a given user object will match according to the
+rules which can be use by the PKINIT matching plugin. To most suitable
+representation for the user object (LDAPMessage, krb5\_db\_entry or
+something else) must still be determined. To initialize the library a
+list of LDAPMessage objects can be passed to an initialization function
+which will return an opaque context.
+
+#### Matching {#Matching2}
+
+The pkinit plugin of MIT Kerberos must find a suitable certificate from
+a Smartcard as well and has defined the following syntax (see the
+pkinit\_cert\_match section of the krb5.conf man page or
+[[​]{.icon}http://web.mit.edu/Kerberos/krb5-1.14/doc/admin/conf\_files/krb5\_conf.html](http://web.mit.edu/Kerberos/krb5-1.14/doc/admin/conf_files/krb5_conf.html){.ext-link}
+for details). The main components are
+
+-   &lt;SUBJECT&gt;regular-expression
+-   &lt;ISSUER&gt;regular-expression
+-   &lt;SAN&gt;regular-expression
+-   &lt;EKU&gt;extended-key-usage-list
+-   &lt;KU&gt;key-usage-list
+
+and can be grouped together with a prefixed '&&' (and) or '`||`' (or)
+operator ('&&' is the default). If multiple rules are given they are
+iterated with the order in the config file as long as a rule matches
+exactly one certificate.
+
+**Question: MIT Kerberos use case-sensitive matching and POSIX Extended
+Regular Expression syntax, shall we do the same?**
+
+While &lt;SUBJECT&gt; and &lt;ISSUER&gt; are (imo) already quite
+flexible I can see some potential extensions for the other components.
+
+&lt;EKU&gt; and &lt;KU&gt; in MIT Kerberos only accept certain string
+values related to some allowed values in those field as defined in
+[[​]{.icon}https://www.ietf.org/rfc/rfc3280.txt](https://www.ietf.org/rfc/rfc3280.txt){.ext-link}
+. The selection is basically determined by what is supported on server
+side of the pkinit plugin of MIT Kerberos. Since we plan to extend
+pkinit and support local authentication without pkinit as well I would
+suggest to allow OID strings for those components as well (the
+comparison is done on the OID level nonetheless).
+
+The &lt;SAN&gt; component in MIT Kerberos only checks the otherName SAN
+component for the id-pkinit-san OID as defined in
+[[​]{.icon}https://www.ietf.org/rfc/rfc4556.txt](https://www.ietf.org/rfc/rfc4556.txt){.ext-link}
+or the szOID\_NT\_PRINCIPAL\_NAME OID as mentioned in
+[[​]{.icon}https://support.microsoft.com/en-us/kb/287547](https://support.microsoft.com/en-us/kb/287547){.ext-link}.
+While this is sufficient for the default pkinit user case of MIT
+Kerberos I would suggest to extend this component by allowing to
+specific an OID with &lt;SAN:O.I.D&gt;
+
+The prefix tag for this type of matching rules would be 'KRB5:' and I
+would suggest to take this a default, i.e. if the prefix tag is missing
+'KRB5:' will be assumed.
+
+#### Matching - alternative RFC4523 syntax {#Matching-alternativeRFC4523syntax}
+
+Based on the X.509
+[CertificateAssertion?](https://docs.pagure.org/sssd-test2/CertificateAssertion.html){.missing
+.wiki} syntax
+[[​]{.icon}RFC4523](https://www.ietf.org/rfc/rfc4523.txt){.ext-link}
+introduces Generic String Encoding Rules (GSER)-based
+([[​]{.icon}RFC3641](https://www.ietf.org/rfc/rfc3641.txt){.ext-link}
+and
+[[​]{.icon}RFC3642](https://www.ietf.org/rfc/rfc3642.txt){.ext-link})
+syntax to write
+[CertificateAssertions?](https://docs.pagure.org/sssd-test2/CertificateAssertions.html){.missing
+.wiki} which can be used to match certificates as well.
+
+A matching rule for an issuer would look like
+
+``` {.wiki}
+{ issuer "cn=CA,dc=example,dc=com" }
+```
+
+There is an identifier for keyUsage as well
+
+``` {.wiki}
+{ issuer "cn=CA,dc=example,dc=com" , keyUsage { digitalSignature , keyEncipherment } }
+```
+
+but it looks like there is none specific for the extendedKeyUsage which
+is important to separate certificate eg. for email signing and for login
+purposes. I think even nameConstraints cannot be use here because
+according to X.509 "nameConstraints matches if the subject names ..."
+which only include the subject and the subject alternative names (please
+let me know if there is a standardized way to add assertions for
+extensions like the extendedKeyUsage).
+
+Besides extendedKeyUsage there are other components in the certificate
+where we want to add matching rules in the future which are currently
+not handled by RFC4523. E.g. 'Authority Information Access' (see
+[[​]{.icon}RFC5280 section
+4.2.2.1](https://tools.ietf.org/rfc/rfc5280.txt){.ext-link} where
+information about CRLs or OCSP responders are stored. With this we would
+be able to only select certificates which have an OCSP responder defined
+or where we known that the CRL is updated regularly.
+
+Although it would be possible to add new assertion for our usage
+seamlessly I think it would not be a good idea to do this without making
+sure that they will be added to any new versions of RFC4523. I currently
+have no idea how easy or hard this would be and how this would limit our
+flexibility to react on request from users and customers.
+
+To restrict the matching not only to a single certificate but to a group
+of certificates based on the subject (owner) name constraints as defined
+in [[​]{.icon}RFC3280 section
+4.2.1.11](https://tools.ietf.org/html/rfc3280.html#section-4.2.1.11){.ext-link}
+can be used. The constraints are applied to the subject name and subject
+alternative names attributes in the certificate and consist of a list of
+allowed names (permittedSubtrees) and rejected names (excludedSubtrees).
+For directory names (the subject name and the related SAN attribute) an
+area in the directory tree can be specified where the names should
+match. E.g. to match all subject names from the 'research' department
+but not from sub-departments of 'research'
+
+``` {.wiki}
+{ permittedSubtrees { ( base "CN=research,DC=example,DC=com" , minimum 1, maximum 1 ) } }
+```
+
+can be used. To allow everything but the 'no\_access' subtree
+
+``` {.wiki}
+{ excludedSubtrees { ( base "CN=no_access,DC=example,DC=com" ) } }
+```
+
+can be used, 'minimum' and 'maximum' are not needed here because the
+default for 'minimum' is '0' and a missing 'maximum' specifies the whole
+subtree.
+
+Compared the regular-expressions this syntax makes it easy to reject
+specific types of names. But it also requires that a full base is
+specified and only a simple '\*key\_string\*'. This is of course more
+safe but it has to be noted that the matching rules are only applied on
+valid and verified certificates. Since CA certificates can contain name
+constraints as well and [[​]{.icon}with p11-kit it is even possible to
+staple those
+extensions](http://nmav.gnutls.org/2016/06/restricting-scope-of-ca-certificates.html){.ext-link}
+it would be possible to reject certificates system-wide already during
+the verification.
+
+Based on this I would suggest to reserve the prefix tag 'RFC4523:' for
+this type of matching rule but postpone the implementation.
+
+##### Issuer specific matching {#Issuerspecificmatching}
+
+Although the MIT Kerberos rules allow to select the issuer of a
+certificate there are use cases where a more specific selection is
+needed. E.g. if there are some default matching rules for all issuers
+and some other issuer specific rules where the default rules should not
+apply. To make this possible with the above scheme the default rules
+must have an &lt;ISSUER&gt; clause which matches all but the issuer with
+the specific rules. Writing regular-expressions to not match a specific
+string or a list of strings is at least error-prone if not impossible.
+
+To make it easier to define issuer specific rules and default rules at
+the same time and optional issuer string can be added to the rule to
+indicate that for the given issuer only those rules should be
+considered. Given the use-case I think it is acceptable to require that
+the full issuer must be specified here in LDAP order (see below) and
+case-sensitive matching is used.
+
+How the issuer string is linked to the matching rules depends on the
+storage (LDAP or sssd.conf, see below for details).
+
+#### Mapping {#Mapping2}
+
+Since different certificates, e.g. issued by different CAs, might have
+different mapping rule, a matching rule must be added if there are more
+than 1 mapping rule. A single mapping rule without a matching rule might
+be used as default/catch-all rule in this case.
+
+If multiple rules matches the derived LDAP filter components can be
+grouped with the or-operator "|".
+
+With trusted AD forests the mapped users might come from trusted domains
+as well. To avoid searching in every single domain a list of expected
+domains can be added to each mapping rule. If the list is empty the
+local domain is assumed by default. An option might be added to switch
+the behavior to search all domains if the list is empty.
+
+Similar to Active Directory we will require a dedicated LDAP attribute
+in the user entry (anchor) to map the certificate to the user entry.
+Mapping rules which allow to search users based on some data from the
+certificate and common LDAP attributes make it easy to roll out
+certificate based authentication in existing environments. E.g. if one
+of the SAN attributes in the certificate contains the email address of
+the user a single mapping rule is needed to map every user with a
+certificate. No changes to existing LDAP user objects are needed.
+
+On the other hand certificates issues by external CA might not contain
+data to reliable match all users based on common LDAP attributes. Or it
+should be possible to authenticate with a single certificate as multiple
+different users. In those cases a dedicated attributes is needed in the
+user entry which contains some information about the certificate like
+the altSecurityIdentities attribute used by Active Directory.
+
+A specific per-user attribute also relates to other authentication
+methods available for a users. Password hashes and Kerberos keys are
+stored in the user entry as well. OTP tokens are managed in separate
+objects but contain the DN of the user as a unique reference. In all
+cases the removal of a single attribute will disable/remove a specific
+authentication method for a user.
+
+Finally, since mapping is about searching a user entry in the LDAP tree
+the dedicated attribute can be indexed to speed up the searches and help
+to avoid a high server load.
+
+##### Compatibility with Active Directory {#CompatibilitywithActiveDirectory}
+
+With trusted AD forests we have to support the mapping anchors used by
+AD which is typically an issue-subject pair like e.g.
+*X509:&lt;I&gt;C=US,O=InternetCA,CN=APublicCertificateAuthority&lt;S&gt;C=US,O=Fabrikam,OU=Sales,CN=Jeff
+Smith*. Active Directory uses a per-user LDAP attribute
+[[​]{.icon}altSecurityIdentities](https://msdn.microsoft.com/en-us/library/cc220106.aspx){.ext-link}
+to allow arbitrary user-certificate mappings if there is no suitable
+user-principal-name entry in the SAN of the certificate or if a single
+certificate should be used to authenticate as different users.
+
+Unfortunately there is no single document where all values and use-case
+of this attribute are listed. The best overview I found is in
+[[​]{.icon}https://blogs.msdn.microsoft.com/spatdsg/2010/06/18/howto-map-a-user-to-a-certificate-via-all-the-methods-available-in-the-altsecurityidentities-attribute/](https://blogs.msdn.microsoft.com/spatdsg/2010/06/18/howto-map-a-user-to-a-certificate-via-all-the-methods-available-in-the-altsecurityidentities-attribute/){.ext-link}.
+In
+[[​]{.icon}https://msdn.microsoft.com/en-us/library/ms677943%28v=vs.85%29.aspx](https://msdn.microsoft.com/en-us/library/ms677943%28v=vs.85%29.aspx){.ext-link}
+it is explained how altSecurityIdentities is used for user object and
+only mentions the issue-subject pair as an example, but does not mention
+other cases.
+[[​]{.icon}https://msdn.microsoft.com/en-us/library/hh536384.aspx](https://msdn.microsoft.com/en-us/library/hh536384.aspx){.ext-link}
+explains what is required for PKINIT which includes the issuer-subject
+pair but allows 5 other variants as well. (Interestingly, the user
+related page says that using only the issuer &lt;I&gt; is allowed but
+not using only the subject &lt;S&gt; while the PKINIT page says that
+using only the subject &lt;S&gt; is allowed and does not list a usage
+with only the issue &lt;I&gt;. I guess it is a typo in the user page,
+because &lt;S&gt; contains user specific information while &lt;I&gt; is
+the same for all certificates from the given issuer).
+
+So it looks like the most important variant is the issuer-subject pair.
+This one is e.g. created when a certificate is added via the 'Name
+Mappings' context menu entry in AD's 'Users and Computers' utility
+('Advanced Features' must be activated in the 'View' menu). The
+attribute value might look like
+
+``` {.wiki}
+altSecurityIdentities: X509:<I>O=Red Hat,OU=prod,CN=Certificate Authority<S>DC
+ =com,DC=redhat,OU=users,OID.0.9.2342.19200300.100.1.1=sbose,E=sbose@redhat.co
+ m,CN=Sumit Bose Sumit Bose
+```
+
+First it can be seen that X.500 ordering is used. Second, if RDN types
+not explicitly mentioned in the RFCs are used, you are on your own. As
+can be seen AD can translate the deprecated OID
+[[​]{.icon}1.2.840.113549.1.9.1](http://www.oid-info.com/get/1.2.840.113549.1.9.1){.ext-link}
+and uses 'E' as NSS. But the OID
+[[​]{.icon}0.9.2342.19200300.100.1.1](http://www.oid-info.com/get/0.9.2342.19200300.100.1.1){.ext-link}
+which is explicitly mentioned in RFC4514 is not translated as UID but
+the plain OID syntax is used (my guess it that Microsoft tries to be
+compatible with "older" versions because the UID was added in RFC2253
+from 1997 but was not present in the RFC1779 from 1995 and RFC1485 from
+1993).
+
+This leads us to mapping rules like
+&lt;ALT-SEC-ID-I-S:ldapAttributeName&gt; which would try in a best
+effort to produce the exact attribute value AD is using. This should
+work reliable with standard RDN types (see above). I think an optional
+'ldapAttributeName' is useful here so that the same mapping rule can be
+used with different LDAP servers (e.g. IPA) where user-specific mapping
+attributes are used with the same content but a different attribute
+name.
+
+According to the blob post describing altSecurityIdentities some other
+additional mapping rules might be useful too. This will give us
+
+-   &lt;ALT-SEC-ID-I-S:ldapAttributeName&gt;
+-   &lt;ALT-SEC-ID-S:ldapAttributeName&gt;
+-   &lt;ALT-SEC-ID-SKI:ldapAttributeName&gt;
+-   &lt;ALT-SEC-ID-I-SR:ldapAttributeName&gt;
+-   &lt;ALT-SEC-ID-SHA1-PUBKEY:ldapAttributeName&gt;
+-   &lt;ALT-SEC-ID-RFC822:ldapAttributeName&gt;
+-   &lt;ALT-SEC-ID-TP-PUBKEY:ldapAttribute&gt; (?)
+
+(The last is mentioned in [[​]{.icon}MS-DVRE section
+2.3.3.](https://msdn.microsoft.com/en-us/library/dn408946.aspx){.ext-link}
+but seems to be specific for joining devices in Azure)
+
+So far I didn't found a AD tool which creates to other mappings, if you
+know one, please let me know.
+
+Besides altSecurityIdentities AD uses the SAN with the
+szOID\_NT\_PRINCIPAL\_NAME OID to map users. It has to be noted that AD
+does not only look at the 'userPrincipalName' LDAP attribute to map the
+principal from the certificate but uses the default principal of an AD
+user
+[[​]{.icon}'samAccountName@AD.REALM](mailto:'samAccountName@AD.REALM){.mail-link}'
+as well. Interestingly a 'Kerberos:user@AD.REALM' entry in
+altSecurityIdentities did not work in my tests and AD denied login. So
+what AD does currently matches how SSSD tried to resolve a
+fully-qualified name against AD. I would suggest a mapping rule like
+
+-   &lt;NT\_PRINCIPAL\_NAME:ldapAttributeName&gt;
+
+to allow the search the user with the SAN value. When the backend is
+talking to AD and the principal cannot be found the fallback search with
+the 'samAccountName' LDAP is used. Since [[​]{.icon}MS-PKCS Appendix
+A](https://msdn.microsoft.com/en-us/library/cc238488.aspx){.ext-link}
+explicitly says that id-pkinit-san is ignored it does not have to be
+included for this mapping rule.
+
+##### Using the Certificate as an anchor {#UsingtheCertificateasananchor}
+
+For IPA and other generic LDAP servers an LDAP attribute like e.g.
+userCertificate is a good anchor as well and is currently already used
+to allow local authentication with a Smartcard. Since it is the current
+default I would suggest that an empty mapping rule with use the LDAP
+attribute configured by the SSSD option ldap\_user\_certificate as
+anchor and search with the whole certificate.
+
+It has to be noted that having the binary certificate in the
+userCertificate LDAP attribute is not sufficient for pkinit on AD.
+Either checks in the matching rule, e.g. checking if a SAN with
+szOID\_NT\_PRINCIPAL\_NAME OID is available, or mapping rules from above
+should be used if pkinit is required with AD.
+
+##### Future consideration {#Futureconsideration}
+
+A mapping rule can use a similar syntax like the matching rule where the
+LDAP attribute can be added with a ':', e.g.
+
+-   &lt;ISSUER:O.I.D.:ldapAttributeName:\*&gt;
+-   &lt;SUBJECT:O.I.D.:ldapAttributeName:\*&gt;
+-   &lt;SAN:O.I.D.:ldapAttributeName:\*&gt;
+
+where O.I.D. is either the OID or name of a RDN type or the OID or some
+well-known-name of the SAN component respectively. Since the SUBJECT
+might contain multiple RDNs of the same type always the "most specific"
+is selected because in general this will be the most suited one to map
+the certificate to a specific user. "most specific" means the last in
+X.500 order and the first in LDAP order (see discussion below for
+details).
+
+If the O.I.D. is missing the full SUBJECT/ISSUER is used for mapping. If
+'DN' is used as ldapAttributeName SUBJECT is expected to be the DN of
+the user. If the O.I.D. is missing in the SAN case the same default as
+with matching (id-pkinit-san and szOID\_NT\_PRINCIPAL\_NAME OID) is
+used. If both SAN values can be found in the certificate and are
+different the LDAP search filter will combine both with the or-operator.
+
+The optional '\*' in the end indicates that a sub-string search
+(ldapAttributeName=\*value\*) should be used and not an exact match
+(ldapAttributeName=value). Please note that it depends on the
+server-side definition of the LDAP attribute if case-sensitive or
+case-insensitve matching is used.
+
+Currently I see no usage for &lt;KU&gt; and &lt;EKU&gt; in mapping rules
+because they do not contain any user-specific data. If at some point we
+will have personal CAs we might consider to add &lt;ISSUER&gt; based
+mappings.
+
+Most of the interesting values from the SAN should be directly map-able
+to LDAP attributes. And processing the string representation of
+&lt;SUBJECT&gt; might be tricky as discussed below. Nevertheless it
+might be possible to add to following in a future release if more
+complex operations on the values are needed:
+
+-   &lt;SUBJECT:ldapAttributeName&gt;/regexp/replacement/
+-   &lt;SAN:O.I.D.:ldapAttributeName&gt;/regexp/replacement/
+
+where "/regexp/replacement/" stands for optional sed-like substitution
+rules. E.g. a rule like
+
+``` {.wiki}
+<SUBJECT:samAccountName>/^CN=\([^,]*\).*$/\1/
+```
+
+would take the subject string 'CN=Certuser,CN=Users,DC=example,DC=com'
+from the certificate and generate a LDAP search filter component
+'(samAccountName=Certuser)' which can be included in a LDAP search
+filter which includes additional components like e.g. an objectClass.
+
+The search-and-replace does not has to be sed-like because afaik there
+is not library which offers this and I would like to avoid implementing
+it. GLib e.g. has
+[[​]{.icon}g\_regex\_replace](https://developer.gnome.org/glib/stable/glib-Perl-compatible-regular-expressions.html#g-regex-replace){.ext-link}.
+Since we already have a GLib dependency in SSSD due to soem utf8 helper
+functions using might be acceptable as well. Nevertheless it would be
+nice to hear if there are alternative libraries available as well.
+
+Maybe even search-and-replace are not sufficient for all cases and
+something like embedded lua scripts are needed. But since certificate
+mapping is about access control and authorization it should be always
+considered if adding a new attribute to the users LDAP entry which makes
+mapping easy and straight-forward wouldn't be the better solution.
+
+##### Some notes about DNs {#SomenotesaboutDNs}
+
+The X.500 family of standards define names as "SEQUENCE OF
+[RelativeDistinguishedName?](https://docs.pagure.org/sssd-test2/RelativeDistinguishedName.html){.missing
+.wiki}" where the sequence is "starting with the root and ending with
+the object being named" (see X.501 section 9.2 for details). On the
+other hand RFC4514 section 2.1 says "Otherwise, the output consists of
+the string encoding of each
+[RelativeDistinguishedName?](https://docs.pagure.org/sssd-test2/RelativeDistinguishedName.html){.missing
+.wiki} in the RDNSequence (according to Section 2.2), starting with the
+last element of the sequence and moving backwards toward the first."
+This means that the ASN.1 encoded issuer and subject DN from the X.509
+certificate can be either displayed as string in the
+
+-   X.500 order: DC=com,DC=example,CN=users,CN=Certuser
+
+or in the
+
+-   LDAP order: CN=Certuser,CN=Users,DC=example,DC=com
+
+As a consequence different tools will use a different order when
+printing the issuer and subject DN. While NSS's certutil will use the
+LDAP order, 'openssl x509' and gnutls's certtool will use the X.500
+order (the latter might change due to
+[[​]{.icon}https://gitlab.com/gnutls/gnutls/issues/111](https://gitlab.com/gnutls/gnutls/issues/111){.ext-link}).
+
+This makes it important to specific the order which is used by SSSD for
+mapping and matching. I would prefer the LDAP order here. E.g. by
+default the AD CA uses the DN of the users entry in AD as subject in the
+issues certificate. So a matching rule like '&lt;SUBJECT:dn&gt;' could
+tell SSSD to directly search the user based on its DN (which btw is the
+original intention of the subject field in the certificate, only that
+the DN should be looked up in a more general DAP as defined by X.500 and
+not in the lightweight version called LDAP)
+
+Another issue is the limited set of attribute names/types required by
+the RFCs (see section 4.1.2.4 of RFC 3280 and section 3 of RFC 4514). If
+e.g. the deprecated OID
+[[​]{.icon}1.2.840.113549.1.9.1](http://www.oid-info.com/get/1.2.840.113549.1.9.1){.ext-link}
+is used all tools are able to identify it as an email address but
+OpenSSL displays it as
+'emailAddress=[[​]{.icon}user@example.com](mailto:user@example.com){.mail-link}',
+certtool as
+'EMAIL=[[​]{.icon}user@example.com](mailto:user@example.com){.mail-link}'
+and certutil as
+'E=[[​]{.icon}user@example.com](mailto:user@example.com){.mail-link}'.
+So matching rules should try to avoid attribute names or only the ones
+from [[​]{.icon}RFC
+4514](https://www.ietf.org/rfc/rfc4514.txt){.ext-link}:
+
+-   CN commonName (2.5.4.3)
+-   L localityName (2.5.4.7)
+-   ST stateOrProvinceName (2.5.4.8)
+-   O organizationName (2.5.4.10)
+-   OU organizationalUnitName (2.5.4.11)
+-   C countryName (2.5.4.6)
+-   STREET streetAddress (2.5.4.9)
+-   DC domainComponent (0.9.2342.19200300.100.1.25)
+-   UID userId (0.9.2342.19200300.100.1.1)
+
+#### About restricting or enforcing the mapping an matching any further {#Aboutrestrictingorenforcingthemappinganmatchinganyfurther}
+
+The goal of the matching rules in MIT Kerberos is to select a single
+certificate from a Smartcard which will then be used for PKINIT. Since
+we already plan to enhance SSSD to support multiple certificates on a
+Smartcard and if needed prompt the user which one to use for login we
+should not enforce that the matching rules should return only a single
+certificate or nothing.
+
+Similar we plan to enhance SSSD to use the same certificate to log in
+with different user identities, e.g. as a user with standard privileges
+or as a user with administrator privileges. So it can make sense that
+multiple mapping rules apply to the same certificate and the related
+LDAP search filter components are or-ed together.
+
+In many cases the login program will first ask for a user name which
+will help to restrict the number of suitable certificates even further
+and the mapping rules are only needed to check if the certificate
+belongs to the user trying to log in.
+
+But gdm has a feature where gdm will detect when a Smartcard is inserted
+and call PAM without a user name. In this case SSSD has to determine the
+user name based on the certificates found on the Smartcard. If in this
+case multiple valid certificates are on the card and the mapping rules
+will return multiple users for each certificate gdm has to display a
+quite long selection of certificate-user pairs the user has to choose
+from.
+
+So it should be underlined in the documentation that the matching and
+mapping rules should be detailed and specific so that for the given
+environment they help to avoid cases where the user is prompted to
+select a certificate (or user name in the gdm case) when trying to log
+in.
+
+#### Storing matching and mapping configuration {#Storingmatchingandmappingconfiguration}
+
+On the IPA server a new objectclass can be created to store an
+matching-mapping-domain rule triple together with a specific issuer. All
+attributes are optional because a missing mapping rule would mean that
+the user entry will be search with the whole certificate. A missing
+matching rule will indicate catch-all rule with a default mapping. If
+the domain is missing only the local domain will be searched. If only a
+specific issuer is given certificates from this issuer must be stored in
+the LDAP entry of the user for the local domain to make authentication
+possible.
+
+Specifying matching-mapping-domain rules in sssd.conf is a bit more
+complicated because SSSD does not respect multiple entries with the same
+keyword, only the last one is used. So all rules have to be added to a
+single line. To make this less error-prone and more readable the rules
+with all needed components can a added in individual ini-sections and in
+the domain section on the the name is referenced
+
+``` {.wiki}
+[domain/some.domain]
+...
+certificate_rules = cert_rule1, cert_rule2
+...
+[certfificate_rule/cert_rule1]
+certificate_issuer = ....
+certificate_match = ....
+certificate_map = ....
+certificate_domains = ....
+
+[certfificate_rule/cert_rule2]
+certificate_issuer = ....
+certificate_match = ....
+certificate_map = ....
+certificate_domains = ...
+```
+
+As an alternative the rules components can be enclosed by curly-braces
+'{}{}{}{}' and each rule is separated by a comma ','. A single rule in
+curly braces indicates a matching rule and the mapping will be done with
+the whole certificate. A default/catch-all mapping rule will start with
+an empty pair of curly braces followed by a pair containing the mapping
+rule. Issuer specific rules will have three pairs of curly braces where
+the first pair must contain an issuer string.
+
+##### Examples {#Examples}
+
+-   Only matching rule
+
+    ``` {.wiki}
+    [certificate_rule/msLogon] 
+    certificate_match = <EKU>msScLogin
+    ```
+
+    only allow certificates with have the Microsoft OID for Smartcard
+    logon 1.3.6.1.4.1.311.20.2.2 set, use the whole certificate to
+    look-up the user in the local domain. The same result can be
+    achieved with
+
+-   Matching rule with OID:
+
+    ``` {.wiki}
+    [certificate_rule/msLogonOID]
+    certificate_match = <EKU>1.3.6.1.4.1.311.20.2.2
+    ```
+
+    see above
+
+-   e
+
+    ``` {.wiki}
+    [certificate_rule/issuer_subject]
+    matching_rule = <ISSUER>*my-company*<SAN:rfc822Name>*@my-company.com$
+    mapping_rule = <ALT-SEC-ID-I-S:altSecurityIdentities>
+    certificate_domains = my-company.com
+    ```
+
+    only allow certificates form the 'my-company' issuer which have an
+    email address from the 'my-company.com' domain in the rfc882Name SAN
+    attribute. Use AD style issuer-subject search filter
+    '(altSecurityIdentities=&lt;I&gt;cn=issuer,dc=my-company,dc=com&lt;S&gt;cn=user,dc=my-company,dc=com)'
+    to find the matching user in the
+
+domain 'my-company.com'
+
+#### Mapping - alternative direct use of LDAP search filters {#Mapping-alternativedirectuseofLDAPsearchfilters}
+
+Since the goal of the mapping rules is to create a LDAP search filter a
+filter template can be used to define a mapping rules a well:
+
+``` {.wiki}
+(&(someAttr={issuer})(someOtherAttr=*{subject:O.I.D}*))
+```
+
+This offers much more flexibility in the rules. The syntax is a bit more
+complex but LDAP search filters are well documented and administrators
+should already have a basic understanding. Nevertheless a validation is
+needed when a new rule is entered to make sure the template can be use
+to generate a valid LDAP search filter.
+
+### Configuration changes {#Configurationchanges}
+
+Does your feature involve changes to configuration, like new options or
+options changing values? Summarize them here. There's no need to go into
+too many details, that's what man pages are for.
+
+### How To Test {#HowToTest}
+
+This section should explain to a person with admin-level of SSSD
+understanding how this change affects run time behaviour of SSSD and how
+can an SSSD user test this change. If the feature is internal-only,
+please list what areas of SSSD are affected so that testers know where
+to focus.
+
+### How To Debug {#HowToDebug}
+
+Explain how to debug this feature if something goes wrong. This section
+might include examples of additional commands the user might run (such
+as keytab or certificate sanity checks) or explain what message to look
+for.
+
+### Authors {#Authors}
+
+Give credit to authors of the design in this section.
