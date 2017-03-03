@@ -1,0 +1,100 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><p>
+</p><div class="wiki-toc">
+<ol>
+  <li>
+    <ol>
+      <li>
+        <a href="#LDAPReferrals">LDAP Referrals</a>
+        <ol>
+          <li>
+            <a href="#Pre-requisites">Pre-requisites</a>
+            <ol>
+              <li>
+                <a href="#sdap_id_openhancements">sdap_id_op enhancements</a>
+              </li>
+            </ol>
+          </li>
+          <li>
+            <a href="#Single-entrylookup">Single-entry lookup</a>
+          </li>
+          <li>
+            <a href="#Multiple-entrylookup">Multiple-entry lookup</a>
+          </li>
+          <li>
+            <a href="#Optimizations">Optimizations</a>
+          </li>
+          <li>
+            <a href="#Relationshiptomultiplesearchbases">Relationship to multiple search bases</a>
+          </li>
+          <li>
+            <a href="#Questionsneedingresearch">Questions needing research</a>
+          </li>
+          <li>
+            <a href="#StufftoTest">Stuff to Test</a>
+          </li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+</ol>
+</div><p>
+</p>
+<h2 id="LDAPReferrals">LDAP Referrals</h2>
+<h3 id="Pre-requisites">Pre-requisites</h3>
+<h4 id="sdap_id_openhancements">sdap_id_op enhancements</h4>
+<ol><li>Disentangle sdap_id_op setup from failover configuration
+</li><li>Handle async resolver needs for referrals. We need to look up referred servers and take the first IP returned by DNS.
+</li><li>Add idle disconnection timer for connections (see Ticket <a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1036" title="enhancement: [RFE] close LDAP connection to the server when idle for some ... (closed: fixed)">#1036</a>, needs to have its priority bumped up). We don't want to be hanging onto referred servers forever.
+</li></ol><h3 id="Single-entrylookup">Single-entry lookup</h3>
+<ol><li>Perform lookup on standard server connection
+</li><li>Get referral reply
+</li><li>Acquire sdap connection to the referred server
+</li><li>Perform lookup on referred server
+</li><li>Repeat as needed until referral depth limit is reached
+</li></ol><h3 id="Multiple-entrylookup">Multiple-entry lookup</h3>
+<p>
+First approximation: just process each referral as a series of single-entry lookups, gathering all results at the end.
+</p>
+<h3 id="Optimizations">Optimizations</h3>
+<ol><li>Keep lookup cache/hashtable of entries pointing to the same referred entry (I suspect the value is low here, as the chance of multiple replies referring to the same entry is unlikely).
+</li><li>In the case of multiple referred entries to the same LDAP server, can we bundle them into single requests? (Probably not. Referrals will end up requiring BASE searches. Most LDAP servers don't support subtree searches on DN)
+</li><li>Keep a hash/lookup table of sdap_id_op links. Don't reconnect unless we have to (such as when performing auth via LDAP simple bind).
+<ol><li>Keep separate sdap_id_op links for ID and AUTH. ID always uses the default bind credentials, AUTH can drop the bind and reconnect.
+</li></ol></li></ol><h3 id="Relationshiptomultiplesearchbases">Relationship to multiple search bases</h3>
+<p>
+Only the primary server will need multiple bases. The referrals will end up as base searches, thereby ignoring the multiple search base values.
+</p>
+<p>
+Referrals should <em>ignore</em> the base filtering of ticket <a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/960" title="defect: ldap_*_search_base doesn't fully limit the group / netgroup search base ... (closed: fixed)">#960</a>.
+</p>
+<p>
+How do we handle originalDN? I think we need to save originalDN as it would have appeared on the primary server, not the referred server.
+</p>
+<p>
+Research: how are we doing this now? I remember that we hit this before when dealing with referrals. Did we solve it for all referral types or only some?
+</p>
+<p>
+Finally, related to the search filtering, ticket <a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/960" title="defect: ldap_*_search_base doesn't fully limit the group / netgroup search base ... (closed: fixed)">#960</a> should do its filtering based on the originalDN value, not the referred DN.
+</p>
+<h3 id="Questionsneedingresearch">Questions needing research</h3>
+<ol><li>Do all referrals give a complete answer? (i.e. If they refer locally, is it relative?)
+<ul><li><a class="ext-link" href="http://www.ietf.org/rfc/rfc3296.txt"><span class="icon">​</span>http://www.ietf.org/rfc/rfc3296.txt</a> says that "The ref attribute values SHOULD NOT be used as a relative name-component of an entry's DN [RFC2253]."
+</li></ul></li><li>Can we keep a connection open to rebind? i.e. If we're performing AUTH, do we have to open a new socket connection to perform a new simple bind, or can we drop and bind again?)
+</li><li>How do we treat unreachable referral servers?
+<ol><li>As missing entries. This might cause cache issues with flaky networks, as we always treat missing entries as definitive deletion of the entry for our cache. I believe this is how things are handled now with the openldap internal referral chasing, but I need to research this.
+</li><li>Any unreachable referral server results in SSSD going offline. This is potentially chaotic, as it introduces multiple points of failure resulting in offline operation.
+</li><li>Flag unreachable entries as "complete", thereby having SSSD rely on their presence or abscence in the cache. While this sounds nice in theory, I think this would probably be very difficult to get right, especially with enumeration. I recommend deferring this as a future optimization and going with one of the other approaches (or possibly make the other approaches into an sssd.conf option).
+</li></ol></li><li>How do we handle nested referrals?
+<ul><li>Option: Handle all referrals at a particular depth before descending further. This can help avoid attempts to create duplicate sdap_id_ops. The downside to this approach is that situations where entries are coming from multiple servers will only ever function as quickly as the slowest server in the set.
+</li><li>Option: Track nestings as additional subreq levels. Add careful sdap_id_op acquisition locking and proceed into nestings as quickly as they are available. This is more complicated to get right, but probably will provide a noticeable gain in complex setups.
+</li></ul></li></ol><h3 id="StufftoTest">Stuff to Test</h3>
+<ol><li>Entry referrals
+<ol><li>Same server different DN
+</li><li>Different server same DN
+</li><li>Different server different DN
+</li></ol></li><li>Subtree referrals
+<ol><li>Same server different DN
+</li><li>Different server different DN
+</li></ol></li><li>Referral on bind attempt (referred AUTH)
+</li><li>Referred password change
+</li></ol></body></html>

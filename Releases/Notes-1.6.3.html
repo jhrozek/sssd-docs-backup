@@ -1,0 +1,24 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<ul><li>Fixes a major cache performance issue introduced in 1.6.2
+</li><li>Fixes a potential infinite-loop with certain LDAP layouts
+</li></ul><h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Jakub Hrozek (4):
+</p>
+<ul><li>Plug memory leaks in LDAP provider
+</li><li>RFC2307bis initgroups: fix nested groups processing
+</li><li>Steal result onto mem_ctx in sdap_initgr_nested_get_direct_parents
+</li><li>Use LDAPDerefSpec properly
+</li></ul><p>
+Jan Zeleny (1):
+</p>
+<ul><li>Handle group renaming correctly
+</li></ul><p>
+Stephen Gallagher (5):
+</p>
+<ul><li>Bumping version to 1.6.3
+</li><li>RESPONDER: Fix segfault in sss_packet_send()
+</li><li>SYSDB: add index for nameAlias
+</li><li>Fix bad backport of group rename patch
+</li><li>Update translation files for release
+</li></ul></body></html>

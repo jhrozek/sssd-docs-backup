@@ -1,0 +1,59 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h1 id="FeatureName">Feature Name</h1>
+<p>
+Improve config validation
+</p>
+<p>
+Related ticket(s):
+</p>
+<ul><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2247"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2247</a>
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2028"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2028</a>
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/1308"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/1308</a>
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2249"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2249</a>
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2269"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2269</a>
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2465"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2465</a>
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2687"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2687</a>
+</li><li>...and more
+</li></ul><h3 id="Problemstatement">Problem statement</h3>
+<p>
+Admins should be notified if their configuration is not valid
+Admins should have an option to still log in to the system if they do an error in configuration
+</p>
+<h3 id="Usecases">Use cases</h3>
+<ul><li>Fallback config
+<ul><li>With responders, we can use defaults, they are usually paranoid enough
+</li><li>With domains, we probably can only fall back to last known good (except local domain)
+</li><li>Could we start only responders so that if cached data is available, the responders can be used?
+</li></ul></li><li>Last known good (First known good)
+<ul><li>For domains
+</li><li>Use-case: admin changes something and wants to still log in
+</li></ul></li><li>Config merging
+<ul><li>Deprecate "services" line
+</li><li>Be able to drop domain into /etc/sssd/sssd.conf.d/
+</li></ul></li><li>Config validation
+<ul><li>prerequisity: have a common definition of options and autogenerate the rest
+<ul><li>Autogenerate dp_opts, man pages and configAPI sources from a common location
+</li><li>Look at Samba
+</li></ul></li><li>...for that we need to use dp_opts everywhere
+</li></ul></li></ul><h3 id="Todo">To do</h3>
+<ul><li>Does ding-libs support config validation?
+</li></ul><h3 id="Overviewofthesolution">Overview of the solution</h3>
+<p>
+Describe, without going too low into technical details, what changes need to happen in SSSD during implementation of this feature. This section should be understood by a person with understanding of how SSSD works internally but doesn't have an in-depth understanding of the code. For example, it's fine to say that we implement a new option <tt>foo</tt> with a default value <tt>bar</tt>, but don't talk about how is <tt>foo</tt> processed internally and which structure stores the value of `foo. In some cases (internal APIs, refactoring, ...) this section might blend with the next one.
+</p>
+<h3 id="Implementationdetails">Implementation details</h3>
+<p>
+A more technical extension of the previous section. Might include low-level details, such as C structures, function synopsis etc. In case of very trivial features (e.g a new option), this section can be merged with the previous one.
+</p>
+<h3 id="Configurationchanges">Configuration changes</h3>
+<p>
+Does your feature involve changes to configuration, like new options or options changing values? Summarize them here. There's no need to go into too many details, that's what man pages are for.
+</p>
+<h3 id="HowToTest">How To Test</h3>
+<p>
+This section should explain to a person with admin-level of SSSD understanding how this change affects run time behaviour of SSSD and how can an SSSD user test this change. If the feature is internal-only, please list what areas of SSSD are affected so that testers know where to focus.
+</p>
+<h3 id="Authors">Authors</h3>
+<p>
+Give credit to authors of the design in this section.
+</p>
+</body></html>

@@ -1,0 +1,556 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><p>
+</p><div class="wiki-toc">
+<ol>
+  <li>
+    <a href="#Introduction">Introduction</a>
+  </li>
+  <li>
+    <a href="#WhyCodingGuidelines">Why Coding Guidelines?</a>
+    <ol>
+      <li>
+        <a href="#Maintainability">Maintainability</a>
+      </li>
+      <li>
+        <a href="#Readability">Readability</a>
+      </li>
+    </ol>
+  </li>
+  <li>
+    <a href="#Definitions">Definitions</a>
+  </li>
+  <li>
+    <a href="#NoteonC99">Note on C99</a>
+  </li>
+  <li>
+    <a href="#Rules">Rules</a>
+    <ol>
+      <li>
+        <a href="#GeneralRules">General Rules</a>
+      </li>
+      <li>
+        <a href="#SpacesandIndentation">Spaces and Indentation</a>
+      </li>
+      <li>
+        <a href="#LengthofLine">Length of Line</a>
+      </li>
+      <li>
+        <a href="#Comments">Comments</a>
+      </li>
+      <li>
+        <a href="#IFDEF">IFDEF</a>
+      </li>
+      <li>
+        <a href="#IncludeFiles">Include Files</a>
+      </li>
+      <li>
+        <a href="#Macros">Macros</a>
+      </li>
+      <li>
+        <a href="#Useofgoto">Use of goto</a>
+        <ol>
+          <li>
+            <a href="#Labeldone">Label done</a>
+          </li>
+          <li>
+            <a href="#Labelfail">Label fail</a>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <a href="#Variables">Variables</a>
+        <ol>
+          <li>
+            <a href="#Naming">Naming</a>
+          </li>
+          <li>
+            <a href="#Declaring">Declaring</a>
+          </li>
+          <li>
+            <a href="#UseofTypedefs">Use of Typedefs</a>
+          </li>
+          <li>
+            <a href="#DeclaringStructures">Declaring Structures</a>
+          </li>
+          <li>
+            <a href="#GlobalVariables">Global Variables</a>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <a href="#Functions">Functions</a>
+        <ol>
+          <li>
+            <a href="#ExternalFunctionDeclarations">External Function Declarations</a>
+          </li>
+          <li>
+            <a href="#DeclaringModuleFunctions">Declaring Module Functions</a>
+          </li>
+          <li>
+            <a href="#OrderoftheFunctions">Order of the Functions</a>
+          </li>
+          <li>
+            <a href="#NamingFunctions">Naming Functions</a>
+          </li>
+          <li>
+            <a href="#IndentingFunctions">Indenting Functions</a>
+          </li>
+          <li>
+            <a href="#FunctionDeclaration">Function Declaration</a>
+          </li>
+          <li>
+            <a href="#FunctionParameters">Function Parameters</a>
+          </li>
+          <li>
+            <a href="#UseofConst">Use of Const</a>
+          </li>
+          <li>
+            <a href="#ToolstoUse">Tools to Use</a>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <a href="#ConditionsandStatements">Conditions and Statements</a>
+        <ol>
+          <li>
+            <a href="#Condition">Condition</a>
+          </li>
+          <li>
+            <a href="#IFStatements">IF Statements</a>
+          </li>
+          <li>
+            <a href="#Loops">Loops</a>
+            <ol>
+              <li>
+                <a href="#Switch">Switch</a>
+              </li>
+            </ol>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <a href="#Strings">Strings</a>
+        <ol>
+          <li>
+            <a href="#Internationalizedi18nStrings">Internationalized (i18n) Strings</a>
+          </li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+</ol>
+</div><p>
+</p>
+<p>
+This guide is work in progress and should replace the older FreeIPA guide.
+</p>
+<h1 id="Introduction">Introduction</h1>
+<p>
+This manual contains coding standards and guidelines for SSSD and FreeIPA contributors. It is updated based heavily on the FreeIPA style which was based on <a class="ext-link" href="http://directory.fedoraproject.org/wiki?title=Coding_Style"><span class="icon">​</span>389 Directory Server style guide</a> but deviates from it and covers more aspects.
+</p>
+<p>
+All new code should adhere to these standards but please do not go back and make wholesale formatting changes to the old code. It just confuses things and is generally a waste of time.
+</p>
+<h1 id="WhyCodingGuidelines">Why Coding Guidelines?</h1>
+<p>
+The Coding Guidelines are necessary to improve maintainability and readability of the code.
+</p>
+<h2 id="Maintainability">Maintainability</h2>
+<p>
+If you're merging changes from a patch it's much easier if everyone is using the same coding style.  This isn't the reality for a lot of our code, but we're trying to get to the point where most of it uses the same style.
+</p>
+<h2 id="Readability">Readability</h2>
+<p>
+Remember, code isn't just for compilers, it's for people, too.  If it wasn't for people, we would all be programming in assembly.  Coding style and consistency mean that if you go from one part of the code to another you don't spend time having to re-adjust from one style to another.  Blocks are consistent and readable and the flow of the code is apparent.  Coding style adds value for people who have to read your code after you've been hit by a bus.  Remember that.
+</p>
+<h1 id="Definitions">Definitions</h1>
+<p>
+The following guidelines apply to developing code in the SSSD project. Some rules are mandatory some rules are just suggestions or recommendations. We will use following terminology to identify whether this or that rule is mandatory or not.
+</p>
+<ul><li>MUST – everybody must follow the rule
+</li><li>HIGHLY RECOMMENDED – the rule should be followed unless there are some serious reasons why they should not be followed.
+</li><li>RECOMMENDED – it is a best practice to use this rule. It is not required but strongly encouraged.
+</li><li>DISCRETION – follow this at developer discretion.
+</li></ul><h1 id="NoteonC99">Note on C99</h1>
+<p>
+We compile code with -std=gnu99 flag. It is OK to use C99 features supported by GCC and Clang, however C++ style line comments (<em>) should still be avoided. Using variable length arrays should be done with caution and only be used for smaller arrays.
+</em></p>
+<h1 id="Rules">Rules</h1>
+<h2 id="GeneralRules">General Rules</h2>
+<ul><li>MUST: All source and header files must include a copy of the license.
+</li><li>HIGHLY RECOMMENDED: Stick to a K&amp;R coding style for C.
+</li><li>HIGHLY RECOMMENDED: Curly braces on same line as if/while.
+</li><li>MUST: All code should be peer reviewed before being checked in.
+</li><li>MUST: If you are fixing a bug, attach the patch to the bug report.
+</li><li>HIGHLY RECOMMENDED: For Python we have an enforced style in many cases already but consistency is important.
+</li></ul><h2 id="SpacesandIndentation">Spaces and Indentation</h2>
+<ul><li>MUST: No tabs all indentation 4 spaces.
+</li><li>HIGHLY RECOMMENDED: When wrapping lines, try to break it:
+<ul><li>after a comma
+</li><li>before an operator
+</li><li>align the new line with the beginnigng of the expression at the same level in the previous line
+</li><li>in case of long "if" statements, wrap the line before an operator and indent the new line
+</li><li>if all else fails, just indent 8 spaces.
+</li></ul></li></ul><h2 id="LengthofLine">Length of Line</h2>
+<p>
+MUST: Do not make lines longer than 120 characters.
+</p>
+<p>
+HIGHLY RECOMMENDED: Keep lines within 80 character boundary for better readability.
+</p>
+<h2 id="Comments">Comments</h2>
+<p>
+MUST: Use only C style comments /* */ not C++.
+</p>
+<p>
+MUST: When commenting use the following styles:
+</p>
+<pre class="wiki">    /*
+     * VERY important single-line comments look like this.
+     */
+
+    /* Most single-line comments look like this. */
+
+    /*
+     * Multi-line comments look like this. Make them real sentences. Fill
+     * them so they look like real paragraphs.
+     */
+</pre><p>
+Avoid:
+</p>
+<pre class="wiki">    /* Multiline comments
+       that look like this */
+</pre><p>
+HIGHLY RECOMMENDED: Avoid useless comments that do not add value to the code.
+</p>
+<p>
+HIGHLY RECOMMENDED: Each function should be preceded with a block comment describing what the function is supposed to do.
+</p>
+<p>
+HIGHLY RECOMMENDED: Block comments should be preceded by a blank line to set it apart. Line up the * characters in the block comment.
+</p>
+<p>
+HIGHLY RECOMMENDED: Python comments can use either the # or """ form
+</p>
+<h2 id="IFDEF">IFDEF</h2>
+<p>
+HIGHLY RECOMMENDED: When using #ifdefs, it's nice to add comments in the pairing #endif:
+</p>
+<pre class="wiki">   #ifndef _HEADER_H_
+   #define _HEADER_H_
+   
+   /* something here */
+   
+   #endif /* !_HEADER_H_ */
+</pre><p>
+or:
+</p>
+<pre class="wiki">   #ifdef HAVE_PTHREADS
+   
+   /* some code here */
+   
+   #else /* !HAVE_PTHREADS */
+   
+   /* some other code here */
+   
+   #endif /* HAVE_PTHREADS */
+</pre><h2 id="IncludeFiles">Include Files</h2>
+<p>
+RECOMMENDED: Includes should be grouped properly. Standard headers and local headers should definitely be separated by a blank line. Other logical grouping should be reasonably done if needed. Files inside the groups should be sorted alphabetically, unless a specific order is required - this however is very rare, and must not happen. Also, one shouldn't depend on the fact that one header file includes other one, unless it is really obvious and/or desirable, like in cases
+when one header file practically "enhances" the other one, for example
+with more error codes, etc.
+</p>
+<h2 id="Macros">Macros</h2>
+<p>
+HIGHLY RECOMMENDED: Macros that are unsafe should be in upper-case. This also applies to macros that span multiple lines:
+</p>
+<pre class="wiki">   #define MY_MACRO(a, b) do {   \
+                foo((a) + (b));  \
+                bar(a);          \
+   } while (0)
+</pre><p>
+Notice that arguments should be in parentheses if there's a risk. Also notice that a is referenced two times, and hence the macro is dangerous. Wrapping the body in do { } while (0) makes it safe to use it like this:
+</p>
+<pre class="wiki">   if (expr)
+       MY_MACRO(x, y);
+</pre><p>
+Notice the semicolon is used after the invocation, not in the macro
+definition.
+</p>
+<p>
+Otherwise, if a macro is safe (for example a simple wrapping function),
+then the case can be lower-case.
+</p>
+<h2 id="Useofgoto">Use of goto</h2>
+<p>
+We use goto to simplify cleanup operations and some other tasks that need to be done before leaving the function.
+</p>
+<p>
+MUST: Never use goto to jump backwards in the code
+</p>
+<p>
+HIGHLY RECOMMENDED: If goto is needed in the code, use one of the following labels: done, fail (TBD: add other allowed labels)
+</p>
+<p>
+RECOMMENDED: Do not use more than one goto label per function.
+</p>
+<h3 id="Labeldone">Label done</h3>
+<p>
+Label done is used as jump target before exit. Clean-up operations, such as freeing local talloc context, usually follow the done label. Both successful and unsuccessful function executions pass this label.
+</p>
+<h3 id="Labelfail">Label fail</h3>
+<p>
+Used as special exit path when function fails. Successful function execution typically does not execute statements after this label.
+</p>
+<h2 id="Variables">Variables</h2>
+<h3 id="Naming">Naming</h3>
+<p>
+HIGHLY RECOMMENDED: Use low case multi word underscore separated notation for naming variables. 
+</p>
+<p>
+HIGHLY RECOMMENDED: Make name meaningful.
+</p>
+<p>
+MUST: Never use Hungarian notation when naming variables.
+</p>
+<h3 id="Declaring">Declaring</h3>
+<pre class="wiki">RECOMMENDED: One declaration per line is preferred.
+    int foo;
+    int bar;
+</pre><p>
+instead of
+</p>
+<pre class="wiki">   int foo, bar;
+</pre><p>
+HIGHLY RECOMMENDED: Initialize at declaration time when possible.
+</p>
+<p>
+RECOMMENDED: Avoid complex variable initializations (like calling functions) when
+declaring variables like:
+</p>
+<pre class="wiki">   int foobar = get_foobar(baz);
+
+but split it in:
+
+   int foobar;
+   
+   foobar = get_foobar(baz);
+   ...
+</pre><p>
+MUST: Always declare variables at the top of the function or block. If you find yourself declaring many variables inside inner block or loop, consider refactoring the block into helper function.
+HIGHLY RECOMMENDED: Avoid shadowing variables. Use different name even if the shadowed variable is not important for the inner blocks.
+</p>
+<p>
+RECOMMENDED: Don't initialize static or global variables to 0 or NULL.
+</p>
+<h3 id="UseofTypedefs">Use of Typedefs</h3>
+<p>
+HIGHLY  RECOMMENDED: Avoid using typedefs. Typedefs obscure structures and make it harder to understand and debug.
+</p>
+<h3 id="DeclaringStructures">Declaring Structures</h3>
+<p>
+DISCRETION: When defining structure or union try make it easy to read. You may use some form of alignment if you see that this might make it more readable.
+</p>
+<h3 id="GlobalVariables">Global Variables</h3>
+<p>
+HIGHLY  RECOMMENDED: Avoid using global variables. They make for very poor
+code. Should be used only if no other way can be found. They tend to be
+not thread/async safe
+</p>
+<h2 id="Functions">Functions</h2>
+<h3 id="ExternalFunctionDeclarations">External Function Declarations</h3>
+<p>
+HIGHLY  RECOMMENDED: Avoid situations where you have to explicitly list out external function. The header files should in general take  care of the external function declaration. If this is not the case it is subject for review of the  header file hierarchy.
+</p>
+<h3 id="DeclaringModuleFunctions">Declaring Module Functions</h3>
+<p>
+DISCRETION: It up to the developer to define the order of the functions in the module and thus declare functions at the top or use a native flow of the module and avoid forward function declarations.
+</p>
+<h3 id="OrderoftheFunctions">Order of the Functions</h3>
+<p>
+DISCRETION: It is up to the developer which approach to use: whether to write the main function at the top of the module and then all the supporting functions or start with supporting functions and have the main one at the bottom. Both approaches are acceptable. One can use additional comments to help identify how the module is structured.
+</p>
+<h3 id="NamingFunctions">Naming Functions</h3>
+<p>
+MUST: For function names use multi word underscore separate naming convention like this monitor_task_init(struct task_server *task); 
+</p>
+<p>
+MUST: Never use Hungarian notation when naming functions.
+ 
+</p>
+<h3 id="IndentingFunctions">Indenting Functions</h3>
+<p>
+DISCRETION: It is up to the developer which pattern to use when indenting the function parameters if function has long name and has to be split between multiple lines. The pattern however MUST be consistent across the module so if you are fixing somebodies code continue with the pattern used in the module. 
+</p>
+<h3 id="FunctionDeclaration">Function Declaration</h3>
+<p>
+DISCRETION: It is up to the developer whether to put the return type of the function and modifiers (static for example) in front of the function on the same line or start the line with the an actual function name. In any case the pattern MUST be consistent across the module. If you are adding function to an already existing module follow its pattern.
+MUST: Put opening “{“ of the function body on the beginning of the new line after the function declaration.
+HIGHLY RECOMMENDED: Do not put spaces before or after parenthesis in the declaration of the parameters. For example:
+</p>
+<blockquote>
+<p>
+OK: <tt> int foo(int bar, int baz); </tt>
+NOT OK: <tt> int bad ( arg1 , arg2 ); </tt>
+</p>
+</blockquote>
+<h3 id="FunctionParameters">Function Parameters</h3>
+<p>
+RECOMMENDED: Try to always put "input" arguments before "output" arguments, if you have arguments that provide both input an output put them between the pure-input and the pure-output ones. Add underscore prefix "_" to output arguments.
+</p>
+<blockquote>
+<p>
+OK: <tt> foo(int in1, void *in2, char **_ou1); </tt>
+NOT OK: <tt> voo(char **ou1, int in1); </tt>
+</p>
+</blockquote>
+<h3 id="UseofConst">Use of Const</h3>
+<p>
+RECOMMENDED: If appropriate, always use the const modifier for pointers passed to the function. This makes the intentions of the function more clearer, plus allows the compiler to catch more bugs and make some optimizations.
+</p>
+<h3 id="ToolstoUse">Tools to Use</h3>
+<p>
+RECOMMENDED: Creating lists and queues was already done a lot of times. When
+possible, use some common functions for manipulating these to avoid
+mistakes.
+</p>
+<h2 id="ConditionsandStatements">Conditions and Statements</h2>
+<h3 id="Condition">Condition</h3>
+<p>
+RECOMMENDED: Use the full condition syntax like  (str == NULL) rather than (!str).
+</p>
+<h3 id="IFStatements">IF Statements</h3>
+<p>
+HIGHLY RECOMMENDED: If-else statements should have the following form:
+</p>
+<pre class="wiki">    if (''condition'') {
+        /* do some work */
+    }
+
+    if (''condition'') {
+        /* do some work */
+    } else {
+        /* do some other work */
+    }
+</pre><p>
+HIGHLY RECOMMENDED: Balance the braces in the if and else in an if-else statement if either has only one line:
+</p>
+<pre class="wiki">    if (condition) {
+        /*
+         * stuff that takes up more than one
+         * line
+         */
+    } else {
+        /* stuff that only uses one line */
+    }
+</pre><p>
+HIGHLY RECOMMENDED: Use braces even if there s just one line in the if statement. 
+</p>
+<p>
+DISCRETION: You can avoid the braces if entire if statement is on one line.
+</p>
+<p>
+NOT OK:
+</p>
+<pre class="wiki">    if (foo)
+        bar();
+</pre><p>
+OK:
+</p>
+<pre class="wiki">    if (foo) {
+        bar();
+    }
+</pre><p>
+Also OK:
+</p>
+<pre class="wiki">    if (foo) bar();
+</pre><p>
+Always use braces if there is an else part:
+</p>
+<pre class="wiki">    if (foo) {
+        bar();
+    } else {
+        baz();
+    }
+</pre><p>
+HIGHLY RECOMMENDED: Avoid last-return-in-else problem.  Code should look like this:
+</p>
+<pre class="wiki">    int foo(int bar)
+    {
+        if (something) {
+            /* stuff done here */
+            return 1;            
+        }
+    
+        return 0;
+    }
+</pre><p>
+<strong>NOT</strong> like this:
+</p>
+<pre class="wiki">    int foo(int bar)
+    {
+        if (something) {
+            /* stuff done here */
+            return 1;            
+        } else {
+            return 0;
+        }
+    }
+</pre><p>
+HIGHLY RECOMMENDED: Conditions with &lt;, &lt;=, &gt;= or == operators should isolate the value being checked (untrusted value)
+on the left hand side of the comparison. The right hand side should contain trusted values (thus avoiding overflows/underflows).
+Use unsigned types when storing sizes or lengths. For example if variable len is untrusted and variables size and p are trusted
+(NOTE: sizes and length should be stored in unsigned types):
+</p>
+<blockquote>
+<p>
+NOT OK: <tt> if ((p + len ) &gt; size) return EINVAL; </tt>
+OK: <tt> if (len &gt; size - p) return EINVAL; </tt>
+</p>
+</blockquote>
+<h3 id="Loops">Loops</h3>
+<p>
+HIGHLY RECOMMENDED: For, while and until statements should take a similar form:
+</p>
+<pre class="wiki">    for (''initialization; condition; update'') {
+        /* iterate here */
+    }
+
+    while (''condition'') {
+        /* do some work */
+    }
+</pre><h4 id="Switch">Switch</h4>
+<p>
+HIGHLY RECOMMENDED: Use the following style for the switch statements. Add comments if missing break is intentional.
+</p>
+<pre class="wiki">   switch (var) {
+   case 0:
+       break;
+   case 1:
+       printf("meh.\n");
+       /* FALLTHROUGH */
+   case 2:
+       printf("2\n");
+       break;
+   default:
+       /* Always have default */
+       break;
+   }
+</pre><h2 id="Strings">Strings</h2>
+<h3 id="Internationalizedi18nStrings">Internationalized (i18n) Strings</h3>
+<p>
+ 
+If the string will be internationalized (e.g. is marked with _()) and 
+it has more than one format substitution you <strong><em>MUST</em></strong> use <em>index</em> format specifiers, not positional format specifiers. Translators need the option to reorder where substitutions appear in a string because the ordering of nouns, verbs, phrases, etc. differ between languages. If conventional positional format conversion specifiers (e.g. %s %d) are used the string cannot be reordered because the ordering of the format specifiers must match the ordering of the printf arguments supplying the substitutions. The fix for this is easy, use indexed format specifiers. An indexed specifier includes an (1 based) index to the % character that introduces the format specifier (e.g. %1$ to indicate the first argument). That index is used to select the matching argument from the argument list. When indexed specifiers are used <em>all</em> format specifiers and <em>all</em> * width fields <strong><em>MUST</em></strong> use indexed specifiers.
+</p>
+<p>
+Here is an example of incorrect usage with positional specifiers:
+</p>
+<pre class="wiki">  printf(_("item %s has %s value"), name, value);
+</pre><p>
+Here is the correct usage using indexed specifiers:
+</p>
+<pre class="wiki">  printf(_("item %1$s has %2$s value"), name, value);
+</pre><p>
+See man 3 printf as well as section 15.3.1 "C Format Strings" in the GNU gettext manual for more details.
+</p>
+</body></html>

@@ -1,0 +1,61 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h1 id="TroubleshootingDNSupdateissues">Troubleshooting DNS update issues</h1>
+<h2 id="CheckSSSDconfiguration">Check SSSD configuration</h2>
+<p>
+First of all, check if options <tt>dyndns_update</tt>, <tt>dyndns_refresh_interval</tt>, <tt>dyndns_update_ptr</tt>, and <tt>dyndns_ttl</tt> have desired values in <tt>/etc/sssd/sssd.conf</tt>.
+</p>
+<p>
+Default values depend on selected provider. For Active directory see <tt>man 5 sssd-ad</tt>, for FreeIPA see <tt>man 5 sssd-ipa</tt> etc. For further information please see <tt>man 5 sssd.conf</tt>.
+</p>
+<h2 id="MakeSSSDlogsuseful">Make SSSD logs useful</h2>
+<p>
+Set <tt>debug_level=8</tt> (or higher) so the log shows exact messages from <tt>nsupdate</tt> tool.
+</p>
+<p>
+In the logs, look for trailer <tt>-- Begin nsupdate message --</tt> and messages beneath it. This is the interesing part.
+</p>
+<h2 id="Trynsupdateyourself">Try nsupdate yourself</h2>
+<p>
+For easier debugging you can run <tt>nsupdate</tt> yourself. Copy&amp;paste input for <tt>nsupdate</tt> from logs to a separate file and play with it (e.g. add <tt>debug</tt> statement to the input).
+</p>
+<ol><li>Obtain machine ticket: <tt>$ kinit -kt</tt>
+</li><li>Run nsupdate: <tt>$ nsupdate -g /tmp/commands_copied_from_log_file</tt>
+</li></ol><h2 id="VerifyDNSconfiguration">Verify DNS configuration</h2>
+<p>
+As a first step, <tt>nsupdate</tt> auto-detects DNS zone name and server responsible for the DNS zone. This information is printed out if <tt>debug</tt> statement is present in nsupdate's input.
+</p>
+<p>
+It looks like this:
+</p>
+<pre class="wiki">Reply from SOA query:
+;; -&gt;&gt;HEADER&lt;&lt;- opcode: QUERY, status: NXDOMAIN, id:  32531
+;; flags: qr rd ra; QUESTION: 1, ANSWER: 0, AUTHORITY: 1, ADDITIONAL: 0
+;; QUESTION SECTION:
+;name.to.be.updated.example.com.	IN	SOA
+
+;; AUTHORITY SECTION:
+example.com.		0	IN	SOA	ns01.example.com. noc.example.com. 2016072000 300 180 604800 600
+
+Found zone name: example.com
+The master is: ns01.example.com
+Sending update to 192.0.2.1#53
+</pre><p>
+Check that:
+</p>
+<ul><li>The <tt>Found zone name</tt> must match zone name configured on DNS servers.
+</li><li><tt>The master is</tt> must contain name of Primary Master DNS server which accepts DNS updates. This value is taken from <tt>MNAME</tt> field in the <tt>SOA</tt> record.
+</li><li>Message <tt>Sending update to</tt> contains correct IP address of the Primary Master DNS server.
+</li></ul><p>
+If any of the above is not correct the problem is likely not caused by SSSD but by DNS configuration:
+</p>
+<ul><li>Double-check SOA record for particular zone in DNS.
+</li><li>Make sure that servers listed in <tt>/etc/resolv.conf</tt> return correct answers.
+</li></ul><h2 id="CheckDNSserverslogs">Check DNS server's logs</h2>
+<p>
+The DNS server can reply with multiple various error codes. Look for trailer <tt>Reply from update query:</tt> (it might appear multiple times) and check all <tt>status</tt> codes:
+</p>
+<pre class="wiki">Reply from update query:
+;; -&gt;&gt;HEADER&lt;&lt;- opcode: UPDATE, status: REFUSED, id:  10871
+</pre><p>
+In this case server replied with error <tt>REFUSED</tt>. Most likely, the access controls on the DNS server do not allow this particular client to issue DNS updates for given DNS name/type/etc. Check logs at Primary Master DNS server and see what information got logged there.
+</p>
+</body></html>

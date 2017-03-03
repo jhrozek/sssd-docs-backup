@@ -1,0 +1,142 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><p>
+</p><div class="wiki-toc">
+<ol>
+  <li>
+    <ol>
+      <li>
+        <a href="#Netgroups">Netgroups</a>
+        <ol>
+          <li>
+            <a href="#OverviewofNetgroups">Overview of Netgroups</a>
+          </li>
+          <li>
+            <a href="#OverviewofNetgroupsinName-ServiceSwitch">Overview of Netgroups in Name-Service Switch</a>
+          </li>
+          <li>
+            <a href="#OverviewofNetgroupsinLDAP">Overview of Netgroups in LDAP</a>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <a href="#SSSD">SSSD</a>
+        <ol>
+          <li>
+            <a href="#Overviewofapproach">Overview of approach</a>
+            <ol>
+              <li>
+                <a href="#Highlevel">High level</a>
+              </li>
+              <li>
+                <a href="#Lower-level-setnetgrent">Lower-level - setnetgrent</a>
+              </li>
+              <li>
+                <a href="#Handlingnestednetgroups">Handling nested netgroups</a>
+              </li>
+              <li>
+                <a href="#Trackingnestinglimits">Tracking nesting limits</a>
+              </li>
+            </ol>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <a href="#DanglingQuestions">Dangling Questions</a>
+      </li>
+    </ol>
+  </li>
+</ol>
+</div><p>
+</p>
+<h2 id="Netgroups">Netgroups</h2>
+<h3 id="OverviewofNetgroups">Overview of Netgroups</h3>
+<p>
+Netgroups define network-wide groups used for permission checking when fielding requests for remote mounts, remote logins, and remote shells. For remote mounts, the information in netgroup is used to classify machines; for remote logins and remote shells, it is used to classify users.
+</p>
+<p>
+Netgroups have a name, and contain one or more of the following members:
+</p>
+<ul><li>The name of another netgroup (supporting nested netgroups)
+</li><li>A three-tuple of (username,hostname,domainname) (parentheses included)
+</li></ul><h3 id="OverviewofNetgroupsinName-ServiceSwitch">Overview of Netgroups in Name-Service Switch</h3>
+<p>
+The interface and behavior of netgroups in libc is a multi-step procedural interface as follows:
+</p>
+<ol><li>The user calls <tt>setnetgrent(netgroupname)</tt>
+<ul><li>This sets an internal, global iterator to the start of the list of members for the netgroup specified by netgroupname
+</li></ul></li><li>The user calls <tt>getnetgrent()</tt> repeatedly until it returns failure
+<ul><li>This returns one set of username, hostname and domainname for each call, until there are no more associated with the netgroupname
+</li></ul></li><li>The user calls <tt>endnetgrent()</tt>
+<ul><li>This cleans up after itself
+</li></ul></li></ol><p>
+Internally, libraries providing netgroups in libc must unroll the nested netgroups so that all results are returned by <tt>getnetgrent()</tt> without additional explicit calls.
+</p>
+<h3 id="OverviewofNetgroupsinLDAP">Overview of Netgroups in LDAP</h3>
+<p>
+Netgroups in LDAP are entries containing the objectClass <tt>nisNetgroup</tt>. This objectClass specifies two options:
+<dl class="wiki"><dt>nisNetgroupTriple</dt><dd>
+A netgroup, specified as a literal string. So it would be <tt>(hostname,username,domainname)</tt>
+</dd><dt>memberNisNetgroup</dt><dd>
+The name of another netgroup whose contents need to be rolled into this entry.
+</p>
+</dd></dl>
+<p>
+Complete example (taken from <a class="ext-link" href="http://directory.fedoraproject.org/wiki/Howto:Netgroups"><span class="icon">​</span>http://directory.fedoraproject.org/wiki/Howto:Netgroups</a>):
+</p>
+<pre class="wiki">dn: cn=LinuxTeam,ou=Netgroup,dc=example,dc=com
+objectClass: nisNetgroup
+objectClass: top
+cn: LinuxTeam
+nisNetgroupTriple: (,frank,example.com)
+nisNetgroupTriple: (,jill,example.com)
+memberNisNetgroup: QA
+memberNisNetgroup: Development
+memberNisNetgroup: Operations
+description: The Linux Team
+</pre><h2 id="SSSD">SSSD</h2>
+<h3 id="Overviewofapproach">Overview of approach</h3>
+<p>
+Netgroups will be processed similarly to how we handle enumerations in SSSD. 
+</p>
+<h4 id="Highlevel">High level</h4>
+<ol><li>When a <tt>setnetgrent()</tt> request arrives, we will first check the LDB cache and then we will go to the backends to update the cache.
+</li><li>Once the cache is readied, we will then construct a result object that we can iterate through to return the result set.
+</li><li>Once the result object is ready, we will reply to the <tt>setgetgrent()</tt> request to notify the calling application that it can start calling <tt>getnetgrent()</tt>
+</li><li>The calling application will issue <tt>getnetgrent()</tt> calls until there are no more members available.
+</li><li>The calling application will call <tt>endnetgrent()</tt>
+</li></ol><h4 id="Lower-level-setnetgrent">Lower-level - setnetgrent</h4>
+<ol><li>Incoming requests to the SSSD will behave similarly to the user and group enumaration code, except that the individual result objects for different netgroup names will be stored in a hash table keyed on the netgroup name.
+</li><li>During processing, if a netgroup contains nested netgroups, we will need to issue a recursive internal <tt>setnetgrent()</tt> request. This means we will need to have a nesting limit (and ideally, loop-detection)
+</li><li>The response object must contain the complete unrolled results of all of its child netgroups, so that we do not need to maintain multiple iterators for reading through the children.
+</li><li>The acknowledgement response to the initial <tt>setnetgrent()</tt> request will need to happen only after all nested netgroups have been cached.
+</li></ol><h4 id="Handlingnestednetgroups">Handling nested netgroups</h4>
+<p>
+During <tt>setnetgrent()</tt> processing, we will convert the results into a collection object (see libcollection). For each nested group, we will recurse into <tt>setnetgrent()</tt> and create a new collection object that can be added to the parent collection. In this way, we will be able to unroll the groups easily.
+</p>
+<p>
+Later, in <tt>getnetgrent()</tt> processing, we will construct the response from the stored collection object, rather than directly from the ldb_result object as we do with user and group enumerations.
+</p>
+<p>
+Public interfaces:
+</p>
+<pre class="wiki">struct tevent_req setnetgrent_send(char *netgroupname, hash_table_t *nesting)
+</pre><pre class="wiki">errno_t setnetgrent_recv(tevent_req *req, struct collection **entries)
+</pre><p>
+Internally, the processing for <tt>setnetgrent_send()</tt> is expected to recurse into nested netgroups and add the resulting <tt>entries</tt> to its own list using the <tt>col_add_collection_to_collection()</tt> interface with the <tt>col_add_mode_clone</tt> mode.
+</p>
+<h4 id="Trackingnestinglimits">Tracking nesting limits</h4>
+<p>
+The biggest danger in nesting is the risk of loops in the memberships. To resolve this, I propose that we keep track of subrequests in a dhash table. This would behave as follows:
+</p>
+<ol><li>In <tt>setnetgrent_send()</tt> we would first check whether the hash_count of the hash table is equal to the nesting limit. If it is, we will return completion immediately.
+</li><li>Next we will check whether netgroupname already exists in the hash table. If it does, then we know we have looped and will simply return completion immediately.
+</li><li>At this point, we will add the current netgroup name to the hash table (with a NULL associated value) and continue processing this request.
+</li><li>In <tt>setnetgrent_recv()</tt> we will remove the requested netgroupname from the hash table and amend the result collection.
+</li></ol><p>
+This will allow us to protect against both loops and excessive nesting all at once.
+</p>
+<h2 id="DanglingQuestions">Dangling Questions</h2>
+<ol><li>Is it permissible for a single client to request multiple different netgroups concurrently?
+<ul><li>My reading of the documentation for [set|get|end]netgrent leads me to believe that this is not permitted by libc.
+</li></ul></li><li>Maybe this is too low-level at this time, but is a cleanup task planned?
+<ul><li>Netgroups should be handled in the same way that users and groups are handled, so I will probably have to extend the existing cleanup task to also address the netgroups entries in the cache - sgallagh
+</li></ul></li></ol></body></html>

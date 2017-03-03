@@ -1,0 +1,36 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Description">Description</h2>
+<p>
+This test ensures that users stored in native LDB backend can log in using SSSD.
+</p>
+<h2 id="Howtotest">How to test</h2>
+<ol><li>Follow the steps in <a class="wiki" href="https://docs.pagure.org/sssd-test2/Fedora_11_Test_Day/Installation.html">Installing the SSSD</a>. If you are running the Test Day LiveCD, you may skip this step. 
+</li><li>Copy <a class="attachment" href="https://fedorahosted.org/sssd/attachment/wiki/Fedora_11_Test_Day/sssd.conf" title="Attachment 'sssd.conf' in Fedora_11_Test_Day">sssd.conf</a><a class="trac-rawlink" href="https://fedorahosted.org/sssd/raw-attachment/wiki/Fedora_11_Test_Day/sssd.conf" title="Download">​</a> to /etc/sssd/sssd.conf
+</li><li>Restart the SSSD service (as root):
+<pre class="wiki">service sssd restart
+</pre>(Please disregard the "<tt>Unable to register control with rootdse!</tt>" messages, as they are erroneous).
+</li><li>Verify that the SSSD services are running:
+<pre class="wiki">ps -e |grep sss
+</pre>You should see:
+<pre class="wiki">30968 pts/0    00:00:00 sssd
+30970 pts/0    00:00:00 sssd_dp
+30972 pts/0    00:00:00 sssd_be
+30973 pts/0    00:00:00 sssd_be
+30974 pts/0    00:00:00 sssd_be
+30975 pts/0    00:00:00 sssd_nss
+30976 pts/0    00:00:00 sssd_pam
+</pre></li><li>Create a new local user with the following command (as root). You don't need to create this user again if you followed the <a class="wiki" href="https://docs.pagure.org/sssd-test2/Fedora_11_Test_Day/NSS_Local_Native.html">NSS Local Native testcase</a>
+<pre class="wiki">/usr/sbin/sss_useradd nativelocaluser
+</pre>(Again, you can disregard the "<tt>Unable to register control with rootdse!</tt>" messages.)
+</li><li>Change password of this new user (as root)
+<pre class="wiki">passwd nativelocaluser
+</pre></li><li>Start the OpenSSH server if not running (as root)
+<pre class="wiki">service sshd start
+</pre>The reason, we're testing logging in via ssh and not virtual consoles is that the VTs read PAM config on startup.
+</li><li>Try logging in as nativelocaluser
+<pre class="wiki">ssh nativelocaluser@localhost
+</pre></li><li>When logged in as nativelocaluser, let the user change his own password
+<pre class="wiki">passwd
+</pre></li><li>Log out and log back in using the new password
+<pre class="wiki">logout
+ssh nativelocaluser@localhost
+</pre></li></ol></body></html>

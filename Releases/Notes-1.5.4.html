@@ -1,0 +1,39 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<ul><li>Fixes for Active Directory when not all users and groups have POSIX attributes
+</li><li>Fixes for handling users and groups that have name aliases (aliases are ignored)
+</li><li>Fix group memberships after initgroups in the IPA provider
+</li></ul><h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Jakub Hrozek (4):
+</p>
+<ul><li>Fix LDAP search filter for nested initgroups
+</li><li>Add originalDN to fake groups
+</li><li>Use fake groups during IPA schema initgroups
+</li><li>Return from functions in LDAP provider after marking request as failed
+</li></ul><p>
+Stephen Gallagher (19):
+</p>
+<ul><li>Update version to 1.5.4
+</li><li>Require existence of GID number and name in group searches
+</li><li>Require existence of username, uid and gid for user enumeration
+</li><li>Add support for krb5 access provider to SSSDConfig API
+</li><li>Fix incorrect return value check
+</li><li>Create sysdb_get_rdn() function
+</li><li>Add sysdb_attrs_primary_name()
+</li><li>Ignore aliases for users
+</li><li>RFC2307: Ignore aliases for groups
+</li><li>RFC2307bis: Ignore aliases for groups
+</li><li>Use sysdb_attrs_primary_name() in sdap_initgr_nested_store_group
+</li><li>Add sysdb_attrs_primary_name_list() routine
+</li><li>Don't crash if we get a multivalued name without an origDN
+</li><li>Don't crash on error if _name parameter unspecified
+</li><li>Check result of talloc_strdup() properly
+</li><li>sss_obfuscate: Avoid traceback on ctrl+d
+</li><li>sss_obfuscate: abort on ctrl+c
+</li><li>Add transifex_client configuration
+</li><li>Adding new translations
+</li></ul><p>
+Sumit Bose (1):
+</p>
+<ul><li>Sanitize DN when searching the original DN in the cache
+</li></ul></body></html>

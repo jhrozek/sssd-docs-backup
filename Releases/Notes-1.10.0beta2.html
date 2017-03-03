@@ -1,0 +1,181 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<ul><li>The Active Directory provider now includes support for retrieving identity information and authentication as users from trusted domains in the same forest. The SSSD looks up the information using the Global Catalog. Currently this feature is only supported when the SSSD is connected to the forest root.
+</li><li>The group memberships for Active Directory users are read from the PAC during login. If the PAC is not available (such as when group membership is requested for a user who has never logged in), the SSSD falls back to using tokenGroups.
+</li><li>The Active Directory provider is able to autodiscover the NetBIOS (flat) name of the domain it connects to. The NetBIOS name is discovered automatically on startup.
+</li><li>The full_name_format option now accepts a new parameter that expands to the NetBIOS name of the domain
+</li><li>The new krb5_use_kdcinfo option allows the administrator to disable the Kerberos locator plugin and rely on information read from the krb5.conf file completely.
+</li><li>A new option ldap_disable_range_retrieval was added. Switching this option to True skips large Active Directory groups that might otherwise take a long time to download and process.
+</li><li>A new option refresh_expired_interval was added. This option allows to configure a background task that would automatically refresh entries that are nearing their expiration time. In this release, only refreshing netgroups is implemented.
+</li></ul><h2 id="PackagingChanges">Packaging Changes</h2>
+<ul><li>The Makefile has been amended so that it no longer uses overlinking which is disabled by default on some distributions (such as Debian and its derivatives)
+</li><li>The upstream RPM specfile now packages each provider separately. The SSSD deamon and the responders are now included in the sssd-common package, while the sssd package has become a "meta package" that Requires all the existing providers for backwards compatibility.
+</li><li>The libsss_sudo and libsss_autofs libraries are now part of the sssd-common package
+</li></ul><h2 id="TicketsFixed">Tickets Fixed</h2>
+<ul><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1510" title="task: Split providers into their own subpackages (closed: fixed)">#1510</a> - Split providers into their own subpackages
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1797" title="task: Use hardened flags for building RPMs (closed: fixed)">#1797</a> - Use hardened flags for building RPMs
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1976" title="defect: Copy-n-paste error in AD provider (closed: fixed)">#1976</a> - Copy-n-paste error in AD provider
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1883" title="defect: Add a new option to disable the Kerberos locator plugin completely (closed: fixed)">#1883</a> - Add a new option to disable the Kerberos locator plugin completely
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1713" title="enhancement: [RFE] Add a task to the SSSD to periodically refresh cached entries (closed: fixed)">#1713</a> - [RFE] Add a task to the SSSD to periodically refresh cached entries
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1891" title="task: unite periodic refresh API (closed: fixed)">#1891</a> - unite periodic refresh API
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1789" title="defect: ldap_access_order improvements (man page fix) (closed: fixed)">#1789</a> - ldap_access_order improvements (man page fix)
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1972" title="defect: Dereference after a NULL check in tests/common_dom.c (closed: fixed)">#1972</a> - Dereference after a NULL check in tests/common_dom.c
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1971" title="defect: Dereference before NULL check in nscd.c (closed: fixed)">#1971</a> - Dereference before NULL check in nscd.c
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1816" title="defect: Non-fatal errors looking up trusted domains with IPA back end (closed: fixed)">#1816</a> - Non-fatal errors looking up trusted domains with IPA back end
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1845" title="defect: move libsss_sudo and libsss_autofs back into the main sssd package (closed: fixed)">#1845</a> - move libsss_sudo and libsss_autofs back into the main sssd package
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/364" title="enhancement: [RFE] Recognize trusted domains in AD provider (closed: fixed)">#364</a>  - [RFE] Recognize trusted domains in AD provider
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1557" title="enhancement: [RFE] Use the Global Catalog in SSSD for the AD provider (closed: fixed)">#1557</a> - [RFE] Use the Global Catalog in SSSD for the AD provider
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1558" title="enhancement: [RFE] Use MS-PAC to retrieve user's group list (closed: fixed)">#1558</a> - [RFE] Use MS-PAC to retrieve user's group list
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1951" title="defect: NetBIOS domain name should be read at startup (closed: fixed)">#1951</a> - NetBIOS domain name should be read at startup
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1929" title="defect: Junk character in sssd_domain.log for domain string when sssd tries to go ... (closed: fixed)">#1929</a> - Junk character in sssd_domain.log for domain string when sssd tries to go online from offline mode
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1928" title="defect: Libtool fails to find dependent libraries (closed: fixed)">#1928</a> - Libtool fails to find dependent libraries
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1950" title="defect: segfault while processing ASQ request (closed: fixed)">#1950</a> - segfault while processing ASQ request
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1924" title="defect: MAN: Make it clear which address is used to update DNS records (closed: fixed)">#1924</a> - MAN: Make it clear which address is used to update DNS records
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1648" title="defect: Fully qualified account names form should be able to use flatname in the ... (closed: fixed)">#1648</a> - Fully qualified account names form should be able to use flatname in the fq format
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1930" title="defect: Crash with negative values in ldap_idmap_range_size (closed: fixed)">#1930</a> - Crash with negative values in ldap_idmap_range_size
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1823" title="defect: getgrnam / getgrgid for large user groups is too slow due to range ... (closed: fixed)">#1823</a> - getgrnam / getgrgid for large user groups is too slow due to range retrieval functionality
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1927" title="task: Provide a script to create a SRPM without having to run configure (closed: fixed)">#1927</a> - Provide a script to create a SRPM without having to run configure
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1785" title="defect: NSCD warning is irritating (closed: fixed)">#1785</a> - NSCD warning is irritating
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1934" title="defect: sssd crashes if junk is present in sssd.conf (closed: fixed)">#1934</a> - sssd crashes if junk is present in sssd.conf
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1772" title="task: Rename or alias the SAFEALIGN macros (closed: fixed)">#1772</a> - Rename or alias the SAFEALIGN macros
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1909" title="defect: Clarify the AD site discovery in sssd-ad man page (closed: fixed)">#1909</a> - Clarify the AD site discovery in sssd-ad man page
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1921" title="defect: Login failure: Enterprise Principal enabled by default for AD Provider (closed: fixed)">#1921</a> - Login failure: Enterprise Principal enabled by default for AD Provider
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1905" title="defect: pysss_nss_idmap improvements (closed: fixed)">#1905</a> - pysss_nss_idmap improvements
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1914" title="defect: pysss_nss_idmap:  Support also Unicode strings and return them by default (closed: fixed)">#1914</a> - pysss_nss_idmap: Support also Unicode strings and return them by default
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1922" title="defect: sssd_be crashes when looking up users in the LDAP provider with ID mapping (closed: fixed)">#1922</a> - sssd_be crashes when looking up users in the LDAP provider with ID mapping
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1910" title="defect: Clarify that AD DNS updates are performed using GSS-TSIG (closed: fixed)">#1910</a> - Clarify that AD DNS updates are performed using GSS-TSIG
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1915" title="defect: Turn on dyndns updates by default in the AD provider (closed: fixed)">#1915</a> - Turn on dyndns updates by default in the AD provider
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1912" title="defect: SUDO is not working for users from trusted AD domain (closed: fixed)">#1912</a> - SUDO is not working for users from trusted AD domain
+</li><li><a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/1468" title="enhancement: [RFE] AD: Should be able to log in as long or short domains (closed: fixed)">#1468</a> - [RFE] AD: Should be able to log in as long or short domains
+</li></ul><h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Jakub Hrozek (45):
+</p>
+<ul><li>Update the version for the 1.10 beta2 release
+</li><li>Actually use the index parameter in resolv_get_sockaddr_address_index
+</li><li>Fix a typo in sssd-ad man page
+</li><li>tests: Do not set cwd twice
+</li><li>Enable the AD dynamic DNS updates by default
+</li><li>man: Clarify that AD dyndns updates are secured using GSS-TSIG
+</li><li>LDAP: Always initialize idmap object
+</li><li>Re-add a useful DEBUG message
+</li><li>man: Clarify the AD site discovery documentation
+</li><li>man: Note that IPA updates are secured with GSS-TSIG
+</li><li>Remove unneeded parameter of setup_child and namespace it
+</li><li>Fix dyndns timer initialization
+</li><li>IPA: Check for ENOMEM
+</li><li>Remove unneeded comment
+</li><li>FO: Fix setting status of duplicates
+</li><li>AD dyndns: extract the host name from URI
+</li><li>Add utility functions for formatting fully-qualified names
+</li><li>Check the validity of FQname format prior to using it
+</li><li>Allow flat name in the FQname format
+</li><li>Remove branching to improve readability
+</li><li>tests: Link fqnames_tests with libsss_test_common.la
+</li><li>Do not obfuscate calls with booleans
+</li><li>LDAP: sdap_id_ctx might contain several connections
+</li><li>LDAP: Refactor account info handler into a tevent request
+</li><li>LDAP: Pass in a connection to ID functions
+</li><li>LDAP: new SDAP domain structure
+</li><li>LDAP: return sdap search return code to ID
+</li><li>Move domain_to_basedn outside IPA subtree
+</li><li>New utility function sss_get_domain_name
+</li><li>LDAP: split a function to create search bases
+</li><li>LDAP: store FQDNs for trusted users and groups
+</li><li>Split generating primary GID for ID mapped users into a separate function
+</li><li>LDAP: Do not store separate GID for subdomain users
+</li><li>AD: Add additional service to support Global Catalog lookups
+</li><li>AD ID lookups - choose GC or LDAP as appropriate
+</li><li>AD: Store trusted AD domains as subdomains
+</li><li>rpm: Fold libsss_sudo and libsss_autofs back into the main SSSD package
+</li><li>dyndns: Fix NULL check
+</li><li>man: document the need to set ldap_access_order
+</li><li>A new option krb5_use_kdcinfo
+</li><li>Fix allocation check in the AD provider
+</li><li>rpm: Use hardened flags for RPM build
+</li><li>rpm: Split providers into separate subpackages
+</li><li>Update transifex URL to transifex.com
+</li><li>Updating translations for the 1.10 beta2 release
+</li></ul><p>
+Jan Cholasta (4):
+</p>
+<ul><li>UTIL: Add function sss_names_init_from_args
+</li><li>SSH: Fix parsing of names from client requests
+</li><li>SSH: Use separate field for domain name in client requests
+</li><li>SSH: Do not skip domains with use_fully_qualified_names in host key requests
+</li></ul><p>
+Lukas Slebodnik (13):
+</p>
+<ul><li>Fixes compilation without selinux.
+</li><li>Fix broken build with selinux.
+</li><li>Fix segfault in AD Subdomains Module
+</li><li>Fixing critical format string issues.
+</li><li>Adding script to create a SRPM
+</li><li>Removing unused functions.
+</li><li>Adding option to disable retrieving large AD groups.
+</li><li>Making order in tests.
+</li><li>Remove empty directories after tests run.
+</li><li>Prevent segfault while processing ASQ request
+</li><li>Fix compilation with disabled link_all_deplibs.
+</li><li>Use deep copy for dns_domain and discovery_domain
+</li><li>Fix dereference after a NULL check in tests.
+</li></ul><p>
+Michal Zidek (1):
+</p>
+<ul><li>Rename SAFEALIGN macros.
+</li></ul><p>
+Ondrej Kos (8):
+</p>
+<ul><li>Fix segfault in DYNDNS
+</li><li>DB: Fix segfault when configuration file cannot be parsed
+</li><li>Move nscd.c from tools to util
+</li><li>Check NSCD configuration file
+</li><li>Fail with misconfigured id-mapping ranges
+</li><li>MAN: state default dyndns interface
+</li><li>DB: Don't add invalid ranges
+</li><li>Don't test for NULL in nscd config check
+</li></ul><p>
+Pavel Březina (5):
+</p>
+<ul><li>sudo responder: search rules for subdomains in parent domain subtree
+</li><li>back end: periodic task API
+</li><li>back end: periodical refresh of expired records API
+</li><li>back end: add refresh expired records periodic task
+</li><li>providers: refresh expired netgroups
+</li></ul><p>
+Stef Walter (1):
+</p>
+<ul><li>Add a domain config attribute for realmd
+</li></ul><p>
+Stephen Gallagher (2):
+</p>
+<ul><li>Remove old hash support from example spec
+</li><li>Add 'description' attribute to SSSDConfig API
+</li></ul><p>
+Sumit Bose (21):
+</p>
+<ul><li>AD: read flat name and SID of the AD domain
+</li><li>Add missing \n to debug string
+</li><li>Fix missing initialization in Python bindings for libsss_nss_idmap
+</li><li>Add support for tuples and unicode pysss_nss_idmap.so
+</li><li>Always update cached upn if enterprise principals are used
+</li><li>Fix return code for AD subdomain request
+</li><li>pysss_nss_idmap: do not treat strings as sequences
+</li><li>IPA: Always initialize ID mapping
+</li><li>Handle SID strings in sdap_attrs_get_sid_str() as well
+</li><li>IPA: read user and group SID
+</li><li>Add SID related requests to the LDAP provider
+</li><li>Set canonicalize flag if enterprise principals are used
+</li><li>Lookup domains at startup
+</li><li>Add be request queue
+</li><li>Use queue for get_subdomains
+</li><li>Read SIDs of groups with sysdb_initgroups() as well
+</li><li>Enhance PAC responder for AD users
+</li><li>Intermittent fix for get_user_and_group_users_done
+</li><li>Always send the PAC to the PAC responder
+</li><li>Implicitly activate the PAC responder for AD provider
+</li><li>Fix some doxygen warnings
+</li></ul><p>
+Yuri Chornoivan (1):
+</p>
+<ul><li>Fix minor typos
+</li></ul></body></html>

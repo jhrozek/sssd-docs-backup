@@ -1,0 +1,434 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><p>
+</p><div class="wiki-toc">
+<ol>
+  <li>
+    <ol>
+      <li>
+        <a href="#Synopsis">Synopsis</a>
+      </li>
+      <li>
+        <a href="#Windows2008ServerSetup">Windows 2008 Server Setup</a>
+        <ol>
+          <li>
+            <a href="#OperatingSystemInstallation">Operating System Installation</a>
+          </li>
+          <li>
+            <a href="#DomainConfiguration">Domain Configuration</a>
+          </li>
+          <li>
+            <a href="#EnablingLDAPSearches">Enabling LDAP Searches</a>
+            <ol>
+              <li>
+                <a href="#UsingSASLGSSAPIBindsforLDAPSearches">Using SASL/GSSAPI Binds for LDAP Searches</a>
+                <ol>
+                  <li>
+                    <a href="#CreatingServiceKeytabwithSamba">Creating Service Keytab with Samba</a>
+                  </li>
+                  <li>
+                    <a href="#etcsambasmb.conf">/etc/samba/smb.conf</a>
+                  </li>
+                  <li>
+                    <a href="#CreatingServiceKeytabonAD">Creating Service Keytab on AD</a>
+                  </li>
+                </ol>
+              </li>
+              <li>
+                <a href="#UsingDNPasswordBindsforLDAPSearches">Using DN/Password Binds for LDAP Searches</a>
+              </li>
+            </ol>
+          </li>
+          <li>
+            <a href="#AddingaGroup">Adding a Group</a>
+          </li>
+          <li>
+            <a href="#AddingaUser">Adding a User</a>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <a href="#LinuxClientSetup">Linux Client Setup</a>
+        <ol>
+          <li>
+            <a href="#etckrb5.conf">/etc/krb5.conf</a>
+          </li>
+          <li>
+            <a href="#etcsssdsssd.conf">/etc/sssd/sssd.conf</a>
+          </li>
+          <li>
+            <a href="#NSSPAMConfiguration">NSS/PAM Configuration</a>
+            <ol>
+              <li>
+                <a href="#FedoraRHEL">Fedora/RHEL</a>
+              </li>
+              <li>
+                <a href="#DebianUbuntu">Debian/Ubuntu?</a>
+              </li>
+              <li>
+                <a href="#ConfigureNSSPAMmanually">Configure NSS/PAM manually</a>
+                <ol>
+                  <li>
+                    <a href="#etcnsswitch.conf">/etc/nsswitch.conf</a>
+                  </li>
+                  <li>
+                    <a href="#etcpam.dcommon-auth">/etc/pam.d/common-auth</a>
+                  </li>
+                  <li>
+                    <a href="#etcpam.dcommon-account">/etc/pam.d/common-account</a>
+                  </li>
+                  <li>
+                    <a href="#etcpam.dcommon-password">/etc/pam.d/common-password</a>
+                  </li>
+                  <li>
+                    <a href="#etcpam.dcommon-session">/etc/pam.d/common-session</a>
+                  </li>
+                </ol>
+              </li>
+            </ol>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <a href="#UnderstandingKerberosActiveDirectory">Understanding Kerberos &amp; Active Directory</a>
+        <ol>
+          <li>
+            <a href="#OptionalFinalTest">Optional Final Test</a>
+          </li>
+          <li>
+            <a href="#Furtherreading">Further reading</a>
+          </li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+</ol>
+</div><p>
+</p>
+<h2 id="Synopsis">Synopsis</h2>
+<p>
+This describes how to configure SSSD to authenticate with a Windows 2008 Domain Server. This guide is a work in progress.
+</p>
+<h2 id="Windows2008ServerSetup">Windows 2008 Server Setup</h2>
+<p>
+The domain to be configured is <em>ad.example.com</em> using realm <em>AD.EXAMPLE.COM</em>, the Windows server is <em>server.ad.example.com</em>, and the client host where SSSD is running is <em>client.ad.example.com</em>. Reboot Windows during installation and setup when prompted and complete the needed steps as Administrator.
+</p>
+<h3 id="OperatingSystemInstallation">Operating System Installation</h3>
+<ul><li>Boot from the Windows 2008 Server DVD
+</li><li>Install Windows 2008 Server using the hostname <em>server.ad.example.com</em>
+</li><li>Make sure <em>server.ad.example.com</em> is in DNS
+</li></ul><h3 id="DomainConfiguration">Domain Configuration</h3>
+<ul><li>In <em>Server Manager</em> add the <em>Active Directory Domain Services</em> role
+</li><li>Create a new domain named <em>ad.example.com</em>
+</li><li>Required: in <em>Server Manager</em> add the <em>Identity Management for UNIX</em> Role Service for <em>Active Directory Domain Services</em>, use the domain name for the NIS domain name
+<ul><li>Currently SSSD won't work with AD in a meaningful fashion without this (this might change if <a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/995" title="enhancement: RFE: Enhance Handling of primaryGroupID from Active Directory (closed: wontfix)">#995</a> and <a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/996" title="enhancement: RFE: Allow Constructing uid from Active Directory objectSid (closed: fixed)">#996</a> are solved)
+</li></ul></li></ul><h3 id="EnablingLDAPSearches">Enabling LDAP Searches</h3>
+<p>
+In order to allow SSSD to do LDAP searches for user information in AD SSSD must be configured to bind with SASL/GSSAPI or DN/password.  GSSAPI is recommended.
+</p>
+<h4 id="UsingSASLGSSAPIBindsforLDAPSearches">Using SASL/GSSAPI Binds for LDAP Searches</h4>
+<p>
+Create the service keytab for the host running SSSD on AD.  Either do this with Samba, or using Windows.  Samba is recommended.
+</p>
+<h5 id="CreatingServiceKeytabwithSamba">Creating Service Keytab with Samba</h5>
+<p>
+On the Linux client with properly configured <em>/etc/krb5.conf</em> (see below) and suitable <em>/etc/samba/smb.conf</em>:
+</p>
+<h5 id="etcsambasmb.conf">/etc/samba/smb.conf</h5>
+<pre class="wiki">[global]
+   workgroup = EXAMPLE
+   client signing = yes
+   client use spnego = yes
+   kerberos method = secrets and keytab
+   log file = /var/log/samba/%m.log
+   password server = AD.EXAMPLE.COM
+   realm = EXAMPLE.COM
+   security = ads
+</pre><ul><li><em>net ads join -U Administrator</em>
+<ul><li>Or do <em>kinit Administrator</em> first and use <em>-k</em> instead of <em>-U Administrator</em>
+</li></ul></li><li>Additional principals can be created later with <em>net ads keytab add</em> if needed.
+</li></ul><p>
+You don't need a Domain Administrator account to do this, you just need an account with sufficient rights to join a machine to the domain.  This is a notable advantage of this approach over generating the keytab directly on the AD controller.  If you're using NFS you may want to specify a different createupn argument here.  This does not cause any problems for sssd.  This would be done using:
+</p>
+<p>
+<em>net ads join createupn="nfs/client.ad.example.com@<tt></tt>AD.EXAMPLE.COM" -U Administrator</em>
+</p>
+<h5 id="CreatingServiceKeytabonAD">Creating Service Keytab on AD</h5>
+<p>
+Do not do this step if you've already created a keytab using Samba.
+</p>
+<p>
+On the Windows server:
+</p>
+<ul><li>Open <em>Users &amp; Computers</em> snap-in
+</li><li>Create a new <em>Computer</em> object named <em>client</em> (i.e., the name of the host running SSSD)
+</li><li>On the command prompt:
+<ul><li><em>setspn -A host/client.ad.example.com@<tt></tt>AD.EXAMPLE.COM client</em>
+</li><li><em>setspn -L client</em>
+</li><li><em>ktpass /princ host/client.ad.example.com@<tt></tt>AD.EXAMPLE.COM /out client-host.keytab /crypto all /ptype KRB5_NT_PRINCIPAL -desonly /mapuser AD\client$ /pass *</em>
+<ul><li>This sets the machine account password and UPN for the principal
+</li><li>If you create additional keytabs for the host add <em>-setpass -setupn</em> for the above command to prevent resetting the machine password (thus changing kvno) and to prevent overwriting the UPN
+</li></ul></li></ul></li><li>Transfer the keytab created in a secure manner to the client as <em>/etc/krb5.keytab</em> and make sure its permissions are correct:
+<ul><li><em>chown root:root /etc/krb5.keytab</em>
+</li><li><em>chmod 0600 /etc/krb5.keytab</em>
+</li><li><em>restorecon /etc/krb5.keytab</em>
+</li></ul></li></ul><p>
+See the <em>Linux Client Setup</em> section for verifying the keytab file and the example sssd.conf below for the needed SSSD configuration.
+</p>
+<h4 id="UsingDNPasswordBindsforLDAPSearches">Using DN/Password Binds for LDAP Searches</h4>
+<p>
+Not generally recommended but see the example sssd.conf below.
+</p>
+<h3 id="AddingaGroup">Adding a Group</h3>
+<ul><li>Open <em>Administrative Tools</em> -&gt; <em>Active Directory Users and Computers</em>
+</li><li>Browse to <em>ad.example.com</em>, then to <em>Users</em>
+</li><li>Right click on <em>Users</em> and <em>Create a New Group</em> named <em>unixusers</em>
+</li><li>Double click on the <em>unixusers</em> group then switch to the <em>UNIX Attributes</em> tab
+</li><li>Select the NIS Domain created earlier
+</li><li>Set the <em>GID</em> as appropriate
+</li></ul><h3 id="AddingaUser">Adding a User</h3>
+<ul><li>Open <em>Administrative Tools</em> -&gt; <em>Active Directory Users and Computers</em>
+</li><li>Browse to <em>ad.example.com</em>, then to <em>Users</em>
+</li><li>Right click on <em>Users</em> and <em>Create a New User</em> named <em>aduser</em>
+</li><li>Make sure <em>User must change password at next logon</em> and <em>Account is disabled</em> are unchecked
+</li><li>Double click on the <em>aduser</em> group then switch to the <em>UNIX Attributes</em> tab
+</li><li>Select the NIS Domain created earlier
+</li><li>Set the <em>UID</em> as appropriate
+</li><li>Set the <em>Login Shell</em> to <em>/bin/bash</em>
+</li><li>Set the <em>Home Directory</em> to <em>/home/aduser</em>
+</li><li>Set <em>Primary Group Name/GID</em> to <em>unixusers</em>
+</li></ul><h2 id="LinuxClientSetup">Linux Client Setup</h2>
+<ul><li>Install <em>sssd</em> package on the Linux client machine
+</li><li>Make configuration changes to the files below
+</li><li>Start the <em>sssd</em> service
+</li></ul><h3 id="etckrb5.conf">/etc/krb5.conf</h3>
+<pre class="wiki">[logging]
+ default = FILE:/var/log/krb5libs.log
+
+[libdefaults]
+ default_realm = AD.EXAMPLE.COM
+ dns_lookup_realm = true
+ dns_lookup_kdc = true
+ ticket_lifetime = 24h
+ renew_lifetime = 7d
+ rdns = false
+ forwardable = yes
+
+# You may also want either of:
+# allow_weak_crypto = true
+# default_tkt_enctypes = arcfour-hmac
+
+[realms]
+# Define only if DNS lookups are not working
+# AD.EXAMPLE.COM = {
+#  kdc = server.ad.example.com
+#  admin_server = server.ad.example.com
+# }
+
+[domain_realm]
+# Define only if DNS lookups are not working
+# .ad.example.com = AD.EXAMPLE.COM
+# ad.example.com = AD.EXAMPLE.COM
+</pre><p>
+Make sure <em>kinit aduser@<tt></tt>AD.EXAMPLE.COM</em> works properly. Add the Windows server IP/hostname to <em>/etc/hosts</em> only if needed.
+</p>
+<p>
+If using SASL/GSSAPI to bind to AD also test that the keytab is working properly:
+</p>
+<p>
+<em>klist -ke</em>
+</p>
+<p>
+<em>kinit -k CLIENT$@<tt></tt>AD.EXAMPLE.COM</em>
+</p>
+<p>
+If you generated your keytab with a different createupn argument, it's possible this won't work and the following works instead.  This is absolutely fine as far as sssd is concerned, and you can instead generate a ticket for the upn you have created:
+</p>
+<p>
+<em>kinit -k -t /etc/krb5.keytab 'nfs/client.ad.example.com@<tt></tt>AD.EXAMPLE.COM' </em>
+</p>
+<p>
+Now using this credential you've just created try fetching data from the server with <em>ldapsearch</em> (in case of issues make sure <em>/etc/openldap/ldap.conf</em> does not contain any unwanted settings):
+</p>
+<p>
+<em>/usr/bin/ldapsearch -H ldap://server.ad.example.com/ -Y GSSAPI -N -b "dc=ad,dc=example,dc=com" "(&amp;(objectClass=user)(sAMAccountName=aduser))"</em>
+</p>
+<p>
+By using the credential from the keytab, you've verified that this credential has sufficient rights to retrieve user information.
+</p>
+<p>
+After both <em>kinit</em> and <em>ldapsearch</em> work properly proceed to actual SSSD configuration.
+</p>
+<h3 id="etcsssdsssd.conf">/etc/sssd/sssd.conf</h3>
+<p>
+Example <em>sssd.conf</em> configuration, additional options can be added as needed.
+</p>
+<pre class="wiki">[sssd]
+config_file_version = 2
+domains = ad.example.com
+services = nss, pam
+debug_level = 0
+
+[nss]
+
+[pam]
+
+[domain/ad.example.com]
+# Unless you know you need referrals, turn them off
+ldap_referrals = false
+# Uncomment if you need offline logins
+# cache_credentials = true
+enumerate = false
+
+id_provider = ldap
+auth_provider = krb5
+chpass_provider = krb5
+access_provider = ldap
+
+# Uncomment if service discovery is not working
+#ldap_uri = ldap://server.ad.example.com/
+
+# Comment out if not using SASL/GSSAPI to bind
+ldap_sasl_mech = GSSAPI
+# Uncomment and adjust if the default principal host/fqdn@REALM is not available
+#ldap_sasl_authid = nfs/client.ad.example.com@AD.EXAMPLE.COM
+
+# Define these only if anonymous binds are not allowed and no keytab is available
+# Enabling use_start_tls is very important, otherwise the bind password is transmitted
+# over the network in the clear
+#ldap_id_use_start_tls = True
+#ldap_default_bind_dn = CN=binduser,OU=user accounts,DC=ad,DC=example,DC=com
+#ldap_default_authtok_type = password
+#ldap_default_authtok = bindpass
+
+ldap_schema = rfc2307bis
+
+ldap_user_search_base = ou=user accounts,dc=ad,dc=example,dc=com
+ldap_user_object_class = user
+
+ldap_user_home_directory = unixHomeDirectory
+ldap_user_principal = userPrincipalName
+
+ldap_group_search_base = ou=groups,dc=ad,dc=example,dc=com
+ldap_group_object_class = group
+
+ldap_access_order = expire
+ldap_account_expire_policy = ad
+ldap_force_upper_case_realm = true
+
+# Uncomment if dns discovery of your AD servers isn't working.
+#krb5_server = server.ad.example.com
+krb5_realm = AD.EXAMPLE.COM
+
+# Probably required with sssd 1.8.x and newer
+krb5_canonicalize = false
+
+# Perhaps you need to redirect to certain attributes?
+# ldap_user_object_class = user
+# ldap_user_name = sAMAccountName
+# ldap_user_uid_number = msSFU30UidNumber
+# ldap_user_gid_number = msSFU30GidNumber
+# ldap_user_gecos = displayName
+# ldap_user_home_directory = msSFU30HomeDirectory
+# ldap_user_shell = msSFU30LoginShell
+# ldap_user_principal = userPrincipalName
+# ldap_group_object_class = group
+# ldap_group_name = cn
+# ldap_group_gid_number = msSFU30GidNumber
+
+</pre><h3 id="NSSPAMConfiguration">NSS/PAM Configuration</h3>
+<p>
+Depending on your distribution you have different options how to enable SSSD.
+</p>
+<h4 id="FedoraRHEL">Fedora/RHEL</h4>
+<p>
+Use <em>authconfig</em> to enable SSSD, install <em>oddjob-mkhomedir</em> to make sure home directory creation works with SELinux:
+</p>
+<p>
+<em>authconfig --enablesssd --enablesssdauth --enablemkhomedir --update</em>
+</p>
+<h4 id="DebianUbuntu"><a class="missing wiki" href="https://docs.pagure.org/sssd-test2/Debian/Ubuntu.html" rel="nofollow">Debian/Ubuntu?</a></h4>
+<p>
+Install <em>libnss-sss</em> and <em>libpam-sss</em> to have SSSD added as NSS/PAM provider in <em>/etc/nsswitch.conf</em> and <em>/etc/pam.d/common-*</em> configuration files. Add <em>pam_mkhomedir.so</em> to PAM session configuration manually. Restart SSSD after these changes.
+</p>
+<h4 id="ConfigureNSSPAMmanually">Configure NSS/PAM manually</h4>
+<p>
+Manual configuration can be done with the following changes. The PAM example file paths are from <a class="missing wiki" href="https://docs.pagure.org/sssd-test2/Debian/Ubuntu.html" rel="nofollow">Debian/Ubuntu?</a>, in Fedora/RHEL corresponding manual configuration should be done in <em>/etc/pam.d/system-auth</em> and <em>/etc/pam.d/password-auth</em>.
+</p>
+<h5 id="etcnsswitch.conf">/etc/nsswitch.conf</h5>
+<p>
+More maps will be available later (see at least tickets <a class="new ticket" href="https://fedorahosted.org/sssd/ticket/359" title="enhancement: SSSD NSS should support host map (new)">#359</a>, <a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/360" title="enhancement: SSSD NSS should support automount map (closed: duplicate)">#360</a>, <a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/900" title="enhancement: Implement automount map intgration with SSSD (closed: fixed)">#900</a>, <a class="new ticket" href="https://fedorahosted.org/sssd/ticket/901" title="enhancement: [Feature] Implement support for the LDAP served maps (new)">#901</a>, <a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/929" title="enhancement: Add support for the services map (closed: fixed)">#929</a>).
+</p>
+<pre class="wiki">#
+# /etc/nsswitch.conf
+#
+
+passwd:         files sss
+shadow:         files sss
+group:          files sss
+
+hosts:          files dns
+
+bootparams:     files
+
+ethers:         files
+netmasks:       files
+networks:       files
+protocols:      files
+rpc:            files
+services:       files
+
+netgroup:       files sss
+
+publickey:      files
+
+automount:      files
+aliases:        files
+</pre><h5 id="etcpam.dcommon-auth">/etc/pam.d/common-auth</h5>
+<p>
+Right after the <em>pam_unix.so</em> line, add
+</p>
+<pre class="wiki">auth         sufficient    pam_sss.so use_first_pass
+</pre><h5 id="etcpam.dcommon-account">/etc/pam.d/common-account</h5>
+<p>
+Right after the <em>pam_unix.so</em> line, add
+</p>
+<pre class="wiki">account      [default=bad success=ok user_unknown=ignore] pam_sss.so
+</pre><h5 id="etcpam.dcommon-password">/etc/pam.d/common-password</h5>
+<p>
+Right after the <em>pam_unix.so</em> line, add
+</p>
+<pre class="wiki">password     sufficient    pam_sss.so use_authtok
+</pre><h5 id="etcpam.dcommon-session">/etc/pam.d/common-session</h5>
+<p>
+Just before the <em>pam_unix.so</em> line, add
+</p>
+<pre class="wiki">session      optional      pam_mkhomedir.so
+</pre><p>
+Right after the <em>pam_unix.so</em> line, add
+</p>
+<pre class="wiki">session      optional      pam_sss.so
+</pre><h2 id="UnderstandingKerberosActiveDirectory">Understanding Kerberos &amp; Active Directory</h2>
+<p>
+It is important to understand that (unlike Linux MIT based KDC) Active Directory based KDC divides Kerberos principals into two groups:
+</p>
+<ul><li><em>User Principals</em> - usually equals to the sAMAccountname attribute of the object in AD. In short, User Principal is entitled to obtain TGT (ticket granting ticket). User Principals could be hence used to generate a TGT via <tt>kinit -k &lt;principalname&gt;</tt>
+</li><li><em>Service Principals</em> - represents which Kerberized service can be used on the computer in question. Service principals <strong>CANNOT</strong> be used to obtain a TGT -&gt; cannot be used to grant an access to Active Directory controller for example.
+</li></ul><p>
+Each user object in Active Directory (understand that a computer object in AD is de-facto user object as well) can have:
+</p>
+<ul><li>maximum of 2 User Principal Names (UPN). One is pre-defined by its <em>sAMAccountName</em> LDAP attribute (mentioned above, for computer objects it has a form of "&lt;hostname&gt;$") and second by its <em><a class="missing wiki" href="https://docs.pagure.org/sssd-test2/UserPrincipalName.html" rel="nofollow">UserPrincipalName?</a></em> string attribute
+</li><li>many Service Principal Names (typically one for each Kerberized service we want to enable on the computer) defined by the <em><a class="missing wiki" href="https://docs.pagure.org/sssd-test2/ServicePrincipalName.html" rel="nofollow">ServicePrincipalName?</a></em> (SPN) list attribute. The attributes can be seen/set using the ADSIedit snap-in for example.
+</li></ul><h3 id="OptionalFinalTest">Optional Final Test</h3>
+<p>
+You may have made iterative changes to your setup while learning about SSSD.  To make sure that your setup actually works, and you're not relying on cached credentials, or cached LDAP information, you may want to clear out the local cache.  Obviously this will erase local credentials, and all cached user information, so you should only do this for testing, and while on the network with network access to the AD servers.
+</p>
+<p>
+<em>service sssd stop; rm -f /var/lib/sss/db/*; service sssd start</em>
+</p>
+<p>
+If all looks well on your system after this, you know that sssd is able to use the kerberos and ldap services you've configured.
+</p>
+<h3 id="Furtherreading">Further reading</h3>
+<p>
+Please see the following article on Technet site (<a class="ext-link" href="http://technet.microsoft.com/en-us/library/cc772815%28WS.10%29.aspx"><span class="icon">​</span>http://technet.microsoft.com/en-us/library/cc772815%28WS.10%29.aspx</a>) for more in-depth Kerberos understanding
+</p>
+</body></html>

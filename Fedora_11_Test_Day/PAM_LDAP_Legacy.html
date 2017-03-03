@@ -1,0 +1,35 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Description">Description</h2>
+<p>
+This test ensures that users stored in LDAP can log in using the LDAP proxy module for PAM.
+</p>
+<h2 id="Howtotest">How to test</h2>
+<ol><li>Follow the steps in <a class="wiki" href="https://docs.pagure.org/sssd-test2/Fedora_11_Test_Day/Installation.html">Installing the SSSD</a>. If you are running the Test Day LiveCD, you may skip this step. Especially ensure that you have the right contents of /etc/pam.d/system-auth.
+</li><li>Edit /etc/sssd/sssd.conf. Find the [domains/LDAP] section and uncomment the following authentication settings:
+<pre class="wiki">cache-credentials = TRUE
+auth-module = proxy
+pam-target = sssdproxyldap
+</pre></li><li>As root, create file <tt>/etc/pam.d/sssdproxyldap</tt> with the following contents:
+<pre class="wiki">#%PAM-1.0
+auth      required    pam_ldap.so
+account   required    pam_ldap.so
+password  required    pam_ldap.so
+session   required    pam_ldap.so
+</pre></li><li>The LDAP server at <tt>rawhide1.fedoraproject.org</tt> provides users named sssdtestNNNNN where NNNNN is a number from 10000 to 10100. The server also provides a few other users with special usernames:
+<pre class="wiki">sssd-test:x:11004:11004:SSSD 1 test user:/home/sssd-test:/bin/bash
+sssd.test:x:11001:11001:SSSD 1 test user:/home/sssd.test:/bin/bash
+sssd:test:x:11003:11003:SSSD 1 test user:/home/sssd:test:/bin/bash
+sssd@test:x:11002:11002:SSSD 1 test user:/home/sssd@test:/bin/bash
+sssd_test:x:11005:11005:SSSD 1 test user:/home/sssd_test:/bin/bash
+</pre></li><li>Make sure the SSH deamon is running. If not, start it
+<pre class="wiki">service sshd status
+service sshd start
+</pre></li><li>Pick one of the sssdtestNNNNN users. All these users have the same password "sssdtest". 
+</li><li>Try logging in via SSH using the username you chose and password "sssdtest"
+<pre class="wiki">ssh localhost -l sssdtest10005@LDAP
+</pre></li><li>Test offline support by terminating your network connection (e.g. unplugging your network cable or turning off your WiFI card), then rerun the above tests and verify that they return the same results. To minimize delays while the LDAP server is offline, consider the following settings for your <tt>/etc/ldap.conf</tt>:
+<pre class="wiki">timelimit 10
+bind_timelimit 5
+nss_reconnect_maxsleeptime 2
+nss_reconnect_sleeptime 1
+</pre></li><li>Clean up after this test by commenting out the configuration entries in step 2, above.
+</li></ol></body></html>

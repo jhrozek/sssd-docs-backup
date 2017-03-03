@@ -1,0 +1,63 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h1 id="DDNS-updatequalityofinputfornsupdate">DDNS - update quality of input for nsupdate</h1>
+<p>
+Related ticket(s):
+</p>
+<ul><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2495"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2495</a>
+</li></ul><h3 id="Problemstatement">Problem statement</h3>
+<p>
+SSSD provides input to nsupdate that's redundant and might actually impair proper resolution using DNS. Further, format of messages pasted to nsupdate is grouped by command type - deleting and adding addresses are two separate batches which is not optimal as update of one of address families might be prohibited to be changed on server.
+</p>
+<h3 id="Usecases">Use cases</h3>
+<p>
+If DNS system is broken using dyndns_server option might be an workaround
+</p>
+<h3 id="Overviewofthesolution">Overview of the solution</h3>
+<ul><li>Allow SSSD to add a new option that would specify which server to update DNS with ('dyndns_server')
+</li><li>In first attempt to perform DDNS <strong>do not specify zone/server/realm</strong> commands in input for nsupdate (nsupdate will then utilize DNS)
+</li><li>As fallback (if first attempt fails) specify realm command and if 'dyndns_server' option is specified then also add server command with value of 'dyndns_server'
+</li><li>Bulk deleting and adding addresses from the same address family into one batch rather then grouping by command type
+</li></ul><h3 id="Implementationdetails">Implementation details</h3>
+<ul><li>Remove servername and dns_zone parameters from sdap_dyndns_update_send() as they are no longer used. Remove code from AD and IPA provider which was passing this data to sdap_dyndns_update_send().
+</li><li>Remove dns_zone field from struct sdap_dyndns_update_state and remove all code relating to it.
+</li><li>In sdap_dyndns_update_done() make setting command realm conditional same way as command server is.
+</li><li>Update nsupdate_msg_add_fwd() to group commands by address family processed IP belongs to.
+</li></ul><h3 id="Configurationchanges">Configuration changes</h3>
+<p>
+New option dyndns_server
+</p>
+<h3 id="HowToTest">How To Test</h3>
+<p>
+Check that IP addresses get changed in IPA and on AD. Break DNS resolving to force first attempt of DDNS to fail. Check that messages generated as input for nsupdate in domain logs are matching the expectation.
+</p>
+<h4 id="Exampleofexpectedformatofmessages">Example of expected format of messages</h4>
+<p>
+<strong>First attempt</strong>
+</p>
+<pre class="wiki">update delete husker.human.bs. in A
+update add husker.human.bs. 1200 in A 192.168.122.180
+send
+update delete husker.human.bs. in AAAA
+update add husker.human.bs. 1200 in AAAA 2001:cdba::666
+send
+</pre><p>
+<strong>Fallback attempt</strong>
+</p>
+<pre class="wiki">;sever is present only if option dyndns_server is set in sssd.conf 
+server 192.168.122.20
+;realm is used always in fallback message
+realm IPA.WORK
+update delete husker.human.bs. in A
+update add husker.human.bs. 1200 in A 192.168.122.180
+send
+;sever is present only if option dyndns_server is set in sssd.conf 
+server 192.168.122.20
+;realm is used always in fallback message
+realm IPA.WORK
+update delete husker.human.bs. in AAAA
+update add husker.human.bs. 1200 in AAAA 2001:cdba::666
+send
+</pre><h3 id="Authors">Authors</h3>
+<p>
+<a class="mail-link" href="mailto:preichl@redhat.com"><span class="icon">​</span>preichl@redhat.com</a>
+</p>
+</body></html>

@@ -1,0 +1,71 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><p>
+</p><div class="wiki-toc">
+<ol>
+  <li>
+    <ol>
+      <li>
+        <a href="#Highlights">Highlights</a>
+      </li>
+      <li>
+        <a href="#TicketsFixed">Tickets Fixed</a>
+      </li>
+      <li>
+        <a href="#DetailedChangelog">Detailed Changelog</a>
+      </li>
+    </ol>
+  </li>
+</ol>
+</div><p>
+</p>
+<h2 id="Highlights">Highlights</h2>
+<ul><li>Numerous manpage and translation updates
+</li><li>LDAP: Handle situations where the RootDSE isn't available anonymously
+</li><li>LDAP: Fix regression for users using non-standard LDAP attributes for user information
+</li></ul><h2 id="TicketsFixed">Tickets Fixed</h2>
+<p>
+</p><div><dl class="wiki compact"><dt><a class="closed" href="/sssd/ticket/1183" title="sssd.conf man page does not list autofs in the list of known services">#1183</a></dt><dd>sssd.conf man page does not list autofs in the list of known services</dd><dt><a class="closed" href="/sssd/ticket/1219" title="Warn on 'make update-po' if there are manpages not listed in po4a.cfg">#1219</a></dt><dd>Warn on 'make update-po' if there are manpages not listed in po4a.cfg</dd><dt><a class="closed" href="/sssd/ticket/1249" title="Unable to lookup user aliases with proxy provider.">#1249</a></dt><dd>Unable to lookup user aliases with proxy provider.</dd><dt><a class="closed" href="/sssd/ticket/1258" title="SSSD should attempt to get the RootDSE after binding">#1258</a></dt><dd>SSSD should attempt to get the RootDSE after binding</dd><dt><a class="closed" href="/sssd/ticket/1265" title="document the possible performance gains of disabling referral chasing">#1265</a></dt><dd>document the possible performance gains of disabling referral chasing</dd><dt><a class="closed" href="/sssd/ticket/1278" title="Inadequate info in man page for &#34;ldap_disable_paging&#34; feature">#1278</a></dt><dd>Inadequate info in man page for "ldap_disable_paging" feature</dd><dt><a class="closed" href="/sssd/ticket/1290" title="No info in sssd manpages for &#34;ldap_sasl_minssf&#34;">#1290</a></dt><dd>No info in sssd manpages for "ldap_sasl_minssf"</dd><dt><a class="closed" href="/sssd/ticket/1295" title="Fix erronous reference to the 'allow' access_provider">#1295</a></dt><dd>Fix erronous reference to the 'allow' access_provider</dd><dt><a class="closed" href="/sssd/ticket/1300" title="autofs: maximum key name must be PATH_MAX">#1300</a></dt><dd>autofs: maximum key name must be PATH_MAX</dd><dt><a class="closed" href="/sssd/ticket/1307" title="sdap_check_aliases must not error when detects the same user">#1307</a></dt><dd>sdap_check_aliases must not error when detects the same user</dd><dt><a class="closed" href="/sssd/ticket/1312" title="group members are now lowercased in case insensitive domains">#1312</a></dt><dd>group members are now lowercased in case insensitive domains</dd><dt><a class="closed" href="/sssd/ticket/1315" title="New SSSD does not fetch renewable tickets">#1315</a></dt><dd>New SSSD does not fetch renewable tickets</dd><dt><a class="closed" href="/sssd/ticket/1320" title="Auth fails for user with non-default attribute names">#1320</a></dt><dd>Auth fails for user with non-default attribute names</dd></dl></div><p>
+</p>
+<h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Jakub Hrozek (14):
+</p>
+<ul><li>man: document that referral chasing might bring performance penalty
+</li><li>pam_sss: improve error handling in SELinux code
+</li><li>Remove the "command" option from documentation
+</li><li>autofs: Raise the maximum key length to PATH_MAX
+</li><li>MAN: timeout can be specified for services, too
+</li><li>MAN: document the hostid and autofs providers
+</li><li>proxy: Canonicalize user and group names
+</li><li>proxy: new option proxy_fast_alias
+</li><li>sdap_check_aliases must not error when detects the same user
+</li><li>Document sss_tools better
+</li><li>Get the RootDSE after binding if not successfull before
+</li><li>confdb_get_bool needs a TALLOC_CTX in sssd-1.8
+</li><li>Lowercase group members in case-insensitive domains
+</li><li>Read sysdb attribute name, not LDAP attribute map name
+</li></ul><p>
+Marco Pizzoli (1):
+</p>
+<ul><li>Two manual pages fixes
+</li></ul><p>
+Pavel Březina (1):
+</p>
+<ul><li>sudo api: check sss_status instead of errnop in sss_sudo_send_recv_generic()
+</li></ul><p>
+Stef Walter (1):
+</p>
+<ul><li>Fix erronous reference to the 'allow' access_provider
+</li></ul><p>
+Stephen Gallagher (6):
+</p>
+<ul><li>Bumping version to 1.8.3
+</li><li>MAN: Improve ldap_disable_paging documentation
+</li><li>MAN: Add ldap_sasl_minssf to the manpage
+</li><li>Update translation files
+</li><li>Fix typo in translation file
+</li><li>Update translations for 1.8.3 release
+</li></ul><p>
+Yuri Chornoivan (1):
+</p>
+<ul><li>Fix typo: retreiving-&gt;retrieving
+</li></ul></body></html>

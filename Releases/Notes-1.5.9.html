@@ -1,0 +1,83 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><p>
+</p><div class="wiki-toc">
+<ol>
+  <li>
+    <ol>
+      <li>
+        <a href="#Highlights">Highlights</a>
+        <ol>
+          <li>
+            <a href="#NewFeatures">New Features</a>
+          </li>
+          <li>
+            <a href="#ImportantBugfixes">Important Bugfixes</a>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <a href="#DetailedChangelog">Detailed Changelog</a>
+      </li>
+    </ol>
+  </li>
+</ol>
+</div><p>
+</p>
+<h2 id="Highlights">Highlights</h2>
+<h3 id="NewFeatures">New Features</h3>
+<ul><li>Support for overriding home directory, shell and primary GID locally
+</li><li>Properly honor TTL values from SRV record lookups
+</li><li>Support non-POSIX groups in nested group chains (for RFC2307bis LDAP servers)
+</li></ul><h3 id="ImportantBugfixes">Important Bugfixes</h3>
+<ul><li>Properly escape IPv6 addresses in the failover code
+</li><li>Do not crash if inotify fails (e.g. resource exhaustion)
+</li><li>Don't add multiple TGT renewal callbacks (too many log messages)
+</li></ul><h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Jakub Hrozek (15):
+</p>
+<ul><li>Add utility function to return IP address as string
+</li><li>Add a utility function to escape IPv6 address for use in URIs
+</li><li>Use escaped IP addresses in LDAP provider
+</li><li>Escape IPv6 IP addresses in the IPA provider
+</li><li>Add a new option to override primary GID number
+</li><li>Add a new option to override home directory value
+</li><li>Add new options to override shell value
+</li><li>Add new resolv_hostent data structure and utility functions
+</li><li>Resolve hosts by name from files into resolv_hostent
+</li><li>Resolve hosts by name from DNS into resolv_hostent
+</li><li>Switch resolver to using resolv_hostent and honor TTL
+</li><li>Provide TTL structure names for c-ares &lt; 1.7
+</li><li>Test NULL server hostname in fail over tests
+</li><li>Log nsupdate message
+</li><li>Don't pass NULL to printf for TLS errors
+</li></ul><p>
+Jan Zeleny (4):
+</p>
+<ul><li>Added sysdb_attrs_get_bool() function
+</li><li>Non-posix group processing - sysdb changes
+</li><li>Non-posix group processing - ldap provider and nss responder
+</li><li>Fall back to polling when inotify fails
+</li></ul><p>
+Kaushik Banerjee (1):
+</p>
+<ul><li>Changing default to Default for consistency
+</li></ul><p>
+Stephen Gallagher (6):
+</p>
+<ul><li>Update version to 1.5.9
+</li><li>Fix typo in initgroups negative cache check
+</li><li>Ensure that SSSD always Requires: the primary-arch sssd-client
+</li><li>Fix bad merge
+</li><li>Clear up -Wunused-but-set-variable warnings
+</li><li>Updating translation files for SSSD 1.5.9
+</li></ul><p>
+Sumit Bose (7):
+</p>
+<ul><li>Add online callback only once for TGT renewal
+</li><li>Delete cached ccache file if password is expired
+</li><li>Do not check pwdAttribute
+</li><li>Add sockaddr_storage to sdap_service
+</li><li>Add sdap_call_conn_cb() to call add connection callback directly
+</li><li>Use name based URI instead of IP address based URIs
+</li><li>Use ldap_init_fd() instead of ldap_initialize() if available
+</li></ul></body></html>

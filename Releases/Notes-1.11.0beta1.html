@@ -1,0 +1,47 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<ul><li>This pre-release does not bring any changes visible to the end-user. It is intended to be part of the development of FreeIPA 3.3 and its focus of supporting legacy (non-SSSD) clients in a setup where IPA server established a trust relationship with an Active Directory clients.
+</li><li>The handling of ID ranges in the provides has been changed to use a plugin interface where each provider can use a different plugin and have a different behaviour
+</li><li>The libsss_idmap library has been enhanced in several ways such as handling "external mappings" or supporting base RIDs other than 0
+</li><li>The assumption that subdomain users always have a primary user-private-group (UPG) has been removed
+</li><li>If the SSSD is running on the IPA server, it is able to perform lookups for trusted users directly against the AD server using the AD provider lookups
+</li></ul><h2 id="TicketsFixed">Tickets Fixed</h2>
+<p>
+</p><div><dl class="wiki compact"><dt><a class="closed" href="/sssd/ticket/1938" title="[RFE] Add a new call to libsss_idmap to add a new mapping where the first ...">#1938</a></dt><dd>[RFE] Add a new call to libsss_idmap to add a new mapping where the first RID is not 0</dd><dt><a class="closed" href="/sssd/ticket/1960" title="[RFE] Add range type for ID mapping in AD to libsss_idmap">#1960</a></dt><dd>[RFE] Add range type for ID mapping in AD to libsss_idmap</dd><dt><a class="closed" href="/sssd/ticket/1961" title="[RFE] Add plugin to LDAP provider to find new ranges">#1961</a></dt><dd>[RFE] Add plugin to LDAP provider to find new ranges</dd><dt><a class="closed" href="/sssd/ticket/1962" title="[RFE] Integrate AD provider lookup code into IPA subdomain user lookup">#1962</a></dt><dd>[RFE] Integrate AD provider lookup code into IPA subdomain user lookup</dd><dt><a class="closed" href="/sssd/ticket/1979" title="[RFE] Add an optional unique range identifier">#1979</a></dt><dd>[RFE] Add an optional unique range identifier</dd><dt><a class="closed" href="/sssd/ticket/1993" title="[RFE] Add a new option to denote server mode">#1993</a></dt><dd>[RFE] Add a new option to denote server mode</dd></dl></div><p>
+</p>
+<h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Jakub Hrozek (11):
+</p>
+<ul><li>Updating the version for the 1.10.1 release
+</li><li>Bump version to track 1.11 development
+</li><li>IPA: Add a server mode option
+</li><li>LDAP: Add utility function sdap_copy_map
+</li><li>AD: decouple ad_id_ctx initialization
+</li><li>AD: initialize failover with custom realm, domain and failover service
+</li><li>IPA: Initialize server mode ctx if server mode is on
+</li><li>AD: Move storing sdap_domain for subdomain to generic LDAP code
+</li><li>IPA: Create and remove AD id_ctx for subdomains discovered in server mode
+</li><li>IPA: Look up AD users directly if IPA server mode is on
+</li><li>Updating translations for the 1.11 beta1 release
+</li></ul><p>
+Sumit Bose (18):
+</p>
+<ul><li>idmap: allow first RID to be set
+</li><li>idmap: add optional unique range id
+</li><li>idmap: add option to indicate external_mapping
+</li><li>idmap: allow NULL domain sid for external mappings
+</li><li>idmap: add calls to check if ID mapping conforms to ranges
+</li><li>idmap: add sss_idmap_domain_has_algorithmic_mapping
+</li><li>Add cmocka based tests for libsss_idmap
+</li><li>Add now options ldap_min_id and ldap_max_id
+</li><li>SDAP IDMAP: Add configured domain to idmap context
+</li><li>Allow different methods to find new domains for idmapping
+</li><li>Add sdap_idmap_domain_has_algorithmic_mapping()
+</li><li>Replace SDAP_ID_MAPPING checks with sdap_idmap_domain_has_algorithmic_mapping
+</li><li>Add ipa_idmap_init()
+</li><li>Add support for new ipaRangeType attribute
+</li><li>Replace new_subdomain() with find_subdomain_by_name()
+</li><li>IPA: read ranges before subdomains
+</li><li>Save mpg state for subdomains
+</li><li>Read mpg state for subdomains from cache
+</li></ul></body></html>

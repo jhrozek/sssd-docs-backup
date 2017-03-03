@@ -1,0 +1,149 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<ul><li>This release focused mainly on fixing regressions compared to the 1.8 series and bugfixes for features introduced in the 1.9 release cycle. The release also includes two security fixes
+</li><li>A security bug assigned CVE-2013-0219 was fixed - TOCTOU race conditions when creating or removing home directories for users in local domain
+</li><li>A security bug assigned CVE-2013-0220 was fixed - out-of-bounds reads in autofs and ssh responder
+</li><li>The sssd_pam responder processes pending requests after reconnect
+</li><li>A serious memory leak in the NSS responder was fixed
+</li><li>Requests that were processing group entries with DNs pointing out of any configured search bases were not terminated correctly, causing long timeouts
+</li><li>Kerberos tickets are correctly renewed even after SSSD daemon restart
+</li><li>The autofs LDAP provider correctly updates entries that changed mount options on the LDAP server
+</li><li>Secondary groups are now reported correctly for a user coming from a trusted Active Directory server
+</li><li>Kerberos principal selection was fixed to behave correctly when accessing an Active Directory server
+</li><li>Multiple fixes related to SUDO integration, in particular fixing functionality when the sssd back end process was changing its online/offline status
+</li><li>The pwd_exp_warning option was fixed to function as documented in the manual page
+</li></ul><h2 id="TicketsFixed">Tickets Fixed</h2>
+<p>
+</p><div><dl class="wiki compact"><dt><a class="closed" href="/sssd/ticket/1564" title="pam_sss(crond:account): Request to sssd failed. Timer expired">#1564</a></dt><dd>pam_sss(crond:account): Request to sssd failed. Timer expired</dd><dt><a class="closed" href="/sssd/ticket/1592" title="always reread the master map from LDAP">#1592</a></dt><dd>always reread the master map from LDAP</dd><dt><a class="closed" href="/sssd/ticket/1620" title="sss_cache: fqdn not accepted">#1620</a></dt><dd>sss_cache: fqdn not accepted</dd><dt><a class="closed" href="/sssd/ticket/1624" title="sudoUser group and netgroup specifications don't work">#1624</a></dt><dd>sudoUser group and netgroup specifications don't work</dd><dt><a class="closed" href="/sssd/ticket/1626" title="sssd caching not working as expected for selinux usermap contexts">#1626</a></dt><dd>sssd caching not working as expected for selinux usermap contexts</dd><dt><a class="closed" href="/sssd/ticket/1635" title="investigate the behaviour of ldap_sasl_authid in 1.9.x">#1635</a></dt><dd>investigate the behaviour of ldap_sasl_authid in 1.9.x</dd><dt><a class="closed" href="/sssd/ticket/1655" title="Login fails - sssd_be module polling fd indefinitely and gets killed">#1655</a></dt><dd>Login fails - sssd_be module polling fd indefinitely and gets killed</dd><dt><a class="closed" href="/sssd/ticket/1659" title="sss_userdel doesn't remove entries from in-memory cache">#1659</a></dt><dd>sss_userdel doesn't remove entries from in-memory cache</dd><dt><a class="closed" href="/sssd/ticket/1666" title="IPA Trust does not show secondary groups for AD Users for commands like id ...">#1666</a></dt><dd>IPA Trust does not show secondary groups for AD Users for commands like id and getent</dd><dt><a class="closed" href="/sssd/ticket/1672" title="Error in PAC responder">#1672</a></dt><dd>Error in PAC responder</dd><dt><a class="closed" href="/sssd/ticket/1677" title="memberUid required for primary groups to match sudo rule">#1677</a></dt><dd>memberUid required for primary groups to match sudo rule</dd><dt><a class="closed" href="/sssd/ticket/1679" title="Primary server status is not always reset after failover to backup server ...">#1679</a></dt><dd>Primary server status is not always reset after failover to backup server happened</dd><dt><a class="closed" href="/sssd/ticket/1680" title="krb5_kpasswd failover doesn't work">#1680</a></dt><dd>krb5_kpasswd failover doesn't work</dd><dt><a class="closed" href="/sssd/ticket/1682" title="Offline sudo denies access with expired entry_cache_timeout">#1682</a></dt><dd>Offline sudo denies access with expired entry_cache_timeout</dd><dt><a class="closed" href="/sssd/ticket/1685" title="Negative cache timeout is not working for proxy provider">#1685</a></dt><dd>Negative cache timeout is not working for proxy provider</dd><dt><a class="closed" href="/sssd/ticket/1687" title="Disallow root SSH public key authentication">#1687</a></dt><dd>Disallow root SSH public key authentication</dd><dt><a class="closed" href="/sssd/ticket/1689" title="sudo: if first full refresh fails, schedule another first full refresh">#1689</a></dt><dd>sudo: if first full refresh fails, schedule another first full refresh</dd><dt><a class="closed" href="/sssd/ticket/1690" title="Option ldap_sudo_include_regexp named incorrectly">#1690</a></dt><dd>Option ldap_sudo_include_regexp named incorrectly</dd><dt><a class="closed" href="/sssd/ticket/1694" title="Incorrect synchronization in mmap cache">#1694</a></dt><dd>Incorrect synchronization in mmap cache</dd><dt><a class="closed" href="/sssd/ticket/1699" title="ldap_chpass_uri failover fails on using same hostname">#1699</a></dt><dd>ldap_chpass_uri failover fails on using same hostname</dd><dt><a class="closed" href="/sssd/ticket/1701" title="sudo denies access with disabled ldap_sudo_use_host_filter">#1701</a></dt><dd>sudo denies access with disabled ldap_sudo_use_host_filter</dd><dt><a class="closed" href="/sssd/ticket/1702" title="sssd_nss crashes during enumeration">#1702</a></dt><dd>sssd_nss crashes during enumeration</dd><dt><a class="closed" href="/sssd/ticket/1703" title="Wrong variable check in the memberof plugin">#1703</a></dt><dd>Wrong variable check in the memberof plugin</dd><dt><a class="closed" href="/sssd/ticket/1704" title="Wrong error handler in sss_mc_create_file">#1704</a></dt><dd>Wrong error handler in sss_mc_create_file</dd><dt><a class="closed" href="/sssd/ticket/1706" title="segfault in async_resolv.c">#1706</a></dt><dd>segfault in async_resolv.c</dd><dt><a class="closed" href="/sssd/ticket/1708" title="sssd components seem to mishandle sighup">#1708</a></dt><dd>sssd components seem to mishandle sighup</dd><dt><a class="closed" href="/sssd/ticket/1710" title="man sssd-sudo has wrong title">#1710</a></dt><dd>man sssd-sudo has wrong title</dd><dt><a class="closed" href="/sssd/ticket/1714" title="user id lookup fails for case sensitive users using proxy provider">#1714</a></dt><dd>user id lookup fails for case sensitive users using proxy provider</dd><dt><a class="closed" href="/sssd/ticket/1716" title="Make functions manipulating with mmap cache more defensive">#1716</a></dt><dd>Make functions manipulating with mmap cache more defensive</dd><dt><a class="closed" href="/sssd/ticket/1717" title="Limit requests coalescing in time">#1717</a></dt><dd>Limit requests coalescing in time</dd><dt><a class="closed" href="/sssd/ticket/1722" title="crash in memory cache">#1722</a></dt><dd>crash in memory cache</dd><dt><a class="closed" href="/sssd/ticket/1724" title="Explicit null dereferenced">#1724</a></dt><dd>Explicit null dereferenced</dd><dt><a class="closed" href="/sssd/ticket/1727" title="AD provider: getgrgid removes nested group memberships">#1727</a></dt><dd>AD provider: getgrgid removes nested group memberships</dd><dt><a class="closed" href="/sssd/ticket/1728" title="Failure in memberof can lead to failed database update">#1728</a></dt><dd>Failure in memberof can lead to failed database update</dd><dt><a class="closed" href="/sssd/ticket/1730" title="MEmory leak in new memcache initgr cleanup function">#1730</a></dt><dd>MEmory leak in new memcache initgr cleanup function</dd><dt><a class="closed" href="/sssd/ticket/1731" title="krb5 ticket renewal does not read the renewable tickets from cache">#1731</a></dt><dd>krb5 ticket renewal does not read the renewable tickets from cache</dd><dt><a class="closed" href="/sssd/ticket/1732" title="clarify the disadvantages of enumeration in sssd.conf">#1732</a></dt><dd>clarify the disadvantages of enumeration in sssd.conf</dd><dt><a class="closed" href="/sssd/ticket/1735" title="Failover to krb5_backup_kpasswd doesn't work">#1735</a></dt><dd>Failover to krb5_backup_kpasswd doesn't work</dd><dt><a class="closed" href="/sssd/ticket/1736" title="Smart refresh doesn't notice &#34;defaults&#34; addition with OpenLDAP">#1736</a></dt><dd>Smart refresh doesn't notice "defaults" addition with OpenLDAP</dd><dt><a class="closed" href="/sssd/ticket/1740" title="Incorrect principal searched for in keytab">#1740</a></dt><dd>Incorrect principal searched for in keytab</dd><dt><a class="closed" href="/sssd/ticket/1754" title="wrong filter for autofs maps in sss_cache">#1754</a></dt><dd>wrong filter for autofs maps in sss_cache</dd><dt><a class="closed" href="/sssd/ticket/1757" title="memory cache is not updated after user is deleted from ldb cache">#1757</a></dt><dd>memory cache is not updated after user is deleted from ldb cache</dd><dt><a class="closed" href="/sssd/ticket/1758" title="sssd fails to update to changes on autofs maps">#1758</a></dt><dd>sssd fails to update to changes on autofs maps</dd><dt><a class="closed" href="/sssd/ticket/1760" title="Failover to ldap_chpass_backup_uri doesn't work">#1760</a></dt><dd>Failover to ldap_chpass_backup_uri doesn't work</dd><dt><a class="closed" href="/sssd/ticket/1761" title="sssd_be crashes looking up members with groups outside the nesting limit">#1761</a></dt><dd>sssd_be crashes looking up members with groups outside the nesting limit</dd><dt><a class="closed" href="/sssd/ticket/1764" title="Modifications using sss_usermod tool are not reflected in memory cache">#1764</a></dt><dd>Modifications using sss_usermod tool are not reflected in memory cache</dd><dt><a class="closed" href="/sssd/ticket/1770" title="ipa-client-automount: autofs failed in s390x and ppc64 platform">#1770</a></dt><dd>ipa-client-automount: autofs failed in s390x and ppc64 platform</dd><dt><a class="closed" href="/sssd/ticket/1773" title="SSSD should warn when pam_pwd_expiration_warning value is higher than ...">#1773</a></dt><dd>SSSD should warn when pam_pwd_expiration_warning value is higher than passwordWarning LDAP attribute.</dd><dt><a class="closed" href="/sssd/ticket/1775" title="local provider: All member users are not returned on looking up top level ...">#1775</a></dt><dd>local provider: All member users are not returned on looking up top level parent group.</dd><dt><a class="closed" href="/sssd/ticket/1779" title="Rule mismatch isn't noticed before smart refresh on ppc64 and s390x">#1779</a></dt><dd>Rule mismatch isn't noticed before smart refresh on ppc64 and s390x</dd><dt><a class="closed" href="/sssd/ticket/1781" title="sssd: Out-of-bounds read flaws in autofs and ssh services responders">#1781</a></dt><dd>sssd: Out-of-bounds read flaws in autofs and ssh services responders</dd><dt><a class="closed" href="/sssd/ticket/1782" title="TOCTOU race conditions by copying and removing directory trees">#1782</a></dt><dd>TOCTOU race conditions by copying and removing directory trees</dd><dt><a class="closed" href="/sssd/ticket/1783" title="Group lookup fails and takes ~60s to return to shell if member dn is ...">#1783</a></dt><dd>Group lookup fails and takes ~60s to return to shell if member dn is incorrect</dd><dt><a class="closed" href="/sssd/ticket/1787" title="reset the release in upstream spec before releasing 1.9.4">#1787</a></dt><dd>reset the release in upstream spec before releasing 1.9.4</dd></dl></div><p>
+</p>
+<h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Jakub Hrozek (47):
+</p>
+<ul><li> Updating the version for the 1.9.4 release
+</li><li> SUDO: strdup the input variable
+</li><li> PAC: check the return value of diff_git_lists
+</li><li> SYSDB: Move misplaced assignment
+</li><li> LDAP: remove dead assignment
+</li><li> MEMBEROF: Fix copy-n-paste error
+</li><li> NSS: Fix the error handler in sss_mc_create_file
+</li><li> SYSDB: More debugging during the conversion to ghost users
+</li><li> MAN: Fix the title of sssd-sudo
+</li><li> MEMBEROF: silence compilation warnings
+</li><li> Set cloexec flag for log files
+</li><li> RESOLV: Do not steal the resulting hostent on error
+</li><li> SYSDB: fix copy-n-paste error
+</li><li> SYSDB: Add API to invalidate all map objects
+</li><li> DP: invalidate all cached maps if a request for auto.master comes in
+</li><li> AUTOFS: allow removing entries from hash table
+</li><li> AUTOFS: remove all maps from hash if request for auto.master comes in
+</li><li> RESPONDERS: Create a common file with service names and versions
+</li><li> AUTOFS: Clear enum cache if a request comes in from the sss_cache
+</li><li> Add responder_sbus.h to noinst_HEADERS
+</li><li> Free resources if fileno failed
+</li><li> Search for SHORTNAME$@REALM instead of fqdn$@REALM by default
+</li><li> Potential resource leak in sss_nss_mc_get_record
+</li><li> SYSDB: Remove duplicate selinux defines
+</li><li> SYSDB: Split a function to read all SELinux maps
+</li><li> SELINUX: Process maps even when offline
+</li><li> IPA: Rename IPA_CONFIG_SELINUX_DEFAULT_MAP
+</li><li> AD: replace GID/UID, do not add another one
+</li><li> AD: Add user as a direct member of his primary group
+</li><li> TOOLS: move memcache related functions to tools_mc_utils.c
+</li><li> TOOLS: Split querying nss responder into a separate function
+</li><li> TOOLS: Provide a convenience function to refresh a list of groups
+</li><li> TOOLS: Refresh memcache after changes to local users and groups
+</li><li> LDAP: avoid complex realloc logic in save_rfc2307bis_group_memberships
+</li><li> autofs: Use SAFEALIGN_SET_UINT32 instead of SAFEALIGN_COPY_UINT32
+</li><li> NSS: invalidate memcache user entry on initgr, too
+</li><li> Invalidate user entry even if there are no groups
+</li><li> LDAP: Compare lists of DNs when saving autofs entries
+</li><li> TOOLS: invalidate parent groups in memory cache, too
+</li><li> Convert the value of pwd_exp_warning to seconds
+</li><li> TOOLS: Use openat/unlinkat when removing the homedir
+</li><li> TOOLS: Use file descriptor to avoid races when creating a home directory
+</li><li> SYSDB: make the sss_ldb_modify_permissive function public
+</li><li> SYSDB: Expire group if adding ghost users fails with EEXIST
+</li><li> MAN: Clarify that saving users after enumerating large domain might be CPU intensive
+</li><li> TOOLS: Compile on old platforms such as RHEL5
+</li><li> Updating the translations for the 1.9.4 release
+</li></ul><p>
+Jan Cholasta (2):
+</p>
+<ul><li> SSH: Reject requests for authorized keys of root
+</li><li> Check that strings do not go beyond the end of the packet body in autofs and SSH requests.
+</li></ul><p>
+Michal Zidek (4):
+</p>
+<ul><li> sssd_nss: Remove entries from memory cache if not found in sysdb
+</li><li> tools: sss_userdel and groupdel remove entries from memory cache
+</li><li> sss_cache: fqdn not accepted
+</li><li> sss_userdel and sss_groupdel with use_fully_qualified_names
+</li></ul><p>
+Ondrej Kos (4):
+</p>
+<ul><li> PROXY: fix negative cache
+</li><li> PROXY: fix groups caching
+</li><li> LDAP: initialize refresh function handler
+</li><li> SYSDB: Modify ghosts in permissive mode
+</li></ul><p>
+Pavel Březina (22):
+</p>
+<ul><li> sudo manpage: clarify that sudoHost may contain wildcards and not regular expression
+</li><li> let krb5_kpasswd failover work
+</li><li> sudo: don't get stuck in rules and smart refresh when offline
+</li><li> sysdb_get_sudo_user_info() initialize attrs on declaration
+</li><li> sudo: include primary group in user group list
+</li><li> sudo: support generalized time format
+</li><li> let ldap_chpass_uri failover work when using same hostname
+</li><li> try primary server after retry_timeout + 1 seconds when switching to backup
+</li><li> add sdap_sudo_schedule_refresh()
+</li><li> check dp error in sdap_sudo_full_refresh_done()
+</li><li> sudo: schedule another full refresh in short interval if the first fails
+</li><li> sudo: do full refresh when data provider is back online
+</li><li> let krb5_backup_kpasswd failover work
+</li><li> memcache: add macro that validates record length
+</li><li> explicit null dereferenced in sss_nss_mc_get_record()
+</li><li> memcache: make MC_PTR_TO_SLOT() more readable
+</li><li> sudo smart refresh: do not include usn in filter if no valid usn is known
+</li><li> sudo smart refresh: fix debug message
+</li><li> let ldap_backup_chpass_uri work
+</li><li> fix backend callbacks: remove callback properly from dlist
+</li><li> sudo responder: change num_rules type from size_t to uint32_t
+</li><li> nested groups: fix group lookup hangs if member dn is incorrect
+</li></ul><p>
+Simo Sorce (12):
+</p>
+<ul><li> Add a macro to copy with barriers
+</li><li> Allow mmap calls to gracefully return absent ctx
+</li><li> sssd_pam: Cleanup requests cache on sbus reconect
+</li><li> responder_dp: Add timeout to side requets
+</li><li> memberof: Prevent unneded failure case
+</li><li> sssd_nss: Plug memory leaks
+</li><li> nss_mc: Add extra checks when dereferencing records
+</li><li> Update free table when records are invalidated.
+</li><li> Carefully check records when forcibly invalidating
+</li><li> mmap cache: invalidate cache on fatal error
+</li><li> Remove unused header
+</li><li> Fix invalidating autofs maps
+</li></ul><p>
+Sumit Bose (18):
+</p>
+<ul><li> select_principal_from_keytab() look for plain input as well
+</li><li> select_principal_from_keytab() do wildcard lookups after specific ones
+</li><li> Fix a 'shadows a global declaration' warning
+</li><li> Add default section to switch statement
+</li><li> krb5 tgt renewal: fix usage of ldb_dn_get_component_val()
+</li><li> Use struct pac_grp instead of gid_t for groups from PAC
+</li><li> Add find_domain_by_id()
+</li><li> IDMAP: add sss_idmap_smb_sid_to_unix()
+</li><li> Update domain ID for local domain as well
+</li><li> Always get user data from PAC
+</li><li> Save domain and GID for groups from the configured domain
+</li><li> Remote groups do not have an original DN attribute
+</li><li> Read remote groups from PAC
+</li><li> Translate LDB_ERR_ATTRIBUTE_OR_VALUE_EXISTS to EEXIST
+</li><li> Use hash table to collect GIDs from PAC to avoid dups
+</li><li> Add tests for get_gids_from_pac()
+</li><li> PAC responder: check if existing user differs
+</li><li> Refactor gid handling in the PAC responder
+</li></ul></body></html>

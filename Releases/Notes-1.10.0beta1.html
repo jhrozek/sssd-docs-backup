@@ -1,0 +1,148 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<ul><li>The Active Directory provider now includes support for Site-based discovery. This feature allows the Active Directory clients to find the most suitable Domain Controller to connect to.
+</li><li>Support for dynamic DNS updates in the Active Directory provider. This feature enables the clients to automatically update or refresh their DNS records stored in the AD server.
+</li><li>A new library, called <tt>libsss_nss_idmap</tt> was introduced. This library allows the user to convert Windows Security Identifiers (SIDs) to names and vice versa. The library also includes Python bindings.
+</li><li>Setting the SELinux context on the IPA server now also works for users coming from a trusted Active Directory domain
+</li><li>Fixed a serious performance issue when enumerating large number of users
+</li><li>The <tt>subdomain_homedir</tt> configuration option gained a new template expansion <tt>%F</tt> that expands to the flat name (NetBIOS name) of the trusted AD domain
+</li></ul><h2 id="PackagingChanges">Packaging Changes</h2>
+<ul><li>The SSSD python ConfigAPI was moved to its own noarch subpackage to make the SSSD packaging more compliant with the Fedora packaging guidelines
+</li><li>The <tt>libsss_nss_idmap</tt> library and its Python bindings are packaged in separate subpackages
+</li></ul><h2 id="TicketsFixed">Tickets Fixed</h2>
+<p>
+</p><div><dl class="wiki compact"><dt><a class="closed" href="/sssd/ticket/1625" title="Confusing error messages for invalid sssd.conf">#1625</a></dt><dd>Confusing error messages for invalid sssd.conf</dd><dt><a class="closed" href="/sssd/ticket/1741" title="sss_cache doesn't support subdomains">#1741</a></dt><dd>sss_cache doesn't support subdomains</dd><dt><a class="closed" href="/sssd/ticket/1767" title="unify sss_mc_set_recycled">#1767</a></dt><dd>unify sss_mc_set_recycled</dd><dt><a class="closed" href="/sssd/ticket/1774" title="move processing of password expiration back to PAM provider only">#1774</a></dt><dd>move processing of password expiration back to PAM provider only</dd><dt><a class="closed" href="/sssd/ticket/1784" title="rewrite nested group processing to follow the tevent_req coding style">#1784</a></dt><dd>rewrite nested group processing to follow the tevent_req coding style</dd><dt><a class="closed" href="/sssd/ticket/1786" title="Use new interface from ding-libs ini interface">#1786</a></dt><dd>Use new interface from ding-libs ini interface</dd><dt><a class="closed" href="/sssd/ticket/1830" title="make the authtok structure really opaque">#1830</a></dt><dd>make the authtok structure really opaque</dd><dt><a class="closed" href="/sssd/ticket/1839" title="Incorrect *.py[co] files placement">#1839</a></dt><dd>Incorrect *.py[co] files placement</dd><dt><a class="closed" href="/sssd/ticket/1844" title="add a call to calculated the range for a given domain SID to libsss_idmap">#1844</a></dt><dd>add a call to calculated the range for a given domain SID to libsss_idmap</dd><dt><a class="closed" href="/sssd/ticket/1848" title="unused parameter in ipa_selinux handler">#1848</a></dt><dd>unused parameter in ipa_selinux handler</dd><dt><a class="closed" href="/sssd/ticket/1860" title="pidfile() may leak memory on error">#1860</a></dt><dd>pidfile() may leak memory on error</dd><dt><a class="closed" href="/sssd/ticket/1861" title="potential out-of-bounds-write in sss_idmap_sid_to_dom_sid">#1861</a></dt><dd>potential out-of-bounds-write in sss_idmap_sid_to_dom_sid</dd><dt><a class="closed" href="/sssd/ticket/1862" title="negative return in files.c">#1862</a></dt><dd>negative return in files.c</dd><dt><a class="closed" href="/sssd/ticket/1864" title="Bad comparisons in checks found by new Coverity instance">#1864</a></dt><dd>Bad comparisons in checks found by new Coverity instance</dd><dt><a class="closed" href="/sssd/ticket/1865" title="Logically dead code in tools_util.c">#1865</a></dt><dd>Logically dead code in tools_util.c</dd><dt><a class="closed" href="/sssd/ticket/1867" title="document that AD provider is always case insensitive">#1867</a></dt><dd>document that AD provider is always case insensitive</dd><dt><a class="closed" href="/sssd/ticket/1877" title="ding-libs.dhash: uninitialized pointer read">#1877</a></dt><dd>ding-libs.dhash: uninitialized pointer read</dd><dt><a class="closed" href="/sssd/ticket/1888" title="freeipa 3.2 trusted ad user not listed in external group">#1888</a></dt><dd>freeipa 3.2 trusted ad user not listed in external group</dd><dt><a class="closed" href="/sssd/ticket/1889" title="coverity: dead code in sudo client">#1889</a></dt><dd>coverity: dead code in sudo client</dd></dl></div><p>
+</p>
+<h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Abhishek Singh (3):
+</p>
+<ul><li>cmocka unittest for find_uid added
+</li><li>cmocka unittest for io added
+</li><li>Fix segmentation fault in test_io.
+</li></ul><p>
+Ariel Barria (2):
+</p>
+<ul><li>Allow setting krb5_renew_interval with a delimiter
+</li><li>Confusing error messages for invalid sssd.conf
+</li></ul><p>
+Jakub Hrozek (38):
+</p>
+<ul><li>Updating the version for the 1.10 beta1 release
+</li><li>krb5 child: Use the correct type when processing OTP
+</li><li>pidfile(): Do not leak fd on error
+</li><li>Fix potential out-of-bounds write in sss_idmap_sid_to_dom_sid
+</li><li>Return errno, not -1 on failure in files.c
+</li><li>Check for correct variable name
+</li><li>Init failover with be_res options
+</li><li>Centralize resolv_init, remove resolv context list
+</li><li>dyndns: Fix initializing sdap_id_ctx
+</li><li>Check for the correct variables
+</li><li>Allocate PAM DP request data on responder context
+</li><li>LDAP: Always fail if a map can't be found
+</li><li>Put the override_homedir into an included xml file
+</li><li>Allow using flatname for subdomain home dir template
+</li><li>Fix simple access group control in case-insensitive domains
+</li><li>Make leak checks usable in tests that do not utilize check
+</li><li>tests: Fix the order of key/values
+</li><li>LDAP: do not invalidate pointer with realloc while processing ghost users
+</li><li>Convert the simple access check to new error codes
+</li><li>tests: Link the simple access tests with -ldl
+</li><li>Do not keep growing event context
+</li><li>Document the naming convention for SSSD domains
+</li><li>Document that the AD provider is case-insensitive
+</li><li>selinux: if no domain matches, make the debug message louder
+</li><li>Only try to relink ghost users if we're not enumerating
+</li><li>Display the last grace warning, too
+</li><li>Refactor dynamic DNS updates
+</li><li>Convert IPA-specific options to be back-end agnostic
+</li><li>dyndns: new option dyndns_refresh_interval
+</li><li>resolver: Return PTR record as string
+</li><li>dyndns: New option dyndns_update_ptr
+</li><li>dyndns: new option dyndns_force_tcp
+</li><li>dyndns: new option dyndns_auth
+</li><li>Split out the common code from timed DNS updates
+</li><li>Active Directory dynamic DNS updates
+</li><li>AD: Always initialize ID mapping
+</li><li>Only check UPN if enterprise principals are not used
+</li><li>Updating the translations for the 1.10 beta1 release
+</li></ul><p>
+Jan Cholasta (1):
+</p>
+<ul><li>Add exit status section to sss_ssh_* man pages
+</li></ul><p>
+Lukas Slebodnik (5):
+</p>
+<ul><li>LDAP: Fix value initialization warnings
+</li><li>Incorrect *.py[co] files placement
+</li><li>Fix krbcc dir creation issue with MIT krb5 1.11
+</li><li>Default TEST_DIR to cwd, not empty string if not set explicitly
+</li><li>SUDO: IPA provider
+</li></ul><p>
+Michal Zidek (6):
+</p>
+<ul><li>Check for waitpid failure at wrong place.
+</li><li>Wrong condition after waitpid.
+</li><li>sss_cache: support for subdomains
+</li><li>sss_cache: Remove annoying messages
+</li><li>Inform about function duplication.
+</li><li>libsss_idmap: function to calculate range
+</li></ul><p>
+Ondrej Kos (3):
+</p>
+<ul><li>DB: Switch to new libini_config API
+</li><li>CONFDB: prevent double free
+</li><li>IDMAP: Fix variable initialization
+</li></ul><p>
+Pavel Březina (18):
+</p>
+<ul><li>resolv: add resolv_get_domain request to resolv utils
+</li><li>resolv: add resolv_discover_srv request to resolv utils
+</li><li>DNS sites support - SRV lookup plugin interface
+</li><li>DNS sites support - SRV DNS lookup plugin
+</li><li>fail over - add function to insert multiple servers to the list
+</li><li>DNS sites support - replace SRV lookup code with a plugin call
+</li><li>DNS sites support - use SRV DNS lookup plugin in all providers
+</li><li>DNS sites support - add IPA SRV plugin
+</li><li>sudo client: remove dead code
+</li><li>add fo_discover_servers request
+</li><li>IPA SRV plugin: use fo_discover_servers request
+</li><li>IPA SRV plugin: improve debugging
+</li><li>sdap: add sdap_connect_host request
+</li><li>add sss_ldap_encode_ndr_uint32
+</li><li>DNS sites support - add AD SRV plugin
+</li><li>dns srv plugin: compare domain names case insensitive
+</li><li>AD SRV plugin: check if site name is empty
+</li><li>fo_discover_servers_send: don't crash when backup_domain is NULL
+</li></ul><p>
+Simo Sorce (1):
+</p>
+<ul><li>Further restrict become_user drop of privileges.
+</li></ul><p>
+Sumit Bose (21):
+</p>
+<ul><li>Fix and rename get_my_domain_data()
+</li><li>Refactoring: remove duplicated code in nss responder
+</li><li>Allow usage of enterprise principals
+</li><li>Make IPA SELinux provider aware of subdomain users
+</li><li>Add override_homedir.xml to po4a.cfg
+</li><li>Remove unused TALLOC_CTX from responder_get_domain()
+</li><li>responder_get_domain: do not return disabled domains
+</li><li>responder_get_domain(): remove timeout calculation
+</li><li>LDAP: always store SID if available
+</li><li>Add secid filter to responder-dp protocol
+</li><li>Add two new request types to the data-provider interface
+</li><li>Add idmap context to nss context
+</li><li>Add responder_get_domain_by_id()
+</li><li>sysdb: add sysdb_search_object_by_sid()
+</li><li>Add sss_ncache_set_sid() and sss_ncache_check_sid()
+</li><li>Remove unused attribute list
+</li><li>Use struct to hold different types of request parameters
+</li><li>Add SID related lookups to IPA subdomains
+</li><li>Add SID related calls to the NSS responder
+</li><li>Add client library for SID related lookups
+</li><li>Add python interface to libsss_nss_idmap
+</li></ul><p>
+Yuri Chornoivan (1):
+</p>
+<ul><li>Fix typos in man pages
+</li></ul></body></html>

@@ -1,0 +1,127 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><p>
+</p><div class="wiki-toc">
+<ol>
+  <li>
+    <ol>
+      <li>
+        <a href="#SUDOSupporttoSSSD">SUDO Support to SSSD</a>
+      </li>
+      <li>
+        <a href="#DESIGN:">DESIGN :</a>
+      </li>
+      <li>
+        <a href="#SUDOPlugin">SUDO Plugin</a>
+      </li>
+      <li>
+        <a href="#SUDOResponder">SUDO Responder</a>
+      </li>
+      <li>
+        <a href="#SUDOProviderInterface">SUDO Provider Interface</a>
+      </li>
+      <li>
+        <a href="#LDAPProviderforSUDO">LDAP Provider for SUDO</a>
+      </li>
+      <li>
+        <a href="#Advantagesofthisdesign">Advantages of this design</a>
+      </li>
+    </ol>
+  </li>
+</ol>
+</div><p>
+</p>
+<h2 id="SUDOSupporttoSSSD">SUDO Support to SSSD</h2>
+<hr />
+<p>
+<br />
+This Design document talks about the integration of SUDO support to SSSD through plugin system.The SUDO can be used to check whether a user have rights to execute the instructions as another user. Using this plugin SUDO can be configured to use custom rules and policies. So that we can alter authorization rules so as to provide cached access to LDAP. This will make it easier to maintain centralized sudo rules. The SSSD caches the SUDO policies, so that the SUDO support can work better with a LDAP sever.
+<br />
+</p>
+<blockquote>
+<p>
+To integrate the sudo feature into the System Security Service Daemon(SSSD) we must have some components to handle sudo policies and authentication at both client side and server side. At the LDAP sever side, the schema for storing the sudo policies is available(or already implemented). So that, the SUDO rules can be loaded into an LDAP server and managed centrally using this schema. The LDAP servers follows the SUDO schema specified at the Suborders LDAP Manual (<a class="ext-link" href="http://www.gratisoft.us/sudo/man/1.8.0/sudoers.ldap.man.html"><span class="icon">​</span>http://www.gratisoft.us/sudo/man/1.8.0/sudoers.ldap.man.html</a>). Any Directory Server can load the described schema and become a provider of the centrally managed SUDO rules for the SUDO clients.
+</p>
+</blockquote>
+<p>
+<br />
+</p>
+<p>
+      
+</p>
+<h2 id="DESIGN:">DESIGN :</h2>
+<blockquote>
+<p>
+At the highest level  the SUDO feature is implemented as the client side SUDO utility and server side SUDO schema as shown below.
+</p>
+</blockquote>
+<p>
+<a style="padding:0; border:none" href="https://fedorahosted.org/sssd/attachment/wiki/DesignDocs/SUDOSupport/sssd1.png"><img src="https://fedorahosted.org/sssd/raw-attachment/wiki/DesignDocs/SUDOSupport/sssd1.png" alt="High level design of SUDO system" title="High level design of SUDO system" /></a>
+</p>
+<p>
+     
+</p>
+<blockquote>
+<p>
+In this level the LDAP server contains centrally managed SUDO schema specifying the SUDO rules. The sudo utility at the client side queries the LDAP server to authenticate the request. The server inspects the query with SUDO schema to determine whether the requested user have the right to execute this command. Then returns the result back to the client.
+</p>
+</blockquote>
+<p>
+When Plugin comes in to action, the SSSD works with this plugin so that the sudo queries is sent to the LDAP server. On receiving the sudo command on the runtime the SUDO utility will transfer give the chance for processing the request to the plugin integrated to the sudo utility at client side. This is done based on the Plugin-API provided by the sudo utility. The manual for Plugin-API can be found here (<a class="ext-link" href="http://www.gratisoft.us/sudo/man/1.8.1/sudo_plugin.man.html"><span class="icon">​</span>http://www.gratisoft.us/sudo/man/1.8.1/sudo_plugin.man.html</a>). The SSSD provides a cached support to SUDO using this plugin.
+</p>
+<p>
+<a style="padding:0; border:none" href="https://fedorahosted.org/sssd/attachment/wiki/DesignDocs/SUDOSupport/SUDO2.png"><img src="https://fedorahosted.org/sssd/raw-attachment/wiki/DesignDocs/SUDOSupport/SUDO2.png" alt="SUDO plugin in action" title="SUDO plugin in action" /></a>
+</p>
+<p>
+The Plug-in is designed as 4 components. They are<br />
+(1). Lightweight plugin for SUDO.<br />
+(2). SUDO responder daemon.<br />
+(3). SUDO provider type.<br />
+(4). LDAP implementation of the SUDO provider type<br />
+</p>
+<hr />
+<h2 id="SUDOPlugin">SUDO Plugin</h2>
+<hr />
+<blockquote>
+<p>
+The lightweight plugin just forwards the sudo command request from the SUDO utility to the SSSD. The plugin is made using the plugin-API and connected to the sudo utility at the client side. When user types in the command with sudo (eg: sudo ls ) the sudo utility gives the chance for execution to the sudo plugin. The plugin calls the pam_authenticate() from the pam library with pam service defined for sudo, to verify the user provided information. If the pam module returns PAM_SUCCESS then plugin continues with sssd else dies with an error message. If pam authentication is successful, then the plugin just forwards the request obtained from the sudo utility to the SSSD daemon. The format of this forward request is available at <a class="missing wiki" href="https://docs.pagure.org/sssd-test2/%5B%20https%3A//fedorahosted.org/sssd/wiki/DesignDocs/SUDOSupport/PluginWireProtocol.html#THEPLUGINWIREPROTOCOL" rel="nofollow">[ https://fedorahosted.org/sssd/wiki/DesignDocs/SUDOSupport/PluginWireProtocol#THEPLUGINWIREPROTOCOL?</a>]
+</p>
+</blockquote>
+<p>
+<a style="padding:0; border:none" href="https://fedorahosted.org/sssd/attachment/wiki/DesignDocs/SUDOSupport/sudoPlugin.png"><img src="https://fedorahosted.org/sssd/raw-attachment/wiki/DesignDocs/SUDOSupport/sudoPlugin.png" /></a>
+</p>
+<hr />
+<h2 id="SUDOResponder">SUDO Responder</h2>
+<hr />
+<p>
+The request forwarded by plugin reaches SSSD which gives the request to the SUDO responder daemon. First of all, the responder performs a look-up against the SSSD's cache or sysdb. The result of this lookup can be either a cache-hit or a cache-miss or an expired entry. If the entry exists in the cache and is not expired, we will immediately reply to the plugin module with the answer that shows whether the user can be authenticated to run the specified command as SUDO user. There the sudo request ends. In the case of a cache-miss, the SUDO responder needs to get the latest SUDO schema information from the LDAP server. So that the request for contacting the LDAP server is given to LDAP provider. When the entry in the cache is found to be expired the same step as in the cache miss is followed.
+</p>
+<p>
+<a style="padding:0; border:none" href="https://fedorahosted.org/sssd/attachment/wiki/DesignDocs/SUDOSupport/SUDO4.png"><img src="https://fedorahosted.org/sssd/raw-attachment/wiki/DesignDocs/SUDOSupport/SUDO4.png" alt="SUDO responder checks the cache" title="SUDO responder checks the cache" /></a>
+</p>
+<hr />
+<h2 id="SUDOProviderInterface">SUDO Provider Interface</h2>
+<hr />
+<p>
+Sudo provider provides a interface to write/update the schema obtained from the LDAP server through LDAP provider. In the case of a cache miss or expired cache the sudo responder contacts the LDAP provider to get the schema from server and the returned schema is used to serve the SUDO request from the sudo utility. and this result is passed to the SUDO provider which writes this data to the offline cache in the SSSD. So that the next request before the expiration time can be served without any LDAP searches. SO that the over all efficiency of SUDO operation increases by the use of SSSD and its offline cache.
+</p>
+<p>
+The provider defines the communication protocol and functional interface for actual back end and the responder.
+</p>
+<hr />
+<h2 id="LDAPProviderforSUDO">LDAP Provider for SUDO</h2>
+<hr />
+<p>
+In case of a cache miss or expired entry in the cache the SUDO need to connect to the LDAP sever to update the offline schema in the cache. The LDAP provider will deal with all the issues related to connecting the LDAP server, Sending LDAP queries and receiving schema from the LDAP server etc. Sudo provider gets this request from the responder. The result obtained ( schema from LDAP server ) is returned to the sudo responder.
+</p>
+<p>
+The LDAP Provider has existing interfaces for 1) Identity, 2) Authentication, 3) Access-control and 4) Password-change. The design adds one more component to it. It is 5) SUDO policy. This component deals with the back end and provider issues.
+</p>
+<p>
+<a style="padding:0; border:none" href="https://fedorahosted.org/sssd/attachment/wiki/DesignDocs/SUDOSupport/SUDO6.png"><img src="https://fedorahosted.org/sssd/raw-attachment/wiki/DesignDocs/SUDOSupport/SUDO6.png" alt="SUDO provider connects to LDAP server" title="SUDO provider connects to LDAP server" /></a>
+</p>
+<hr />
+<h2 id="Advantagesofthisdesign">Advantages of this design</h2>
+<hr />
+<p>
+This design allows us to load any SUDO implementation into the back-end daemon and have it 1) work properly and 2) be completely self-contained, so that the SUDO Responder doesn't need to know which is running. i.e without any additional burden to the SUDO responder we can connect it to any server system with valid SUDO implementation. 
+</p>
+</body></html>

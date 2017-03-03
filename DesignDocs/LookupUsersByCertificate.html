@@ -1,0 +1,121 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h1 id="LookupUsersbyCertificate">Lookup Users by Certificate</h1>
+<p>
+Related ticket(s):
+</p>
+<ul><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2596"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2596</a>
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/546"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/546</a>
+</li><li><a class="ext-link" href="https://fedorahosted.org/freeipa/ticket/4238"><span class="icon">​</span>https://fedorahosted.org/freeipa/ticket/4238</a> (design page: <a class="ext-link" href="http://www.freeipa.org/page/V4/User_Certificates"><span class="icon">​</span>http://www.freeipa.org/page/V4/User_Certificates</a>)
+</li></ul><h3 id="Problemstatement">Problem statement</h3>
+<p>
+As stated in ticket <a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/2596" title="enhancement: Add a way to lookup users based on CAC identity certificates (closed: fixed)">#2596</a> applications doing user authentication based on certificates, e.g. web servers, need a way to map the certificate presented by the client to a specific user. Although there are various ways to derive a user name from special entries in the certificate so far there is no generally accepted scheme. The most general and in some cases the only possible way is to look up the certificate directly in the LDAP server. This requires that the certificate is stored in the LDAP server which we will assume for this initial design. (In a second part user lookups based on the certificate content will be added, this requires that the syntax for the mapping is specified in  <a class="ext-link" href="http://www.freeipa.org/page/V4/User_Certificates#Certificate_Identity_Mapping"><span class="icon">​</span>http://www.freeipa.org/page/V4/User_Certificates#Certificate_Identity_Mapping</a>)
+</p>
+<p>
+The primary interface to lookup users by certificate would be D-BUS.
+</p>
+<h3 id="Usecases">Use cases</h3>
+<p>
+The primary use case is described in ticket <a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/2596" title="enhancement: Add a way to lookup users based on CAC identity certificates (closed: fixed)">#2596</a>. If Apache is configured to use certificate based client authentication modules like mod_lookup_identity has access to the PAM encoded certificate via environment variables. With this data as input mod_lookup_identity should call a D-BUS method like <em>org.freedesktop.sssd.infopipe.GetUserAttrByCert</em> which will return the data of the user the certificate belongs similar to the <em>GetUserAttr</em> method.
+</p>
+<h3 id="Overviewofthesolution">Overview of the solution</h3>
+<p>
+Besides adding the D-Bus method to the InfoPipe responder the generic LDAP backend should be able to search and read the certificate data if available from a LDAP server and store it to the cache. The internal sysdb interface must be extended to search cached entries with the certificate as input.
+</p>
+<h3 id="Implementationdetails">Implementation details</h3>
+<h4 id="LDAPbackend">LDAP backend</h4>
+<p>
+Reading certificate data if available just requires adding a new user attribute which will be requested during LDAP searches for a user. In general the certificate is stored as a DER encoded binary on the LDAP server. <strong>Question: should we add an option like ldap_user_cert_encoding to support other encodings a server might send to us, or shall we add it only when there is a real use case?</strong> Internally the certificate should be stored DER encoded to the cache as well because this encoding is the most unambiguous encoding (e.g. with PEM encoding it is not clear if the base64 blob should have line breaks or not and if the enclosing '-----BEGIN CERTIFICATE-----' and '-----END CERTIFICATE-----' should be stored as well and if line break should be added here or not?)
+</p>
+<p>
+To search a user with the help of the certificate the DER encoded binary ticket must be transformed into a search filter. In this case it would be something like 'userCertificate=\23\a5\3e......' where each byte from the certificate is is represented by a hex value pre-pendened by a '\'. The filter should be generated in a subroutine which accepts the DER encoded certificate with base64 ascii armor and returns the search filter. This way the subroutine can later be extended to accept configuration options for the identity mapping and can return different search filters for those cases. Since the requirement for LDAP and sysdb search filters are the same there should be an option indicating if a LDAP or sysdb filter is needed, because the attribute names might be different.
+</p>
+<p>
+Although it would be possible to handle the binary DER data directly I think using a base64 ascii armor to handle the data as a string is useful to avoid adding code for handling binaries e.g. in the S-BUS requests to the backends.
+</p>
+<h4 id="SYSDBAPI">SYSDB API</h4>
+<p>
+A new call sysdb_search_user_by_cert() should be added which get the DER encoded certificate with base64 ascii armor as input and use the function described above to get a proper search filter. Currently it will be only the search filter for the binary certificate. Other than that the new call will act like to other sysdb_search_user_by_*() calls.
+</p>
+<h4 id="InfoPipe">InfoPipe</h4>
+<p>
+A new method GetUSerAttrByCert() must be implemented which expected the PEM encoded certificate and an array of attrbute names. <strong>Question: Should we only support PEM here or other formats as well? In this case we need a third parameter indicating the encoding of the certificate data.</strong>. <a class="missing wiki" href="https://docs.pagure.org/sssd-test2/InfoPipe.html" rel="nofollow">InfoPipe?</a> will convert the certificate into DER encoding with base64 ascii armor, search the cache and eventually forward the request to the backend. The request to the backend is processed similar to a request by name, only that a new filter name, e.g. DP_CERT_ID "cert", is needed.
+</p>
+<p>
+Since it is in general not obvious to which domain a certificate belongs, the search must iterate over all domains in case no matching certificate was found. For the cases where there is a strong 1:1 relationship between the issuer of a certificate and a domain, configuration options for this can be added later. 
+</p>
+<h3 id="Configurationchanges">Configuration changes</h3>
+<p>
+A new user attribute open 'ldap_user_certificate' will be added to the LDAP provider. By default only the IPA provider will set a value for it to avoid reading about 1k of data which is not needed in the other providers. <strong>Question: Does this make sense or shall we enable it for other providers as well?</strong>
+</p>
+<h3 id="HowToTest">How To Test</h3>
+<p>
+First a certificate must be load to a IPA user entry, it can be any kind of certificate as long as it is valid an DER or PEM encoded. Until IPA has some import utilities ldapmodify should be used. A LDIF file might look like this:
+</p>
+<pre class="wiki">dn: uid=cert_user,cn=users,cn=accounts,dc=ipa,dc=devel
+changetype: modify
+add: userCertificate;binary
+userCertificate;binary::MII...=
+</pre><p>
+where MII...= indicates the base64 encoded certificate data. If you have a PEM encoded certificate you can just use the base64 part here. If the certificate is DER encoded it can be transformed to base64 with
+</p>
+<pre class="wiki">base64 &lt; ./certificate_file.der | tr -d '\n'
+</pre><p>
+Testing can be done with the help of the dbus-send utility:
+</p>
+<pre class="wiki"># dbus-send --system --print-reply  --dest=org.freedesktop.sssd.infopipe \
+                                         /org/freedesktop/sssd/infopipe/Users \
+                                         org.freedesktop.sssd.infopipe.Users.FindByCertificate \
+                                         string:"-----BEGIN CERTIFICATE-----.......-----END CERTIFICATE-----"
+method return sender=:1.1479 -&gt; dest=:1.1498 reply_serial=2
+   object path "/org/freedesktop/sssd/infopipe/Users/ipa_2edevel/240600004"
+
+# dbus-send --system --print-reply --dest=org.freedesktop.sssd.infopipe /org/freedesktop/sssd/infopipe/Users/ipa_2edevel/240600004 org.freedesktop.DBus.Properties.Get string:"org.freedesktop.sssd.infopipe.Users.User" string:"name"
+method return sender=:1.1479 -&gt; dest=:1.1529 reply_serial=2
+   variant       string "cert_user"
+
+# dbus-send --system --print-reply --dest=org.freedesktop.sssd.infopipe /org/freedesktop/sssd/infopipe/Users/ipa_2edevel/240600004 org.freedesktop.DBus.Properties.GetAll string:"org.freedesktop.sssd.infopipe.Users.User"
+method return sender=:1.1479 -&gt; dest=:1.1530 reply_serial=2
+   array [
+      dict entry(
+         string "name"
+         variant             string "cert_user"
+      )
+      dict entry(
+         string "uidNumber"
+         variant             uint32 240600004
+      )
+      dict entry(
+         string "gidNumber"
+         variant             uint32 240600004
+      )
+      dict entry(
+         string "gecos"
+         variant             string "ipa u1"
+      )
+      dict entry(
+         string "homeDirectory"
+         variant             string "/home/cert_user"
+      )
+      dict entry(
+         string "loginShell"
+         variant             string "/bin/sh"
+      )
+      dict entry(
+         string "groups"
+         variant             array [
+               object path "/org/freedesktop/sssd/infopipe/Groups/ipa_2edevel/240600004"
+               object path "/org/freedesktop/sssd/infopipe/Groups/ipa_2edevel/240600005"
+               object path "/org/freedesktop/sssd/infopipe/Groups/ipa_2edevel/240600006"
+            ]
+      )
+      dict entry(
+         string "extraAttributes"
+         variant             array [
+            ]
+      )
+   ]
+</pre><p>
+The first dbus-send command shows the lookup by certificate, the following two just illustrate how a single property or all can be requested from the returned object path.
+</p>
+<h3 id="Authors">Authors</h3>
+<ul><li>Sumit Bose &lt;<a class="mail-link" href="mailto:sbose@redhat.com"><span class="icon">​</span>sbose@redhat.com</a>&gt;
+</li></ul></body></html>

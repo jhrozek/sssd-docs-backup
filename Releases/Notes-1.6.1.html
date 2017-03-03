@@ -1,0 +1,43 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<ul><li>Fixes a serious issue with LDAP connections when the communication is dropped (e.g. VPN disconnection, waking from sleep)
+</li><li>SSSD is now less strict when dealing with users/groups with multiple names when a definitive primary name cannot be determined
+</li><li>The LDAP provider will no longer attempt to canonicalize by default when using SASL. An option to re-enable this has been provided.
+</li><li>Fixes for non-standard LDAP attribute names (e.g. those used by Active Directory)
+</li><li>Three HBAC regressions have been fixed.
+</li><li>Fix for an infinite loop in the deref code
+</li></ul><h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Jakub Hrozek (9):
+</p>
+<ul><li>pyhbac: Do not convert int to bool
+</li><li>Fix returning groups when gidNumber attribute is not ordered
+</li><li>Prevent segfault if vetoed_shells are specified without allowed_shells
+</li><li>Handle timeout during sss_ldap_init_send
+</li><li>IPA dyndns: do not segfault if the server cannot be resolved
+</li><li>Return the first value of name if the multivalued name attribute does not match RDN
+</li><li>Add LDAP provider option to set LDAP_OPT_X_SASL_NOCANON
+</li><li>Use the default Kerberos realm for LDAP with GSSAPI auth
+</li><li>Fix moving to next entry in deref code
+</li></ul><p>
+Ralf Haferkamp (1):
+</p>
+<ul><li>Allow the O_NONBLOCK flag to be reset correctly
+</li></ul><p>
+Stephen Gallagher (7):
+</p>
+<ul><li>Bumping version to 1.6.1
+</li><li>Revert "Allow LDAP to decide when an expiration warning is warranted"
+</li><li>Use sysdb attribute name for GID, not LDAP attribute
+</li><li>HBAC: Handle saving groups that have no members
+</li><li>HBAC: Use of hostgroups for targethost or sourcehost was broken
+</li><li>HBAC: Properly skip all non-group memberOf entries
+</li><li>Updating translation files for 1.6.1 release
+</li></ul><p>
+Sumit Bose (1):
+</p>
+<ul><li>Improve password policy error code and message
+</li></ul><p>
+Yuri Chornoivan (1):
+</p>
+<ul><li>Fix two man page typos
+</li></ul></body></html>

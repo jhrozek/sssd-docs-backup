@@ -1,0 +1,41 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<ul><li>Resolves long-standing issues related to group processing with RFC2307bis LDAP servers
+</li><li>Fixed bugs in RFC2307bis group memberships related to initgroups
+</li><li>Fix tight-loop bug on systems with older OpenLDAP client libraries (such as Red Hat Enterprise Linux 5)
+</li></ul><h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Héctor Daniel Cabrera (1):
+</p>
+<ul><li>Updating ES translation
+</li></ul><p>
+Jakub Hrozek (9):
+</p>
+<ul><li>Fix sysdb_group_dn_name
+</li><li>Fix sysdb_attrs_to_list
+</li><li>Request the correct attribute name
+</li><li>End update_members request if there's nothing to do
+</li><li>sysdb interface for adding incomplete group entries
+</li><li>Add fake groups during initgroups
+</li><li>sysdb interface for adding expired user entries
+</li><li>Shortcut for save_group() to accept sysdb DNs as member attributes
+</li><li>Add fake users during saving of RFC2307 group
+</li></ul><p>
+Jan Zeleny (1):
+</p>
+<ul><li>Disable events on ldap fd when offline.
+</li></ul><p>
+Simo Sorce (1):
+</p>
+<ul><li>Add option to limit nested groups
+</li></ul><p>
+Stephen Gallagher (8):
+</p>
+<ul><li>Request all group attributes during initgroups processing
+</li><li>Add common hash table setup
+</li><li>Make sdap_save_users_send handle zero users gracefully
+</li><li>Handle nested groups in RFC2307bis
+</li><li>Make user argument of sysdb_update_members_send a const
+</li><li>Modify sysdb_add_group_member_send to accept users and groups
+</li><li>Add proper nested initgroup support for RFC2307bis servers
+</li><li>Releasing version 1.2.4
+</li></ul></body></html>

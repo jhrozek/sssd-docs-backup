@@ -1,0 +1,121 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<ul><li>A new option ad_access_filter was added. This option allows the
+administrator to easily configure LDAP search filter that the users logging
+in must match in order to be granted access
+</li><li>Group resolution now supports resolving group members from different
+trusted AD domains in a single forest
+</li><li>A bug that prevented a configuration file with trailing spaces to be
+loaded was fixed
+</li><li>SSSD no longer crashes if the LDAP connection is terminated while LDAP
+requests are still in progress
+</li><li>Several important bugs related to the Global Catalog support were fixed:
+<ul><li>SSSD now correctly falls back to LDAP lookups in case Global Catalog
+is not reachable
+</li><li>If the AD servers were specified using the ad_server option and not
+autodiscovered, server fail over did not work correctly with 1.11.1
+</li></ul></li></ul><h2 id="Featureremoval">Feature removal</h2>
+<ul><li>The Kerberos provider will no longer try to create public directories when evaluating the krb5_ccachedir option. This is a necessary backwards-incompatible change, as SSSD has no way to know when a directory should be public and when it shouldn't without additional information. Moreover creating public directories is something the system administrator should perform, not the authentication daemon. The tmpfiles.d(5) facility can be used for that purpose by admins that need dynamic creation of public directories at system boot time.
+</li></ul><h2 id="DocumentationChanges">Documentation Changes</h2>
+<ul><li>The decimal debug levels are now recommended instead of the advanced
+hexadecimal levels which are more suitable for developers
+</li></ul><h2 id="TicketsFixed">Tickets Fixed</h2>
+<p>
+</p><div><dl class="wiki compact"><dt><a class="closed" href="/sssd/ticket/1968" title="Memory grows if subdomain goes away in the AD provider">#1968</a></dt><dd>Memory grows if subdomain goes away in the AD provider</dd><dt><a class="closed" href="/sssd/ticket/2030" title="getent response requires sssd restart after trust add">#2030</a></dt><dd>getent response requires sssd restart after trust add</dd><dt><a class="closed" href="/sssd/ticket/2064" title="ad: unable to resolve membership when user is from different domain than ...">#2064</a></dt><dd>ad: unable to resolve membership when user is from different domain than group</dd><dt><a class="closed" href="/sssd/ticket/2071" title="Ccache directory creation leads to unexpected results">#2071</a></dt><dd>Ccache directory creation leads to unexpected results</dd><dt><a class="closed" href="/sssd/ticket/2082" title="[RFE] Add a new option ad_access_filter">#2082</a></dt><dd>[RFE] Add a new option ad_access_filter</dd><dt><a class="closed" href="/sssd/ticket/2092" title="Group lookup is not returned immediately after service startup">#2092</a></dt><dd>Group lookup is not returned immediately after service startup</dd><dt><a class="closed" href="/sssd/ticket/2100" title="sudo responder does not support specifying just one of ...">#2100</a></dt><dd>sudo responder does not support specifying just one of sudoNotBefore/sudoNotAfter</dd><dt><a class="closed" href="/sssd/ticket/2101" title="Use idrange of forest root if there is none for a member domain and type ...">#2101</a></dt><dd>Use idrange of forest root if there is none for a member domain and type is ipa-ad-trust-posix</dd><dt><a class="closed" href="/sssd/ticket/2104" title="AD provider should fall back the LDAP if Global Catalog is not reachable">#2104</a></dt><dd>AD provider should fall back the LDAP if Global Catalog is not reachable</dd><dt><a class="closed" href="/sssd/ticket/2105" title="Do not show 'Could not add new domain' error messages if ...">#2105</a></dt><dd>Do not show 'Could not add new domain' error messages if ldap_id_mapping=false</dd><dt><a class="closed" href="/sssd/ticket/2112" title="Coverity reported potential NULL dereference">#2112</a></dt><dd>Coverity reported potential NULL dereference</dd><dt><a class="closed" href="/sssd/ticket/2116" title="SID looksups are not handled if noexist_delete flag is set">#2116</a></dt><dd>SID looksups are not handled if noexist_delete flag is set</dd><dt><a class="closed" href="/sssd/ticket/2121" title="ipa ad trusted user lookups failed with sssd_be crash">#2121</a></dt><dd>ipa ad trusted user lookups failed with sssd_be crash</dd><dt><a class="closed" href="/sssd/ticket/2123" title="Creating system accounts on a IdM client takes up to 10 minutes when AD ...">#2123</a></dt><dd>Creating system accounts on a IdM client takes up to 10 minutes when AD trust is configured in the IdM.</dd><dt><a class="closed" href="/sssd/ticket/2124" title="sssd_nss exited abnormally and generated core files.">#2124</a></dt><dd>sssd_nss exited abnormally and generated core files.</dd><dt><a class="closed" href="/sssd/ticket/2126" title="sssd_be segfault when authenticating against active directory">#2126</a></dt><dd>sssd_be segfault when authenticating against active directory</dd><dt><a class="closed" href="/sssd/ticket/2131" title="NSS responder doesn't qualify memberuid and ghost users of groups that ...">#2131</a></dt><dd>NSS responder doesn't qualify memberuid and ghost users of groups that contain members from different domains</dd></dl></div><p>
+</p>
+<h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Jakub Hrozek (23):
+</p>
+<ul><li>Updating the version for the 1.11.2 release
+</li><li>krb5: Fix unit tests
+</li><li>INI: Disable line-wrapping functionality
+</li><li>KRB5: Return PAM_ACCT_EXPIRED when logging in as expired AD user
+</li><li>PROXY: Fix memory hierarchy when enumerating services
+</li><li>Inherit ID limits of parent domains if set
+</li><li>SYSDB: Add sysdb_delete_by_sid
+</li><li>LDAP: Delete entry by SID if not found
+</li><li>LDAP: Amend sdap_access_check to allow any connection
+</li><li>LDAP: Parse FQDN into name/domain for subdomain users
+</li><li>AD: Add a new option ad_access_filter
+</li><li>AD: Use the ad_access_filter if it's set
+</li><li>AD: Search GC by default during access control, fall back to LDAP
+</li><li>AD: Add extended access filter
+</li><li>TEST: Test getgrnam with emphasis on members
+</li><li>NSS: Print FQDN for groups with mixed domain membership
+</li><li>KRB5: Handle ERR_CHPASS_FAILED
+</li><li>NSS: Fix service enumeration
+</li><li>MAN: Document that krb5 directories can only be created as private
+</li><li>LDAP: Check all search bases during nested group processing
+</li><li>NSS: Fix parenthesis
+</li><li>AD: Fix ad_access_filter parsing with empty filter
+</li><li>Updating translation for the 1.11.2 release
+</li></ul><p>
+Lukas Slebodnik (9):
+</p>
+<ul><li>LDAP: Set default value for dyndns update to false
+</li><li>krb5: Remove warning dereference of a null pointer
+</li><li>krb5: Use right function to free data.
+</li><li>AD: Prefer GC port from SRV record
+</li><li>AD: fall back to LDAP if GC is not available.
+</li><li>tests: Use right format string for type size_t
+</li><li>Makefile: Add missing libraries
+</li><li>Makefile: Remove unused variable TEST_MOCK_OBJ
+</li><li>LDAP: Return correct error code
+</li></ul><p>
+Pavel Březina (23):
+</p>
+<ul><li>sudo: allow specifying only one time restriction
+</li><li>sudo: improve time restrictions debug messages
+</li><li>nss: wait for initial subdomains request to finish
+</li><li>subdomains: first destroy ptask then remove sdom
+</li><li>dp: make subdomains refresh interval configurable
+</li><li>dp: store list of ongoing requests
+</li><li>utils: add ERR_DOMAIN_NOT_FOUND error code
+</li><li>dp: set request domain
+</li><li>dp: add function to terminate request of specific domain
+</li><li>dp: free sdap domain if subdomain is removed
+</li><li>be_ptask: add be_ptask_create_sync()
+</li><li>dp: convert cleanup task to be_ptask
+</li><li>ipa: destroy cleanup task when subdomain is removed
+</li><li>ad: destroy ptasks when subdomain is removed
+</li><li>sdap_save_user: try to determine domain by SID
+</li><li>sdap_save_group: try to determine domain by SID
+</li><li>free sid obtained from sss_idmap_unix_to_sid()
+</li><li>ad: shortcut if possible during get object by ID or SID
+</li><li>sdap: store base dn in sdap_domain
+</li><li>sdap: add sdap_domain_get_by_dn()
+</li><li>ghosts: pick correct domain for every member
+</li><li>sdap_fill_memberships: pick correct domain for every member
+</li><li>nested groups: pick correct domain for cache lookups
+</li></ul><p>
+Simo Sorce (1):
+</p>
+<ul><li>krb5: Remove ability to create public directories
+</li></ul><p>
+Stephen Gallagher (4):
+</p>
+<ul><li>SYSDB: Fix incorrect DEBUG message
+</li><li>MAN: Clarify debug level documentation
+</li><li>MAN: Reflow debug_levels.xml
+</li><li>BUILD: Update bashrc macros
+</li></ul><p>
+Sumit Bose (17):
+</p>
+<ul><li>AD: properly intitialize GC from ad_server option
+</li><li>LDAP: handle SID requests if noexist_delete is set
+</li><li>IPA server mode: properly initialize ext_groups
+</li><li>idmap: add internal function to free a domain struct
+</li><li>idmap: fix a memory leak if a collision is detected
+</li><li>idmap: allow ranges with external mapping to overlap
+</li><li>sdap_idmap: add sdap_idmap_get_configured_external_range()
+</li><li>sdap_idmap: properly handle ranges for external mappings
+</li><li>Add unconditional online callbacks
+</li><li>IPA: add callback to reset subdomain timeouts
+</li><li>sdap_get_generic_ext_send: check if we a re still connected
+</li><li>find_subdomain_by_sid: skip domains with missing domain_id
+</li><li>idmap: add sss_idmap_domain_by_name_has_algorithmic_mapping()
+</li><li>sdap_idmap_domain_has_algorithmic_mapping: add domain name argument
+</li><li>IPA: add trusted domains with missing idrange
+</li><li>ad_subdom_store: check ID mapping of the domain not of the parent
+</li><li>be_spy_create: free be_req and not the long living data
+</li></ul></body></html>

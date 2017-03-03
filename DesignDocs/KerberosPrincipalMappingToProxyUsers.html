@@ -1,0 +1,57 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h1 id="MappingIDprovidernamestoKerberosprincipals">Mapping ID provider names to Kerberos principals</h1>
+<p>
+Related ticket(s):
+</p>
+<ul><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2509"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2509</a>
+</li></ul><h3 id="Problemstatement">Problem statement</h3>
+<p>
+Some users are migrating to SSSD from a legacy configuration that consisted
+of a traditional UNIX user stored in <tt>/etc/passwd</tt> and managing their
+Kerberos tickets either with the use of some GUI tool or just command-line
+<tt>kinit</tt>. While these users can use SSSD by configuring the <tt>id_provider</tt>
+proxy, very often the name of their UNIX user is different from the name
+of their company-wide Kerberos credentials.
+</p>
+<p>
+This feature helps the above use-case by mapping their UNIX user name to
+the Kerberos principal name.
+</p>
+<h3 id="Usecases">Use cases</h3>
+<p>
+Joe User has a company laptop where his UNIX user has been traditionally named <tt>joe</tt>. At the same time, his company Kerberos principal is called <tt>juser@EXAMPLE.COM</tt>. Joe would like to start using SSSD to leverage features
+like offline kinit without having to rename his UNIX user and chown all his local files to the corporate user ID.
+</p>
+<p>
+While most of this design page describes setup using the proxy provider, which would be the typical case, this option can be used along with any <tt>id_provider</tt>.
+</p>
+<h3 id="Overviewofthesolution">Overview of the solution</h3>
+<p>
+The Kerberos provider will acquire a new option that describes how are the user names from the ID provider mapped onto the user part of the Kerberos principal. The user would then add the appropriate mapping to the <tt>domain</tt> section
+of <tt>sssd.conf</tt>.
+</p>
+<h3 id="Implementationdetails">Implementation details</h3>
+<p>
+A new option <tt>krb5_map_user</tt> would be added to the Kerberos auth
+code. This option would have form similar to how we map the LDAP extra
+attributes, that is <tt>local_name:krb5_name</tt>. When mapping exists for the user
+who is authenticating, the krb5_auth module would use that user name for
+calls like <tt>find_or_guess_upn</tt> instead of <tt>pd-&gt;name</tt>. We should consider
+whether to keep using <tt>pd-&gt;name</tt> or introduce another attribute to the
+<tt>krb5_child_req</tt> structure.
+</p>
+<h3 id="Configurationchanges">Configuration changes</h3>
+<p>
+A new configuration option tentatively called <tt>krb5_map_user</tt> would be added. This option is unset by default, which means whatever user name the ID provider stores will be used.
+</p>
+<h3 id="HowToTest">How To Test</h3>
+<ol><li>Prepare a Kerberos KDC, add a user principal (<tt>juser@EXAMPLE.COM</tt>)
+</li><li>Add a local user using <tt>useradd</tt> with name that differs from Kerberos principal in the name portion. (<tt>joe</tt>)
+</li><li>Configure SSSD with <tt>id_provider=proxy</tt> with <tt>proxy_lib_name=files</tt> and <tt>auth_provider=krb5</tt> pointing to our test KDC
+</li><li>Attempt to authenticate using a PAM service. The authentication should fail and the logs would show authentication as <tt>joe@EXAMPLE.COM</tt>
+</li><li>Set <tt>krb5_map_user</tt> to <tt>joe:juser</tt> and restart SSSD.
+</li><li>Authenticate again. This time, authentication should succeed and the user's klist output should list <tt>juser@EXAMPLE.COM</tt>. The <tt>id(1)</tt> output should still list <tt>joe</tt>, though.
+</li><li>Test that Kerberos ticket renewals still work
+</li><li>Test that delayed kinit still works.
+</li></ol><h3 id="Authors">Authors</h3>
+<ul><li>Jakub Hrozek &lt;<a class="mail-link" href="mailto:jhrozek@redhat.com"><span class="icon">​</span>jhrozek@redhat.com</a>&gt;
+</li></ul></body></html>

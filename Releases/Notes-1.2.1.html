@@ -1,0 +1,86 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<ul><li>Eliminated many potential bugs identified by Coverity's Integrity manager
+</li><li>Improvements and bugfixes to the negative cache and filter_users/groups
+</li><li>Eliminated a serious tight-loop condition
+</li><li>Changed default min_id value to 1 to avoid conflicts with many real-world deployments
+</li><li>Fix a bug with ldap_access_filter not being able to handle outer parentheses
+</li><li>Fix a bug in the SSSDConfig API that caused it to through unexpected exceptions if there were unknown entries in the configuration file
+</li><li>Properly handle the Kerberos credential cache when going offline
+</li><li>Remove the krb5_changepw_principal option (there are no kerberos implementations that use anything other than kadmin/changepw@REALM)
+</li></ul><h2 id="DetailedReleaseNotes">Detailed Release Notes</h2>
+<p>
+Dmitri Pal (3):
+</p>
+<ul><li>Memory leak in case of empty value
+</li><li>Fixing NULL dereferencing in ini_config
+</li><li>Addressing initialization issues.
+</li></ul><p>
+Göran Uddeborg (2):
+</p>
+<ul><li>Updating sv translation
+</li><li>Update sv translation
+</li></ul><p>
+Jakub Hrozek (15):
+</p>
+<ul><li>Man page fixes
+</li><li>Skip empty attributes with warning
+</li><li>Fix realm_str dereference
+</li><li>Fix potential NULL dereference in sss_groupshow
+</li><li>Fix potential NULL dereference in fail_over.c
+</li><li>Fix Incorrect NULL check in get_server_common()
+</li><li>Add missing break to switch statement
+</li><li>Undocument the krb5_changepw_principal option
+</li><li>Remove the -g option from useradd
+</li><li>get_uid_from_pid should use fstat rather than lstat
+</li><li>Fix invalid talloc_move in groupshow
+</li><li>Fix potential resource leak in copy_tree_ctx()
+</li><li>Potential memory leak in _nss_sss_*_r()
+</li><li>Check closedir call in find_uid
+</li><li>Print correct return code
+</li></ul><p>
+Stephen Gallagher (30):
+</p>
+<ul><li>Fix typo in Makefile
+</li><li>Fix broken build against older versions of OpenLDAP
+</li><li>Fix typo in Makefile.am
+</li><li>Disable connection callbacks when going online
+</li><li>Change default min_id to 1
+</li><li>Allow ldap_access_filter values wrapped in parentheses
+</li><li>Properly handle read() and write() throughout the SSSD
+</li><li>Fix misuse of errno in find_uid.c
+</li><li>Avoid potential NULL dereference
+</li><li>Properly handle missing originalMemberOf entry in initgroups
+</li><li>Don't leak directory access resources on errors in directory_list()
+</li><li>Check the correct variable for NULL after creating timer
+</li><li>Properly check that the timeout event was created for cleanup/enum
+</li><li>Check return code of hash_delete in proxy_child_destructor
+</li><li>Eliminate unused variable from pc_init_timeout()
+</li><li>Make sure to close varargs before returning from a function
+</li><li>Properly null-terminate socket path
+</li><li>Don't segfault if ldap_access_filter is unspecified
+</li><li>Add ldap_force_upper_case_realm to example AD config
+</li><li>Handle (ignore) unknown options in get_domain() and get_service()
+</li><li>Remove references to the DP service from the SSSDConfig API tests
+</li><li>Standardize on correct spelling of "principal" for krb5
+</li><li>Initialize len before looping to read the pidfile
+</li><li>Refactor the negative cache
+</li><li>Move setup of filter_users and filter_groups to negcache.c
+</li><li>Honor filter_users in PAM
+</li><li>Fix potential resource leak in remove_tree_with_ctx()
+</li><li>Fix return value from remove_connection_callback() destructor
+</li><li>Protect against segfault in remove_ldap_connection_callbacks
+</li><li>Releasing SSSD 1.2.1
+</li></ul><p>
+Sumit Bose (10):
+</p>
+<ul><li>Fix handling of ccache file when going offline
+</li><li>Compare full service name
+</li><li>Add sysdb_attrs_get_string_array()
+</li><li>Use sysdb_attrs_get_string_array() instead of sysdb_attrs_get_el()
+</li><li>Initialize pam_data in Kerberos child.
+</li><li>Avoid a potential double-free
+</li><li>Add a missing return value
+</li><li>Add a missing initializer
+</li><li>Add a missing break
+</li><li>Add a missing free()
+</li></ul></body></html>

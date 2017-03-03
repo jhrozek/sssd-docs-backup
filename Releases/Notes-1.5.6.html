@@ -1,0 +1,38 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><p>
+</p><div class="wiki-toc">
+<ol>
+  <li>
+    <ol>
+      <li>
+        <a href="#Highlights">Highlights</a>
+      </li>
+      <li>
+        <a href="#DetailedChangelog">Detailed Changelog</a>
+      </li>
+    </ol>
+  </li>
+</ol>
+</div><p>
+</p>
+<h2 id="Highlights">Highlights</h2>
+<ul><li>Fixed a serious memory leak in the memberOf plugin
+</li><li>Fixed a regression with the negative cache that caused it to be essentially nonfunctional
+</li><li>Fixed an issue where the user's full name would sometimes be removed from the cache
+</li><li>Fixed an issue with password changes in the kerberos provider not working with kpasswd
+</li></ul><h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Simo Sorce (2):
+</p>
+<ul><li>memberof: fix calculation of replaced members
+</li><li>memberof: free delete operation payload once done
+</li></ul><p>
+Stephen Gallagher (7):
+</p>
+<ul><li>Never remove gecos from the sysdb cache
+</li><li>Do not throw a DP error when failing to delete a nonexistent entity
+</li><li>Add debug logging to the negative cache
+</li><li>Fix a regression with the negative cache in multi-domain configurations
+</li><li>Fix regression where nonexistent entries were never added to the negative cache
+</li><li>Bumping version to 1.5.6
+</li><li>Always generate kpasswdinfo file
+</li></ul></body></html>

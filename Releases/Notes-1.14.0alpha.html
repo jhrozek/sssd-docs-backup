@@ -1,0 +1,619 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<ul><li>Several internal interfaces were refactored, providing cleaner code and better memory hierarchy. This change will allow the code to be easier to maintain and extend and get rid of sssd_be crashes on service restarts while active requests are running.
+</li><li>The IPA provider allows looking up users from trusted Active Directory domains by certificates that are included in the IPA ID-views. Please note that this functionality requires a recent IPA server.
+</li><li>The AD provider is now able to look up users from Active Directory domains by certificate. This change enables logins for Active Directory users with the help of a smart card.
+</li><li>The sss_override tool is now able to add certificates as local overrides in the SSSD cache. Please note that the certificate overrides are stored in the local cache, so removing the cache also removes all the certificates!
+</li><li>Invalid certificates are skipped instead of aborting the whole operation when logging in with a smart card using SSH.
+</li><li>A new option <tt>local_negative_timeout</tt> was added. This option allows the admin to specify the time during which lookups for users that are not handled by SSSD but are present on the system (typically in <tt>/etc/passwd</tt> and <tt>/etc/group</tt>) and prevents repeated lookups of local users on the remote server during initgroups operation.
+</li><li>This version allows several OCSP-related options such as the OCSP responder to be configured during smart card authentication
+</li><li>SSSD is now able to determine the name of the user who logs in from the inserted smart card without having to type in the username. Please note that this functionality must be enabled with the <tt>allow_missing_name</tt> pam_sss option.
+</li><li>The sss_cache command line tool is now able to invalidate SUDO rules with its new <tt>-r/-R</tt> switches. Please note that the sudo rules are not refreshed with the <tt>sss_cache</tt> tool immediately. Refer to the sssd-sudo man page for the existing refresh timeouts.
+</li><li>The AD provider as well as the IPA provider part that handles AD users is able to use the PAC blob attached to the Kerberos ticket to resolve group memberships for a user if available. If the PAC blob is not available, other methods such as tokenGroups are used instead.
+</li><li>The libipa_hbac library was decorated with debug statements, allowing the administrator to see individual parts of the HBAC rules as well as the request passed to the evaluator
+</li><li>Several systemtap probes were added across the SSSD codebase as well as example systemtap scripts that use these probes. The scripts allow the administrator to observe the performance of some operations such as saving a group or the 'id' command with systemtap.
+</li></ul><h2 id="PackagingChanges">Packaging Changes</h2>
+<ul><li>The <tt>libsss_sudo.so</tt> and <tt>libsss_autofs.so</tt> libraries were moved to individual subpackage. This change allows the sudo and autofs libraries to be installed in containers when the SSSD deamon is running on the host or in another container.
+</li><li>The <a class="missing wiki" href="https://docs.pagure.org/sssd-test2/PolicyKit.html" rel="nofollow">PolicyKit?</a> rules used by the p11 child during smartcard authentication were moved into their own subpackage to prevent conflict in ownership with the polkit package
+</li><li>The upstream RPMs no longer run as an unprivileged user, because there are several known issues related to running SSSD completely unprivileged. It it still possible to switch to a non-privileged user in the sssd.conf file.
+</li><li>If no configuration file exists on SSSD startup, the SSSD is now able to read a default sssd.conf on first start. Downstreams are encouraged to ship a default sssd.conf to allow SSSD to be enabled by default.
+</li></ul><h2 id="DocumentationChanges">Documentation Changes</h2>
+<ul><li>It is possible to configure SSSD debugging with the <tt>debug</tt> option which is an alias to the existing <tt>debug_level</tt> option.
+</li><li>A new <tt>local_negative_timeout</tt> option was added to configure the time during which lookups for users that exist on the system but are not handled by SSSD are negatively cached.
+</li><li>The PAC responder allows the time during which data read from the PAC bloc is considered valid with a new <tt>pac_lifetime</tt> option.
+</li><li>Several PAM services were added to the default list of Group Policy mappings. These include adding the <tt>unity</tt> login manager to the <tt>ad_gpo_map_interactive</tt> list and the <tt>polkit-1</tt> service to the ad_gpo_map_allow list.
+</li><li>The p11 responder allows configuring the default OCSP responder with its new option <tt>ocsp_default_responder</tt> and the certificate expected to sign the OCSP response with the new <tt>ocsp_default_responder_signing_cert</tt> option.
+</li><li>The <tt>pam_sss.so</tt> PAM module has a new option <tt>allow_missing_name</tt> that allows looking up the user (typically with the help of a certificate on a smartcard) during login.
+</li><li>The <tt>sss_override</tt> tool gained a new option <tt>-x/--certificate</tt> that can be used to specify a local (as in the local cache) certificate for a particular user.
+</li><li>The <tt>sss_cache</tt> tool gained new options <tt>-r/-R</tt> that allow the administrator to invalidate the sudo rules in the cache.
+</li></ul><h2 id="TicketsFixed">Tickets Fixed</h2>
+<p>
+</p><div><dl class="wiki compact"><dt><a class="closed" href="/sssd/ticket/1656" title="Name-space add_string and make it clear it can also remove string">#1656</a></dt><dd>Name-space add_string and make it clear it can also remove string</dd><dt><a class="closed" href="/sssd/ticket/2081" title="[RFE] sss_cache: invalidate sudo rules">#2081</a></dt><dd>[RFE] sss_cache: invalidate sudo rules</dd><dt><a class="closed" href="/sssd/ticket/2151" title="[RFE] Integrate SSSD with containers">#2151</a></dt><dd>[RFE] Integrate SSSD with containers</dd><dt><a class="closed" href="/sssd/ticket/2158" title="PAC responder needs much time to process large group lists">#2158</a></dt><dd>PAC responder needs much time to process large group lists</dd><dt><a class="closed" href="/sssd/ticket/2317" title="make the negcache timeout part of nc_ctx">#2317</a></dt><dd>make the negcache timeout part of nc_ctx</dd><dt><a class="closed" href="/sssd/ticket/2369" title="check correct usage of talloc_realloc">#2369</a></dt><dd>check correct usage of talloc_realloc</dd><dt><a class="closed" href="/sssd/ticket/2424" title="review the use of umask() in sssd code">#2424</a></dt><dd>review the use of umask() in sssd code</dd><dt><a class="closed" href="/sssd/ticket/2683" title="man sssd.conf should clarify details about subdomain_inherit option.">#2683</a></dt><dd>man sssd.conf should clarify details about subdomain_inherit option.</dd><dt><a class="closed" href="/sssd/ticket/2703" title="Need better libhbac debuging added to sssd">#2703</a></dt><dd>Need better libhbac debuging added to sssd</dd><dt><a class="closed" href="/sssd/ticket/2715" title="Make it possible to lookup user via UPN / Kerberos principal via IFP">#2715</a></dt><dd>Make it possible to lookup user via UPN / Kerberos principal via IFP</dd><dt><a class="closed" href="/sssd/ticket/2816" title="CI: whitespace_test FAILED without any output">#2816</a></dt><dd>CI: whitespace_test FAILED without any output</dd><dt><a class="closed" href="/sssd/ticket/2848" title="cache_req: add SID lookups">#2848</a></dt><dd>cache_req: add SID lookups</dd><dt><a class="closed" href="/sssd/ticket/2855" title="Move libsss_sudo.so outside sssd-common">#2855</a></dt><dd>Move libsss_sudo.so outside sssd-common</dd><dt><a class="closed" href="/sssd/ticket/2866" title="Cannot authenticate AD trust users after disconnecting network">#2866</a></dt><dd>Cannot authenticate AD trust users after disconnecting network</dd><dt><a class="closed" href="/sssd/ticket/2869" title="cache_req tests don't use leak_check_push/leak_check_pop in fixtures">#2869</a></dt><dd>cache_req tests don't use leak_check_push/leak_check_pop in fixtures</dd><dt><a class="closed" href="/sssd/ticket/2870" title="AD GPO fails if the machine account belongs to a domain controller">#2870</a></dt><dd>AD GPO fails if the machine account belongs to a domain controller</dd><dt><a class="closed" href="/sssd/ticket/2897" title="Smart Cards: Certificate in the ID View">#2897</a></dt><dd>Smart Cards: Certificate in the ID View</dd><dt><a class="closed" href="/sssd/ticket/2903" title="Review and update wiki pages for 1.14 Alpha">#2903</a></dt><dd>Review and update wiki pages for 1.14 Alpha</dd><dt><a class="closed" href="/sssd/ticket/2924" title="Incorrect mapping for locked vs expired accounts with the krb provider">#2924</a></dt><dd>Incorrect mapping for locked vs expired accounts with the krb provider</dd><dt><a class="closed" href="/sssd/ticket/2928" title="NSS responder should negatively cache local users for a longer time">#2928</a></dt><dd>NSS responder should negatively cache local users for a longer time</dd><dt><a class="closed" href="/sssd/ticket/2941" title="Screen locks and smart card is removed - must show a message to insert the ...">#2941</a></dt><dd>Screen locks and smart card is removed - must show a message to insert the correct smartcard</dd><dt><a class="closed" href="/sssd/ticket/2968" title="Abstract async connect functions from sss_ldap">#2968</a></dt><dd>Abstract async connect functions from sss_ldap</dd><dt><a class="closed" href="/sssd/ticket/2973" title="Common responder code closes socket to early on client shutdown">#2973</a></dt><dd>Common responder code closes socket to early on client shutdown</dd><dt><a class="closed" href="/sssd/ticket/2977" title="ssh with Smartcards - skip invalid certificates">#2977</a></dt><dd>ssh with Smartcards - skip invalid certificates</dd><dt><a class="closed" href="/sssd/ticket/2999" title="RFE - alias log_level to debug_level">#2999</a></dt><dd>RFE - alias log_level to debug_level</dd><dt><a class="closed" href="/sssd/ticket/3005" title="[Patch] Vague error message: [sss_ldap_init_sys_connect_done] (0x0020): ...">#3005</a></dt><dd>[Patch] Vague error message: [sss_ldap_init_sys_connect_done] (0x0020): ldap_install_tls failed: Connect error</dd><dt><a class="closed" href="/sssd/ticket/3010" title="SSSD doesn't fail over to next GC if authentication fails">#3010</a></dt><dd>SSSD doesn't fail over to next GC if authentication fails</dd></dl></div><p>
+</p>
+<h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Alexander Bokovoy (1):
+</p>
+<ul><li>SPEC: Move polkit rules into sssd-polkit-rules subpackage
+</li></ul><p>
+Dan Lavu (5):
+</p>
+<ul><li>sss_override: Add restart requirements to man page
+</li><li>MAN: Clarify that subdomain_inherit only works for IPA and AD
+</li><li>URL in BUILD.txt is incorrect
+</li><li>Clarify that subdomains always use service discovery
+</li><li>PAM: Fix man for pam_account_{expired,locked}_message
+</li></ul><p>
+David Disseldorp (1):
+</p>
+<ul><li>build: detect endianness at configure time
+</li></ul><p>
+Fabiano Fidêncio (4):
+</p>
+<ul><li>sysdb: move add_string() convenience to sysdb.c
+</li><li>sysdb: add sysdb_{add,replace,delete}_string()
+</li><li>sysdb: move add_ulong() convenience to sysdb.c
+</li><li>sysdb: add sysdb_{add,replace,delete}_ulong()
+</li></ul><p>
+Graham Leggett (1):
+</p>
+<ul><li>Add underlying diagnostic message for SSL errors.
+</li></ul><p>
+Jakub Hrozek (72):
+</p>
+<ul><li>Updating the version to track 1.14 development
+</li><li>MAN: Clarify pam_trusted_users option description
+</li><li>MAN: proxy and krb5 are valid access control modules
+</li><li>contrib: Add a pre-push hook to warn about commits without Reviewed-By
+</li><li>AD: Provide common connection list construction functions
+</li><li>AD: Consolidate connection list construction on ad_common.c
+</li><li>tests: Fix compilation warning
+</li><li>FO: Don't free rc-allocated structure
+</li><li>tests: Reduce failover code duplication
+</li><li>FO: Use refcount to keep track of servers returned to callers
+</li><li>tools: Don't shadow 'exit'
+</li><li>IFP: Skip non-POSIX groups properly
+</li><li>SSSD: Add a new option diag_cmd
+</li><li>DP: Drop dp_pam_err_to_string
+</li><li>DP: Check callback messages for valid UTF-8
+</li><li>sbus: Check string arguments for valid UTF-8 strings
+</li><li>DP: Do not confuse static analysers with dead code
+</li><li>CONTRIB: Add a gdb pretty-printer for ldb and sysdb_attrs
+</li><li>BUILD: Only install polkit rules if the directory is available
+</li><li>AD: Add autofs provider
+</li><li>KRB5: Handle preauth request timeout more gracefully
+</li><li>KRB5: Handle KRB5_REALM_UNKNOWN as ERR_NETWORK_IO
+</li><li>FO: Use tevent_req_defer_callback() when notifying callers
+</li><li>IPA: Use search timeout, not enum timeout for searching overrides
+</li><li>DP: Reduce code duplication in the callback handlers
+</li><li>DP: Reduce code duplication in Data Provider handlers
+</li><li>MAN: Clarify when should TGs be disabled for group nesting restriction
+</li><li>DP: Print warning when the handler is not configured
+</li><li>tests: use unittest.<a class="missing wiki" href="https://docs.pagure.org/sssd-test2/TestCase.html" rel="nofollow">TestCase?</a>.assertCountEqual if possible
+</li><li>Fix pep8 warnings in pyhbac-test.py
+</li><li>SDAP: Make it possible to silence errors from dereference
+</li><li>Add a new option ldap_group_external_member
+</li><li>IPA: Add interface to call into IPA provider from LDAP provider
+</li><li>LDAP: Use the IPA provider interface to resolve external group members
+</li><li>IPA: Use the common if-else coding style
+</li><li>tests: Extend test_child_common.c to include tests for the only_extra_args functionality
+</li><li>NSS: Move a DEBUG message so that it's less confusing
+</li><li>MAN: Move subdomain_inherit to the correct man section
+</li><li>MAN: Move proxy_fast_alias to the correct man section
+</li><li>memberof: Don't allocate on a NULL context
+</li><li>tests: Add a unit test for the external groups resolution
+</li><li>libipa_hbac: Do not use C99
+</li><li>libipa_hbac: Add more debug messages
+</li><li>libipa_hbac: Fix typo in constant name
+</li><li>libipa_hbac: Move the library to src/lib/ipa_hbac
+</li><li>MAN: Remove duplicate description of the pam_account_locked_message option
+</li><li>AD: Recognize Windows Server 2016
+</li><li>memberof: Fix a memory leak when removing ghost users
+</li><li>memberof: Don't allocate on NULL when deleting memberUids
+</li><li>tests: Check NULL context in sysdb-tests when removing group members
+</li><li>MAN: Drop the reference to IPAv2 in the man page
+</li><li>Make sdap_process_group_send() static
+</li><li>MAN: Remove references to the obsolete <a class="missing wiki" href="https://docs.pagure.org/sssd-test2/PubkeyAgent.html" rel="nofollow">PubkeyAgent?</a> ssh option
+</li><li>UTIL: Add ERR_SBUS_REQUEST_HANDLED
+</li><li>IFP: Do not crash on invalid arguments to <a class="missing wiki" href="https://docs.pagure.org/sssd-test2/GetUserAttr.html" rel="nofollow">GetUserAttr?</a>
+</li><li>UTIL: exit() the forked process if exec()-ing a child process fails
+</li><li>AD: Do not schedule the machine renewal task if adcli is not executable
+</li><li>AD: Do not leak file descriptors during machine password renewal
+</li><li>Do not leak fds in case of failures setting up a child process
+</li><li>LDAP: Try also the AD access control for IPA users
+</li><li>RESPONDER: Fix error check in cache_req.c
+</li><li>UTIL: Add a PROBE macro into probes.h
+</li><li>BUILD: Add build infrastructure for systemtap scripts
+</li><li>SYSDB: Track transaction nesting in sysdb_ctx
+</li><li>SYSDB: Add systemtap probes to track sysdb transactions
+</li><li>STAP: Add helper functions to for human-readable account request representation
+</li><li>LDAP: Decorate the hot paths in the LDAP provider with systemtap probes
+</li><li>CONTRIB: Add a systemtap script to analyze the performance of the 'id' command
+</li><li>CONTRIB: Add a systemstap script to measure nested group code performance
+</li><li>BUILD: Enable systemtap during RPM build and CI
+</li><li>Updating the translations for the 1.14 alpha release
+</li><li>Updating the version for the 1.14 beta release
+</li></ul><p>
+Lukas Slebodnik (107):
+</p>
+<ul><li>CONTRIB: pre-push hook could work with python3
+</li><li>BUILD: Link just libsss_crypto with crypto libraries
+</li><li>BUILD: Link crypto_tests with existing library
+</li><li>BUILD: Remove unused variable TEST_MOCK_OBJ
+</li><li>BUILD: Avoid symlinks with python modules
+</li><li>SSSDConfigTest: Try load saved config
+</li><li>SSSDConfigTest: Test real config without config_file_version
+</li><li>intg_tests: Fix PEP8 warnings
+</li><li>responder_common_tests: Removed unused libraries
+</li><li>BUILD: Remove unused variables
+</li><li>BUILD: Remove SSS_CRYPTO_LIBS from common libraries
+</li><li>BUILD: Accept krb5 1.14 for building the PAC plugin
+</li><li>BUILD: Fix detection of pthread with strict CFLAGS
+</li><li>sbus_codegen_tests: Suppress warning Wmaybe-uninitialized
+</li><li>BUILD: Fix cleanup without NLS
+</li><li>SDAP: Remove unused sdap_id_ctx from sdap_id_conn_cache_create
+</li><li>BUILD: Fix doc directory for sss_simpleifp
+</li><li>LDAP: Fix leak of file descriptors
+</li><li>BUILD: Remove sudo doxygen file
+</li><li>CI: Workaroung for code coverage with old gcc
+</li><li>FAIL_OVER: Fix warning value computed is not used
+</li><li>cache_req: Fix warning -Wshadow
+</li><li>SBUS: Fix warnings -Wshadow
+</li><li>TESTS: Fix warnings -Wshadow
+</li><li>INIT: Drop syslog.target from service file
+</li><li>AD: Remove unused memory context from ad_user_conn_list
+</li><li>DP_PTASK: Fix warning may be used uninitialized
+</li><li>UTIL: Fix memory leak in switch_creds
+</li><li>TESTS: Initialize leak check
+</li><li>TESTS: Check return value of check_leaks_pop
+</li><li>TESTS: Make check_leaks static function
+</li><li>TESTS: Add warning for unused result of leak check functions
+</li><li>sss_client: Fix underflow of active_threads
+</li><li>sssd_client: Do not use removed memory cache
+</li><li>test_memory_cache: Test removing mc without invalidation
+</li><li>Revert "intg: Invalidate memory cache before removing files"
+</li><li>CONFIGURE: Bump AM_GNU_GETTEXT_VERSION
+</li><li>test_sysdb_subdomains: Do not use assignment in assertions
+</li><li>ldap_local_override_test: Fix failure with python2.6
+</li><li>sbus_codegen_tests: Use portable definition of large constants
+</li><li>CI: Update suppression file for 32bit el6
+</li><li>DEBUG: Add missing new lines
+</li><li>AD: Log SID in debug message
+</li><li>SPEC: Change package ownership of %{pubconfpath}/krb5.include.d
+</li><li>SPEC: Move libsss_sudo.so outside sssd-common
+</li><li>SPEC: Fix unowned directories
+</li><li>SPEC: Use systemd macros
+</li><li>pam-srv-tests: Reuse test directory for IO tests
+</li><li>FAILOVER: Improve reporting of errors
+</li><li>TOOLS: Fix warning Wsign-compare
+</li><li>pysss_murmur: Fix warning Wsign-compare
+</li><li>pyhbac: Fix warning Wsign-compare
+</li><li>SPEC: Remove unnecessary clean-up of buildroot
+</li><li>SPEC: Fix packaging of libsss_simpleifp
+</li><li>CONFIGURE: Replace obsoleted macro AC_PROG_LIBTOOL
+</li><li>TESTS: Fix race condition in python test
+</li><li>server-tests: Fix clean-up after successful test
+</li><li>PYTHON: sss_obfuscate should work with python3
+</li><li>PYTHON: Fix pep8 errors in sss_obfuscate
+</li><li>intg: Change preference of openldap module path
+</li><li>SPEC: Move libsss_autofs.so outside sssd-common
+</li><li>SPEC: Remove unnecessary requirements
+</li><li>sss_idmap-tests: Fix segmentation fault
+</li><li>krb5_child: Warn if user cannot read krb5.conf
+</li><li>Fix typos reported by lintian
+</li><li>UTIL: Use prefix for debug function
+</li><li>UTIL: Provide varargs version of debug_fn
+</li><li>IPA: Use sss_vdebug_fn in hbac_debug_messages
+</li><li>IPA: log real hbac function
+</li><li>HBAC: Check format string in hbac log function
+</li><li>UTIL: Use sss_vdebug_fn for callbacks
+</li><li>Revert "DEBUG: Preventing chown_debug_file if journald on"
+</li><li>DEBUG: Ignore ENOENT for change owner of log files
+</li><li>TOOLS: Fix minor memory leak in sss_colondb_writeline
+</li><li>CI: Use yum-deprecated instead of dnf
+</li><li>BUILD: Remove unused include directories
+</li><li>BUILD: Simplify build of cwrap tests
+</li><li>UTIL: Fix indentation in dlinklist.h
+</li><li>UTIL: Fix warning misleading-indentation
+</li><li>CLIENT: Reduce code duplication
+</li><li>CLIENT: Retry request after EPIPE
+</li><li>libipa_hbac: Ensure we always build with C90
+</li><li>UTIL: Do not call stderr with negative number
+</li><li>UTIL: Move debug part from util.h -&gt; new debug.h
+</li><li>UTIL: Allow to append new line in sss_vdebug_fn
+</li><li>AUTOMAKE: Force usage of parallel test harness
+</li><li>CI: Use make check instead of make-check-wrap
+</li><li>IPA: Remove unused parameter from ipa_ext_group_member_check
+</li><li>SDAP: Remove unused parameter talloc context
+</li><li>test_ipa_subdom_server: Workaround for slow krb5 + SELinux
+</li><li>SPEC: Run extra unit tests with epel
+</li><li>GPO: Soften umask in gpo_child
+</li><li>GPO_CHILD: Create directories in gpo_cache with right permissions
+</li><li>GPO: Process GPOS in offline mode if ldap search failed
+</li><li>IPA: Check RDN in ipa_add_ad_memberships_get_next
+</li><li>dp_ptask: Fix memory leak in synchronous ptask
+</li><li>test_be_ptask: Check leaks in tests
+</li><li>test_ad_common: Include missing header if building with NSS
+</li><li>SYSDB_SUDO: Remove useless test
+</li><li>IPA_SUDO: Prevent dereference of NULL pointer
+</li><li>intg: Use different uid range for add_remove tests
+</li><li>LDAP: Print port in sdap_print_server
+</li><li>TOOLS: Fix warning maybe-uninitialized
+</li><li>pam-srv-tests: Increase cached_auth_timeout
+</li><li>CI: Exclude files in /tmp during coverage runs
+</li><li>pam-srv-tests: Fix warning unused-function
+</li><li>SPEC: Run sssd as privileged user
+</li></ul><p>
+Mathieu Deaudelin-Lemay (1):
+</p>
+<ul><li>Changes to allow SSSD to be used for access control with a machine account belonging to a domain controller.
+</li></ul><p>
+Michal Židek (15):
+</p>
+<ul><li>SSSDConfig: Do not raise exception if config_file_version is missing
+</li><li>spec: Missing initgroups mmap file
+</li><li>util: Update get_next_domain's interface
+</li><li>tests: Add get_next_domain_flags test
+</li><li>sysdb: Include disabled domains in link_forest_roots
+</li><li>sysdb: Use get_next_domain instead of dom-&gt;next
+</li><li>Refactor some conditions
+</li><li>util: Continue if setlocale fails
+</li><li>server_setup: Log failed attempt to set locale
+</li><li>tests: Run intgcheck without libsemanage
+</li><li>tests: Regression test with wrong LC_ALL
+</li><li>ldap_local_override_test: Remove sss_cache from teardown
+</li><li>MAN: sssd.conf should mention SSS_NSS_USE_MEMCACHE
+</li><li>NSS: do not skip cache check for netgoups
+</li><li>GPO: log specific ini parse error messages
+</li></ul><p>
+Nikolai Kondrashov (15):
+</p>
+<ul><li>CI: Exclude whitespace_test from Valgrind checks
+</li><li>TESTS: Make whitespace_test pass without whitespace
+</li><li>man: Mention groups in filter_groups description
+</li><li>man: Note filter_groups are not affecting nesting
+</li><li>intg: Get base DN from LDAP connection object
+</li><li>intg: Add support for specifying all user attrs
+</li><li>intg: Split LDAP test fixtures for flexibility
+</li><li>intg: Reduce sssd.conf duplication in test_ldap.py
+</li><li>intg: Fix RFC2307bis group member creation
+</li><li>intg: Do not use non-existent pre-increment
+</li><li>CI: Do not skip tests not checked with Valgrind
+</li><li>CI: Handle dashes in valgrind-condense
+</li><li>intg: Fix all PEP8 issues
+</li><li>CI: Enforce coverage make check failures
+</li><li>intg: Add more LDAP tests
+</li></ul><p>
+Pavel Březina (131):
+</p>
+<ul><li>sbus codegen tests: free ctx
+</li><li>sss tools: improve option handling
+</li><li>cache_req: provide extra flag for oob request
+</li><li>cache_req: add support for UPN
+</li><li>cache_req tests: reduce code duplication
+</li><li>cache_req: remove raw_name and do not touch orig_name
+</li><li>intg: fix typos
+</li><li>sss_override: fix comment describing format
+</li><li>sss_override: explicitly set ret = EOK
+</li><li>sss_override: steal msgs string to objs
+</li><li>nss: send original name and id with local views if possible
+</li><li>sudo: search with view even if user is found
+</li><li>sudo: send original name and id with local views if possible
+</li><li>sss_tools: always show common and help options
+</li><li>sss_override: fix exporting multiple domains
+</li><li>sss_override: add user-find
+</li><li>sss_override: add group-find
+</li><li>sss_override: add user-show
+</li><li>sss_override: add group-show
+</li><li>sss_override: do not free ldb_dn in get_object_dn()
+</li><li>sss_override: use more generic help text
+</li><li>sss_tools: do not allow unexpected free argument
+</li><li>BE: Add IFP to known clients
+</li><li>AD: remove annoying debug message
+</li><li>man sssd-ad: fix typo
+</li><li>SYSDB: Add missing include to sysdb_services.h
+</li><li>LDAP: Mark globals in ldap_opts.h as extern
+</li><li>AD: Mark globals in ad_opts.h as extern
+</li><li>IPA: Mark globals in ipa_opts.h as extern
+</li><li>KRB5: Mark globals in krb5_opts.h as extern
+</li><li>SUDO: convert periodical refreshes to be_ptask
+</li><li>SUDO: move refreshes from sdap_sudo.c to sdap_sudo_refresh.c
+</li><li>SUDO: move offline check to handler
+</li><li>SUDO: simplify error handling
+</li><li>SUDO: fix sdap_id_op logic
+</li><li>SUDO: fix tevent style
+</li><li>SUDO: fix sdap_sudo_smart_refresh_recv()
+</li><li>SUDO: sdap_sudo_load_sudoers improve iterator
+</li><li>SUDO: set USN inside sdap_sudo_refresh request
+</li><li>SUDO: built host filter inside sdap_sudo_refresh request
+</li><li>SUDO: do not imitate full refresh if usn is unknown in smart refresh
+</li><li>SUDO: fix potential memory leak in sdap_sudo_init
+</li><li>SUDO: obtain host information when going online
+</li><li>SUDO: remove finalizer
+</li><li>SUDO: make sdap_sudo_handler static
+</li><li>SUDO: use size_t instead of int in for cycles
+</li><li>SUDO: get srv_opts after we are connected
+</li><li>AD SRV: prefer site-local DCs in LDAP ping
+</li><li>SDAP: handle ret properly in ldap_get_options()
+</li><li>SDAP: do not fail if refs are found but not processed
+</li><li>SDAP: Add request that iterates over all search bases
+</li><li>SDAP: rename sdap_get_id_specific_filter
+</li><li>SDAP: support empty filters in sdap_combine_filters()
+</li><li>SUDO: use sdap_search_bases instead custom sb iterator
+</li><li>SUDO: make sudo sysdb interface more reusable
+</li><li>SUDO: move code shared between ldap and ipa to separate module
+</li><li>SUDO: allow to disable ptask
+</li><li>SUDO: fail on failed request that cannot be retry
+</li><li>IPA: add ipa_get_rdn and ipa_check_rdn
+</li><li>SDAP: use ipa_get_rdn() in nested groups
+</li><li>IPA SUDO: choose between IPA and LDAP schema
+</li><li>IPA SUDO: Add ipasudorule mapping
+</li><li>IPA SUDO: Add ipasudocmdgrp mapping
+</li><li>IPA SUDO: Add ipasudocmd mapping
+</li><li>IPA SUDO: Implement sudo handler
+</li><li>IPA SUDO: Implement full refresh
+</li><li>IPA SUDO: Implement rules refresh
+</li><li>IPA SUDO: Remember USN
+</li><li>SDAP: Add sdap_or_filters
+</li><li>IPA SUDO: Implement smart refresh
+</li><li>SUDO: sdap_sudo_set_usn() do not steal usn
+</li><li>SUDO: remove full_refresh_in_progress
+</li><li>SUDO: assume zero if usn is unknown
+</li><li>SUDO: allow disabling full refresh
+</li><li>SUDO: remember usn as number instead of string
+</li><li>SUDO: simplify usn filter
+</li><li>IPA SUDO: Add support for ipaSudoRunAsExt* attributes
+</li><li>sdap_connect_send: fail if uri or sockaddr is NULL
+</li><li>MAKE: Do not compile generated header files
+</li><li>cache_req: simplify cache_req_cache_check()
+</li><li>cache_req: do not lookup views if possible
+</li><li>remove user certificate if not found on the server
+</li><li>IPA SUDO: download externalUser attribute
+</li><li>cache_req: bring together search parameters
+</li><li>cache_req: fix typo in debug message
+</li><li>cache_req: break cache_req_input_create into more functions
+</li><li>cache_req: rename debug_fqn to debugobj
+</li><li>cache_req: improve debugging
+</li><li>cache_req tests: remove unused users and groups
+</li><li>mock domain: reset ldb errors
+</li><li>cache_req tests: use leak check in test fixtures
+</li><li>cache_req tests: improve user and group creation
+</li><li>utils: return const char <strong> from dup_string_list
+</strong></li><li>cache_req: add SID lookups
+</li><li>cache_req test: add lookup by sid
+</li><li>cache_req: hide input and pass parameters in struct
+</li><li>cache_req: rename cache_req_input to cache_req
+</li><li>cache_req: remove old comment
+</li><li>IPA SUDO: fix typo
+</li><li>IPA SUDO: support old ipasudocmd rdn
+</li><li>SUDO: be able to parse modifyTimestamp correctly
+</li><li>sudo: remove unused structure sudo_dp_request
+</li><li>sudo: use cache_req for initgroups
+</li><li>sudo: do not use tevent when parsing query
+</li><li>sudo: convert get_sudorules to tevent
+</li><li>Inform about (un)successful connection
+</li><li>Failover to next server if authentication fails
+</li><li>Remove braces from DEBUG statements
+</li><li>Rename dp_ptask to be_ptask
+</li><li>Rename dp_refresh.h to be_refresh.h
+</li><li>Rename dp_refresh.c to be_refresh.c
+</li><li>Rename dp_dyndns.h to be_dyndns.h
+</li><li>Rename dp_dyndns.c to be_dyndns.c
+</li><li>Rename dp_backend.h to backend.h
+</li><li>SBUS: Add sbus_conn_register_iface_map
+</li><li>SBUS: Add data provider errors
+</li><li>SBUS: Print debug message when handler fails
+</li><li>ERRORS: Add ERR_OFFLINE
+</li><li>ERRORS: Add ERR_TERMINATED
+</li><li>ERRORS: Add ERR_INVALID_DATA_TYPE
+</li><li>ERRORS: Add ERR_MISSING_DP_TARGET
+</li><li>sdap_search_bases: allow map to be NULL
+</li><li>sdap_search_bases: allow returning only the first reply
+</li><li>sdap ops: add support for deref
+</li><li>DP: Introduce new interface for backend
+</li><li>DP: Add callback for backward compatibility
+</li><li>DP TESTS: Mock data_provider
+</li><li>DP TESTS: Add unit tests for dp_request_table.c
+</li><li>DP: Switch to new interface
+</li><li>RESPONDER: New interface for client registration
+</li><li>DP: Move be_req_acct and remove discard_const
+</li></ul><p>
+Pavel Reichl (39):
+</p>
+<ul><li>SDAP: Relax POSIX check
+</li><li>AD: fix minor memory leak
+</li><li>IPA: fix minor memory leak
+</li><li>SDAP: fix minor memory leak
+</li><li>PROXY: fix minor memory leak
+</li><li>sss_override: amend man page - overrides do not stack
+</li><li>DYNDNS: use realm and server commands only as fallback
+</li><li>DYNDNS: improve nsupdate_msg_add_fwd()
+</li><li>intg: fix assert messages in test_memory_cache
+</li><li>HBAC: remove misleading comment about deny rules
+</li><li>sudo: remove unused param. in ldap_get_sudo_options
+</li><li>autofs: remove unused params in del_autofs_entries
+</li><li>LDAP: remove unused param. in sdap_fallback_local_user
+</li><li>PAM: remove unused parameter cdb
+</li><li>sss_override: Remove unused parameter tool_ctx
+</li><li>SDAP: optional warning - sizelimit exceeded in POSIX check
+</li><li>SDAP: allow_paging in sdap_get_generic_ext_send()
+</li><li>SDAP: change type of attrsonly in sdap_get_generic_ext_state
+</li><li>SDAP: pass params in sdap_get_and_parse_generic_send
+</li><li>sss_override: Removed overrides might be in memcache
+</li><li>sudo: remove unused param name in sdap_sudo_get_usn()
+</li><li>pam-srv-tests: split pam_test_setup() so it can be reused
+</li><li>pam-srv-tests: Add UT for cached 'online' auth.
+</li><li>intg: Add test for user and group local overrides
+</li><li>sysdb-tests: Fix warning - incompatible pointer type
+</li><li>IDMAP: Fix computing max id for slice range
+</li><li>IDMAP: New structure for domain range params
+</li><li>IDMAP: Add support for automatic adding of ranges
+</li><li>IDMAP: Fix minor memory leak
+</li><li>IDMAP: Man change for ldap_idmap_range_size option
+</li><li>NSS: Fix memory leak netgroup
+</li><li>SDAP: Add error code to debug message
+</li><li>IDMAP: Add test to validate off by one bug
+</li><li>SDAP: Add return code ERR_ACCOUNT_LOCKED
+</li><li>PAM: Pass account lockout status and display message
+</li><li>IDMAP: Add minor performance improvements
+</li><li>IDMAP: Make parameter names more descriptive
+</li><li>DP TESTS: Add unit tests for dp_request.c
+</li><li>DP TESTS: Add unit tests for dp_builtin.c
+</li></ul><p>
+Petr Cech (56):
+</p>
+<ul><li>TESTS: Fixing of uninitialized pointer.
+</li><li>HBAC: Better libhbac debugging
+</li><li>REFACTOR: umask(0177) --&gt; umask(SSS_DFL_UMASK)
+</li><li>REFACTOR: DFL_RSP_UMASK constant in responder code
+</li><li>REFACTOR: umask(077) --&gt; umask(SSS_DFL_X_UMASK)
+</li><li>REFACTOR: SCKT_RSP_UMASK constant in responder code
+</li><li>P11_CHILD_NSS: More restrictive permissions
+</li><li>UTILS: More restrictive permissions in domain_info
+</li><li>UTIL-TESTS: More restrictive permissions
+</li><li>TESTS: More restrictive permissions in debug_tests
+</li><li>TESTS: Restrictive permissions in check_and_open
+</li><li>DEBUG: Preventing chown_debug_file if journald on
+</li><li>KRB5_CHILD: More restrictive umask
+</li><li>UTIL: More restrictive umask on sss_unique_file()
+</li><li>TOOLS: DFL_UMASK --&gt; SSS_DFL_UMASK
+</li><li>TEST: Add test_user_by_recent_filter_valid
+</li><li>TEST: Refactor of test_responder_cache_req.c
+</li><li>TEST: Refactor of test_responder_cache_req.c
+</li><li>TEST: Add common function are_values_in_array()
+</li><li>TEST: Add test_users_by_recent_filter_valid
+</li><li>TEST: Add test_group_by_recent_filter_valid
+</li><li>TEST: Refactor of test_responder_cache_req.c
+</li><li>TEST: Add test_groups_by_recent_filter_valid
+</li><li>IPA_PROVIDER: Explicit no handle of services
+</li><li>KRB5_CHILD: Debug logs for PAC timeout
+</li><li>KRB5: Adding DNS SRV lookup for krb5 provider
+</li><li>TOOLS: Fix memory leak after getline() failed
+</li><li>TOOLS: Add comments on functions in colondb
+</li><li>TEST_TOOLS_COLONDB: Add tests for sss_colondb_*
+</li><li>TESTS: global_talloc_context push/pop remove
+</li><li>NEGCACHE: Fixing typo in test_sss_ncache_gid()
+</li><li>NEGCACHE: Removing of condition for ttl = -1
+</li><li>SYSDB: Add new funtions into sysdb_sudo
+</li><li>TESTS: Test of sysdb_search_sudo_rules
+</li><li>SSS_CACHE: Refactor
+</li><li>TOOL: Invalidation of sudo rules at sss_cache
+</li><li>AUTOFS: Removing of redudant debug message
+</li><li>TEST: Removing duplication of mock_rctx
+</li><li>NEGCACHE: Adding timeout to struct sss_nc_ctx
+</li><li>NEGCACHE: Removing timeout from sss_ncache_check_*
+</li><li>NEGCACHE: Adding getter for timeout
+</li><li>RESPONDER: Removing neg_timeout from pam responder
+</li><li>RESPONDER: Removing neg_timeout from pac_ctx
+</li><li>RESPONDER: Removing neg_timeout from sudo resp.
+</li><li>RESPONDER: Removing neg_timeout from ifp repsonder
+</li><li>RESPONDER: Removing neg_timeout from nss responder
+</li><li>RESPONDERS: Negcache in resp_ctx preparing
+</li><li>RESPONDER: Removing ncache from nss_ctx
+</li><li>RESPONDER: Removing ncache from ifp_ctx
+</li><li>RESPONDER: Removing ncache from pac_ctx
+</li><li>RESPONDER: Removing ncache from pam_ctx
+</li><li>RESPONDER: Removing ncache from sudo_ctx
+</li><li>RESPONDER: Removing of redudant function
+</li><li>AD_PROVIDER: Fix constant char *
+</li><li>RESPONDERS: Negative caching of local users
+</li><li>TEST: New tests for negative caching of locals
+</li></ul><p>
+Robert Antoni Buj Gelonch (1):
+</p>
+<ul><li>Add Catalan translation to LINGUAS
+</li></ul><p>
+Simo Sorce (6):
+</p>
+<ul><li>Krb5/PAM: Fix account lockout error handling
+</li><li>Util: Improve code to get connection credentials
+</li><li>Util: Move socket setup in a common utility file
+</li><li>Util: Set socket options and flags separately
+</li><li>Util Sockets: Tidy up connect() handling
+</li><li>Responders: Fix client destructor
+</li></ul><p>
+Stephen Gallagher (11):
+</p>
+<ul><li>LDAP: Inform about small range size
+</li><li>Monitor: Show service pings at debug level 8
+</li><li>GPO: Add Cockpit to the Remote Interactive defaults
+</li><li>GPO: Add other display managers to interactive logon
+</li><li>Netlink: Ignore RTM_NEWADDR signals from link-local
+</li><li>GPO: Add "unity" to ad_gpo_map_interactive
+</li><li>UTIL: Add secure copy function
+</li><li>Internal: Rename CONFDB_DEFAULT_CONFIG_FILE
+</li><li>CONFIG: Use default config when none provided
+</li><li>GPO: Add "polkit-1" to ad_gpo_map_allow
+</li><li>DEBUG: Add <tt>debug</tt> alias for debug_level
+</li></ul><p>
+Sumit Bose (69):
+</p>
+<ul><li>PAM: only allow missing user name for certificate authentication
+</li><li>fix ldb_search usage
+</li><li>fix upn cache_req for sub-domain users
+</li><li>nss: fix UPN lookups for sub-domain users
+</li><li>DP: successful authentication sets explicitly PAM_SUCCESSS
+</li><li>NSS: fix a use-after-free issue
+</li><li>pam-srv-tests: Change service name
+</li><li>cache_req: check all domains for lookups by certificate
+</li><li>IPA: fix override with the same name
+</li><li>p11: allow p11_child to run completely unprivileged
+</li><li>p11: check if cert is valid before selecting it
+</li><li>p11: enable ocsp checks
+</li><li>ldap: skip sdap_save_grpmem() if ignore_group_members is set
+</li><li>initgr: only search for primary group if it is not already cached
+</li><li>LDAP: check early for missing SID in mapping check
+</li><li>nfs idmap: fix infinite loop
+</li><li>ipa_s2n_save_objects(): use configured user and group timeout
+</li><li>Use right domain for user lookups
+</li><li>sdap_save_grpmem: determine domain by SID if possible
+</li><li>ldap: remove originalMeberOf if there is no memberOf
+</li><li>UTIL: allow to skip default options for child processes
+</li><li>DP_TASK: add be_ptask_get_timeout()
+</li><li>AD: add task to renew the machine account password if needed
+</li><li>FO: add fo_get_active_server()
+</li><li>FO: add be_fo_get_active_server_name()
+</li><li>AD: try to use current server in the renewal task
+</li><li>p11: add gnome-screensaver to list of allowed services
+</li><li>Just return NULL if tevent_req_create() fails
+</li><li>subdomains: inherit ldap_krb5_keytab
+</li><li>IPA: lookup idview name even if there is no master domain record
+</li><li>IPA: invalidate override data if original view is missing
+</li><li>sdap: improve filtering of multiple results in GC lookups
+</li><li>pam_sss: reorder pam_message array
+</li><li>SDAP: make some AD specific calls public
+</li><li>LDAP: refactor sdap_ad_tokengroups_initgr_mapping_done()
+</li><li>util: make concatenate_string_array() reusable
+</li><li>AD: process PAC during initgroups request
+</li><li>IPA: rename ipa_s2n_get_fqlist* to ipa_s2n_get_list*
+</li><li>IPA: ipa_s2n_get_list_send() allow other list types
+</li><li>IPA: resolve PAC for trusted users on IPA clients
+</li><li>PAC: only save PAC blob into the cache
+</li><li>sss_override: do not generate DN, search object
+</li><li>tools: read additional data of the master domain
+</li><li>sss_override: only add domain if name is not fully qualified
+</li><li>intg: local override for user with mixed case name
+</li><li>krb5_auth_store_creds: silence spurious debug message
+</li><li>build: move ndr_krb5pac check to the other Samba checks
+</li><li>IPA: terminate properly if view name lookup fails
+</li><li>IPA: use forest name when looking up the Global Catalog
+</li><li>libwbclient: wbcSidsToUnixIds() don't fail on errors
+</li><li>AD: use krb5_keytab for subdomain initialization
+</li><li>p11: add missing man page entry and config API
+</li><li>p11: add no_verification option
+</li><li>p11: add OCSP default responder options
+</li><li>PAM: add pam_sss option allow_missing_name
+</li><li>p11: add PKCS11_LOGIN_TOKEN_NAME environment variable
+</li><li>sysdb: add sysdb_attrs_add_base64_blob()
+</li><li>sysdb: add searches by certificate with overrides
+</li><li>cache_req: use overide aware call for lookup by certificate
+</li><li>ipa: add support for certificate overrides
+</li><li>nss: include certificates in full result list
+</li><li>ipa: save cert as blob in the cache
+</li><li>AD: read user certificate if available
+</li><li>nss: return user certificate base64 encoded
+</li><li>sss_override: add certificate support
+</li><li>IPA: allow lookups by cert in sub-domains on the client
+</li><li>NSS: add SSS_NSS_GETNAMEBYCERT request
+</li><li>nss-idmap: add sss_nss_getnamebycert()
+</li><li>ssh: skip invalid certificates
+</li></ul></body></html>

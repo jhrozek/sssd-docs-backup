@@ -1,0 +1,267 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><p>
+</p><div class="wiki-toc">
+<ol>
+  <li>
+    <a href="#DBusresponderdesign">DBus responder design</a>
+    <ol>
+      <li>
+        <a href="#ProblemStatement">Problem Statement</a>
+      </li>
+      <li>
+        <a href="#TheDBusinterfacedesign">The DBus interface design</a>
+        <ol>
+          <li>
+            <a href="#Cachedobjects">Cached objects</a>
+          </li>
+          <li>
+            <a href="#Objectexposedonthebus">Object exposed on the bus</a>
+          </li>
+          <li>
+            <a href="#Representingusersandgroupsonthebus">Representing users and groups on the bus</a>
+          </li>
+          <li>
+            <a href="#RepresentingSSSDprocessesonthebus">Representing SSSD processes on the bus</a>
+          </li>
+          <li>
+            <a href="#Representingserviceobjectsonthebus">Representing service objects on the bus</a>
+          </li>
+          <li>
+            <a href="#Representingdomainobjectsonthebus">Representing domain objects on the bus</a>
+          </li>
+          <li>
+            <a href="#Synchronousgetterbehaviour">Synchronous getter behaviour</a>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <a href="#SSSDdaemonfeatures">SSSD daemon features</a>
+        <ol>
+          <li>
+            <a href="#Accesscontrol">Access control</a>
+            <ol>
+              <li>
+                <a href="#Limitingaccesstotheresponder">Limiting access to the responder</a>
+              </li>
+              <li>
+                <a href="#Limitingaccesstoattributes">Limiting access to attributes</a>
+              </li>
+            </ol>
+          </li>
+          <li>
+            <a href="#Supportfornon-POSIXusersandgroups">Support for non-POSIX users and groups</a>
+          </li>
+          <li>
+            <a href="#Donotrequireenumerationtobeenabledtoretrievesetofusers">Do not require enumeration to be enabled to retrieve set of users</a>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <a href="#Authors">Authors</a>
+      </li>
+    </ol>
+  </li>
+</ol>
+</div><p>
+</p>
+<h1 id="DBusresponderdesign">DBus responder design</h1>
+<p>
+Related ticket(s):
+</p>
+<ul><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2072"><span class="icon">​</span>Provide an experimental DBus responder to retrieve custom attributes from SSSD cache</a>
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2073"><span class="icon">​</span>Extend the LDAP backend to retrieve extended set of attributes</a>
+</li></ul><h2 id="ProblemStatement">Problem Statement</h2>
+<p>
+The contemporary centralized user databases such as IPA or Active Directory store many attributes that describe the user. Apart from attributes that are related to a "computer user" entry
+such as user name, login shell or an ID, the databases often store data about the physical user represented by the entry, such as telephone number. Since the SSSD already has means of
+connecting to the remote directory, including advanced features like offline support or fail over, it would appear as a natural choice for retrieving these attributes. However, the only
+interface the SSSD provides towards the system at the moment is the standard <a class="ext-link" href="https://www.gnu.org/software/libc/manual/html_node/Name-Service-Switch.html"><span class="icon">​</span>POSIX interface</a> and a couple of
+ad-hoc application specific responders (sudo, ssh, autofs). The purpose of this document is to describe a design of a new responder, that would listen on the system bus and allow third party
+consumers to retrieve custom attributes stored in a centralized database via a DBus call.
+</p>
+<h2 id="TheDBusinterfacedesign">The DBus interface design</h2>
+<p>
+This section gathers feedback expressed in mailing lists, private e-mail
+conversations and IRC discussions and summarizes feature requests and
+areas that need improvement into a design proposal of both the DBus API and several required changes in the core SSSD deamon.
+</p>
+<h3 id="Cachedobjects">Cached objects</h3>
+<p>
+<a class="ext-link" href="https://docs.pagure.org/sssd-test2/DesignDocs/DBusCachedObjects.html"><span class="icon">​</span>D-Bus Interface: Cached Objects</a>
+</p>
+<h3 id="Objectexposedonthebus">Object exposed on the bus</h3>
+<p>
+Instead of a single interface returning object attributes in an LDAP-like way, the interface would be built in an object-oriented fashion. Each object (ie a user or a group) would be identified
+with an object path and methods would be available to the interface user to make it possible to retrieve either a single object or a set of object.
+</p>
+<p>
+The interface will support users, groups and domains.
+</p>
+<h3 id="Representingusersandgroupsonthebus">Representing users and groups on the bus</h3>
+<p>
+<a class="ext-link" href="https://docs.pagure.org/sssd-test2/DesignDocs/DBusUsersAndGroups.html"><span class="icon">​</span>D-Bus Interface: Users and Groups</a>
+</p>
+<h3 id="RepresentingSSSDprocessesonthebus">Representing SSSD processes on the bus</h3>
+<ul><li><strong>object path</strong>: /org/freedesktop/sssd/infopipe/Components/monitor
+</li><li><strong>object path</strong>: /org/freedesktop/sssd/infopipe/Components/Responders/$responder_name
+</li><li><strong>object path</strong>: /org/freedesktop/sssd/infopipe/Components/Backends/$sssd_domain_name
+</li></ul><ul><li><strong>method</strong> org.freedesktop.sssd.infopipe.ListComponents()
+<ul><li>returns: Array of object paths representing component objects
+</li></ul></li><li><strong>method</strong> org.freedesktop.sssd.infopipe.ListResponders()
+<ul><li>returns: Array of object paths representing component objects
+</li></ul></li><li><strong>method</strong> org.freedesktop.sssd.infopipe.ListBackends()
+<ul><li>returns: Array of object paths representing component objects
+</li></ul></li><li><strong>method</strong> org.freedesktop.sssd.infopipe.FindMonitor()
+<ul><li>returns: Object path representing the monitor object
+</li></ul></li><li><strong>method</strong> org.freedesktop.sssd.infopipe.FindResponderByName(String name)
+<ul><li><em>name</em>: The name of the responder to retrieve
+</li><li>returns: Object path representing the responder object
+</li></ul></li><li><strong>method</strong> org.freedesktop.sssd.infopipe.FindBackendByName(String name)
+<ul><li><em>name</em>: The name of the backend to retrieve
+</li><li>returns: Object path representing the backend object
+</li></ul></li></ul><p>
+The name "Components" is chosen to not imply any particular implementation on SSSD side.
+</p>
+<p>
+The component objects implements org.freedesktop.sssd.infopipe.Components interface, which is define as:
+</p>
+<ul><li><strong>method</strong> org.freedesktop.sssd.infopipe.Components.Enable()
+<ul><li>returns: nothing
+</li><li>note: changes will be visible after SSSD is restarted
+</li></ul></li><li><strong>method</strong> org.freedesktop.sssd.infopipe.Components.Disable()
+<ul><li>returns: nothing
+</li><li>note: changes will be visible after SSSD is restarted
+</li></ul></li><li><strong>method</strong> org.freedesktop.sssd.infopipe.Components.ChangeDebugLevel(Uint32 debug_level)
+<ul><li><em>debug_level</em>: Debug level to set
+</li><li>returns: nothing
+</li><li>note: changes will be permanent but do not require restart of the deamon
+</li></ul></li></ul><ul><li><strong>property</strong> String name
+<ul><li>The name of this service.
+</li></ul></li><li><strong>property</strong> Uint32 debug_level
+<ul><li>The name of this service.
+</li></ul></li><li><strong>property</strong> Boolean enabled
+<ul><li>Whether the service is enabled or not
+</li></ul></li><li><strong>property</strong> string type
+<ul><li>Type of the component. One of "monitor", "responder", "backend".
+</li></ul></li></ul><p>
+This approach will completely distinguish SSSD processes from services and domains, which are logical units that should not contain any information about SSSD architecture.
+</p>
+<h3 id="Representingserviceobjectsonthebus">Representing service objects on the bus</h3>
+<p>
+This API should include methods to represent service object(s) and provide basic information and configuration abilities.
+</p>
+<ul><li><strong>object path</strong>: /org/freedesktop/sssd/infopipe/Services/$service
+</li></ul><ul><li><strong>method</strong> org.freedesktop.sssd.infopipe.ListServices()
+<ul><li>returns: Array of object paths representing Service objects
+</li></ul></li><li><strong>method</strong> org.freedesktop.sssd.infopipe.FindServiceByName(String name)
+<ul><li><em>name</em>: The name of the service to retrieve
+</li><li>returns: Object path representing the service object
+</li></ul></li></ul><p>
+ 
+The service object will in the first iteration include several properties describing the domain. As this iteration doesn't allow any modification, only properties and not methods are considered:
+</p>
+<ul><li><strong>property</strong> String name
+<ul><li>The name of this service.
+</li></ul></li><li>service dependent properties
+</li></ul><p>
+Other properties might be added upon request.
+</p>
+<h3 id="Representingdomainobjectsonthebus">Representing domain objects on the bus</h3>
+<p>
+For some consumers (such as realmd), it's important to also know the properties of a domain. The API should include methods to retrieve a active domain object(s) and represent the domains as objects on the bus as well.
+</p>
+<ul><li><strong>object path</strong>: /org/freedesktop/sssd/infopipe/Domains/$domain
+</li></ul><p>
+The synopsis of these calls would look like:
+</p>
+<ul><li><strong>method</strong> org.freedesktop.sssd.infopipe.ListDomains()
+<ul><li>returns: Array of object paths representing Domain objects
+</li></ul></li><li><strong>method</strong> org.freedesktop.sssd.infopipe.ListSubdomainsByDomain(String name)
+<ul><li>returns: Array of object paths representing Domain objects associated with domain $name
+</li></ul></li><li><strong>method</strong> org.freedesktop.sssd.infopipe.FindDomainByName(String name)
+<ul><li><em>name</em>: The name of the domain to retrieve
+</li><li>returns: Object path representing the domain object
+</li></ul></li></ul><p>
+ 
+The domain object will in the first iteration include several properties describing the domain. As this iteration doesn't allow any modification, only properties and not methods are considered:
+</p>
+<ul><li><strong>property</strong> String name
+<ul><li>The name of this domain. Same as the domain stanza in the sssd.conf
+</li></ul></li><li><strong>property</strong> String[] primary_servers
+<ul><li>Array of primary servers associated with this domain
+</li></ul></li><li><strong>property</strong> String[] backup_servers
+<ul><li>Array of backup servers associated with this domain
+</li></ul></li><li><strong>property</strong> Uint32 min_id
+<ul><li>Minimum uid and gid value for this domain
+</li></ul></li><li><strong>property</strong> Uint32 max_id
+<ul><li>Maximum uid and gid value for this domain
+</li></ul></li><li><strong>property</strong> String realm
+<ul><li>The Kerberos realm this domain is configured with
+</li></ul></li><li><strong>property</strong> String forest
+<ul><li>The domain forest this domain belongs to
+</li></ul></li><li><strong>property</strong> String login_format
+<ul><li>The login format this domain expects.
+</li></ul></li><li><strong>property</strong> String fully_qualified_name_format
+<ul><li>The format of fully qualified names this domain uses
+</li></ul></li><li><strong>property</strong> Boolean enumerable
+<ul><li>Whether this domain can be enumarated or not
+</li></ul></li><li><strong>property</strong> Boolean use_fully_qualified_names
+<ul><li>Whether this domain requires fully qualified names
+</li></ul></li><li><strong>property</strong> Boolean subdomain
+<ul><li>Whether the domain is an autodiscovered subdomain or a user-defined domain
+</li></ul></li><li><strong>property</strong> ObjectPath parent_domain
+<ul><li>Object path of a parent domain or empty string if this is a root domain
+</li></ul></li></ul><p>
+Other properties such as provider type or case sensitivity might be added upon request. Right now, we need something other developers can experiment with.
+</p>
+<h3 id="Synchronousgetterbehaviour">Synchronous getter behaviour</h3>
+<p>
+Retrieving a property with a getter will always be sychronous and return the value currently cached. The getter might schedule an out-of-band update depending on the state of the cache object. The primary reason for the getter being synchronous is to be able to be composable, in other words being able to call N getters in a loop and construct a reply message containing N properties without resorting to asychronous updates of the properties.
+</p>
+<p>
+Callers that with to have an up-to-date view of the properties should update the object by calling a special <tt>update</tt> (not included atm) method or subscribe to the PropertiesChanged interface.
+</p>
+<h2 id="SSSDdaemonfeatures">SSSD daemon features</h2>
+<p>
+Apart from features that will directly benefit the new interface, the SSSD itself must adapt to some requirements as well.
+</p>
+<h3 id="Accesscontrol">Access control</h3>
+<p>
+The DBus responder needs to limit who can request information at all and what attributes can be returned.
+</p>
+<h4 id="Limitingaccesstotheresponder">Limiting access to the responder</h4>
+<p>
+The DBus responder will re-use the same mechanism the PAC responder uses where UIDs of clients that can contact the responder will be enumerated in the "allowed_uids" parameter of the responder configuration.
+</p>
+<p>
+In a future enhancement, we might add a "self" mechanism, where client will be allowed to read its own attributes. As limiting attribute access might be different for this use-case, the first iteration of the responder will not include the "self" mechanism.
+</p>
+<h4 id="Limitingaccesstoattributes">Limiting access to attributes</h4>
+<p>
+The responder will have a whitelist of attributes that the client can query. No other attributes will be returned. Requesting an attribute that is not permitted will yield an empty response, same as if the attribute didn't exist. The whitelist will include the standard set of POSIX attributes as returned
+by ie <tt>getpwnam</tt> by default.
+</p>
+<p>
+The administrator will be allowed to extend the whitelist in sssd.conf using a configuration directive either in the <tt>[ifp]</tt> section itself or per-domain. The configuration directive shall allow either explicitly adding attributes to the whitelist (using <tt>+attrname</tt>) or explicitly remove them using <tt>-attrname</tt>.
+</p>
+<p>
+The following example illustrates explicitly allowing the telephoneNumber attribute to be queried and removing the gecos attribute from the whitelist.
+</p>
+<pre class="wiki">    [ifp]
+    user_attributes = +telephoneNumer, -gecos
+</pre><h3 id="Supportfornon-POSIXusersandgroups">Support for non-POSIX users and groups</h3>
+<p>
+Currently the SSSD supports looking up POSIX users and groups, mostly due to the fact that primary consumers are POSIX interfaces such as the Name Service Switch. For instance, the search filters
+in back ends require the presence of attributes ID.
+</p>
+<p>
+In contrast, users and groups that consumers of this new interface require often lack the POSIX attributes. The SSSD must be extended so that even non-POSIX users and groups are handled well.
+</p>
+<h3 id="Donotrequireenumerationtobeenabledtoretrievesetofusers">Do not require enumeration to be enabled to retrieve set of users</h3>
+<p>
+At the moment, the SSSD can either fetch a single user (using getpwnam for example) or all available users (using getpwent). As an effect, all proposed DBus calls require enumeration to be switched on in order to be able to retrieve sets of users. The SSSD needs to either grow a way to retrieve several entries at once without enumerating or needs to make enumeration much faster.
+</p>
+<h2 id="Authors">Authors</h2>
+<ul><li>Jakub Hrozek &lt;<a class="mail-link" href="mailto:jhrozek@redhat.com"><span class="icon">​</span>jhrozek@redhat.com</a>&gt;
+</li><li>Pavel Březina &lt;<a class="mail-link" href="mailto:pbrezina@redhat.com"><span class="icon">​</span>pbrezina@redhat.com</a>&gt;
+</li><li>Stef Walter &lt;<a class="mail-link" href="mailto:stefw@redhat.com"><span class="icon">​</span>stefw@redhat.com</a>&gt;
+</li></ul></body></html>

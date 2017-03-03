@@ -1,0 +1,94 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><p>
+</p><div class="wiki-toc">
+<ol>
+  <li>
+    <ol>
+      <li>
+        <a href="#rpc.idmapdplugin">rpc.idmapd plugin</a>
+      </li>
+      <li>
+        <a href="#SSSNFSClientrpc.idmapdplugin-Design">SSS NFS Client (rpc.idmapd plugin) - Design</a>
+        <ol>
+          <li>
+            <a href="#rpc.idmapd-background">rpc.idmapd - background</a>
+          </li>
+          <li>
+            <a href="#SSSD-Responder">SSSD - Responder</a>
+          </li>
+          <li>
+            <a href="#SSSD-NFSClient">SSSD - NFS Client</a>
+          </li>
+          <li>
+            <a href="#OptimisationTechniques">Optimisation Techniques</a>
+          </li>
+          <li>
+            <a href="#ConfigurationFile">Configuration File</a>
+          </li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+</ol>
+</div><p>
+</p>
+<h2 id="rpc.idmapdplugin">rpc.idmapd plugin</h2>
+<hr />
+<p>
+<br />
+</p>
+<h2 id="SSSNFSClientrpc.idmapdplugin-Design">SSS NFS Client (rpc.idmapd plugin) - Design</h2>
+<p>
+The client is named "<strong>sss_nfs</strong>" (althogh "sss_idmap" or "idmap" might have been better names, the term "idmap" is already occupied in the SSSD world).
+</p>
+<h3 id="rpc.idmapd-background">rpc.idmapd - background</h3>
+<p>
+rpc.idmapd runs on NFSv4 servers as a userspace daemon (part of nfs-utils). Its role is to assist knfsd by providing the following 6 mapping functions:
+</p>
+<ol><li>(user) name to uid
+</li><li>(group) name to gid
+</li><li>uid to (user) name
+</li><li>gid to (group) name
+</li><li>principal (user) name to ids (uid + gid) <sup>(<a href="https://fedorahosted.org/sssd#krbnote">(1)</a>)</sup>
+</li><li>principal (user) name to grouplist (groups which user are member of) <sup>(<a href="https://fedorahosted.org/sssd#krbnote">(1)</a>)</sup>
+</li></ol><p>
+rpc.idmapd provides API for developing plugins (loaded by <tt>dlopen(3)</tt>) which implements the actual mapping process.
+</p>
+<p>
+On the kernel level, there's a caching mechanism for the responses from the userspace daemon.
+</p>
+<p>
+<span class="wikianchor" id="krbnote"></span><sup>(1)</sup> Items 5 + 6 are only relevant for kerberised NFSv4 servers. At the first stage only there won't be kerberos support.
+</p>
+<h3 id="SSSD-Responder">SSSD - Responder</h3>
+<p>
+The functionality required from the Responder side is a subset of the functionality provided by existing NSS Responder's commands.
+</p>
+<p>
+As you can see below (on the client part of the design) - no changes are needed in the NSS Responder.
+</p>
+<h3 id="SSSD-NFSClient">SSSD - NFS Client</h3>
+<p>
+Responder-Facing Interactions (existing NSS Responder commands)
+</p>
+<ul><li><tt>SSS_NSS_GETPWNAM</tt> - map (user) name to uid requests
+</li><li><tt>SSS_NSS_GETGRNAM</tt> - map (group) name to gid requests
+</li><li><tt>SSS_NSS_GETPWUID</tt> - map uid to (user) name requests
+</li><li><tt>SSS_NSS_GETGRGID</tt> - map gid to (group) name requests
+</li></ul><p>
+The request &amp; reply sent to &amp; from the responder is "standard" in terms of the NSS Responder.
+</p>
+<p>
+The client only needs a portion of the reply. Only this portion will be extracted from the packet (i.e. uid/gid/user name/group name).
+</p>
+<h3 id="OptimisationTechniques">Optimisation Techniques</h3>
+<p>
+The optimisation techniques used for the NSS client will be used here as well. i.e. Fast Cache (memcache) &amp; negative-cache.
+</p>
+<p>
+It will be possible for the user to disable Fast Cache from the configuration file. (see below)
+</p>
+<h3 id="ConfigurationFile">Configuration File</h3>
+<p>
+The configuration of the client will be part of rpc.idmap config file (<tt>/etc/idmapd.conf</tt>).
+</p>
+</body></html>

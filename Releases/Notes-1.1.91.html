@@ -1,0 +1,385 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<ul><li>Better support for FreeIPA v2
+</li><li>Allow use of DNS SRV records for failover
+</li><li>Support dynamic DNS updates with FreeIPA v2
+</li><li>Add deferred kinit feature for offline users
+<ul><li>When <tt>krb5_store_password_if_offline</tt> is set to true, the user will automatically kinit when the SSSD comes online (e.g. connecting to VPN)
+</li></ul></li><li>Add retries option to pam_sss.so
+</li><li>Better warnings for nearly-expired passwords
+</li></ul><h2 id="DetailedReleaseNotes">Detailed Release Notes</h2>
+<p>
+Release notes may be inaccurate due to the branching that occurred in this release
+</p>
+<p>
+Cheng-Chia Tseng (4):
+</p>
+<ul><li>Adding empty zh_TW translation files
+</li><li>Updating zh_TW translation
+</li><li>Update zh_TW translation
+</li></ul><p>
+Dmitri Pal (7):
+</p>
+<ul><li>Documentation for collection interface
+</li><li>Do not generate man pages for COLLECION for now.
+</li><li>Fixing verbosity and formatting of the INI unit test.
+</li><li>Adding interface description using doxygen.
+</li><li>Convert collection to use sized values.
+</li><li>Fixing type conversion in INI interface.
+</li><li>Adding interface documentation
+</li></ul><p>
+Cheng-Chia Tseng (4):
+</p>
+<ul><li>Adding empty zh_TW translation files
+</li><li>Updating zh_TW translation
+</li><li>Update zh_TW translation
+</li></ul><p>
+Dmitri Pal (7):
+</p>
+<ul><li>Documentation for collection interface
+</li><li>Do not generate man pages for COLLECION for now.
+</li><li>Fixing verbosity and formatting of the INI unit test.
+</li><li>Adding interface description using doxygen.
+</li><li>Convert collection to use sized values.
+</li><li>Fixing type conversion in INI interface.
+</li><li>Adding interface documentation
+</li></ul><p>
+Dmitry Drozdov (1):
+</p>
+<ul><li>Adding Russion Translation
+</li></ul><p>
+Eugene Indenbom (1):
+</p>
+<ul><li>Add krb5_kpasswd to IPA provider
+</li></ul><p>
+George <a class="missing wiki" href="https://docs.pagure.org/sssd-test2/McCollister.html" rel="nofollow">McCollister?</a> (2):
+</p>
+<ul><li>Fixed alignment problems in nss client/server
+</li><li>Fixed buffer alignment in exchange_credentials().
+</li></ul><p>
+Guido Grazioli (1):
+</p>
+<ul><li>Updating IT translation
+</li></ul><p>
+Héctor Daniel Cabrera (4):
+</p>
+<ul><li>Updating ES translation
+</li><li>Updating ES translation for 1.1.0
+</li><li>Update ES translation
+</li><li>Updating ES translation for 1.1.0
+</li></ul><p>
+Jakub Hrozek (31):
+</p>
+<ul><li>groupshow: only show all parents in recursive mode
+</li><li>Do not run negative resolv test with no network
+</li><li>Reopen logs when SIGHUP is caught
+</li><li>Package example logrotate script
+</li><li>Make filter_users and filter_groups also per-domain
+</li><li>Flush NSCD cache after modifying local database
+</li><li>Remove unused M4 code
+</li><li>Fix segfault in the locator plugin
+</li><li>Fix config file error message
+</li><li>Add generic error message
+</li><li>Fixes for path_utils
+</li><li>Unit tests for path_utils
+</li><li>Generate doxygen documentation for path_utils
+</li><li>Allow running with read only root
+</li><li>Regression test against RHBZ <a class="missing ticket">#576856</a>
+</li><li>Add userdel_cmd param
+</li><li>Make sss_userdel check for logged in users
+</li><li>Move SELinux related functions into its own module
+</li><li>SELinux login management
+</li><li>Treat server names as case-insensitive in failover code
+</li><li>Do not mark a request as failed twice
+</li><li>Sort SRV replies according to RFC 2782
+</li><li>Remove freed server_common entities from list
+</li><li>Support SRV servers in failover
+</li><li>Try all servers during Kerberos auth
+</li><li>Fix uninitialized variable
+</li><li>Add a README file
+</li><li>Use all available servers in LDAP provider
+</li><li>Improve the offline authentication message
+</li><li>Fix memory hierarchy in the ipa timerules
+</li><li>Use service discovery in backends
+</li></ul><p>
+Piotr Drąg (3):
+</p>
+<ul><li>Updating PL translation for 1.1
+</li><li>Updating PL translation
+</li><li>Updating PL translation for 1.1.0
+</li></ul><p>
+Ralf Haferkamp (6):
+</p>
+<ul><li>Fixed check for expired passwords
+</li><li>Fixed authentication check for CHAUTHTOK_PRELIM
+</li><li>Warn user about an expired password
+</li><li>Prompt for old password even when running as root
+</li><li>use logfiles for debug messages
+</li><li>Improvements for LDAP Password Policy support
+</li></ul><p>
+Rui Gouveia (4):
+</p>
+<ul><li>Updating PT translation for 1.1.0
+</li><li>Updating PT translation
+</li><li>Updating PT translation for 1.1.0
+</li><li>Update PT translation
+</li></ul><p>
+Simo Sorce (5):
+</p>
+<ul><li>Fix memberof calculation when deleting groups
+</li><li>Fix invalid read cause by premature free of tmpctx
+</li><li>Fix multiple errors with destructors.
+</li><li>Better handle sdap_handle memory from callers.
+</li><li>Avoid freeing sdap_handle too early
+</li></ul><p>
+Stephen Gallagher (38):
+</p>
+<ul><li>Package libcollection documentation into libcollection-devel
+</li><li>Add <a class="missing wiki" href="https://docs.pagure.org/sssd-test2/BuildRequires.html" rel="nofollow">BuildRequires?</a> for doxygen
+</li><li>Update translatable strings for string freeze
+</li><li>Add ID translation for SSSD 1.1.0
+</li><li>Update POTFILES.in to include missing translatable strings
+</li><li>Fix build when check-devel is not installed
+</li><li>Update translations for string freeze
+</li><li>Updating translation files for string freeze.
+</li><li>Properly handle dbus send attempts on a closed connection
+</li><li>Use correct python macros in sssd.spec
+</li><li>Clean up changelog for sssd.spec
+</li><li>Build and package libini_config docs
+</li><li>Fix a series of memory leaks in the SBUS
+</li><li>Fix error message for ldap_start_tls
+</li><li>Add missing ldap_tls_cacertdir option to SSSDConfig API
+</li><li>Add translated help text for ldap_tls_cacertdir
+</li><li>Update version in master branch to 1.1.90
+</li><li>Ensure the SSSDConfig creates sssd.conf with the correct mode
+</li><li>Fix path_utils_ut segfault
+</li><li>Allow arbitrary-length PAM messages
+</li><li>Fix typo in ldap_id_use_start_tls option description
+</li><li>Add regression test for <a class="ext-link" href="https://fedorahosted.org/sssd/ticket/441"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/441</a>
+</li><li>Do not revert options to defaults in SSSDConfig.get_domain()
+</li><li>Protect against check-and-open race conditions
+</li><li>Support docdir and abs_builddir
+</li><li>Update translations for SSSD 1.2 branch
+</li><li>Remove unused configure macro
+</li><li>Give information about ldap_schema in the sample config
+</li><li>Make ID provider init functions clearer
+</li><li>Remove the NSS_LIBS and KRB5_LIBS variables from sssd.spec
+</li><li>Add dns_resolver_timeout option
+</li><li>Fix segfault in GSSAPI reconnect code
+</li><li>Properly set up SIGCHLD handlers
+</li><li>Make krb5_kpasswd available for any krb5 provider
+</li><li>Clean up kdcinfo and kpasswdinfo files when exiting
+</li><li>Add callback when the ID provider switches from offline to online
+</li><li>Add dynamic DNS updates to FreeIPA
+</li><li>Update version to 1.1.91
+</li></ul><p>
+Sumit Bose (30):
+</p>
+<ul><li>Add simple access provider
+</li><li>Add better checks on PAM socket
+</li><li>Add expandable sequences to krb5_ccachedir
+</li><li>Write the IP address of the KDC to the kdcinfo file
+</li><li>Add krb5_kpasswd option
+</li><li>Fixes for client communication
+</li><li>Lower debug level of unexpected LDAP result codes
+</li><li>Fix kinit after password change
+</li><li>Set LDAP_OPT_RESTART for ldap_sasl_interactive_bind_s()
+</li><li>Fix warnings from -Wmissing-field-initializers
+</li><li>Fix LDAP search paths for IPA HBAC
+</li><li>Add a test for domain_to_basedn()
+</li><li>Revert "Add better checks on PAM socket"
+</li><li>Use SO_PEERCRED on the PAM socket
+</li><li>Set LDAP_OPT_RESTART for all LDAP connections
+</li><li>Fix a potential memory violation
+</li><li>Make Kerberos authentication a tevent_req
+</li><li>New version of IPA auth and password migration
+</li><li>Make the handling of fd events opaque
+</li><li>Unset authentication tokens if password change fails
+</li><li>Display a message if a password reset by root fails
+</li><li>Fix wrong return value
+</li><li>Fix a wrong return value in IPA HBAC
+</li><li>Split pam_data utilities into a separate file
+</li><li>Handle Krb5 password expiration warning
+</li><li>Create kdcinfo and kpasswdinfo file at startup
+</li><li>Compare the full service name
+</li><li>Add support for delayed kinit if offline
+</li><li>Add retry option to pam_sss
+</li><li>Add more warnings about nearly expired passwords
+</li></ul><p>
+Yuri Chornoivan (1):
+</p>
+<ul><li>Add UK translation
+</li></ul><p>
+eindenbom (1):
+</p>
+<ul><li>Avoid accessing half-deallocated memory when using talloc_zfree macro.
+</li></ul><p>
+Dmitry Drozdov (1):
+</p>
+<ul><li>Adding Russion Translation
+</li></ul><p>
+Eugene Indenbom (1):
+</p>
+<ul><li>Add krb5_kpasswd to IPA provider
+</li></ul><p>
+George <a class="missing wiki" href="https://docs.pagure.org/sssd-test2/McCollister.html" rel="nofollow">McCollister?</a> (2):
+</p>
+<ul><li>Fixed alignment problems in nss client/server
+</li><li>Fixed buffer alignment in exchange_credentials().
+</li></ul><p>
+Guido Grazioli (1):
+</p>
+<ul><li>Updating IT translation
+</li></ul><p>
+Héctor Daniel Cabrera (4):
+</p>
+<ul><li>Updating ES translation
+</li><li>Updating ES translation for 1.1.0
+</li><li>Update ES translation
+</li><li>Updating ES translation for 1.1.0
+</li></ul><p>
+Jakub Hrozek (31):
+</p>
+<ul><li>groupshow: only show all parents in recursive mode
+</li><li>Do not run negative resolv test with no network
+</li><li>Reopen logs when SIGHUP is caught
+</li><li>Package example logrotate script
+</li><li>Make filter_users and filter_groups also per-domain
+</li><li>Flush NSCD cache after modifying local database
+</li><li>Remove unused M4 code
+</li><li>Fix segfault in the locator plugin
+</li><li>Fix config file error message
+</li><li>Add generic error message
+</li><li>Fixes for path_utils
+</li><li>Unit tests for path_utils
+</li><li>Generate doxygen documentation for path_utils
+</li><li>Allow running with read only root
+</li><li>Regression test against RHBZ <a class="missing ticket">#576856</a>
+</li><li>Add userdel_cmd param
+</li><li>Make sss_userdel check for logged in users
+</li><li>Move SELinux related functions into its own module
+</li><li>SELinux login management
+</li><li>Treat server names as case-insensitive in failover code
+</li><li>Do not mark a request as failed twice
+</li><li>Sort SRV replies according to RFC 2782
+</li><li>Remove freed server_common entities from list
+</li><li>Support SRV servers in failover
+</li><li>Try all servers during Kerberos auth
+</li><li>Fix uninitialized variable
+</li><li>Add a README file
+</li><li>Use all available servers in LDAP provider
+</li><li>Improve the offline authentication message
+</li><li>Fix memory hierarchy in the ipa timerules
+</li><li>Use service discovery in backends
+</li></ul><p>
+Piotr Drąg (3):
+</p>
+<ul><li>Updating PL translation for 1.1
+</li><li>Updating PL translation
+</li><li>Updating PL translation for 1.1.0
+</li></ul><p>
+Ralf Haferkamp (6):
+</p>
+<ul><li>Fixed check for expired passwords
+</li><li>Fixed authentication check for CHAUTHTOK_PRELIM
+</li><li>Warn user about an expired password
+</li><li>Prompt for old password even when running as root
+</li><li>use logfiles for debug messages
+</li><li>Improvements for LDAP Password Policy support
+</li></ul><p>
+Rui Gouveia (4):
+</p>
+<ul><li>Updating PT translation for 1.1.0
+</li><li>Updating PT translation
+</li><li>Updating PT translation for 1.1.0
+</li><li>Update PT translation
+</li></ul><p>
+Simo Sorce (5):
+</p>
+<ul><li>Fix memberof calculation when deleting groups
+</li><li>Fix invalid read cause by premature free of tmpctx
+</li><li>Fix multiple errors with destructors.
+</li><li>Better handle sdap_handle memory from callers.
+</li><li>Avoid freeing sdap_handle too early
+</li></ul><p>
+Stephen Gallagher (38):
+</p>
+<ul><li>Package libcollection documentation into libcollection-devel
+</li><li>Add <a class="missing wiki" href="https://docs.pagure.org/sssd-test2/BuildRequires.html" rel="nofollow">BuildRequires?</a> for doxygen
+</li><li>Update translatable strings for string freeze
+</li><li>Add ID translation for SSSD 1.1.0
+</li><li>Update POTFILES.in to include missing translatable strings
+</li><li>Fix build when check-devel is not installed
+</li><li>Update translations for string freeze
+</li><li>Updating translation files for string freeze.
+</li><li>Properly handle dbus send attempts on a closed connection
+</li><li>Use correct python macros in sssd.spec
+</li><li>Clean up changelog for sssd.spec
+</li><li>Build and package libini_config docs
+</li><li>Fix a series of memory leaks in the SBUS
+</li><li>Fix error message for ldap_start_tls
+</li><li>Add missing ldap_tls_cacertdir option to SSSDConfig API
+</li><li>Add translated help text for ldap_tls_cacertdir
+</li><li>Update version in master branch to 1.1.90
+</li><li>Ensure the SSSDConfig creates sssd.conf with the correct mode
+</li><li>Fix path_utils_ut segfault
+</li><li>Allow arbitrary-length PAM messages
+</li><li>Fix typo in ldap_id_use_start_tls option description
+</li><li>Add regression test for <a class="ext-link" href="https://fedorahosted.org/sssd/ticket/441"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/441</a>
+</li><li>Do not revert options to defaults in SSSDConfig.get_domain()
+</li><li>Protect against check-and-open race conditions
+</li><li>Support docdir and abs_builddir
+</li><li>Update translations for SSSD 1.2 branch
+</li><li>Remove unused configure macro
+</li><li>Give information about ldap_schema in the sample config
+</li><li>Make ID provider init functions clearer
+</li><li>Remove the NSS_LIBS and KRB5_LIBS variables from sssd.spec
+</li><li>Add dns_resolver_timeout option
+</li><li>Fix segfault in GSSAPI reconnect code
+</li><li>Properly set up SIGCHLD handlers
+</li><li>Make krb5_kpasswd available for any krb5 provider
+</li><li>Clean up kdcinfo and kpasswdinfo files when exiting
+</li><li>Add callback when the ID provider switches from offline to online
+</li><li>Add dynamic DNS updates to FreeIPA
+</li><li>Update version to 1.1.91
+</li></ul><p>
+Sumit Bose (30):
+</p>
+<ul><li>Add simple access provider
+</li><li>Add better checks on PAM socket
+</li><li>Add expandable sequences to krb5_ccachedir
+</li><li>Write the IP address of the KDC to the kdcinfo file
+</li><li>Add krb5_kpasswd option
+</li><li>Fixes for client communication
+</li><li>Lower debug level of unexpected LDAP result codes
+</li><li>Fix kinit after password change
+</li><li>Set LDAP_OPT_RESTART for ldap_sasl_interactive_bind_s()
+</li><li>Fix warnings from -Wmissing-field-initializers
+</li><li>Fix LDAP search paths for IPA HBAC
+</li><li>Add a test for domain_to_basedn()
+</li><li>Revert "Add better checks on PAM socket"
+</li><li>Use SO_PEERCRED on the PAM socket
+</li><li>Set LDAP_OPT_RESTART for all LDAP connections
+</li><li>Fix a potential memory violation
+</li><li>Make Kerberos authentication a tevent_req
+</li><li>New version of IPA auth and password migration
+</li><li>Make the handling of fd events opaque
+</li><li>Unset authentication tokens if password change fails
+</li><li>Display a message if a password reset by root fails
+</li><li>Fix wrong return value
+</li><li>Fix a wrong return value in IPA HBAC
+</li><li>Split pam_data utilities into a separate file
+</li><li>Handle Krb5 password expiration warning
+</li><li>Create kdcinfo and kpasswdinfo file at startup
+</li><li>Compare the full service name
+</li><li>Add support for delayed kinit if offline
+</li><li>Add retry option to pam_sss
+</li><li>Add more warnings about nearly expired passwords
+</li></ul><p>
+Yuri Chornoivan (1):
+</p>
+<ul><li>Add UK translation
+</li></ul><p>
+eindenbom (1):
+</p>
+<ul><li>Avoid accessing half-deallocated memory when using talloc_zfree macro.
+</li></ul></body></html>

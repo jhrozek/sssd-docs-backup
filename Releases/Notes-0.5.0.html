@@ -1,0 +1,191 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="SSSDRelease0.5.0">SSSD Release 0.5.0</h2>
+<h3 id="Highlights">Highlights</h3>
+<p>
+The most significant changes since 0.4.0 are:
+</p>
+<ul><li>The addition of the Kerberos 5 authentication provider
+</li><li>The addition of the native LDAP identity provider
+</li><li>Support for building on Debian and Ubuntu
+</li><li>Improved caching mechanism to reduce server load
+</li><li>Includes the fix released for CVE-2009-2410 in SSSD 0.4.1 and many other bugfixes.
+</li></ul><h3 id="Detailedchangessince0.4.0">Detailed changes since 0.4.0</h3>
+<p>
+Dmitri Pal (21):
+</p>
+<ul><li>    Adding INSERT into collection functionality.
+</li><li>    FORMATTING - minor cleanup of the unit test.
+</li><li>    Queue and stack APIs using collection.
+</li><li>    New deletion unit test.
+</li><li>    Changing function names for collection API.
+</li><li>    Adding wrappers to free data in INI API.
+</li><li>    Fixing build issues
+</li><li>    COLLECTION Removing static placeholder structure.
+</li><li>    COLLECTION Adding flat traversal &amp; copy
+</li><li>    COLLECTION Fixed: iterator_up and insert_into_current
+</li><li>    ELAPI First part of the interface
+</li><li>    INI Refactoring code a bit
+</li><li>    COLLECTION Add remove item functions
+</li><li>    COLLECTION Improving searches
+</li><li>    COLLECTION &amp; INI Cleanup
+</li><li>    INI Simple fix to properly process multi value config parameters.
+</li><li>    ELAPI Next round of functionality - logging part of the interface
+</li><li>    TRACE: Making sure trace is safe to output NULL strings
+</li><li>    ELAPI: Adding concept of targets
+</li><li>    COMMON Fixes to return values, errno, leaks
+</li><li>    ELAPI Shortening names
+</li></ul><p>
+Jakub Hrozek (23):
+</p>
+<ul><li>    fix shadow-utils base path
+</li><li>    PRINT and ERROR macros
+</li><li>    Gettextize the sss_ tools
+</li><li>    Check for root before initializing
+</li><li>    Fix saving new nextID
+</li><li>    Async DNS integration
+</li><li>    Add ares helpers into sssd
+</li><li>    Add async resolver tests
+</li><li>    Improve error messages
+</li><li>    Add ignore_not_found parameter to sysdb delete functions
+</li><li>    Use correct return codes
+</li><li>    Notify user when deleting nonexistent user or group
+</li><li>    Correct check for local domain in tools
+</li><li>    Consolidate tevent helpers
+</li><li>    Fix adding to groups on user creation
+</li><li>    Move parsing of names and domains into util/
+</li><li>    Parse fully qualified names in tools
+</li><li>    Add configure checks for docbook XSL templates and XML tools
+</li><li>    Make child processes exit when parent dies
+</li><li>    Tools ID range fixes
+</li><li>    Make "files" a reserved word for legacy local domain
+</li><li>    Disallow all operations outside domains, fix deleting cache for files
+</li><li>    Fix sysdb tests
+</li></ul><p>
+John Dennis (1):
+</p>
+<ul><li>    add path_utils filesystem path manipulation utility functions
+</li></ul><p>
+Simo Sorce (40):
+</p>
+<ul><li>    Link crypt functions only to sssd binaries
+</li><li>    Fix warnings in stress-tests.c
+</li><li>    Turn sssd_mem_takeover into sssd_mem_attach
+</li><li>    Rename sysdb_req to sysdb_handle.
+</li><li>    Rework transaction code to use tevent_req
+</li><li>    Convert proxy internals to tevent_req style
+</li><li>    Clean up warnings in common/
+</li><li>    Cleanup warnings in client and server code
+</li><li>    Add dumb way to clean up .X files
+</li><li>    Expose sysdb function to parse sysdb_attrs
+</li><li>    Add async helper functions
+</li><li>    Use async helpers for ldap auth module
+</li><li>    Unify password caching ops in sysdb
+</li><li>    Implement the ldap identity module.
+</li><li>    Start rationalizing user tools a bit
+</li><li>    Instrument memberof for debugging
+</li><li>    Add option to add timestamps to debug output
+</li><li>    Raise debug level for version negotiation
+</li><li>    Rework the engine that deals with openldap libraries
+</li><li>    Fix race condition that was causing segfaults
+</li><li>    Fix search replies getting ignored
+</li><li>    Fix race condition in sdap code
+</li><li>    Fix broken ifndefs
+</li><li>    Cleanups
+</li><li>    Refactor some code around watches and timeouts
+</li><li>    Remove redundant memory contexts
+</li><li>    Cosmetic changes
+</li><li>    merge server and connection structures
+</li><li>    Simplify interfaces initialization
+</li><li>    Do not fail enumerations because of range checks
+</li><li>    Minor fixes
+</li><li>    Change services identification mechanism
+</li><li>    Prevent races between dp startup and others
+</li><li>    Change the why DP clients identify
+</li><li>    Fix reversal of parent and member in groupmod
+</li><li>    Fix reconnection code
+</li><li>    Catch possible bad input passed in by glibc
+</li><li>    Add debug statements to sysdb_ops
+</li><li>    Relax memberof constraints a bit
+</li><li>    Do not fail enumerations if a single store fails
+</li></ul><p>
+Stephen Gallagher (52):
+</p>
+<ul><li>    Treat a missing provider entry as a config error
+</li><li>    Update version to 0.4.1
+</li><li>    Fix invalid pointer error in ldb_debug_messages
+</li><li>    Remove unnecessary .la cleanup from sssd.spec.in
+</li><li>    Add missing configure check for getpgrp
+</li><li>    Remove extra implementation of password_destructor
+</li><li>    Make SysV script install executable
+</li><li>    Add --with-aux-info config option to SSSD daemon
+</li><li>    Add --with-aux-info config option to SSS client
+</li><li>    Control sssd_be exported functions
+</li><li>    Control sss_client exports
+</li><li>    Create gettext framework for SSSD daemon
+</li><li>    Do not treat warnings as errors
+</li><li>    Add configure check for PCRE &gt;= 7
+</li><li>    Allow the use of custom CFLAGS on the make command line
+</li><li>    Fix segfault in update_monitor_config
+</li><li>    Protect against segfault in service_signal_reload
+</li><li>    Implement _pam_overwrite_n(n,x) for older systems
+</li><li>    Add pam_sss_macros.h to "make dist"
+</li><li>    Remove redundant libPath option from proxy provider
+</li><li>    Eliminate segfault on first start-up
+</li><li>    Build all SSSD components with warnings enabled
+</li><li>    Run libcollection unit tests with 'make check'
+</li><li>    Run ini_config unit test with "make check"
+</li><li>    Improvements to config file updates
+</li><li>    Monitor resolv.conf for changes
+</li><li>    Implement resInit for monitor, NSS, PAM, DP and the backends
+</li><li>    Fix typo in elapi's Makefile.am that breaks 'make dist'
+</li><li>    Remove unused InfoPipe and PolicyKit code
+</li><li>    Add 'make srpms' target
+</li><li>    Minor cleanups in monitor.c
+</li><li>    Address CVE-2009-2410
+</li><li>    Build and run tests with 'make check'
+</li><li>    Revert build-breaking libsss_util_la change.
+</li><li>    Make socket paths a compile-time option
+</li><li>    Fix monitor ping timeout
+</li><li>    Eliminate unnecessary explicit timeout for DP account requests
+</li><li>    Don't go to the backend for identical cache entry requests
+</li><li>    Refactor responder_dp.c
+</li><li>    Fix broken build
+</li><li>    Ensure that only one local domain is configured
+</li><li>    Remove unneeded binary objects from the replace directory
+</li><li>    Eliminate the --with-tests configure flag
+</li><li>    Make the LOCAL provider always use MagicPrivateGroups
+</li><li>    Add m4 directory at root
+</li><li>    Fix usage of $(builddir) in SSSD
+</li><li>    Remove 'color-tests' from AM_INIT_AUTOMAKE
+</li><li>    Support gettext &gt;= 0.14 instead of 0.17
+</li><li>    Support Docbook 4.4
+</li><li>    Ensure nextID doesn't reuse an existing local UID or GID
+</li><li>    Fix accidentally forcing MPGs on for all domains
+</li><li>    Update version to 0.5.0
+</li></ul><p>
+Sumit Bose (24):
+</p>
+<ul><li>    fix detection of authentication against LOCAL domain
+</li><li>    added kerberos locator plugin
+</li><li>    added kerberos backend with tevent_req event handling
+</li><li>    let .gitignore only filter autogenerated m4 files
+</li><li>    check pending_return after dbus_connection_send_with_reply
+</li><li>    fixed a double talloc_free error
+</li><li>    fixed some typos which prevented password caching
+</li><li>    fix return code of krb5 child to indicate that the kdc is unavailable
+</li><li>    fixed typos and a potential memory leak
+</li><li>    add a short explanation about the used debug levels
+</li><li>    fixed the default value for tls_reqcert
+</li><li>    let krb5 backend safe valid credentials for offline authentication
+</li><li>    add infrastructure to handle new backend targets
+</li><li>    add handling of the new backend targets to proxy backend
+</li><li>    added LDAP change password backend target
+</li><li>    cleanup of pam_sss
+</li><li>    fix return value of confdb_get_domains
+</li><li>    added missing hash_create which was remove by a previous patch
+</li><li>    enable usage of defaultBindDn
+</li><li>    use stored upn if available
+</li><li>    fix handling of filtersUsers in groups
+</li><li>    store additional LDAP attributes
+</li><li>    extended the documentation of LDAP backend
+</li><li>    some UPN handling fixes
+</li></ul></body></html>

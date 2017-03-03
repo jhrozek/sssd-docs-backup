@@ -1,0 +1,49 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<h3 id="libini_config">libini_config</h3>
+<ul><li>This release adds an API to create, modify and save INI files
+</li><li>Merging configuration snippets installed in different locations is supported
+</li></ul><h3 id="libcollection">libcollection</h3>
+<ul><li>New functions: <tt>col_get_dup_item</tt>, <tt>col_delete_item_with_cb</tt>, <tt>col_remove_item_with_cb</tt>
+</li></ul><h2 id="Notefordistributionpackagers">Note for distribution packagers</h2>
+<ul><li>New public header file <tt>ini_configmod.h</tt>
+</li><li>API and ABI is backward compatible with last release (0.4.0)
+</li></ul><h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Dmitri Pal (22):
+</p>
+<ul><li>Print info when array is empty
+</li><li>Declaring new internal access check function
+</li><li>Refactored access control check
+</li><li>New function to merge snippets
+</li><li>Test file for unit test
+</li><li>[INI] Make the merge function build
+</li><li>Function to return one of the dups
+</li><li>Allow to modify item name
+</li><li>Expose delete with callback function
+</li><li>Comment creation helper
+</li><li>Comment can be NULL
+</li><li>Move definition to common header
+</li><li>Fix wrapping error
+</li><li>New interface to modify configuration
+</li><li>Build new interface
+</li><li>Generate doxy doc for INI modification API
+</li><li>Cleaning doxygen comments
+</li><li>Change order of the headers
+</li><li>New interface to save configuration in a file
+</li><li>Implementation of the interface to save configuration
+</li><li>Unit test for the save interface
+</li><li>Build new tests for the save interface
+</li></ul><p>
+Lukas Slebodnik (10):
+</p>
+<ul><li>SPEC: Use correct soname for packages lib{collection,ini_config}
+</li><li>SPEC: Do not include compiled files into package libdhash-devel
+</li><li>ini_config_ut: enable verbose mode with env variable
+</li><li>collection: Add new function col_remove_item_with_cb
+</li><li>INI: Fix memory leak with INI_VA_CLEAN
+</li><li>COLLECTION: Return the last duplicate for big index
+</li><li>INI: Fix adding string with INI_VA_MODADD_E and big index
+</li><li>INI: Add check based test ini_configmod_ut_check
+</li><li>Bump version-info
+</li><li>Update versions before 0.5.0 release
+</li></ul></body></html>

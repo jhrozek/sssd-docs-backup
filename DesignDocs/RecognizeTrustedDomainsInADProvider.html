@@ -1,0 +1,20 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="RecognizetrusteddomainsinADprovider">Recognize trusted domains in AD provider</h2>
+<p>
+Related tickets:
+</p>
+<ul><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/364"><span class="icon">​</span>RFE Recognize trusted domains in AD provider</a>
+</li></ul><h3 id="ProblemStatement">Problem Statement</h3>
+<p>
+With the current LDAP lookups the SSSD AD provider can only find users and groups in the local domain. With Global Catalog lookups (<a class="ext-link" href="https://docs.pagure.org/sssd-test2/DesignDocs/GlobalCatalogLookups.html"><span class="icon">​</span>design page</a>) this will be extended to all users and groups of the local forest. Using the PAC helps to avoid group membership lookups (<a class="ext-link" href="https://fedorahosted.org/sssd/ticket/1558"><span class="icon">​</span>RFE Use MS-PAC to retrieve user's group list</a>). 
+</p>
+<p>
+What is missing are lookups of users and groups in trusted forests and password based authentication of users from trusted forests. For this the names of the trusted forests and additional suffixes managed by the forest are needed. The names the 
+</p>
+<h3 id="Overviewviewofthesolution">Overview view of the solution</h3>
+<h3 id="Implementationdetails">Implementation details</h3>
+<h3 id="Howtotest">How to test</h3>
+<h3 id="Authors">Author(s)</h3>
+<p>
+Sumit Bose &lt;<a class="mail-link" href="mailto:sbose@redhat.com"><span class="icon">​</span>sbose@redhat.com</a>&gt;
+</p>
+</body></html>

@@ -1,0 +1,149 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><p>
+</p><div class="wiki-toc">
+<ol>
+  <li>
+    <a href="#KerberosLocatorPlugin">Kerberos Locator Plugin</a>
+    <ol>
+      <li>
+        <a href="#OldDesign">Old Design</a>
+        <ol>
+          <li>
+            <a href="#Limitations">Limitations</a>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <a href="#NewDesign">New Design</a>
+        <ol>
+          <li>
+            <a href="#LocatorPlugin">Locator Plugin</a>
+          </li>
+          <li>
+            <a href="#LocatorResponder">Locator Responder</a>
+            <ol>
+              <li>
+                <a href="#LocatorResponder-ClientWireProtocol">Locator Responder-Client Wire Protocol</a>
+                <ol>
+                  <li>
+                    <a href="#Request">Request</a>
+                  </li>
+                  <li>
+                    <a href="#Replies">Replies</a>
+                    <ol>
+                      <li>
+                        <a href="#ReplyAddressData">Reply Address Data</a>
+                      </li>
+                      <li>
+                        <a href="#ReplyAddressDataStringrepresentation">Reply Address Data String representation</a>
+                      </li>
+                    </ol>
+                  </li>
+                </ol>
+              </li>
+              <li>
+                <a href="#ResponderBehavior">Responder Behavior</a>
+              </li>
+            </ol>
+          </li>
+          <li>
+            <a href="#KerberosProviderExtensions">Kerberos Provider Extensions</a>
+            <ol>
+              <li>
+                <a href="#SBUSProtocol">SBUS Protocol</a>
+              </li>
+              <li>
+                <a href="#AddressResolution">Address Resolution</a>
+              </li>
+            </ol>
+          </li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+</ol>
+</div><p>
+</p>
+<h1 id="KerberosLocatorPlugin">Kerberos Locator Plugin</h1>
+<h2 id="OldDesign">Old Design</h2>
+<p>
+The current Kerberos locator plugin functions as follows:
+</p>
+<ol><li>The krb5 provider would write a file, <tt>/var/lib/sss/pubconf/kdcinfo.REALM</tt> consisting of a single line, the IP address and port of the KDC being used.
+</li><li>The kerberos locator plugin would read in this file and return the IP address and port to the requesting application.
+</li></ol><h3 id="Limitations">Limitations</h3>
+<ul><li>The locator provides only a single address and is only updated when the krb5 provider in the SSSD service connects to a new KDC.
+</li><li>If the KDC we last authenticated against becomes unreachable, but other KDCs in a failover configuration remain up, applications relying on libkrb5 will fail to access those failover servers.
+</li></ul><h2 id="NewDesign">New Design</h2>
+<h3 id="LocatorPlugin">Locator Plugin</h3>
+<p>
+The Kerberos locator plugin will be reinvented as an sss_client object. It will retain minimal logic in itself except as follows:
+</p>
+<ol><li>It will communicate across a socket to the Locator Responder (sssd_locator).
+</li><li>We will optionally implement an in-memory cache similar to that of the NSS clients.
+</li><li>This communication and caching will support retrieving multiple address/port pairs in a single transaction.
+</li></ol><h3 id="LocatorResponder">Locator Responder</h3>
+<h4 id="LocatorResponder-ClientWireProtocol">Locator Responder-Client Wire Protocol</h4>
+<h5 id="Request">Request</h5>
+<table class="wiki">
+<tr><td>Bytes</td><td>Function
+</td></tr><tr><td>0-4</td><td>Message Length
+</td></tr><tr><td>4-7</td><td>Locate Service Type
+</td></tr><tr><td>9-11</td><td>Socket Type
+</td></tr><tr><td>12-15</td><td>Protocol Family
+</td></tr><tr><td>16-19</td><td>Length of realm
+</td></tr><tr><td>20-XX</td><td>Realm
+</td></tr></table>
+<h5 id="Replies">Replies</h5>
+<table class="wiki">
+<tr><td>Bytes</td><td>Function
+</td></tr><tr><td>0-3</td><td>Length of the message
+</td></tr><tr><td>4-7</td><td>Number of addresses
+</td></tr><tr><td>8-X</td><td>Address Data
+</td></tr></table>
+<p>
+A reply with zero addresses should be interpreted by the client as SSSD not being aware of the requested realm. This should be treated as KRB5_PLUGIN_NO_HANDLE.
+</p>
+<h6 id="ReplyAddressData">Reply Address Data</h6>
+<table class="wiki">
+<tr><td>Bytes</td><td>Function
+</td></tr><tr><td>0-3</td><td>Port
+</td></tr><tr><td>4-7</td><td>Size of address
+</td></tr><tr><td>8-X</td><td>String representation of address
+</td></tr></table>
+<h6 id="ReplyAddressDataStringrepresentation">Reply Address Data String representation</h6>
+<ul><li>IPv4: numbers-and-dots notation as supported by inet_aton(3)
+</li><li>IPv6: hexadecimal string format as supported by inet_pton(3)
+</li><li>This is done so the string can be passed directly to getaddrinfo() in the locator plugin.
+</li></ul><h4 id="ResponderBehavior">Responder Behavior</h4>
+<p>
+The responder will receive requests from the locator plugin. It will parse the realm from the wire protocol and use that to determine which (if any) KRB5 auth or chpass provider is available for that realm. It will then query that provider via the SBUS to get an appropriate list of addresses. Once this reply is made, the responder will answer the locator plugin client.
+</p>
+<p>
+The responder MUST enqueue multiple requests for the same realm together, so that fewer trips to the provider will be required.
+</p>
+<p>
+Once the responder returns, the results SHOULD be added to an in-memory cache similar to that offered by the NSS responder.
+</p>
+<p>
+For compatibility with applications that have older versions of the locator still loaded, the responder MUST write out a <tt>/var/lib/sss/pubconf/kdcinfo.REALM</tt> file containing the first address in the set returned from the provider.
+</p>
+<h3 id="KerberosProviderExtensions">Kerberos Provider Extensions</h3>
+<h4 id="SBUSProtocol">SBUS Protocol</h4>
+<p>
+TBD
+</p>
+<h4 id="AddressResolution">Address Resolution</h4>
+<p>
+The provider SHOULD reply with potential addresses even if the provider is in offline mode. This is to ensure that the locator plugin can accurately return data if the KDCs become available again before the SSSD notices (by performing an online authentication or password-change)
+</p>
+<p>
+If the provider is online, it MUST return the KDC it last communicated with as the first address in the response list. The provider MUST return up to N-1 (configurable) total addresses from its available pool. For example, if the configuration specifies
+</p>
+<pre class="wiki">krb5_locator_addresses = 3
+</pre><p>
+and the KDC is online, it MUST return the KDC it is connected to, followed by the next two servers in the failover list, or fewer if only one or two exist in total.
+</p>
+<p>
+TBD
+</p>
+</body></html>

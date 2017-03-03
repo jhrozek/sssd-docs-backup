@@ -1,0 +1,132 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><p>
+</p><div class="wiki-toc">
+<ol>
+  <li>
+    <ol>
+      <li>
+        <a href="#Synopsis">Synopsis</a>
+      </li>
+      <li>
+        <a href="#Daemonoptions">Daemon options</a>
+      </li>
+      <li>
+        <a href="#PAMresponderoptions">PAM responder options</a>
+      </li>
+      <li>
+        <a href="#PACresponderoptions">PAC responder options</a>
+      </li>
+      <li>
+        <a href="#IFPresponderoptions">IFP responder options</a>
+      </li>
+      <li>
+        <a href="#Generaldomainoptions">General domain options</a>
+      </li>
+      <li>
+        <a href="#LDAPprovideroptions">LDAP provider options</a>
+      </li>
+      <li>
+        <a href="#Kerberosprovideroptions">Kerberos provider options</a>
+      </li>
+      <li>
+        <a href="#Simpleaccessprovideroptions">Simple access provider options</a>
+      </li>
+      <li>
+        <a href="#IPAandADprovideroptions">IPA and AD provider options</a>
+      </li>
+    </ol>
+  </li>
+</ol>
+</div><p>
+</p>
+<h2 id="Synopsis">Synopsis</h2>
+<p>
+This page describes SSSD options that have a security implication. It was last updated with SSSD 1.13.1 in mind. The option description are often pasted from the man pages along with a short sentence explaining why the option has a security implication. Please see the sssd man pages for a more detailed description and the default values.
+</p>
+<p>
+As a general note, the SSSD should already include secure-by-default options, so normally no hardening is needed after the SSSD is configured. A notable exception is the <tt>user</tt> option. Additionally, SSSD tends to honor settings its libraries use and only allows means to override the library settings with SSSD specific This is especially true for libkrb5 and openldap-libs.
+</p>
+<h2 id="Daemonoptions">Daemon options</h2>
+<p>
+Options in this page section control the daemon behaviour and should be placed in the <tt>[sssd]</tt> section.
+</p>
+<dl class="wiki"><dt>services</dt><dd>
+Comma separated list of services that are started when sssd itself starts. It is advisable to disable services that are not required. The same applies for domains.
+</dd><dt>user</dt><dd>
+The user to drop the privileges to where appropriate to avoid running as the root user. At the time of writing, the default is still root, although SSSD in RHEL and Fedora is also configured with the <tt>sssd</tt> user in mind. Adding <tt>user = sssd</tt> to the <tt>[sssd]</tt> section will cause the SSSD worker processes to run as the <tt>sssd</tt> user.
+</dd><dt>certificate_verification</dt><dd>
+If this option is set to no_ocsp, then Online Certificate Status Protocol checks are completely disabled.
+</dd></dl>
+<h2 id="PAMresponderoptions">PAM responder options</h2>
+<p>
+Options in this section configure the PAM responder and belong to the <tt>[pam]</tt> section.
+</p>
+<dl class="wiki"><dt>offline_credentials_expiration</dt><dd>If the authentication provider is offline, how long should we allow cached logins (in days since the last successful online login).
+</dd></dl>
+<dl class="wiki"><dt>offline_failed_login_attempts</dt><dd>If the authentication provider is offline, how many failed login attempts are allowed. Can prevent brute-force attacks when offline.
+</dd></dl>
+<dl class="wiki"><dt>offline_failed_login_delay</dt><dd>The time in minutes which has to pass after offline_failed_login_attempts has been reached before a new login attempt is possible. Can prevent brute-force attacks.
+</dd></dl>
+<dl class="wiki"><dt>pam_verbosity</dt><dd>Controls what kind of messages are shown to the user during authentication. The default is 0 to make sure no info is leaked through a side channel.
+</dd></dl>
+<dl class="wiki"><dt>pam_trusted_users</dt><dd>Specifies the comma-separated list of UID values or user names that are allowed to access the PAM responder as trusted users. Can be used to restrict access to the PAM responder. Users not included in this list can only access <tt>pam_public_domains</tt>.
+</dd></dl>
+<dl class="wiki"><dt>pam_public_domains</dt><dd>Specifies the comma-separated list of domain names that are accessible even to untrusted users.
+</dd></dl>
+<h2 id="PACresponderoptions">PAC responder options</h2>
+<p>
+Options in this section configure the PAC responder and belong to the <tt>[pac]</tt> section.
+</p>
+<dl class="wiki"><dt>allowed_uids</dt><dd>Specifies the comma-separated list of UID values or user names that are allowed to access the PAC responder. By default, only root can, so additional values for this option should be justified.
+</dd></dl>
+<h2 id="IFPresponderoptions">IFP responder options</h2>
+<p>
+Options in this section configure the InfoPipe responder and belong to the <tt>[ifp]</tt> section.
+</p>
+<dl class="wiki"><dt>allowed_uids</dt><dd>Specifies the comma-separated list of UID values or user names that are allowed to access the IFP responder. By default, only root can, so additional values for this option should be justified.
+</dd></dl>
+<h2 id="Generaldomainoptions">General domain options</h2>
+<p>
+Options in this page section are not related to any particular back end type or responder and apply to the <tt>[domain]</tt> section.
+</p>
+<dl class="wiki"><dt>access_provider</dt><dd>contrary to other providers, the default for <tt>access_provider</tt> is permit all. Setting <tt>access_provider</tt> to another access control provider may increase security, on the other hand, if there is no explicit <tt>access_provider</tt> value, then all authenticated users are allowed access.
+</dd></dl>
+<dl class="wiki"><dt>cache_credentials</dt><dd>Determines if user credentials are also cached in the local LDB cache. User credentials are stored in a SHA512 hash, not in plaintext. Setting to true would store hash of password after authentication.
+</dd></dl>
+<dl class="wiki"><dt>cache_credentials_minimal_first_factor_length</dt><dd>If 2-Factor-Authentication (2FA) is used and credentials should be saved this value determines the minimal length the first authentication factor (long term password) must have to be saved as hash in the cache. This should avoid that the short PINs of a PIN based 2FA scheme are saved in the cache which would make them easy targets for brute-force attacks.
+</dd></dl>
+<dl class="wiki"><dt>account_cache_expiration</dt><dd>Number of days entries are left in cache after last successful login before being removed during a cleanup of the cache. Security-paranoid environments might want to set this option especially if <tt>cache_credentials</tt> is set as well.
+</dd></dl>
+<h2 id="LDAPprovideroptions">LDAP provider options</h2>
+<p>
+Options in this section only apply for configurations that set any of the providers to <tt>ldap</tt>.
+</p>
+<dl class="wiki"><dt>ldap_tls_reqcert</dt><dd>Specifies what checks to perform on server certificates in a TLS session, if any. Setting anything but <tt>hard</tt> or <tt>demand</tt> lowers security.
+</dd></dl>
+<dl class="wiki"><dt>ldap_tls_cipher_suite</dt><dd>Specifies acceptable cipher suites, uses OpenLDAP defaults normally. In theory, the admin could set insecure ciphers here.
+</dd></dl>
+<dl class="wiki"><dt>ldap_id_use_start_tls</dt><dd>Specifies that the id_provider connection must also use tls to protect the channel. Normally identity lookups happen in the clear, unlike authentication that must always be encrypted. Similar effect can be achieved with <tt>ldap_sasl_mech=gssapi</tt>
+</dd></dl>
+<h2 id="Kerberosprovideroptions">Kerberos provider options</h2>
+<p>
+Options in this section only apply for configurations that set any of the providers to <tt>krb5</tt>.
+</p>
+<dl class="wiki"><dt>krb5_validate</dt><dd>Verify with the help of krb5_keytab that the TGT obtained has not been spoofed. Setting this option to True helps mitigate MITM attacks.
+</dd></dl>
+<dl class="wiki"><dt>krb5_store_password_if_offline</dt><dd>Store the password of the user if the provider is offline in the kernel keyring and use it to request a TGT when the provider comes online again.
+</dd></dl>
+<dl class="wiki"><dt>krb5_use_fast</dt><dd>Enables flexible authentication secure tunneling (FAST) for Kerberos pre-authentication.
+</dd></dl>
+<dl class="wiki"><dt>krb5_ccname_template</dt><dd>Using certain credential cache types such as keyrings can increase security as the credential cache would only be accessible to the owner and root.
+</dd></dl>
+<h2 id="Simpleaccessprovideroptions">Simple access provider options</h2>
+<p>
+The simple access provider provides ACLs that contain list of user or group names that are permitted or allowed access. It's more secure to whitelist users that should be allowed access (<tt>simple_allow_*</tt>) rather then blacklist those that should be denied access (<tt>simple_deny_*</tt>)
+</p>
+<h2 id="IPAandADprovideroptions">IPA and AD provider options</h2>
+<p>
+None of the options that are specific to either IPA or AD provider have a security consequence. But since both IPA and AD providers are more or less wrappers around <tt>id_provider=ldap</tt> and <tt>auth_provider=krb5</tt>, any LDAP or Kerberos options can be used in IPA or AD domains as well. That said, both providers already use GSSAPI for identity lookups. Additionally, both enable <tt>krb5_validate</tt> by default and the IPA provider also sets the <tt>krb5_use_fast</tt> option to <tt>try</tt>.
+</p>
+<p>
+Please note that the IPA and AD clients are typically configured using tools such as <tt>realmd</tt> or <tt>ipa-client-install</tt> that may set additional options differently than SSSD defaults. A typical example is <tt>cache_credentials</tt> being enabled by default by <tt>ipa-client-install</tt>. In a similar manner, these installers tend to enable a sensible set of services (responders) that might not be required for security-sensitive setups.
+</p>
+</body></html>

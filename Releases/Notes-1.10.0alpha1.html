@@ -1,0 +1,358 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<ul><li>Includes a fix for <a class="ext-link" href="https://lists.fedorahosted.org/pipermail/sssd-devel/2013-March/014066.html"><span class="icon">​</span>CVE-2013-0287</a>: A simple access provider flaw prevents intended ACL use when SSSD is configured as an Active Directory client
+</li><li>Many internal interfaces were refactored, making the code more readable and maintanable in the long term. This refactoring includes the subdomains code, the sysdb interface as a whole, internal error code reporting, SELinux login context processing and processing of nested LDAP groups.
+</li><li>A new option <tt>ipa_dyndns_ttl</tt> was added, allowing the client to set a custom TTL on IPA dynamic DNS updates
+</li><li>A new <tt>ignore_group_members</tt> option was added. This option can be used to suppress downloading group members on group lookups, making the group lookups much faster for environments that do not need to know the group members.
+</li><li>A new option <tt>ldap_rfc2307_fallback_to_local_users</tt> was added. If this option is set to true, SSSD is be able to resolve local group members of LDAP groups.
+</li><li>Added support for krb5 1.11's responder callback.
+</li><li>Support for libnl version 3 was added.
+</li><li>Fixed an indexing bug that prevented the contents of autofs maps from being returned to the automounter deamon in case the map contained a large number of entries
+</li><li>Fixed spurious password expiration warning that was printed on login with the Kerberos back end
+</li><li>Fixed a regression when saving binary attributes to the cache
+</li><li>Fixed a file descriptor leak when sss_cache was executed
+</li></ul><h2 id="PackagingChanges">Packaging Changes</h2>
+<ul><li>The shared components of the SSSD are now built as a shared library to reduce amount of duplicated code being linked into multiple SSSD binaries and lower the disk usage of SSSD installation.
+</li><li>The check that ensured that SSSD is running with the same ldb version it was built against was made optional, defaulting to false. You can enable the strict check again by selecting <tt>--enable-ldb-version-check</tt> during configure
+</li></ul><h2 id="TicketsFixed">Tickets Fixed</h2>
+<p>
+</p><div><dl class="wiki compact"><dt><a class="closed" href="/sssd/ticket/1033" title="[RFE] implement a script/tool joining to the Active Directory domain">#1033</a></dt><dd>[RFE] implement a script/tool joining to the Active Directory domain</dd><dt><a class="closed" href="/sssd/ticket/1287" title="compilation warnings with -O2">#1287</a></dt><dd>compilation warnings with -O2</dd><dt><a class="closed" href="/sssd/ticket/1327" title="When multiple values are assigned, sss_debuglevel should display a usage ...">#1327</a></dt><dd>When multiple values are assigned, sss_debuglevel should display a usage message</dd><dt><a class="closed" href="/sssd/ticket/1371" title="Missing resolv.conf should be non-fatal">#1371</a></dt><dd>Missing resolv.conf should be non-fatal</dd><dt><a class="closed" href="/sssd/ticket/1405" title="[RFE] Kerberos canonicalization should be skipped on password-changes in ...">#1405</a></dt><dd>[RFE] Kerberos canonicalization should be skipped on password-changes in AD provider</dd><dt><a class="closed" href="/sssd/ticket/1476" title="SSSD has a much longer TTL when updating a DNS record than IPA client ...">#1476</a></dt><dd>SSSD has a much longer TTL when updating a DNS record than IPA client install placed in the beginning</dd><dt><a class="closed" href="/sssd/ticket/1481" title="Move sss_cache to the main subpackage">#1481</a></dt><dd>Move sss_cache to the main subpackage</dd><dt><a class="closed" href="/sssd/ticket/1484" title="failover should protect against empty host names">#1484</a></dt><dd>failover should protect against empty host names</dd><dt><a class="closed" href="/sssd/ticket/1495" title="include talloc log in our debug facility">#1495</a></dt><dd>include talloc log in our debug facility</dd><dt><a class="closed" href="/sssd/ticket/1575" title="Change responder contexts hierarchy">#1575</a></dt><dd>Change responder contexts hierarchy</dd><dt><a class="closed" href="/sssd/ticket/1586" title="Make authtoken opaque objects">#1586</a></dt><dd>Make authtoken opaque objects</dd><dt><a class="closed" href="/sssd/ticket/1712" title="sudoNotBefore/sudoNotAfter not supported by sssd sudoers plugin">#1712</a></dt><dd>sudoNotBefore/sudoNotAfter not supported by sssd sudoers plugin</dd><dt><a class="closed" href="/sssd/ticket/1738" title="Decrease the krb5_auth_timeout default value of 15">#1738</a></dt><dd>Decrease the krb5_auth_timeout default value of 15</dd><dt><a class="closed" href="/sssd/ticket/1743" title="selinux: move all logic to responder, provider should only update db">#1743</a></dt><dd>selinux: move all logic to responder, provider should only update db</dd><dt><a class="closed" href="/sssd/ticket/1744" title="selinux: reuse IPA_HBAC_REFRESH or provide an alternative">#1744</a></dt><dd>selinux: reuse IPA_HBAC_REFRESH or provide an alternative</dd><dt><a class="closed" href="/sssd/ticket/1745" title="Unnecessary output is seen when invalid option is passed to sss_cache">#1745</a></dt><dd>Unnecessary output is seen when invalid option is passed to sss_cache</dd><dt><a class="closed" href="/sssd/ticket/1746" title="sss_* tools with use_fully_qualified_names should require fqdn">#1746</a></dt><dd>sss_* tools with use_fully_qualified_names should require fqdn</dd><dt><a class="closed" href="/sssd/ticket/1747" title="Refactor subdomain interfaces">#1747</a></dt><dd>Refactor subdomain interfaces</dd><dt><a class="closed" href="/sssd/ticket/1756" title="append new line to error string from poptStrerror()">#1756</a></dt><dd>append new line to error string from poptStrerror()</dd><dt><a class="closed" href="/sssd/ticket/1763" title="check the return values of sysdb_transaction_commit in sysdb tests">#1763</a></dt><dd>check the return values of sysdb_transaction_commit in sysdb tests</dd><dt><a class="closed" href="/sssd/ticket/1765" title="remove the alt_db_path parameter of sysdb_init">#1765</a></dt><dd>remove the alt_db_path parameter of sysdb_init</dd><dt><a class="closed" href="/sssd/ticket/1766" title="use an explanatory macro for checking if a domain is a subdomain">#1766</a></dt><dd>use an explanatory macro for checking if a domain is a subdomain</dd><dt><a class="closed" href="/sssd/ticket/1771" title="Negative cache messages are displayed at too low of a DEBUG level">#1771</a></dt><dd>Negative cache messages are displayed at too low of a DEBUG level</dd><dt><a class="closed" href="/sssd/ticket/1790" title="Possible null derefence in ipa_subdomains.c">#1790</a></dt><dd>Possible null derefence in ipa_subdomains.c</dd><dt><a class="closed" href="/sssd/ticket/1794" title="reuse open_cloexec elsewhere in the code">#1794</a></dt><dd>reuse open_cloexec elsewhere in the code</dd><dt><a class="closed" href="/sssd/ticket/1803" title="SSSD returns System Error if the ccachedir is not writable">#1803</a></dt><dd>SSSD returns System Error if the ccachedir is not writable</dd><dt><a class="closed" href="/sssd/ticket/1804" title="Filter out inappropriate multicast and subnet broadcast addresses from IPA ...">#1804</a></dt><dd>Filter out inappropriate multicast and subnet broadcast addresses from IPA dynamic DNS update</dd><dt><a class="closed" href="/sssd/ticket/1810" title="Uninitialized scalar variable in responder_get_domain">#1810</a></dt><dd>Uninitialized scalar variable in responder_get_domain</dd><dt><a class="closed" href="/sssd/ticket/1811" title="Unchecked return value in tests">#1811</a></dt><dd>Unchecked return value in tests</dd><dt><a class="closed" href="/sssd/ticket/1813" title="make the ldb check configurable">#1813</a></dt><dd>make the ldb check configurable</dd><dt><a class="closed" href="/sssd/ticket/1819" title="Refresh doxygen template files">#1819</a></dt><dd>Refresh doxygen template files</dd><dt><a class="closed" href="/sssd/ticket/1820" title="sysdb unit tests uses system memberof">#1820</a></dt><dd>sysdb unit tests uses system memberof</dd><dt><a class="closed" href="/sssd/ticket/1833" title="segmentation fault in cmocka unit tests with raised optization level">#1833</a></dt><dd>segmentation fault in cmocka unit tests with raised optization level</dd><dt><a class="closed" href="/sssd/ticket/1834" title="Support for libini 1.0">#1834</a></dt><dd>Support for libini 1.0</dd><dt><a class="closed" href="/sssd/ticket/1838" title="nss and pam clients broken in master">#1838</a></dt><dd>nss and pam clients broken in master</dd><dt><a class="closed" href="/sssd/ticket/1840" title="Add --with-test-dir=/dev/shm to DISTCHECK_CONFIGURE_FLAGS">#1840</a></dt><dd>Add --with-test-dir=/dev/shm to DISTCHECK_CONFIGURE_FLAGS</dd></dl></div><p>
+</p>
+<h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Abhishek Singh (1):
+</p>
+<ul><li>filename in comment is corrected
+</li></ul><p>
+ 
+Ariel Barria (1):
+</p>
+<ul><li>Improve syslog message when configuration cannot be loaded
+</li></ul><p>
+ 
+Jakub Hrozek (44):
+</p>
+<ul><li>Bump version to 1.10dev
+</li><li>Require ar in configure.ac
+</li><li>TESTS: Fix a couple of debug-level setters
+</li><li>SYSDB: Remove unused macros
+</li><li>LDAP: Remove double break
+</li><li>Indentation fix
+</li><li>Bump the version and reset release back to 0
+</li><li>tests: add a unit test for sysdb_netgroup_base_dn
+</li><li>tests: unit test for test_sysdb_search_users
+</li><li>tests: adda a unit test for test_sysdb_search_groups
+</li><li>tests: test sysdb_initgroups
+</li><li>tests: add unit test for sysdb_get_new_id
+</li><li>tests: unit test for sysdb_remove_attrs
+</li><li>TOOLS: set domain in check_group_names
+</li><li>Fix code style
+</li><li>Don't use srcdir with tests
+</li><li>krb5: include backwards compatible declaration of krb5_trace_info
+</li><li>LDAP: Check for authtok validity
+</li><li>Filter out multicast addresses from IPA DNS updates
+</li><li>Lower the DEBUG level if an entry cannot be deleted from memcache
+</li><li>Fix the krb5 password expiration warning
+</li><li>Remove enumerate=true from man sssd-ldap
+</li><li>Do not process success case in an else
+</li><li>Revert "Add debug message to autofs client"
+</li><li>Don't treat 0 as default for pam_pwd_expiration warning
+</li><li>Remove unused functions
+</li><li>Use the correct memory context in be_req_create
+</li><li>Check the return value of sysdb_search_services
+</li><li>Detect the presence of libcmocka during configure
+</li><li>Add utility functions for tests that use sysdb or tevent.
+</li><li>Move sss_cmd_execute from client to responder code.
+</li><li>CMocka based test for the NSS responder
+</li><li>Retry the correct service on krb5 child timeout
+</li><li>Remove duplicate remake from bashrc_sssd
+</li><li>Provide a be_get_account_info_send function
+</li><li>Add unit tests for simple access test by groups
+</li><li>Do not compile main() in DP if UNIT_TESTING is defined
+</li><li>Resolve GIDs in the simple access provider
+</li><li>Return error code from ipa_subdom_store
+</li><li>Move signal.m4 from src/util to external
+</li><li>Document what does access_provider=ad do
+</li><li>Include config.h to build io.c on RHEL5
+</li><li>selinux: Remove unused parameter
+</li><li>Updating the translations for the 1.10 alpha release
+</li></ul><p>
+ 
+James Hogarth (1):
+</p>
+<ul><li>Make TTL configurable for dynamic dns updates
+</li></ul><p>
+ 
+Jan Cholasta (1):
+</p>
+<ul><li>LDAP: If deref search fails, try again without deref
+</li></ul><p>
+ 
+Jan Engelhardt (1):
+</p>
+<ul><li>sysdb: try dealing with binary-content attributes
+</li></ul><p>
+ 
+John Hodrien (1):
+</p>
+<ul><li>Correct sss_ssh_knowhostsproxy typo in man pages
+</li></ul><p>
+ 
+Kamil Dudka (1):
+</p>
+<ul><li>sssd-1.8.0: work around a bug in cov-build from Coverity
+</li></ul><p>
+ 
+Lukas Slebodnik (12):
+</p>
+<ul><li>Improved readability of get_next_domain()
+</li><li>Fixed typo in debug message.
+</li><li>Removing unused parameter type from sudosrv_get_sudorules_query_cache()
+</li><li>Reuse sss_open_cloexec at other places in code.
+</li><li>More generalized function open_debug_file_ex()
+</li><li>Removing unused header file providers.h
+</li><li>Fix sss_client breakage.
+</li><li>Removing unused declaration of functions and variable.
+</li><li>Making the ldb check configurable
+</li><li>Fixing duplicate const
+</li><li>Reusing create_pam_data() on the other places.
+</li><li>Making the authtok structure really opaque.
+</li></ul><p>
+ 
+Michal Zidek (15):
+</p>
+<ul><li>sss_debuglevel: Multiple arguments are treated as error.
+</li><li>Include talloc log in our debug facility
+</li><li>failover: Protect against empty host names
+</li><li>sss_cache: Call DEBUG_INIT sooner
+</li><li>tools: Respect use_fully_qualified_names
+</li><li>Possible null derefence in ipa_subdomains.c.
+</li><li>Unchecked return value in files.c
+</li><li>Use the same dbg level for all ncache hits.
+</li><li>Remove the alt_db_path parameter of sysdb_init
+</li><li>File descriptor leak in nss responder.
+</li><li>Debug message in sss_mc_create_file.
+</li><li>Move SELinux processing to provider.
+</li><li>Reuse cached SELinux mappings.
+</li><li>Make the SELinux refresh time configurable.
+</li><li>tests: Print warning if LDB_MODULES_PATH is not set
+</li></ul><p>
+ 
+Milan Cejnar (1):
+</p>
+<ul><li>tools: append new line to string from poptStrerror()
+</li></ul><p>
+ 
+Nathaniel <a class="missing wiki" href="https://docs.pagure.org/sssd-test2/McCallum.html" rel="nofollow">McCallum?</a> (1):
+</p>
+<ul><li>Add support for krb5 1.11's responder callback.
+</li></ul><p>
+ 
+Ondrej Kos (13):
+</p>
+<ul><li>MAN: quotation fix
+</li><li>Display more information on DB version mismatch
+</li><li>SYSDB: split sysdb_add_user
+</li><li>TESTS: Fix coverity issues 13126, 13127
+</li><li>TESTS: include error message on fail
+</li><li>Fix uninitialized time_t var in responder
+</li><li>krb5_child: fix value type and initialization
+</li><li>Fix initialization of multiple variables
+</li><li>Fix coverity issue 13136
+</li><li>Decrease krb5_auth_timeout default
+</li><li>Update README file
+</li><li>LDAP: Fix value initialization
+</li><li>Provide libnl3 support
+</li></ul><p>
+ 
+Paul B. Henson (1):
+</p>
+<ul><li>Add ignore_group_members option.
+</li></ul><p>
+ 
+Pavel Březina (25):
+</p>
+<ul><li>sudo: do not hardcode protocol version
+</li><li>fix -O3 variable may be uninitialized warnings
+</li><li>sudo: print message if old protocol is used
+</li><li>sudo manpage: clarify that sudoHost may contain wildcards and not regular expression
+</li><li>use talloc_zfree when freeing rhostent in resolver
+</li><li>set ret to EOK after for loop in sdap_sudo_purge_sudoers
+</li><li>Fix LDAP authentication - invalid password length
+</li><li>set struct bet_info-&gt;bet_type
+</li><li>krb: recreate ccache if it was deleted
+</li><li>dp: check whether hostid backend is configured before filing be request
+</li><li>get_next_domain() test dom-&gt;parent-&gt;next for NULL
+</li><li>subdomains: replace invalid characters with underscore in krb5 mapping file name
+</li><li>if selinux is disabled, ignore that selogin dir is missing
+</li><li>sdap_fill_memberships: continue if a member is not foud in sysdb
+</li><li>Add debug message to autofs client
+</li><li>autofs: fix invalid header 'number of entries' in packet
+</li><li>build: require libcmocka on fedora 18+
+</li><li>fix segfault in nss responder unit test
+</li><li>krb5-utils-tests: remove invalid condition
+</li><li>correct order in error_to_str table
+</li><li>do not leak memory on failure in *_process_init()
+</li><li>change responder contexts hierarchy
+</li><li>coding style fix
+</li><li>refactor nested group processing: add new code
+</li><li>refactor nested group processing: replace old code
+</li></ul><p>
+ 
+Simo Sorce (131):
+</p>
+<ul><li>Add helpers to set common mc record fields
+</li><li>Save errno before it might be modified.
+</li><li>Revert "Avoid accessing half-deallocated memory when using talloc_zfree macro."
+</li><li>Avoid duplicating macros
+</li><li>Avoid const warnings when deallocating memory
+</li><li>Fix tevent_req style for krb5_auth
+</li><li>Fix ipa_subdomain_id names and tevent_req style
+</li><li>Fix tevent_req style for get_netgroup in ipa_id
+</li><li>Streamline ipa_account_info handler
+</li><li>Use an entry type mask macro to filter entry types
+</li><li>Fix comment on wrong line
+</li><li>Remove redundant definition.
+</li><li>Fix tevent_req style for sdap_async_sudo.
+</li><li>Remove unhelpful vtable from sss_cache
+</li><li>Remove dead netgroup functions
+</li><li>Revert "Add a default section to a switch-statement"
+</li><li>Add sysdb_search_service() helper function
+</li><li>Use sysdb_search_service() for all svc queries
+</li><li>Fix sdap reinit.
+</li><li>Code can only check for cached passwords
+</li><li>Add function to safely wipe memory.
+</li><li>Add authtok utility functions.
+</li><li>Change pam data auth tokens.
+</li><li>Use new sysdb_search_service() in sss_cache
+</li><li>The Big sysdb/domain split-up!
+</li><li>Refactor sysdb initialization
+</li><li>Refactor single domain initialization
+</li><li>Remove the sysdb_ctx_get_domain() function.
+</li><li>Make sysdb_user_dn() require a domain explictly.
+</li><li>Make sysdb_group_dn() require a domain explictly.
+</li><li>Make sysdb_netgroup_dn() require a domain explictly.
+</li><li>Make sysdb_netgroup_base_dn() require a domain.
+</li><li>Make sysdb_domain_dn() require a domain.
+</li><li>Make sysdb_custom_dn() require a domain.
+</li><li>Make sysdb_custom_subtree_dn() require a domain.
+</li><li>Move range objects into their own top-level tree.
+</li><li>Upgrade DB and move ranges into top level object
+</li><li>Pass domain to sysdb_get&lt;pw/gr&gt;nam() functions
+</li><li>Pass domain to sysdb_get&lt;pwu/grg&gt;&lt;id() functions
+</li><li>Pass domain to sysdb_enum&lt;pw/gr&gt;ebt() functions
+</li><li>Add domain option to sysdb_get/netgr/attrs() fns
+</li><li>Add domain argument to sysdb_initgroups()
+</li><li>Add domain argument to sysdb_get_user_attr()
+</li><li>Add domain to sysdb_search_user_by_name()
+</li><li>Add domain to sysdb_search_user_by_uid()
+</li><li>Add domain to sysdb_search_group_by_name()
+</li><li>Add domain to sysdb_search_group_by_gid()
+</li><li>Add domain arg to sysdb_search_netgroup_by_name()
+</li><li>Add domain argument to sysdb_set_user_attr()
+</li><li>Add domain argument to sysdb_set_group_attr()
+</li><li>Add domain argument to sysdb_set_netgroup_attr()
+</li><li>Add domain argument to sysdb_get_new_id()
+</li><li>Add domain argument to sysdb_add_basic_user()
+</li><li>Add domain argument to sysdb_add_user()
+</li><li>Add domain arguments to sysdb_add_group functions.
+</li><li>Add domain arguments to sysdb_add_inetgroup fns.
+</li><li>Add domain argument to sysdb_store_user()
+</li><li>Add domain argument to sysdb_store_group()
+</li><li>Add domain arg to sysdb group member functions
+</li><li>Add domain argument to sysdb_cache_password()
+</li><li>Add domain argument to sysdb_cache_auth()
+</li><li>Add domain argument to sysdb_store_custom()
+</li><li>Add domain argument to sysdb_search_custom()
+</li><li>Add domain to sysdb_delete_custom
+</li><li>Add domain arg to sysdb_search_users()
+</li><li>Add domain argument to sysdb_delete_user()
+</li><li>Add domain argument to sysdb_search_groups()
+</li><li>Add domain argument to sysdb_delete_group()
+</li><li>Add domain arg to sysdb_search/delete_netgroup()
+</li><li>Add domain argument to sysdb_has/set_enumerated()
+</li><li>Add domain argument to sysdb_remove_attrs()
+</li><li>Add domain argument to sysdb_idmap_ funcitons
+</li><li>Add domain arguemnt to sysdb_get_real_name()
+</li><li>Add domain argument to sysdb autofs functions
+</li><li>Add domain argument to sysdb selinux functions
+</li><li>Add domain arguments to sysdb services functions
+</li><li>Add domain arguments to sysdb ssh functions
+</li><li>Add domain arguments to sysdb sudo functions
+</li><li>Add domain to some subdomain functions
+</li><li>Pass the domain to upgrade functions
+</li><li>Move mpg flag to the domain where it belongs
+</li><li>Kill sysdb-&gt;domain
+</li><li>Stop creating fake sysdb contexts
+</li><li>Tidy up BASE dn macros
+</li><li>Remove outdated code.
+</li><li>Move ldap provider access functions
+</li><li>Remove sysdb as a be context structure member
+</li><li>Remove sysdb as a be request structure member
+</li><li>Remove sysdb argument from ipa_host_info_send()
+</li><li>Remove unused structure
+</li><li>Remove sysdb argument from hbac_user_attrs_to_rule()
+</li><li>Remove sysdb arg from hbac_service_attrs_to_rule()
+</li><li>Remove sysdb arg from hbac_*host_attrs_to_rule()
+</li><li>Remove sysdb arg from ipa_hbac_service_info_send()
+</li><li>Remove sysdb arg from [ipa_]hbac_sysdb_save()
+</li><li>Remove sysdb argument from hbac_get_cached_rules()
+</li><li>Remove hbac_ctx_sysdb()
+</li><li>Remove hbac_ctx_be()
+</li><li>Remove hbac_ctx_ev()
+</li><li>Remove hbac_ctx_sdap_id_[ctx|op]()
+</li><li>Move hbac_ctx_is_offline()
+</li><li>Do not pass NULL to ipa_subdomain_retrieve()
+</li><li>Split simple_access_check function out
+</li><li>Pass domain not be_req to access check functions
+</li><li>Remove domain from be_req structure
+</li><li>Introduce be_req_terminate() helper
+</li><li>Add be_req_create() helper
+</li><li>Add be_req_get_be_ctx() helper.
+</li><li>Add be_req_get_data() helper funciton.
+</li><li>Make struct be_req opaque
+</li><li>Add realm info to sss_domain_info
+</li><li>Avoid sysdb_subdom in sysdb_get_subdomains()
+</li><li>Update main domain info in place
+</li><li>Refactor sysdb_master_domain_add_info()
+</li><li>Add sysdb_subdomain_store() function
+</li><li>Remove sysdb_subdom completely
+</li><li>Add function get_next_domain()
+</li><li>Add ability to disable domains
+</li><li>Change the way domains are linked.
+</li><li>Parent and subdomains use the same sysdb
+</li><li>Introduce IS_SUBDOMAIN() macro
+</li><li>krb5_child style fix
+</li><li>Refactor krb5 child
+</li><li>Add SSSD specific error codes and definitions
+</li><li>Use SSSD specific errors for offline auth
+</li><li>Return ERR_INTERNAL instead of EIO
+</li><li>Cleanup error message handling for krb5 child
+</li><li>Improve IS_SSSD_ERROR() macro
+</li><li>Use common error facility instead of sdap_result
+</li><li>Convert sdap_access to new error codes
+</li><li>ldap: Fallback option for rfc2307 schema
+</li></ul><p>
+ 
+Stephen Gallagher (10):
+</p>
+<ul><li>LDAP: Better debug logging when saving groups
+</li><li>Correct format security for talloc_named of auth tokens
+</li><li>Fix minor grammar error in log
+</li><li>NSS: Add original homedir to home directory template options
+</li><li>BUILD: Build shared components as an internal shared library
+</li><li>BUILD: Add contributed macros and aliases to simplify building
+</li><li>BUILD: Include build aliases in the tarball
+</li><li>BUILD: Fix cmocka detection
+</li><li>BUILD: Fix up whitespace in Makefile.am
+</li><li>BUILD: Always run distcheck and RPM tests in /dev/shm
+</li></ul><p>
+ 
+Sumit Bose (1):
+</p>
+<ul><li>Add a default section to a switch-statement
+</li></ul><p>
+ 
+Thorsten Scherf (1):
+</p>
+<ul><li>Updated Doxygen configuration to 1.8.1
+</li></ul></body></html>

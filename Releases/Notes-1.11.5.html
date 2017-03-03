@@ -1,0 +1,83 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<ul><li>This release focuses primarily on bug fixes.
+</li><li>The release addresses an issue where the SSSD was not able to detect all domains in the forest if it was connected to an AD DC which was not the forest root
+</li><li>A new AD sudo provider was introduced. Setting <tt>sudo_provider=ad</tt> uses the same connection options as <tt>id_provider=ad</tt>, which simplifies the configuration for users who store sudo rules on an Active Directory server.
+</li><li>The ID mapping ranges are checked for collisions before being used, making SSSD more robust in cases where the ranges would collide
+</li><li>Password changes when using OTPs with an IPA server are now supported. Please note that this functionality is not present in the released FreeIPA versions yet.
+</li><li>Several bugs related to setting an SELinux user context from an IPA server were fixed
+</li></ul><h2 id="DocumentationChanges">Documentation Changes</h2>
+<ul><li>A new pam_sss option <tt>ignore_unknown_user</tt> was added. Setting this option makes pam_sss return <tt>PAM_IGNORE</tt> when processing an uknown user instead of <tt>PAM_USER_UNKNOWN</tt>. This option is mostly useful for BSD systems.
+</li></ul><h2 id="TicketsFixed">Tickets Fixed</h2>
+<p>
+</p><div><dl class="wiki compact"><dt><a class="closed" href="/sssd/ticket/1955" title="SSSD pam module accepts usernames with leading spaces">#1955</a></dt><dd>SSSD pam module accepts usernames with leading spaces</dd><dt><a class="closed" href="/sssd/ticket/1958" title="[RFE] Expose the list of trusted domains to IPA">#1958</a></dt><dd>[RFE] Expose the list of trusted domains to IPA</dd><dt><a class="closed" href="/sssd/ticket/2153" title="If both IPA and LDAP are set up with enumeration on, two enum tasks are ...">#2153</a></dt><dd>If both IPA and LDAP are set up with enumeration on, two enum tasks are running</dd><dt><a class="closed" href="/sssd/ticket/2218" title="sssd.conf man pages don't list a configuration option.">#2218</a></dt><dd>sssd.conf man pages don't list a configuration option.</dd><dt><a class="closed" href="/sssd/ticket/2226" title="Make SSSD compilable on systems with non-standard paths to krb5 includes">#2226</a></dt><dd>Make SSSD compilable on systems with non-standard paths to krb5 includes</dd><dt><a class="closed" href="/sssd/ticket/2232" title="[freebsd] pam_sss: add ignore_unknown_user option">#2232</a></dt><dd>[freebsd] pam_sss: add ignore_unknown_user option</dd><dt><a class="closed" href="/sssd/ticket/2235" title="MAN: Remove misleading memberof example from ldap_access_filter example">#2235</a></dt><dd>MAN: Remove misleading memberof example from ldap_access_filter example</dd><dt><a class="closed" href="/sssd/ticket/2251" title="not retrieving homedirs of AD users with posix attributes">#2251</a></dt><dd>not retrieving homedirs of AD users with posix attributes</dd><dt><a class="closed" href="/sssd/ticket/2252" title="Document that `sssd` cache needs to be cleared manually, if ID mapping ...">#2252</a></dt><dd>Document that `sssd` cache needs to be cleared manually, if ID mapping configuration changes</dd><dt><a class="closed" href="/sssd/ticket/2253" title="Check IPA idranges before saving them to the cache">#2253</a></dt><dd>Check IPA idranges before saving them to the cache</dd><dt><a class="closed" href="/sssd/ticket/2256" title="Evaluate usage of sudo LDAP provider together with the AD provider">#2256</a></dt><dd>Evaluate usage of sudo LDAP provider together with the AD provider</dd><dt><a class="closed" href="/sssd/ticket/2257" title="Setting int option to 0 yields the default value">#2257</a></dt><dd>Setting int option to 0 yields the default value</dd><dt><a class="closed" href="/sssd/ticket/2263" title="ipa-server-mode: Use lower-case user name component in home dir path">#2263</a></dt><dd>ipa-server-mode: Use lower-case user name component in home dir path</dd><dt><a class="closed" href="/sssd/ticket/2264" title="SSSD Does not cache SELinux map from FreeIPA correctly">#2264</a></dt><dd>SSSD Does not cache SELinux map from FreeIPA correctly</dd><dt><a class="closed" href="/sssd/ticket/2270" title="IPA SELinux code looks for the host in the wrong sysdb subdir when a ...">#2270</a></dt><dd>IPA SELinux code looks for the host in the wrong sysdb subdir when a trusted user logs in</dd><dt><a class="closed" href="/sssd/ticket/2271" title="sssd fails to handle expired passwords when OTP is used">#2271</a></dt><dd>sssd fails to handle expired passwords when OTP is used</dd><dt><a class="closed" href="/sssd/ticket/2279" title="Add another Kerberos error code to trigger IPA password migration">#2279</a></dt><dd>Add another Kerberos error code to trigger IPA password migration</dd><dt><a class="closed" href="/sssd/ticket/2280" title="Double OK when starting the service">#2280</a></dt><dd>Double OK when starting the service</dd><dt><a class="closed" href="/sssd/ticket/2282" title="SSSD should create the SELinux mapping file with format expected by ...">#2282</a></dt><dd>SSSD should create the SELinux mapping file with format expected by pam_selinux</dd><dt><a class="closed" href="/sssd/ticket/2284" title="Valgrind: Invalid read of int while processing netgroup">#2284</a></dt><dd>Valgrind: Invalid read of int while processing netgroup</dd><dt><a class="closed" href="/sssd/ticket/2285" title="other subdomains are unavailable when joined to a subdomain in the ad ...">#2285</a></dt><dd>other subdomains are unavailable when joined to a subdomain in the ad forest</dd><dt><a class="closed" href="/sssd/ticket/2289" title="Error during password change">#2289</a></dt><dd>Error during password change</dd><dt><a class="closed" href="/sssd/ticket/2293" title="configure time variables not expanded when running ./configure">#2293</a></dt><dd>configure time variables not expanded when running ./configure</dd><dt><a class="closed" href="/sssd/ticket/2300" title="RHEL7 IPA selinuxusermap hbac rule not always matching">#2300</a></dt><dd>RHEL7 IPA selinuxusermap hbac rule not always matching</dd></dl></div><p>
+</p>
+<h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Alexey Shabalin (1):
+</p>
+<ul><li>Use KRB5_CFLAGS where appropriate
+</li></ul><p>
+Jakub Hrozek (16):
+</p>
+<ul><li>Updating the version for the 1.11.5 release
+</li><li>IPA: Don't call tevent_req_post outside _send
+</li><li>IPA: Don't fail if apply_subdomain_homedir returns ENOENT
+</li><li>OPTS: Allow using defaults for blobs
+</li><li>DP: Provide separate dp_copy_defaults function
+</li><li>MAN: Clarify the ldap_access_filter option further
+</li><li>MAN: Clarify that changing ID mapping options might require purging the cache
+</li><li>IPA: Do not save intermediate data to sysdb
+</li><li>AD: Only connect to GC for subdomain users
+</li><li>MAN: Clarify the GC support a bit
+</li><li>IPA: Use the correct domain when processing SELinux rules
+</li><li>IPA: Write SELinux usernames in the right case
+</li><li>KRB5: Do not attempt to get a TGT after a password change using OTP
+</li><li>AD: connect to forest root when downloading the list of subdomains
+</li><li>IPA: Fix SELinux mapping order memory hierarchy
+</li><li>Updating the translations for the 1.11.5 release
+</li></ul><p>
+Lukas Slebodnik (10):
+</p>
+<ul><li>SPEC: Use systemd on available platforms
+</li><li>LDAP: Setup periodic task only once.
+</li><li>UTIL: Sanitize whitespaces.
+</li><li>DOC: Fix names of arguments in doxygen comments
+</li><li>AD: Continue if sssd failes to check extra members
+</li><li>SYSV: Do not call functions success and fail itself
+</li><li>IPA: Use function sysdb_attrs_get_el in safe way
+</li><li>Makefile: Add missing library to the dp_opt_tests
+</li><li>TESTS: Link libsss_test_common with tevent
+</li><li>Makefile: Use alternative method to replace *bindir
+</li></ul><p>
+Michal Zidek (1):
+</p>
+<ul><li>Possible null dereference in SELinux code
+</li></ul><p>
+Nathaniel McCallum (1):
+</p>
+<ul><li>Fix krb5 changepw when FAST-only preauth methods are used (like OTP)
+</li></ul><p>
+Pete Fritchman (1):
+</p>
+<ul><li>PAM: add ignore_unknown_user option
+</li></ul><p>
+Stef Walter (1):
+</p>
+<ul><li>providers: Fix types passed to dbus varargs functions
+</li></ul><p>
+Sumit Bose (13):
+</p>
+<ul><li>IDMAP: add sss_idmap_check_collision(_ex)
+</li><li>IPA: refactor idmap code and add test
+</li><li>IPA: check ranges for collisions before saving them
+</li><li>libsss_idmap: bump version-info
+</li><li>config API: add missing subdomain target to AD provider test
+</li><li>SUDO: AD provider
+</li><li>ipa-server-mode: use lower-case user name for home dir
+</li><li>IPA: Use GC for AD initgroup requests
+</li><li>IPA/KRB5: handle KRB5_PROG_ETYPE_NOSUPP during IPA password migration
+</li><li>krb5_child: remove unused option lifetime_str from k5c_setup_fast()
+</li><li>krb5-child: extract lifetime settings into set_lifetime_options()
+</li><li>krb5_client: rename krb5_set_canonicalize() to set_canonicalize_option()
+</li><li>krb5-child: add revert_changepw_options()
+</li></ul></body></html>

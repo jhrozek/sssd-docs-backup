@@ -1,0 +1,74 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><p>
+</p><div class="wiki-toc">
+<ol>
+  <li>
+    <ol>
+      <li>
+        <a href="#Highlights">Highlights</a>
+      </li>
+      <li>
+        <a href="#TicketsFixed">Tickets Fixed</a>
+      </li>
+      <li>
+        <a href="#DetailedChangelog">Detailed Changelog</a>
+      </li>
+    </ol>
+  </li>
+</ol>
+</div><p>
+</p>
+<h2 id="Highlights">Highlights</h2>
+<ul><li>Fix a bug causing AD servers not to fail over properly when the KDC on the primary server is down
+</li><li>Fix an endianness bug on big-endian systems when looking up services
+</li><li>Fix a segfault dealing with nested groups
+</li><li>Make the nowait cache updates work for netgroups
+</li><li>Fix a regression that broke domains with <tt>use_fully_qualified_names = True</tt>
+</li></ul><h2 id="TicketsFixed">Tickets Fixed</h2>
+<p>
+</p><div><dl class="wiki compact"><dt><a class="closed" href="/sssd/ticket/1206" title="RHEL5 detection in sssd.spec.in does not work">#1206</a></dt><dd>RHEL5 detection in sssd.spec.in does not work</dd><dt><a class="closed" href="/sssd/ticket/1321" title="Warning in debug log about nscd">#1321</a></dt><dd>Warning in debug log about nscd</dd><dt><a class="closed" href="/sssd/ticket/1322" title="Special-case LDAP_SIZELIMIT_EXCEEDED when handling ldap return codes">#1322</a></dt><dd>Special-case LDAP_SIZELIMIT_EXCEEDED when handling ldap return codes</dd><dt><a class="closed" href="/sssd/ticket/1324" title="LDAP provider needs to use all available servers for GSSAPI if the child ...">#1324</a></dt><dd>LDAP provider needs to use all available servers for GSSAPI if the child times out</dd><dt><a class="closed" href="/sssd/ticket/1325" title="heimdal:  configure: Kerberos locator plugin cannot be build">#1325</a></dt><dd>heimdal:  configure: Kerberos locator plugin cannot be build</dd><dt><a class="closed" href="/sssd/ticket/1329" title="Group enumeration fails in proxy provider">#1329</a></dt><dd>Group enumeration fails in proxy provider</dd><dt><a class="closed" href="/sssd/ticket/1333" title="Potential NULL dereference in proxy provider">#1333</a></dt><dd>Potential NULL dereference in proxy provider</dd><dt><a class="closed" href="/sssd/ticket/1335" title="sss_groupadd no longer detects duplicate GID numbers">#1335</a></dt><dd>sss_groupadd no longer detects duplicate GID numbers</dd><dt><a class="closed" href="/sssd/ticket/1338" title="sssd does not provide maps for automounter when custom schema is being ...">#1338</a></dt><dd>sssd does not provide maps for automounter when custom schema is being used</dd><dt><a class="closed" href="/sssd/ticket/1340" title="SSSD netgroups do not honor entry_cache_nowait_percentage">#1340</a></dt><dd>SSSD netgroups do not honor entry_cache_nowait_percentage</dd><dt><a class="closed" href="/sssd/ticket/1343" title="sssd_be crashed with SIGSEGV in _tevent_schedule_immediate()">#1343</a></dt><dd>sssd_be crashed with SIGSEGV in _tevent_schedule_immediate()</dd><dt><a class="closed" href="/sssd/ticket/1344" title="Loading of selinux user maps broken">#1344</a></dt><dd>Loading of selinux user maps broken</dd><dt><a class="closed" href="/sssd/ticket/1348" title="Service lookups by port number doesn't work on s390x/ppc64 arches">#1348</a></dt><dd>Service lookups by port number doesn't work on s390x/ppc64 arches</dd></dl></div><p>
+</p>
+<h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Ariel Barria (2):
+</p>
+<ul><li>Potential NULL dereference in proxy provider
+</li><li>Warn to syslog when dereference requests fail
+</li></ul><p>
+Jakub Hrozek (11):
+</p>
+<ul><li>Special-case LDAP_SIZELIMIT_EXCEEDED
+</li><li>Kerberos locator: Include the correct krb5.h header file
+</li><li>krb5 locator: Do not leak addrinfo
+</li><li>Try all KDCs when getting TGT for LDAP
+</li><li>Send the correct enumeration request
+</li><li>SYSDB: Handle user and group renames better
+</li><li>Use the sysdb attribute name, not LDAP attribute name
+</li><li>LDAP nested groups: Do not process callback with _post deep in the nested structure
+</li><li>Use sized_string correctly in FQDN domains
+</li><li>Send 16bit protocol numbers from the sss_client
+</li><li>Revert the client packet length, too, after reverting the packet protocol
+</li></ul><p>
+Jan Engelhardt (1):
+</p>
+<ul><li>build: resolve link failure
+</li></ul><p>
+Jan Zeleny (1):
+</p>
+<ul><li>Fixed issue in SELinux user maps
+</li></ul><p>
+Stef Walter (3):
+</p>
+<ul><li>Limit krb5_get_init_creds_keytab() to etypes in keytab
+</li><li>If canon'ing principals, write ccache with updated default principal
+</li><li>Remove erroneous failure message in find_principal_in_keytab
+</li></ul><p>
+Stephen Gallagher (7):
+</p>
+<ul><li>Bump version to 1.8.4
+</li><li>murmurhash: Relax inline requirement
+</li><li>RPM: Allow running 'make rpms' on RHEL 5 machines
+</li><li>NSS: Expire in-memory netgroup cache before the nowait timeout
+</li><li>KRB5: Avoid NULL-dereference with empty keytab
+</li><li>NSS: Restore original protocol for getservbyport
+</li><li>Updating translations for 1.8.4 release
+</li></ul></body></html>

@@ -1,0 +1,122 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<ul><li>This release contains bugfixes since the 0.99.0 release.
+</li></ul><h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+David O'Brien (1):
+</p>
+<ul><li>Copy-edit sssd-ipa man page
+</li></ul><p>
+Dmitri Pal (5):
+</p>
+<ul><li>COMMON Improvements to the trace macro
+</li><li>COLLECTION Create reference to the top level collection
+</li><li>COLLECTION: Cleaning FIXME comments
+</li><li>INI: Cleaning FIXME comments.
+</li><li>INI Correcting build warnings.
+</li></ul><p>
+Fabian Affolter (1):
+</p>
+<ul><li>Add German translation
+</li></ul><p>
+Göran Uddeborg (2):
+</p>
+<ul><li>Add Swedish translation for sss_client
+</li><li>Add Swedish translation for SSSD server
+</li></ul><p>
+Jakub Hrozek (13):
+</p>
+<ul><li>Warn visibly about permission problems with the config file
+</li><li>Better error message when there is no local domain configured
+</li><li>Setup ldap child logging from IPA backend
+</li><li>Check the services started against a list of known services
+</li><li>Handle spaces in config parser
+</li><li>Fail on nonexistent input file
+</li><li>Do not start with provider=files
+</li><li>Reduce code duplication between LDAP child and Kerberos child
+</li><li>Change ares usage to be c-ares 1.7.0 compatible
+</li><li>Import ares 1.7.0 helpers
+</li><li>Don't build the SRV and TXT parsing code except for tests
+</li><li>Document the failover feature in manpages
+</li><li>Consolidate code for splitting strings by separator
+</li></ul><p>
+Martin Nagy (3):
+</p>
+<ul><li>Fix egg-info file generation in the spec file
+</li><li>Add some debugging statements to fail_over and resolver
+</li><li>Correctly restart server status after the timeout
+</li></ul><p>
+Simo Sorce (17):
+</p>
+<ul><li>Fix tabs
+</li><li>Fix memberof plugin
+</li><li>Compute and save memberuid in cache as well
+</li><li>Use memberuid and not member in group enumerations
+</li><li>Use the custom password field in groups too.
+</li><li>Resolve nested groups also when rfc2307bis is used
+</li><li>Make strdn build functions more available
+</li><li>Fix nested group memberships
+</li><li>Allow nesting to fix <a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/310" title="defect: sssd_be segfaults because of tevent_loop_once nesting (closed: fixed)">#310</a>
+</li><li>Fix bug <a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/311" title="defect: Segfault shutting down SSSD (closed: fixed)">#311</a>, properly set callback attribute
+</li><li>Change dhash API to be talloc-friendly
+</li><li>dhash: Add private pointer for delete callback
+</li><li>Add comments to document latest changes
+</li><li>Add rebuild task to memberof plugin
+</li><li>Handle the special 02 upgrade case for 04-&gt;05
+</li><li>Fix for <a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/316" title="defect: Native LDAP Backend - Group Memberships Not Returned (closed: fixed)">#316</a>
+</li><li>Fix for <a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/322" title="defect: DB Upgrades from 0.5.0 does not work correctly (closed: fixed)">#322</a>, update from old database versions.
+</li></ul><p>
+Stephen Gallagher (28):
+</p>
+<ul><li>Remove ELAPI from build and tarball
+</li><li>Stop configuring ELAPI
+</li><li>Make debug log timestamps human-readable
+</li><li>Raise debug log level for LDB_DEBUG_WARNING
+</li><li>Add allocation error check
+</li><li>Avoid returning uninitialized result.
+</li><li>Fix potential uninitialized value errors in nsssrv_cmd.c
+</li><li>Fix potential uninitialized value error in responder_dp.c
+</li><li>SSSDDomain.remove_provider() requires only the provider type
+</li><li>Make SSSDDomain.remove_provider() remove configured options
+</li><li>Run dhash tests
+</li><li>Add SSSDDomain.set_name() function to SSSDConfig API
+</li><li>Reduce the verbosity of the SSSDConfigTest
+</li><li>Fix broken SSSDChangeConf.set() function
+</li><li>Fix SSSDConfig API bugs around [de-]activation of domains
+</li><li>Fix RPM spec for RHEL6
+</li><li>SSSDConfig API: fix deactivate_domain()
+</li><li>SSSDConfig.get_domain() should properly detect active state
+</li><li>Ensure that list_active_domains returns the real value
+</li><li>Properly deny id_provider=files
+</li><li>Add missing options to sssd-ipa configuraion
+</li><li>Add missing SSSDConfig file for IPA for make install
+</li><li>Fix processing of Boolean values in SSSDConfig
+</li><li>Add 'permit' and 'deny' access providers to SSSDConfig API
+</li><li>Remove default for ldap_use_start_tls in IPA providers
+</li><li>Run SSSDConfig tests during 'make check'
+</li><li>Fix stupid copy-paste error
+</li><li>Updating to version 0.99.1
+</li></ul><p>
+Sumit Bose (13):
+</p>
+<ul><li>Do not include libsss_ipa.la in rpm package
+</li><li>Immediately return a krb5 change password request when offline
+</li><li>Check LDAP structure before calling ldap_unbind_ext()
+</li><li>Add sysdb_search_custom request
+</li><li>Do not treat missing proc files as errors.
+</li><li>Add basic OS detection
+</li><li>Make packaging of *.egg-info files more flexible
+</li><li>Try to renew Kerberos credentials
+</li><li>Add checks to test the memberuid handling
+</li><li>Add offline support for ipa_access
+</li><li>Add dummy credentials to an empty ccache file
+</li><li>Always update sysdb to the latest version
+</li><li>Fix DEBUG message for sysdb_init
+</li></ul><p>
+beckerde (1):
+</p>
+<ul><li>Add Spanish translation
+</li></ul><p>
+ruigo (1):
+</p>
+<ul><li>Add Portuguese translation
+</li></ul></body></html>

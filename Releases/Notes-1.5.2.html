@@ -1,0 +1,61 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<ul><li>Fixes for support of FreeIPA v2
+</li><li>Fixes for failover if DNS entries change
+</li><li>Improved sss_obfuscate tool with better interactive mode
+</li><li>Fix several crash bugs
+</li><li>Don't attempt to use START_TLS over SSL. Some LDAP servers can't handle this
+</li><li>Delete users from the local cache if initgroups calls return 'no such user' (previously only worked for getpwnam/getpwuid)
+</li><li>Use new Transifex.net translations
+</li><li>Better support for automatic TGT renewal (now survives restart)
+</li><li>Netgroup fixes
+</li></ul><h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Gowrishankar Rajaiyan (2):
+</p>
+<ul><li>removing password option functionality
+</li><li>updating sss_obfuscate man page accordingly
+</li></ul><p>
+Jakub Hrozek (6):
+</p>
+<ul><li>Use realm for basedn instead of IPA domain
+</li><li>Reset server status after timeout
+</li><li>Prevent segfault in failover code
+</li><li>Always expire host name resolution
+</li><li>Run callbacks if server IP changes
+</li><li>Mention Samba libraries URLs in BUILD.txt
+</li></ul><p>
+Simo Sorce (1):
+</p>
+<ul><li>Check that the socket is really ours before attempting to close it.
+</li></ul><p>
+Stephen Gallagher (16):
+</p>
+<ul><li>Update version to 1.5.2dev
+</li><li>Sanitize search filters for nested group lookups
+</li><li>Make the domain argument mandatory in sss_obfuscate
+</li><li>Gracefully handle permission errors in sss_obfuscate
+</li><li>Make SSSDConfig API configuration readable
+</li><li>Only print "no matching service rule" when appropriate
+</li><li>Verify LDAP file descriptor validity
+</li><li>Do not attempt to use START_TLS on SSL connections
+</li><li>Point the IPA provider at the compat tree for netgroups
+</li><li>Remove cached user entry if initgroups returns ENOENT
+</li><li>Perform initgroups lookups for all domains
+</li><li>IPA provider: remove deleted groups during initgroups()
+</li><li>Allow krb5_realm to override ipa_domain
+</li><li>Add krb5_realm to the basic IPA options
+</li><li>Fix uninitialized value error in ipa_get_id_options()
+</li><li>Updating translations for 1.5.2 release
+</li></ul><p>
+Sumit Bose (9):
+</p>
+<ul><li>Fix for generating lists of translated man pages
+</li><li>Remove renewal item if it is not re-added
+</li><li>Check ccache file for renewable TGTs at startup
+</li><li>Do not try to delete sysbd memberOf attribute
+</li><li>Fixes for dynamic DNS update
+</li><li>Add missing name to struct getent_ctx for missing netgroup
+</li><li>Refactor set_netgroup_entry()
+</li><li>Change state of hash entry if netgroup cannot be parsed
+</li><li>Release handle if not connected
+</li></ul></body></html>

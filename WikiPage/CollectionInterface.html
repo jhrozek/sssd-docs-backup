@@ -1,0 +1,28 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h1 id="CollectionInterface">Collection Interface</h1>
+<p>
+Under the hood a lot of the functionality of the <a class="wiki" href="https://docs.pagure.org/sssd-test2/WikiPage/ELAPIInterface.html">ELAPI</a> and <a class="wiki" href="https://docs.pagure.org/sssd-test2/WikiPage/INIInterface.html">INI</a> is built around the collection interface.
+</p>
+<p>
+The collection is a list of the key-value pairs. The collections are used in many different ways in <a class="wiki" href="https://docs.pagure.org/sssd-test2/WikiPage/ELAPIInterface.html">ELAPI</a> and <a class="wiki" href="https://docs.pagure.org/sssd-test2/WikiPage/INIInterface.html">INI</a>.
+The ELAPI events and templates are collections. The set of targets in dispatcher is also implemented as a “collection”. <br />
+The content of the configuration file is also stored in the hierarchical collection inside INI object. 
+</p>
+<p>
+The collection interface allows:
+</p>
+<ul><li>creating collections
+</li><li>adding properties (key – value pairs) to collections
+</li><li>deleting properties
+</li><li>updating properties
+</li><li>nesting collections
+</li><li>serializing collections (to text, to XML, to binary blob like RADIUS uses)
+</li><li>traversing collections (including nesting)
+</li><li>searching collections 
+</li><li>checking that property is in the collection 
+</li><li>getting property value from the collection 
+</li><li>copying collections
+</li><li>...
+</li></ul><p>
+The collections are implemented as light weight link lists. The collections can be easily used as a robust implementation of “set” or “bag” object. Collection also provides implementation of "stack" and "queue" objects. Collection uses hashing to optimize search but it should be noted that it is not as robust as a hash table.  When there are not many items (hundreds not thousands) and they are well distinguished by name the “collection” interface is a good choice. Anyone is welcome to use this interface. For bigger and more complex situations consider using other types of the primitives (hash tables, dictionaries, trees etc.).
+</p>
+</body></html>

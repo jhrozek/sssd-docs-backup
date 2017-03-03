@@ -1,0 +1,317 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><p>
+</p><div class="wiki-toc">
+<ol>
+  <li>
+    <ol>
+      <li>
+        <a href="#Synopsis">Synopsis</a>
+      </li>
+      <li>
+        <a href="#SettingOpenLDAP">Setting OpenLDAP</a>
+        <ol>
+          <li>
+            <a href="#InstallingOpenLDAPpackages">Installing OpenLDAP packages</a>
+          </li>
+          <li>
+            <a href="#StartLDAPservercalling">Start LDAP server calling</a>
+          </li>
+          <li>
+            <a href="#Loadsomebasisschemas">Load some basis schemas</a>
+          </li>
+          <li>
+            <a href="#Definingserverback-end">Defining server back-end</a>
+          </li>
+          <li>
+            <a href="#Definingserverfront-end">Defining server front-end</a>
+          </li>
+          <li>
+            <a href="#Quicktest">Quick test</a>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <a href="#Paswordpolicyppolicy">Pasword policy (ppolicy)</a>
+        <ol>
+          <li>
+            <a href="#Loadingppolicyschema">Loading ppolicy schema</a>
+          </li>
+          <li>
+            <a href="#Loadingppolicymodule">Loading ppolicy module</a>
+          </li>
+          <li>
+            <a href="#Loadingppolicyoverlay">Loading ppolicy overlay</a>
+          </li>
+          <li>
+            <a href="#Settingdefaultppolicysettings">Setting default ppolicy settings</a>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <a href="#SSHkeysinopenldap">SSH keys in openldap</a>
+      </li>
+      <li>
+        <a href="#MISC">MISC</a>
+        <ol>
+          <li>
+            <a href="#Permanentlylockuseraccount">Permanently lock user account</a>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <a href="#Sources">Sources</a>
+      </li>
+    </ol>
+  </li>
+</ol>
+</div><p>
+</p>
+<h2 id="Synopsis">Synopsis</h2>
+<p>
+This page describes how to configure OpenLDAP with enabled password policy and added support for user's SSH keys on Fedora. Main purpose for creating such an environment is mainly for testing SSSD. This guide is a work in progress.
+</p>
+<h2 id="SettingOpenLDAP">Setting OpenLDAP</h2>
+<p>
+This is part is heavily based on article <a class="ext-link" href="https://help.ubuntu.com/10.04/serverguide/openldap-server.html"><span class="icon">​</span>OpenLDAP</a>, so please see it for more details.
+</p>
+<h3 id="InstallingOpenLDAPpackages">Installing OpenLDAP packages</h3>
+<p>
+Package openldap-clients useful command-line utilities such as ldapadd, ldapsearch, ldapmodify, etc., package openldap-servers contains schemas.
+</p>
+<div class="code"><pre>dnf install openldap openldap-clients openldap-servers
+</pre></div><h3 id="StartLDAPservercalling">Start LDAP server calling</h3>
+<p>
+To start with OpenLDAP configuration, server must be running.
+</p>
+<div class="code"><pre>systemctl start slapd
+</pre></div><h3 id="Loadsomebasisschemas">Load some basis schemas</h3>
+<div class="code"><pre>ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/cosine.ldif
+ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap//schema/nis.ldif
+ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/inetorgperson.ldif
+</pre></div><h3 id="Definingserverback-end">Defining server back-end</h3>
+<p>
+<em>backend.example.com.ldif</em> describes basic properties of server backend. Please note the  <em>olcRootPW</em> which holds administrator's password. 
+</p>
+<div class="code"><pre>cat <span class="s">&lt;&lt;EOF &gt;backend.example.com.ldif
+# Load dynamic backend modules
+dn: cn=module,cn=config
+objectClass: olcModuleList
+cn: module
+olcModulepath: /usr/lib/ldap
+olcModuleload: back_hdb
+
+# Database settings
+dn: olcDatabase=hdb,cn=config
+objectClass: olcDatabaseConfig
+objectClass: olcHdbConfig
+olcDatabase: {1}hdb
+olcSuffix: dc=example,dc=com
+olcDbDirectory: /var/lib/ldap
+olcRootDN: cn=admin,dc=example,dc=com
+olcRootPW: aaa
+olcDbConfig: set_cachesize 0 2097152 0
+olcDbConfig: set_lk_max_objects 1500
+olcDbConfig: set_lk_max_locks 1500
+olcDbConfig: set_lk_max_lockers 1500
+olcDbIndex: objectClass eq
+olcLastMod: TRUE
+olcDbCheckpoint: 512 30
+olcAccess: to attrs=userPassword by dn="cn=admin,dc=example,dc=com" write by anonymous auth by self write by * none
+olcAccess: to attrs=shadowLastChange by self write by * read
+olcAccess: to dn.base="" by * read
+olcAccess: to * by dn="cn=admin,dc=example,dc=com" write by * read
+EOF</span>
+</pre></div><p>
+Add LDIF file to the LDAP.
+</p>
+<div class="code"><pre>ldapadd -Y EXTERNAL -H ldapi:/// -f backend.example.com.ldif
+</pre></div><h3 id="Definingserverfront-end">Defining server front-end</h3>
+<p>
+This LDIF file populates LDAP server with users <em>admin</em> and <em>John</em> and also add group <em>example</em>. Again - please note the attributes setting passwords.
+</p>
+<div class="code"><pre>cat <span class="s">&lt;&lt;EOF &gt;frontend.example.com.ldif
+# Create top-level object in domain
+dn: dc=example,dc=com
+objectClass: top
+objectClass: dcObject
+objectclass: organization
+o: Example Organization
+dc: Example
+description: LDAP Example
+
+# Admin user.
+dn: cn=admin,dc=example,dc=com
+objectClass: simpleSecurityObject
+objectClass: organizationalRole
+cn: admin
+description: LDAP administrator
+userPassword: aaa
+
+dn: ou=people,dc=example,dc=com
+objectClass: organizationalUnit
+ou: people
+
+dn: ou=groups,dc=example,dc=com
+objectClass: organizationalUnit
+ou: groups
+
+dn: uid=john,ou=people,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: john
+sn: Doe
+givenName: John
+cn: John Doe
+displayName: John Doe
+uidNumber: 1000
+gidNumber: 10000
+userPassword: password
+gecos: John Doe
+loginShell: /bin/bash
+homeDirectory: /home/john
+shadowExpire: -1
+shadowFlag: 0
+shadowWarning: 7
+shadowMin: 8
+shadowMax: 999999
+shadowLastChange: 10877
+mail: john.doe@example.com
+postalCode: 31000
+l: Toulouse
+o: Example
+mobile: +33 (0)6 xx xx xx xx
+homePhone: +33 (0)5 xx xx xx xx
+title: System Administrator
+postalAddress:
+initials: JD
+
+dn: cn=example,ou=groups,dc=example,dc=com
+objectClass: posixGroup
+cn: example
+gidNumber: 10000
+EOF</span>
+</pre></div><p>
+Add LDIF file to the LDAP.
+</p>
+<div class="code"><pre>ldapadd -x -D <span class="nv">cn</span><span class="o">=</span>admin,dc<span class="o">=</span>example,dc<span class="o">=</span>com -W -f frontend.example.com.ldif
+</pre></div><h3 id="Quicktest">Quick test</h3>
+<div class="code"><pre>ldapsearch -xLLL -b <span class="s2">"dc=example,dc=com"</span> <span class="nv">uid</span><span class="o">=</span>john sn givenName cn
+</pre></div><h2 id="Paswordpolicyppolicy">Pasword policy (ppolicy)</h2>
+<p>
+This section heavily draws from this how-to <a class="ext-link" href="http://www.flagword.net/2013/02/openldap-with-tls-ppolicy-and-master-master-replication-on-rhel6-3/comment-page-1/"><span class="icon">​</span>ppolicy</a>.
+</p>
+<h3 id="Loadingppolicyschema">Loading ppolicy schema</h3>
+<p>
+Load schema describing ppolicy attributes.
+</p>
+<div class="code"><pre>ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/ppolicy.ldif
+</pre></div><h3 id="Loadingppolicymodule">Loading ppolicy module</h3>
+<div class="code"><pre><span class="c">#load ppolicy module
+</span>cat <span class="s">&lt;&lt;EOF &gt;ppolicy_module.ldif
+dn: cn=module,cn=config
+objectClass: olcModuleList
+cn: module
+olcModuleLoad: ppolicy.la
+olcModulePath: /usr/lib64/openldap
+EOF</span>
+</pre></div><p>
+Add LDIF file.
+</p>
+<div class="code"><pre>ldapadd -Y EXTERNAL -H ldapi:/// -f ppolicy_module.ldif
+</pre></div><p>
+Restart LDAP server.
+</p>
+<div class="code"><pre><span class="c">#restart ldap
+</span>systemctl restart slapd
+</pre></div><h3 id="Loadingppolicyoverlay">Loading ppolicy overlay</h3>
+<p>
+Please note the <em>olcPPolicyDefault</em> attribute which holds a DN to a default ppolicy entry.
+</p>
+<div class="code"><pre><span class="c">#Add PPolicy Overlay:
+</span>cat <span class="s">&lt;&lt;EOF &gt;ppolicy-overlay.ldif
+dn: olcOverlay=ppolicy,olcDatabase={3}hdb,cn=config
+objectClass: olcPPolicyConfig
+olcOverlay: ppolicy
+olcPPolicyDefault: cn=ppolicy,ou=policies,dc=example,dc=com
+olcPPolicyUseLockout: TRUE
+olcPPolicyHashCleartext: TRUE
+EOF</span>
+</pre></div><p>
+Add LDIF file.
+</p>
+<div class="code"><pre>ldapadd -Y EXTERNAL -H ldapi:/// -f ./ppolicy-overlay.ldif
+</pre></div><h3 id="Settingdefaultppolicysettings">Setting default ppolicy settings</h3>
+<div class="code"><pre><span class="c"># create default policy
+</span>cat <span class="s">&lt;&lt;EOF &gt;default_ppolicy.ldif
+dn: ou=policies,dc=example,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: policies
+
+dn: cn=ppolicy,ou=policies,dc=example,dc=com
+objectClass: top
+objectClass: device
+objectClass: pwdPolicyChecker
+objectClass: pwdPolicy
+cn: ppolicy
+pwdAttribute: userPassword
+pwdInHistory: 8
+pwdMinLength: 8
+pwdMaxFailure: 3
+pwdFailureCountInterval: 1800
+pwdCheckQuality: 0
+pwdMustChange: TRUE
+pwdGraceAuthNLimit: 0
+pwdMaxAge: 7776000
+pwdExpireWarning: 1209600
+pwdLockoutDuration: 900
+pwdLockout: TRUE
+EOF</span>
+</pre></div><p>
+Add LDIF file.
+</p>
+<div class="code"><pre>ldapadd -x -D <span class="s1">'cn=admin,dc=example,dc=com'</span> -W -H ldapi:/// -f ./default_ppolicy.ldif
+</pre></div><h2 id="SSHkeysinopenldap">SSH keys in openldap</h2>
+<p>
+This section describes how to add SSH keys to user entries. LDIF listing bellow is a converted schema file that can be found at <a class="ext-link" href="https://code.google.com/p/openssh-lpk/"><span class="icon">​</span>openssh-lpk</a>.
+</p>
+<div class="code"><pre>cat <span class="s">&lt;&lt;EOF &gt;/etc/openldap/schema/openssh-lpk_openldap.ldif
+# AUTO-GENERATED FILE - DO NOT EDIT!! Use ldapmodify.
+# CRC32 42a543d1
+dn: cn=openssh-lpk_openldap,cn=schema,cn=config
+objectClass: olcSchemaConfig
+cn: openssh-lpk_openldap
+olcAttributeTypes: {0}( 1.3.6.1.4.1.24552.500.1.1.1.13 NAME 'sshPublicKey' DES
+ C 'MANDATORY: OpenSSH Public key' EQUALITY octetStringMatch SYNTAX 1.3.6.1.4.
+ 1.1466.115.121.1.40 )
+olcObjectClasses: {0}( 1.3.6.1.4.1.24552.500.1.1.2.0 NAME 'ldapPublicKey' DESC
+  'MANDATORY: OpenSSH LPK objectclass' SUP top AUXILIARY MAY ( sshPublicKey $
+ uid ) )
+EOF</span>
+</pre></div><p>
+Add schema file.
+</p>
+<div class="code"><pre>ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/openssh-lpk_openldap.ldif
+</pre></div><h2 id="MISC">MISC</h2>
+<h3 id="Permanentlylockuseraccount">Permanently lock user account</h3>
+<p>
+ 
+LDIF file which set John's account to be permanently locked.
+</p>
+<div class="code"><pre>cat &lt;&lt;EOF &gt;permlock.ldif
+dn: <span class="nv">uid</span><span class="o">=</span>john,ou<span class="o">=</span>People,dc<span class="o">=</span>example,dc<span class="o">=</span>com
+replace: pwdAccountLockedTime
+pwdAccountLockedTime: 000001010000Z
+</pre></div><p>
+Modify John's account.
+</p>
+<div class="code"><pre>ldapmodify -x -D <span class="s1">'cn=admin,dc=example,dc=com'</span> -W -H ldapi:/// -f permlock.ldif
+Enter LDAP Password:
+modifying entry <span class="s2">"uid=john,ou=People,dc=example,dc=com"</span>
+</pre></div><h2 id="Sources">Sources</h2>
+<table class="wiki">
+<tr><td> OpenLDAP </td><td> <a class="ext-link" href="https://help.ubuntu.com/10.04/serverguide/openldap-server.html"><span class="icon">​</span>https://help.ubuntu.com/10.04/serverguide/openldap-server.html</a> 
+</td></tr><tr><td> ppolicy </td><td style="text-align: left"><a class="ext-link" href="http://www.flagword.net/2013/02/openldap-with-tls-ppolicy-and-master-master-replication-on-rhel6-3/comment-page-1/"><span class="icon">​</span>http://www.flagword.net/2013/02/openldap-with-tls-ppolicy-and-master-master-replication-on-rhel6-3/comment-page-1/</a> 
+</td></tr><tr><td> openssh-lpk </td><td> <a class="ext-link" href="https://code.google.com/p/openssh-lpk/"><span class="icon">​</span>https://code.google.com/p/openssh-lpk/</a> 
+</td></tr></table>
+</body></html>

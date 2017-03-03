@@ -1,0 +1,28 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<ul><li>Fixes a bug in the failover code that prevented the SSSD from detecting when it went back online
+</li><li>Fixes a bug causing long (sometimes multiple-minute) waits for NSS requests
+</li><li>Several segfault bugfixes
+</li></ul><h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+David O'Brien (1):
+</p>
+<ul><li>Copy-edit, mainly fixing typos and English
+</li></ul><p>
+Martin Nagy (4):
+</p>
+<ul><li>Re-create c-ares channels if /etc/resolv.conf is modified
+</li><li>Make periodic checks for DNS timeouts
+</li><li>Don't recursively call ares_process_fd() from fd_event()
+</li><li>Make sure callbacks never retry when ares channel is destroyed
+</li></ul><p>
+Simo Sorce (1):
+</p>
+<ul><li>Fix <a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/382" title="defect: sssd_be segfault (closed: fixed)">#382</a>, a segfault bug in the memberof plugin.
+</li></ul><p>
+Stephen Gallagher (4):
+</p>
+<ul><li>Update SV translation
+</li><li>Remove local and kerberos providers from the access_provider list
+</li><li>Explicitly set async DNS timeout
+</li><li>Update version to 1.0.2
+</li></ul></body></html>

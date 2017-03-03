@@ -1,0 +1,118 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h1 id="RestrictingthedomainsaPAMservicecanauthagainst">Restricting the domains a PAM service can auth against</h1>
+<p>
+Related ticket(s):
+</p>
+<ul><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/1021"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/1021</a>
+</li></ul><h3 id="Problemstatement">Problem statement</h3>
+<p>
+Some environments require that different PAM applications can use a different set of SSSD domains. The legacy PAM modules, such as <tt>pam_ldap</tt> were able to use a different configuration file altogether as a parameter for the PAM module. This wiki page describes a similar feature for the SSSD.
+</p>
+<h3 id="Usecase">Use case</h3>
+<p>
+An example use-case is an environment that allows external users to authenticate to an FTP server. This server is running as a separate non-privileged user and should only be able to authenticate to a selected SSSD domain, separate from the internal company accounts. The administrator is able to leverage this new feature to mark allow the FTP user to only authenticate against one of the domains in the FTP PAM config file.
+</p>
+<h3 id="Overviewofthesolution">Overview of the solution</h3>
+<p>
+On the PAM client side, the PAM module should receive a new option that
+specifies the SSSD domains to authenticate against. However, the SSSD
+daemon can't fully trust all PAM services. We can't rely on the PAM service
+fields either, as the data the PAM client sends to the PAM application can
+be faked by the client, especially by users who posses shell access or can
+start custom applications. Instead, there needs to be a list of users who
+we trust. Typically, this would be a list of users who run the PAM aware
+applications we wish to restrict (such as <tt>vsftpd</tt> or <tt>openvpn</tt>). This list
+would default to <tt>root</tt> only.
+</p>
+<p>
+These trusted users would be allowed to authenticate against any domain
+and would also be able to restrict the domains further using a new pam_sss
+option. For the untrusted users, we need to keep a list of domains allowed
+to authenticate against, too. Since by default there are no restrictions
+on the allowed domains, this list would default to "all domains are allowed".
+</p>
+<h3 id="Implementationdetails">Implementation details</h3>
+<p>
+This section breaks down the Overview of the solution into consumable pieces.
+</p>
+<h4 id="Addanewoptionpam_trusted_users">Add a new option <tt>pam_trusted_users</tt></h4>
+<p>
+A new option must be added to the PAM responder. This option will be
+a list of numerical UIDs or group names that are trusted or a special
+keyword "ALL". This list will be parsed during PAM responder initialization
+(<tt>pam_process_init</tt> call) using the <tt>csv_string_to_uid_array</tt> function and
+stored in the PAM responder context (<tt>struct pam_ctx</tt>). The PAC responder
+does pretty much the same in the <tt>pac_process_init</tt> function.
+</p>
+<p>
+In the responder, we already have the credentials of the client stored in
+the <tt>cli_ctx</tt> structure. When a new request comes into the <tt>pam_forwarder</tt>
+function, we will match the client UID against the list of trusted IDs and
+determine whether the client is trusted or not.
+</p>
+<p>
+The default will be the special keyword ALL, meaning all users are
+trusted. This is in line with the current behaviour where any user can
+access any domain.
+</p>
+<h4 id="Addaoptiontolimitthedomainsforuntrustedusers">Add a option to limit the domains for untrusted users</h4>
+<p>
+Another option, called <tt>pam_allowed_auth_domains</tt> shall be added to the
+PAM responder. This option will list the SSSD domains an untrusted client
+can authenticate against. The option will accept either a comma-separated
+list of SSSD domains or any of two special values <tt>all</tt> and <tt>none</tt>. The
+default value will be <tt>none</tt> to make sure the administrator is required
+to spell out the domains that can be contacted by an untrusted client 
+when he starts differentiating trusted and untrusted domains.
+</p>
+<p>
+The option will be parsed during <tt>pam_process_init</tt> and stored in the
+<tt>pam_ctx</tt> structure. An untrusted client will only be allowed to send a
+request to a domain that matches the list of allowed domains.
+</p>
+<p>
+In order to keep the implementation simple, the <tt>all</tt> keyword would
+copy all domain names into <tt>pam_ctx</tt> and the <tt>none</tt> keyword would set the
+variable holding the names to NULL. Then the check would be a simple loop
+for all cases.
+</p>
+<p>
+Care must be taken to ensure a sensible PAM error code for cases where
+the domain wouldn't match.
+</p>
+<h4 id="Addanewpammoduleoptiontolimitthedomains">Add a new pam module option to limit the domains</h4>
+<p>
+The PAM module will gain a new option, called <tt>domains</tt> that will allow the
+administrator to use a list of domains to authenticate this PAM service
+against. In the PAM responder, this option will only be in effect for
+trusted clients. If the client is trusted, only domains listed in this
+PAM option will be considered for authentication.
+</p>
+<p>
+Please note that a patch implementing most of the functionality of this
+PAM module option was contributed to the sssd-devel mailing list by Daniel
+Gollub already.
+</p>
+<h4 id="PasswordChanges">Password Changes</h4>
+<p>
+Password changes should be allowed against all domains, meaning that a user A (recognized via getpeercred) will be allow to perform a password change, ie implicitly allowed to access its own domain even if it is untrusted. Arbitrary password changes for other users should not be allowed.
+</p>
+<h3 id="ConfigurationChanges">Configuration Changes</h3>
+<p>
+Several new options, described in details in the previous section, will be introduced. No existing options will change defaults or gain new option values.
+</p>
+<h3 id="HowToTest">How To Test</h3>
+<ol><li>Prepare an SSSD installation with at least two domains A and B.
+</li><li>Pick a PAM service that is running by a trusted user. One example might be VPN service ran by the openvpn user or similar. Add this user as a value of <tt>pam_trusted_users</tt> option in the <tt>[pam]</tt> section.
+</li><li>Add one of the domains (domain A) as a <tt>domain=</tt> parameter into the <tt>auth</tt> section of your service's PAM config file
+</li><li>Authenticate using the selected PAM service as a user from domain A. The authentication should succeed.
+</li><li>Authenticate using the same service as a user from domain B. The authentication should fail and there should be a reasonable (ie not System Error) return code returned to the application
+</li><li>Authenticate using a different PAM service. Make sure this service is ran by an untrusted user (not root!). Logins against both A and B should fail.
+</li><li>Set the value of <tt>pam_allowed_auth_domains</tt> to A. Login against A should succeed from a service running as untrusted user.
+</li><li>Change the value of <tt>pam_allowed_auth_domains</tt> to all. Login against both domains should succeed from a service running as untrusted user.
+</li><li>Remove the <tt>domains=</tt> option from the PAM config file. The trusted service should now be able to log in against both SSSD domains.
+</li><li>Perform a password change as an untrusted user against a domain that he should not normally be allowed to use. The password change must succeed.
+</li></ol><h3 id="Authors">Authors</h3>
+<ul><li>Daniel Gollub &lt;<a class="mail-link" href="mailto:dgollub@brocade.com"><span class="icon">​</span>dgollub@brocade.com</a>&gt;
+</li><li>Jakub Hrozek &lt;<a class="mail-link" href="mailto:jhrozek@redhat.com"><span class="icon">​</span>jhrozek@redhat.com</a>&gt;
+</li><li>Simo Sorce &lt;<a class="mail-link" href="mailto:simo@redhat.com"><span class="icon">​</span>simo@redhat.com</a>&gt;
+</li></ul></body></html>

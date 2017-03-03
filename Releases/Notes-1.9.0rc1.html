@@ -1,0 +1,41 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<ul><li>This is a bugfix release. No new features have been added. The most important bugs fixed include:
+</li><li>Potential crash when one of two parallel requests would expire the list of servers resolved from a SRV query
+</li><li>Fixed a crash that occured when a service was requested by both name and protocol
+</li><li>A sudo rules refresh is only scheduled when the sudo service is actually configured.
+</li><li>The evaluation of default SELinux rules was changed to match the IPA server expectations 
+</li></ul><h2 id="TicketsFixed">Tickets Fixed</h2>
+<p>
+</p><div><dl class="wiki compact"><dt><a class="closed" href="/sssd/ticket/1331" title="Off-by-one error in sss_hmac_sha1">#1331</a></dt><dd>Off-by-one error in sss_hmac_sha1</dd><dt><a class="closed" href="/sssd/ticket/1364" title="[abrt] sssd-1.8.3-11.fc16: set_server_common_status: Process ...">#1364</a></dt><dd>[abrt] sssd-1.8.3-11.fc16: set_server_common_status: Process /usr/libexec/sssd/sssd_be was killed by signal 11 (SIGSEGV)</dd><dt><a class="closed" href="/sssd/ticket/1438" title="SSSD crashes at boot time">#1438</a></dt><dd>SSSD crashes at boot time</dd><dt><a class="closed" href="/sssd/ticket/1452" title="Authentication fails if kpasswd cannot be resolved">#1452</a></dt><dd>Authentication fails if kpasswd cannot be resolved</dd><dt><a class="closed" href="/sssd/ticket/1454" title="if allocation fails, sss_mmap_cache_init may dereference NULL pointer">#1454</a></dt><dd>if allocation fails, sss_mmap_cache_init may dereference NULL pointer</dd><dt><a class="closed" href="/sssd/ticket/1458" title="Full sudo refresh is scheduled even if there is no sudo responder">#1458</a></dt><dd>Full sudo refresh is scheduled even if there is no sudo responder</dd><dt><a class="closed" href="/sssd/ticket/1466" title="Proxy: Cannot retrieve an user after a group he is a member of was ...">#1466</a></dt><dd>Proxy: Cannot retrieve an user after a group he is a member of was retrieved</dd><dt><a class="closed" href="/sssd/ticket/1467" title="enumeration is broken in the proxy provider">#1467</a></dt><dd>enumeration is broken in the proxy provider</dd><dt><a class="closed" href="/sssd/ticket/1479" title="Hbac logs show wrong rule name granting access">#1479</a></dt><dd>Hbac logs show wrong rule name granting access</dd><dt><a class="closed" href="/sssd/ticket/1486" title="[abrt] sssd-1.8.4-14.fc17: sss_ldap_init_send: Process ...">#1486</a></dt><dd>[abrt] sssd-1.8.4-14.fc17: sss_ldap_init_send: Process /usr/libexec/sssd/sssd_be was killed by signal 11 (SIGSEGV)</dd><dt><a class="closed" href="/sssd/ticket/1496" title="[abrt] sssd-1.8.4-14.fc17: ldap_pvt_sasl_getmechs: Process ...">#1496</a></dt><dd>[abrt] sssd-1.8.4-14.fc17: ldap_pvt_sasl_getmechs: Process /usr/libexec/sssd/sssd_be was killed by signal 11 (SIGSEGV)</dd><dt><a class="closed" href="/sssd/ticket/1505" title="sudo with sss backend should use ipa_hostname">#1505</a></dt><dd>sudo with sss backend should use ipa_hostname</dd><dt><a class="closed" href="/sssd/ticket/1509" title="libsss_sudo is not updated when yum update sssd is called">#1509</a></dt><dd>libsss_sudo is not updated when yum update sssd is called</dd><dt><a class="closed" href="/sssd/ticket/1513" title="Change the processing of the SELinux default map">#1513</a></dt><dd>Change the processing of the SELinux default map</dd><dt><a class="closed" href="/sssd/ticket/1515" title="pam_sss report System Error on wrong password">#1515</a></dt><dd>pam_sss report System Error on wrong password</dd><dt><a class="closed" href="/sssd/ticket/1516" title="krb5_mod_ccname should cancel the transaction at one place only">#1516</a></dt><dd>krb5_mod_ccname should cancel the transaction at one place only</dd><dt><a class="closed" href="/sssd/ticket/1519" title="membership of IPA hostgroups is not evaluated when treating them as ...">#1519</a></dt><dd>membership of IPA hostgroups is not evaluated when treating them as netgroups</dd></dl></div><p>
+</p>
+<h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Jakub Hrozek (12):
+</p>
+<ul><li>Bumping version for the 1.9.0 beta 7 release
+</li><li>libsss_sudo should have a versioned dependency on SSSD
+</li><li>KRB5: cancel the sysdb transaction on one place only
+</li><li>KRB5: Return PAM_AUTH_ERR on incorrect password
+</li><li>RPM: <a class="missing wiki" href="https://docs.pagure.org/sssd-test2/BuildRequire.html" rel="nofollow">BuildRequire?</a> selinux-policy-targeted
+</li><li>SYSDB: NULL-terminate the output of sysdb_get_{ranges,subdomains}
+</li><li>KRB5: Add a missing string argument
+</li><li>NSS: Fix off-by-one error in parse_getservbyname
+</li><li>FO: Check server validity before setting status
+</li><li>DB: Always write the SELinux object to sysdb
+</li><li>SELinux: Always use the default if it exists on the server
+</li><li>Updating the translations for the 1.9.0 RC1 release
+</li></ul><p>
+Ondrej Kos (1):
+</p>
+<ul><li>Out-of-bounds read fix in hmac-sha-1
+</li></ul><p>
+Pavel Březina (3):
+</p>
+<ul><li>netgroup: resolve hostgroup membership correctly
+</li><li>be_process_init(): free ctx on error
+</li><li>backend: initialize sudo only when it is enabled in services
+</li></ul><p>
+Simo Sorce (1):
+</p>
+<ul><li>Remove obsolete comment
+</li></ul></body></html>

@@ -1,0 +1,163 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<ul><li>This release focuses on delivering bug fixes and a subset of the DBus interface from 1.12.
+</li><li>A new responder, called InfoPipe was added. This responder provides a public D-Bus interface accessible over the system bus. In this release, only methods for retrieving user attributes and list of groups were added. The full interface is being developed in the 1.12 series. The primary consumer if this interface subset are Apache modules such as <tt>mod_lookup_identity</tt> or <tt>mod_intercept_form_submit</tt>
+</li><li>Fixed bug in the AD responder that caused crashes when authenticating as a user from a trusted domain to a system enrolled to a trusted domain other than the forest root
+</li><li>A potential crash on timeout in the autofs client library was fixed.
+</li><li>Several patches that improve portability of SSSD, especially with consideration of BSD systems have been included
+</li></ul><h2 id="PackagingChanges">Packaging Changes</h2>
+<ul><li>The InfoPipe responder is packaged in its own subpackage
+</li></ul><h2 id="DocumentationChanges">Documentation Changes</h2>
+<ul><li>The new InfoPipe responder has several configuration options. Refer to the sssd-ifp manual page for details. 
+</li><li>The LDAP provider has a new option ldap_user_extra_attrs that enables the administrator to extend the map of attributes downloaded when looking up a user. These custom attributes can then be retrieved with the new DBus API.
+</li><li>A new pam_sss option <tt>ignore_authinfo_unavail</tt> was added. Setting this option makes pam_sss return <tt>PAM_IGNORE</tt> when SSSD is not running instead of <tt>PAM_AUTHINFO_UNAVAIL</tt>. This option is mostly useful for BSD systems.
+</li></ul><h2 id="TicketsFixed">Tickets Fixed</h2>
+<p>
+</p><div><dl class="wiki compact"><dt><a class="closed" href="/sssd/ticket/1853" title="[RFE] Allow sssd to replace macro (ie. %H) with value specified in config ...">#1853</a></dt><dd>[RFE] Allow sssd to replace macro (ie. %H) with value specified in config file</dd><dt><a class="closed" href="/sssd/ticket/2114" title="refresh_expired_interval man page doc is not clear">#2114</a></dt><dd>refresh_expired_interval man page doc is not clear</dd><dt><a class="closed" href="/sssd/ticket/2294" title="In sssd.conf, setting &#34;ldap_group_nesting_level = 0&#34; does not appear to ...">#2294</a></dt><dd>In sssd.conf, setting "ldap_group_nesting_level = 0" does not appear to work</dd><dt><a class="closed" href="/sssd/ticket/2305" title="SSSD Crashes when storage experiences high latency">#2305</a></dt><dd>SSSD Crashes when storage experiences high latency</dd><dt><a class="closed" href="/sssd/ticket/2312" title="Fails to start in interactive mode when stdin isn't a pts device">#2312</a></dt><dd>Fails to start in interactive mode when stdin isn't a pts device</dd><dt><a class="closed" href="/sssd/ticket/2322" title="segfault in sssd_be when cross forest users are queried">#2322</a></dt><dd>segfault in sssd_be when cross forest users are queried</dd><dt><a class="closed" href="/sssd/ticket/2333" title="Expanding home directory fails when the request comes from the PAC ...">#2333</a></dt><dd>Expanding home directory fails when the request comes from the PAC responder</dd><dt><a class="closed" href="/sssd/ticket/2334" title="Simple access fails to look up primary group when using sssd-ad until ...">#2334</a></dt><dd>Simple access fails to look up primary group when using sssd-ad until running the id command.</dd></dl></div><p>
+</p>
+<h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Alexander Bokovoy (1):
+</p>
+<ul><li>ipa subdomains provider: make sure search by SID works for homedir
+</li></ul><p>
+Benjamin Franzke (1):
+</p>
+<ul><li>BUILD: Link libsss_krb5_common.so to libkeyutils.so
+</li></ul><p>
+Jakub Hrozek (36):
+</p>
+<ul><li>Updating the version for the 1.11.6 development
+</li><li>LDAP: Check the LDAP handle before using it
+</li><li>AD: Do not remove non-root domains when looking up root domain
+</li><li>Remove duplicate declaration
+</li><li>UTIL: Move sss_parse_name_for_domains declaration to util.h
+</li><li>IFP: Fix a typo in the Makefile
+</li><li>IFP: Re-add the <a class="missing wiki" href="https://docs.pagure.org/sssd-test2/InfoPipe.html" rel="nofollow">InfoPipe?</a> server
+</li><li>IFP: Connect to the system bus
+</li><li>TESTS: Create a default sss_names_ctx in create_dom_test_ctx
+</li><li>TESTS: Split a separate common_mock_resp_dp module
+</li><li>RESPONDERS: Add a new request sss_parse_inp_send
+</li><li>LDAP: Fix off-by-one bug in sdap_copy_opts
+</li><li>LDAP: Make it possible to extend an attribute map
+</li><li>AD: Initialize user_map_cnt in server mode
+</li><li>Add a unit test for sss_parse_name_for_domains
+</li><li>SBUS: Generate introspection from the interface meta structure
+</li><li>SBUS: Create an sbus_method_meta instance for Introspection
+</li><li>IFP: Close memstream handle in introspect destructor
+</li><li>SBUS: several trivial style fixes
+</li><li>SBUS: Fix error handling condition
+</li><li>SBUS: Add a convenience function sbus_error_new
+</li><li>SBUS: Split out dbus_conn_send
+</li><li>SBUS: Add SBUS_CONN_TYPE_SYSBUS
+</li><li>SBUS: Add an async request to retrieve the caller ID
+</li><li>SBUS: Refactor sbus_message_handler to retrieve caller ID
+</li><li>IFP: Add utility functions
+</li><li>IFP: use a list of allowed_uids for authentication
+</li><li>IFP: Initialize negative cache timeout
+</li><li>IFP: Add <a class="missing wiki" href="https://docs.pagure.org/sssd-test2/GetUserAttrs.html" rel="nofollow">GetUserAttrs?</a> call
+</li><li>IFP: Per-attribute ACL for users
+</li><li>SYSDB: return SYSDB_NAME from sysdb_initgroups
+</li><li>IFP: Add a <a class="missing wiki" href="https://docs.pagure.org/sssd-test2/GetGroupsList.html" rel="nofollow">GetGroupsList?</a> method
+</li><li>MAN: Add sssd-ifp to the list of translatable manual pages
+</li><li>BUILD: Disable dbus tests when running distcheck
+</li><li>Updating the translations for the 1.11.6 release
+</li><li>Updating the translations again for the 1.11.6 release
+</li></ul><p>
+Lukas Slebodnik (38):
+</p>
+<ul><li>AUTOMAKE: Do not include generated files into tarball
+</li><li>UTIL: Use constant instead of value for stdin.
+</li><li>MONITOR: Fix start up with empty standard input
+</li><li>BUILD: Make samba4 libraries optional
+</li><li>BUILD: Explicitly link libsss_ad.so with sasl libs
+</li><li>sss_autofs: Check return value of autofs make request
+</li><li>sss_autofs: Do not try to free empty autofs context
+</li><li>man: Substitute entity values for entity references
+</li><li>TEST: Some macros aren't defined in older version of check.
+</li><li>TEST: Link ipa_ldap_opt test with openldap libs
+</li><li>UTIL: Add function sss_parse_name_const
+</li><li>NSS: Refactor expand_homedir_template
+</li><li>NSS: Add option to expand homedir template format
+</li><li>TEST: Add test for expand homedir
+</li><li>SPEC: Remove duplicate sssd_ifp.
+</li><li>SBUS: Fix warning declaration shadows a global declaration
+</li><li>Remove unused parameter from ifp_user_get_attr_handle_reply
+</li><li>Remove unused parameter from ifp_user_get_groups_reply
+</li><li>resolv: Do not try to free addrinfo in case of error
+</li><li>CONFIGURE: Remove duplicate detection of pam
+</li><li>CRYPTO: Use unprefixed version of function stpncpy
+</li><li>PAM: macro PAM_DATA_REPLACE isn't available in openpam.
+</li><li>PAM: Fix problem with missing declaration.
+</li><li>UTIL: Fix order of header files.
+</li><li>LDAP: Don't use macro _XOPEN_SOURCE for extra features
+</li><li>PAM: add ignore_authinfo_unavail option
+</li><li>SDAP: Use portable constant as level in setsockopt
+</li><li>PAM: Include header file security/pam_appl.h
+</li><li>MAKE: Remove PAM libraries from libsss_simple
+</li><li>CONFIGURE: Enhance detection of pam
+</li><li>PAM: Fix compilation of pam_test_client with openpam
+</li><li>PAM: Use fallback version of some pam macros
+</li><li>PAM: Define compatible macros for some functions.
+</li><li>SBUS: Define DBUS_ERROR_INIT for old version of dbus
+</li><li>SBUS: Include config.h for enabling function in stdio.h
+</li><li>Unify usage of function gethostname
+</li><li>MAN: Add reference to manual page sssd-sudo
+</li><li>KRB: Prevent dereference of a null pointer
+</li></ul><p>
+Nikolai Kondrashov (12):
+</p>
+<ul><li>Add cscope inverted index files to .gitignore
+</li><li>Move DEBUG macro body to debug_fn
+</li><li>Remove extra flushing from debug message output
+</li><li>Cleanup debug_fn
+</li><li>Make DEBUG macro definition variadic
+</li><li>Make DEBUG macro invocations variadic
+</li><li>Fixup DEBUG macro invocations update
+</li><li>Update DEBUG* invocations to use new levels
+</li><li>Update debug levels in sss_semanage_error_callback
+</li><li>Update debug level in sysdb_check_upgrade_02
+</li><li>Remove DEBUG macro support for old debug levels
+</li><li>build: Switch to AM_DISTCHECK_CONFIGURE_FLAGS
+</li></ul><p>
+Pavel Březina (6):
+</p>
+<ul><li>man: clarify refresh_expired_interval
+</li><li>IFP: do not create client socket
+</li><li>tests: add confdb_path to sss_test_ctx
+</li><li>sbus_tests: fix missing invoker in initializer
+</li><li>sbus request: fix error initialization
+</li><li>SBUS: remove unused variables
+</li></ul><p>
+Pavel Reichl (10):
+</p>
+<ul><li>SDAP: augmented logging for group saving
+</li><li>AD Provider: bug-fix uninitialized variable
+</li><li>AD Provider: bugfix use-after-free
+</li><li>SYSDB: augmented logging when adding new group
+</li><li>LDAP: fix - find primary group by gid
+</li><li>MAN: Detailed ldap_group_nesting_level option
+</li><li>SDAP: Make nesting_level = 0 to ignore nested groups
+</li><li>SDAP: Add option to disable use of Token-Groups
+</li><li>refactor calls of sss_parse_name
+</li><li>TEST: Remove unused variable
+</li></ul><p>
+Stef Walter (13):
+</p>
+<ul><li>sbus: Add meta data structures and code generator
+</li><li>sbus: Add sbus_vtable and update codegen to support it
+</li><li>nss: Stop using one DBus interface with totally different methods
+</li><li>sbus: Rework sbus to use interface metadata and vtables
+</li><li>sbus: Generate constants from interface definitions
+</li><li>sbus: Use constants to make dbus calls
+</li><li>sbus: Add struct sbus_request to represent a DBus invocation
+</li><li>sbus: Refactor how we export DBus interfaces
+</li><li>sbus: Make sbus_new_server() work for non-priveleged processes
+</li><li>sbus_tests: Add some testing of dispatch and handler code
+</li><li>sbus: Add the sbus_request_parse_or_finish() method
+</li><li>sbus: Add type-safe DBus method handlers and finish functions
+</li><li>sbus_codegen_tests: Add test case type-safe handler args
+</li></ul><p>
+Sumit Bose (1):
+</p>
+<ul><li>Make LDAP extra attributes available to IPA and AD
+</li></ul></body></html>

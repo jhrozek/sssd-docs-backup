@@ -1,0 +1,222 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<ul><li> This release focuses on changes not visible to the end-user. The aim is to support new features used by the forthcoming version 3.3 of FreeIPA and targets supporting legacy (non-SSSD) clients in a setup where the FreeIPA server established a trust relationship with an Active Directory Forest.
+<ul><li>The handling of ID ranges in the providers has been changed to use a plugin interface where each provider can use a different plugin
+</li><li>The libsss_idmap library has been enhanced in several ways such as handling "external mappings" or supporting base RIDs other than 0
+</li><li>The assumption that subdomain users always have a primary user-private-group (UPG) has been removed
+</li><li>When SSSD is running on the IPA server, it is able to perform lookups for trusted users directly against the AD server using the AD provider lookups including enumeration and site location
+</li></ul></li><li>The sudo integration was made more robust. SSSD is now able to gracefully handle situations where it is not able to resolve the client host name or sudo rules have multiple name attributes
+</li><li>Several nested group membership bugs were fixed
+</li><li>The PAC responder was made more robust and efficient, modifying existing cache entries instead of always recreating them.
+</li><li>The Kerberos provider now supports the new KEYRING ccache type. This feature depends on yet unreleased libkrb5 and kernel patches.
+</li></ul><h2 id="Packagingchanges">Packaging changes</h2>
+<ul><li>The sssd_pac binary was moved to the IPA and AD provider subpackages from the krb5-common subpackage
+</li></ul><h2 id="Ticketsfixed">Tickets fixed</h2>
+<p>
+</p><div><dl class="wiki compact"><dt><a class="closed" href="/sssd/ticket/1938" title="[RFE] Add a new call to libsss_idmap to add a new mapping where the first ...">#1938</a></dt><dd>[RFE] Add a new call to libsss_idmap to add a new mapping where the first RID is not 0</dd><dt><a class="closed" href="/sssd/ticket/1960" title="[RFE] Add range type for ID mapping in AD to libsss_idmap">#1960</a></dt><dd>[RFE] Add range type for ID mapping in AD to libsss_idmap</dd><dt><a class="closed" href="/sssd/ticket/1961" title="[RFE] Add plugin to LDAP provider to find new ranges">#1961</a></dt><dd>[RFE] Add plugin to LDAP provider to find new ranges</dd><dt><a class="closed" href="/sssd/ticket/1962" title="[RFE] Integrate AD provider lookup code into IPA subdomain user lookup">#1962</a></dt><dd>[RFE] Integrate AD provider lookup code into IPA subdomain user lookup</dd><dt><a class="closed" href="/sssd/ticket/1979" title="[RFE] Add an optional unique range identifier">#1979</a></dt><dd>[RFE] Add an optional unique range identifier</dd><dt><a class="closed" href="/sssd/ticket/1993" title="[RFE] Add a new option to denote server mode">#1993</a></dt><dd>[RFE] Add a new option to denote server mode</dd></dl></div><p>
+</p><div><dl class="wiki compact"><dt><a class="closed" href="/sssd/ticket/1965" title="man: document that the default access provider in AD provider is &#34;permit&#34;">#1965</a></dt><dd>man: document that the default access provider in AD provider is "permit"</dd><dt><a class="closed" href="/sssd/ticket/1988" title="[RFE] sss_cache has no option to clear all cached entries of all types">#1988</a></dt><dd>[RFE] sss_cache has no option to clear all cached entries of all types</dd><dt><a class="closed" href="/sssd/ticket/1997" title="When resolving a SID, search for groups first, then users">#1997</a></dt><dd>When resolving a SID, search for groups first, then users</dd><dt><a class="closed" href="/sssd/ticket/1998" title="sssd-ad man page states that ad_server can be an IP address even though ...">#1998</a></dt><dd>sssd-ad man page states that ad_server can be an IP address even though SSSD doesn't support that</dd><dt><a class="closed" href="/sssd/ticket/2005" title="SSSD filter out ldap user/group if uid/gid is zero">#2005</a></dt><dd>SSSD filter out ldap user/group if uid/gid is zero</dd><dt><a class="closed" href="/sssd/ticket/2009" title="Disallow or warn if full_name_format is set to a non-default value when ...">#2009</a></dt><dd>Disallow or warn if full_name_format is set to a non-default value when IPA server mode is on</dd><dt><a class="closed" href="/sssd/ticket/2023" title="AD provider in server mode follows referrals">#2023</a></dt><dd>AD provider in server mode follows referrals</dd><dt><a class="closed" href="/sssd/ticket/2025" title="pysss module linking is broken">#2025</a></dt><dd>pysss module linking is broken</dd></dl></div><p>
+</p><div><dl class="wiki compact"><dt><a class="closed" href="/sssd/ticket/1408" title="It should be possible to use uid/gid defined in AD instead of SIDs">#1408</a></dt><dd>It should be possible to use uid/gid defined in AD instead of SIDs</dd><dt><a class="closed" href="/sssd/ticket/1821" title="Allow using UIDs and GIDs from AD in trust case">#1821</a></dt><dd>Allow using UIDs and GIDs from AD in trust case</dd><dt><a class="closed" href="/sssd/ticket/1881" title="Determine how to map SID to UID/GID based on IdM server configuration">#1881</a></dt><dd>Determine how to map SID to UID/GID based on IdM server configuration</dd><dt><a class="closed" href="/sssd/ticket/1942" title="convert enumeration timer to be_ptask">#1942</a></dt><dd>convert enumeration timer to be_ptask</dd><dt><a class="closed" href="/sssd/ticket/1963" title="[RFE] Implement or Improve enumeration">#1963</a></dt><dd>[RFE] Implement or Improve enumeration</dd><dt><a class="closed" href="/sssd/ticket/1964" title="[RFE] Enhance IPA SRV plugin to do AD site lookups as well">#1964</a></dt><dd>[RFE] Enhance IPA SRV plugin to do AD site lookups as well</dd><dt><a class="closed" href="/sssd/ticket/1996" title="PAC responder: update cached user object instead of deleting and ...">#1996</a></dt><dd>PAC responder: update cached user object instead of deleting and recreating them</dd><dt><a class="closed" href="/sssd/ticket/2027" title="Domain Users memberships removed in subsequent lookups in server_mode">#2027</a></dt><dd>Domain Users memberships removed in subsequent lookups in server_mode</dd><dt><a class="closed" href="/sssd/ticket/2032" title="sssd sees gid as 0 for AD trust posix users causing lookup failures">#2032</a></dt><dd>sssd sees gid as 0 for AD trust posix users causing lookup failures</dd><dt><a class="closed" href="/sssd/ticket/2035" title="amend the docs of sss_nss_getnamebysid to make it clear it only works for ...">#2035</a></dt><dd>amend the docs of sss_nss_getnamebysid to make it clear it only works for id_provider=ad</dd><dt><a class="closed" href="/sssd/ticket/2044" title="Update sssd-ad manpage to reflect &#34;trust between domains in single forest ...">#2044</a></dt><dd>Update sssd-ad manpage to reflect "trust between domains in single forest are supported"</dd><dt><a class="closed" href="/sssd/ticket/2057" title="Data provider endianess bug">#2057</a></dt><dd>Data provider endianess bug</dd><dt><a class="closed" href="/sssd/ticket/2059" title="sss_packet_grow: wrong use of module to pad data">#2059</a></dt><dd>sss_packet_grow: wrong use of module to pad data</dd></dl></div><p>
+</p>
+<h2 id="Detailedchangelog">Detailed changelog</h2>
+<ul><li>Alexander Bokovoy (3):
+<ul><li>build: fix dependencies for pysss module
+</li><li>pysss: add pysss.getgrouplist(username)
+</li><li>pysss: prevent crashing when group is unresolvable
+</li></ul></li></ul><ul><li>Jakub Hrozek (58):
+<ul><li> Updating the version for the 1.10.1 release
+</li><li> Bump version to track 1.11 development
+</li><li> IPA: Add a server mode option
+</li><li> LDAP: Add utility function sdap_copy_map
+</li><li> AD: decouple ad_id_ctx initialization
+</li><li> AD: initialize failover with custom realm, domain and failover service
+</li><li> IPA: Initialize server mode ctx if server mode is on
+</li><li> AD: Move storing sdap_domain for subdomain to generic LDAP code
+</li><li> IPA: Create and remove AD id_ctx for subdomains discovered in server mode
+</li><li> IPA: Look up AD users directly if IPA server mode is on
+</li><li> Updating translations for the 1.11 beta1 release
+</li><li> Bumping the version for the 1.11 beta2 release
+</li><li> RPM: Move sssd_pac to the krb5-common subpackage
+</li><li> DB: sysdb_search_user_by_name: search by both name and alias
+</li><li> LDAP: When resolving a SID, search for groups first, then users
+</li><li> RPM: Require libsss_idmap from sssd-common
+</li><li> MAN: clarify the default access provider for AD
+</li><li> MAN: IP addresss does not work when used for ad_server
+</li><li> MAN: Clarify the min_id/max_id limits further
+</li><li> Remove unused be_ctx-&gt;sigchld_ctx
+</li><li> IPA: warn if full_name_format is customized in server mode
+</li><li> AD: Set the bool value same as default value in opts
+</li><li> Fix the default FQDN format
+</li><li> SUDO: realloc with sizeof(uint32_t) when adding uint32_t
+</li><li> KRB5: Do not send PAC in server mode
+</li><li> LDAP: Use domain-specific name where appropriate
+</li><li> Updating translations for the 1.11 beta2 release
+</li><li> Bumping the version for the 1.11 beta3 release
+</li><li> Use GID if subdomain is not MPG
+</li><li> PAM: Check negcache when searching for fully qualified users, too
+</li><li> PAM: Set negcache if user is not found after provider check
+</li><li> Use the correct resolv timeout
+</li><li> Remove unused constant
+</li><li> AD: Use the correct include guard
+</li><li> UTIL: Remove obsolete compat macros
+</li><li> KRB5: Formatting changes
+</li><li> KRB5: Do not log to syslog on each login
+</li><li> MAN: AD provider only supports trusted domains from the same forest
+</li><li> PAC: Skip SIDs that cannot be resolved to domain
+</li><li> IPA: Enable AD sites when in server mode
+</li><li> DB: Update sss_domain_info with new updated data
+</li><li> DB: remove unused realm parameter from sysdb_master_domain_add_info
+</li><li> LDAP: Add enum_{users,groups}_recv to follow the tevent_req style
+</li><li> LDAP: Remove unused constant
+</li><li> LDAP: Move the ldap enum request to its own reusable module
+</li><li> LDAP: Convert enumeration to the ptask API
+</li><li> LDAP: Make cleanup synchronous
+</li><li> LDAP: Make the cleanup task reusable for subdomains
+</li><li> LDAP: Make sdap_id_setup_tasks reusable for subdomains
+</li><li> SYSDB: Store enumerate flag for subdomain
+</li><li> Read enumerate state for subdomains from cache
+</li><li> Add a new option to control subdomain enumeration
+</li><li> IPA: enable enumeration if parent domain enumerates in server mode
+</li><li> NSS: Descend into subdomains if enumerate=true
+</li><li> IPA: Add forgotten declaration
+</li><li> DP: Use the correct type for DBus boolean
+</li><li> Updating translations for the 1.11.0 release
+</li><li> Updating the version for the 1.11.0 release
+</li></ul></li></ul><ul><li>Jim Collins (1):
+<ul><li> ldap: only update shadowLastChange when password change is successful
+</li></ul></li></ul><ul><li>Lukas Slebodnik (35):
+<ul><li> BUILD: Use pkg-config to detect cmocka
+</li><li> Return right directory name for dircache
+</li><li> Use conditional build for retrieving ccache.
+</li><li> Remove unused function parameter
+</li><li> Every time use permissive control in function memberof_mod.
+</li><li> Fix clang format string warning.
+</li><li> Use functionm ldb_dn_get_linearized to format struct ldb_dn
+</li><li> Add mising argument required by format string
+</li><li> Remove unused memory context from function unpack_authtok
+</li><li> Fix warnings: uninitialized variable
+</li><li> Fix autotols warnings: macro xyz not found in library
+</li><li> Fix possible dereference of a NULL pointer.
+</li><li> Every time release allocated memory in function py_sss_getgrouplist
+</li><li> Prevent using uninitialized "group_name" in done section.
+</li><li> Remove unused memory context
+</li><li> SSH: Ensure that cmd_ctx-&gt;name will not be NULL.
+</li><li> Add script make_srpm.sh to dist tarball.
+</li><li> NSS: allow removing entries from netgroup hash table
+</li><li> NSS: Clear cached netgroups if a request comes in from the sss_cache
+</li><li> Enable removing nonexisting dn in sdap_handle_account_info
+</li><li> proxy: Alocate auth tokens in struct authtok_conv
+</li><li> Check whether servername is not empty string.
+</li><li> Remove include recursion
+</li><li> Remove include recursion
+</li><li> Use brackets around macros.
+</li><li> Fix memory leak insss_krb5_get_error_message
+</li><li> mmap_cache: Skip records which doesn't have same hash
+</li><li> mmap_cache: Use stricter check for hash keys.
+</li><li> UTIL: Create new wraper header file sss_endian.h
+</li><li> CLIENT: Fix non gnu sss_strnlen implementation
+</li><li> MONITOR: Move function declaration out of conditional build
+</li><li> UTIL: Explicitly include header file sys/socket.h
+</li><li> MEMBEROF: Remove temporary workaround
+</li><li> IPA_HBAC: Explicitelly include header file time.h
+</li><li> CONFIGURE: Get rid of bashism
+</li></ul></li></ul><ul><li>Michal Zidek (16):
+<ul><li> sss_cache: Add option to invalidate all entries
+</li><li> Always set port status to neutral when resetting service.
+</li><li> Missing space in debug message
+</li><li> Remove unused constant.
+</li><li> Set default DNS resolution timeout to 6 seconds.
+</li><li> Lower timeout to contact DNS server
+</li><li> resolv-tests failing with memory leak
+</li><li> ldap, krb5: More descriptive msg on chpass failure.
+</li><li> mmap_cache: Check if slot and name_ptr are not invalid.
+</li><li> mmap_cache: Check data-&gt;name value in client code
+</li><li> mmap_cache: Remove triple checks in client code.
+</li><li> mmap_cache: Off by one error.
+</li><li> mmap_cache: Use better checks for corrupted mc in responder
+</li><li> mmap_cache: Store corrupted mmap cache before reset
+</li><li> mmap_cache: Use sss_atomic_write_s instead of write.
+</li><li> pam: Bad debug message format and parameter.
+</li></ul></li></ul><ul><li>Ondrej Kos (9):
+<ul><li> Do not copy special files when creating homedir
+</li><li> KRB5_CHILD: Fix handling of get_password return code
+</li><li> Do not try to set password when authtok_length is zero
+</li><li> KRB: Handle empty password gracefully
+</li><li> KRB: Replace multiple calls with variable
+</li><li> TOOLS: Update all services with sss_debuglevel
+</li><li> Clarify that getnamebysid currently works only with ipa/ad id_provider
+</li><li> AD: Cast SASL callbacks to propper type
+</li><li> DP: Notify propperly when removing PAC responder
+</li></ul></li></ul><ul><li>Pavel Březina (13):
+<ul><li> remove unused variable
+</li><li> print hint about password complexity when new password is rejected
+</li><li> dyndns timeout test: catch SIGCHLD handler events
+</li><li> SIGCHLD handler: do not call callback when pvt data where freed
+</li><li> Fix netgroup lookup when using fully qualified name
+</li><li> sudo: skip rule on error instead of failing completely
+</li><li> sudo: print better debug message when a rule has multiple cn values
+</li><li> simple access provider: allow fully qualified names
+</li><li> add simple access provider init test
+</li><li> sudo: continue if we are unable to resolve fqdn
+</li><li> sudo: do not fail to store the rule if we can't read usn
+</li><li> sudo: do not strdup usn on ENOENT
+</li><li> sss_packet_grow: correctly pad packet length to 512B
+</li></ul></li></ul><ul><li>Simo Sorce (5):
+<ul><li> Add a commit template
+</li><li> sssd_ad: Add hackish workaround for sasl ad_compat
+</li><li> proxy: Allow initgroup to return NOTFOUND
+</li><li> krb5_common: Refactor to use a talloc temp context
+</li><li> BUILD: Remove unnecessary patch and configure opts
+</li></ul></li></ul><ul><li>Stephen Gallagher (14):
+<ul><li> Move pre and post scripts to sssd-common
+</li><li> Remove sysv-&gt;systemd upgrade routines
+</li><li> Move sssd_pac binary to the IPA and AD providers
+</li><li> Netgroups should ignore the 'use_fully_qualified_names' setting
+</li><li> BUILD: Fix contrib build macros to display warnings
+</li><li> gitignore: Add Eclipse project files to ignore list
+</li><li> KRB5: Add new #define for collection cache types
+</li><li> KRB5: Refactor cc_*_check_existing
+</li><li> KRB5: Only set active and valid on success
+</li><li> KRB5: Add low-level debugging to sss_get_ccache_name_for_principal
+</li><li> KRB5: Remove unnecessary call to become_user()
+</li><li> KRB5: Add support for KEYRING cache type
+</li><li> BUILD: Ignore translations when building RPMs
+</li><li> krb5: Fetch ccname template from krb5.conf
+</li></ul></li></ul><ul><li>Sumit Bose (36):
+<ul><li> idmap: allow first RID to be set
+</li><li> idmap: add optional unique range id
+</li><li> idmap: add option to indicate external_mapping
+</li><li> idmap: allow NULL domain sid for external mappings
+</li><li> idmap: add calls to check if ID mapping conforms to ranges
+</li><li> idmap: add sss_idmap_domain_has_algorithmic_mapping
+</li><li> Add cmocka based tests for libsss_idmap
+</li><li> Add now options ldap_min_id and ldap_max_id
+</li><li> SDAP IDMAP: Add configured domain to idmap context
+</li><li> Allow different methods to find new domains for idmapping
+</li><li> Add sdap_idmap_domain_has_algorithmic_mapping()
+</li><li> Replace SDAP_ID_MAPPING checks with sdap_idmap_domain_has_algorithmic_mapping
+</li><li> Add ipa_idmap_init()
+</li><li> Add support for new ipaRangeType attribute
+</li><li> Replace new_subdomain() with find_subdomain_by_name()
+</li><li> IPA: read ranges before subdomains
+</li><li> Save mpg state for subdomains
+</li><li> Read mpg state for subdomains from cache
+</li><li> Fix memory context for a state member
+</li><li> Fix memory context for hash entries
+</li><li> ipa_s2n_get_user_done: free group_attrs as well
+</li><li> ipa_s2n_get_user_done: make sure ALIAS name is lower case
+</li><li> sdap_get_initgr_done: use the right SID to get a GID
+</li><li> sdap_save_user: save original primary GID of subdomain users
+</li><li> fill_initgr: add original primary GID if available
+</li><li> sdap_add_incomplete_groups: use fully qualified name if needed
+</li><li> save_rfc2307bis_user_memberships: use fq names for subdomains
+</li><li> sysdb_add_incomplete_group: store SID string is available
+</li><li> check_cc_validity: make sure _valid is always set
+</li><li> PAC: if user entry already exists keep it
+</li><li> PAC: do not create users with missing GID
+</li><li> PAC: handle non-POSIX groups in cache
+</li><li> PAC: read user DN instead of constructing it
+</li><li> PAC: do not fail if a single group cannot be added/removed
+</li><li> PAC: use SID instead of GID to search for groups
+</li><li> ipa-server-mode: add IPA group memberships to AD users
+</li></ul></li></ul><ul><li>Yuri Chornoivan (1):
+<ul><li> Fix two minor typos
+</li></ul></li></ul></body></html>

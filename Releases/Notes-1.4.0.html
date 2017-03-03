@@ -1,0 +1,145 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<ul><li>Added support for netgroups to the LDAP provider
+</li><li>Performance improvements made to group processing of RFC2307 LDAP servers
+</li><li>Fixed nested group issues with RFC2307bis LDAP servers without a memberOf plugin
+</li><li>Build-system improvements to support Gentoo
+</li><li>Split out several libraries into the ding-libs tarball. Please find the most recent version of ding-libs on our <a class="ext-link" href="https://docs.pagure.org/sssd-test2/Releases.html#DING-LIBSReleases"><span class="icon">​</span>Releases page</a>. You have to build and install ding-libs before bulding sssd.
+</li><li>Manpage reviewed and updated
+</li></ul><h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Jakub Hrozek (30):
+</p>
+<ul><li>Fix wrong return value in HBAC time rules evaluation
+</li><li>Package systemd unit file
+</li><li>Move crypto functions into its own subdir
+</li><li>Add safe copy/move macros for uint16_t
+</li><li>Password obfuscation utility functions
+</li><li>Fix pysss linking
+</li><li>Python bindings for obfuscation
+</li><li>sss_obfuscate tool
+</li><li>Deobfuscate password in back ends
+</li><li>Fix assorted minor bugs in sss_ tools
+</li><li>Fix parameter order when initializing decryption
+</li><li>Revert "Make ldap bind asynchronous"
+</li><li>Define objectclass with a constant
+</li><li>Use a different min_id for local domain
+</li><li>Add parameter to skip cleanup in sysdb test
+</li><li>Fix sysdb_group_dn_name
+</li><li>Fix sysdb_attrs_to_list
+</li><li>Request the correct attribute name
+</li><li>Add KDC to the list of LDAP options
+</li><li>Report Kerberos error code from ldap_child_get_tgt_sync
+</li><li>Make ldap_child report kerberos return code to parent
+</li><li>Initialize kerberos service for GSSAPI
+</li><li>Check for GSSAPI before attempting to kinit
+</li><li>Add sysdb_attrs_get_ulong utility function
+</li><li>sysdb interface for adding incomplete groups
+</li><li>Save dummy groups to cache during initgroups
+</li><li>sysdb interface for adding fake users
+</li><li>Save dummy member users during RFC2307 getgr{nam,gid}
+</li><li>Use unsigned long for conversion to id_t
+</li><li>set in_transaction explicitly to false
+</li></ul><p>
+Jan Zeleny (14):
+</p>
+<ul><li>Initialized return value in dp_copy_options()
+</li><li>Fixed potential comparison of undefined variable
+</li><li>Fixed printing of undefined value in sdap_async_accounts.c
+</li><li>Fixed uninialized value in proxy_id provider
+</li><li>Cleaned some dead assignments
+</li><li>Reviewed sssd-ldap man page
+</li><li>Fixed small issue in memory context hierarchy
+</li><li>Dead assignments cleanup in providers code
+</li><li>Dead assignments cleanup in NSS responder
+</li><li>Dead assignments cleanup in memberof module
+</li><li>Dead assignments cleanup in various places in SSSD
+</li><li>Disable events on ldap fd when offline.
+</li><li>Man pages should mention supported providers
+</li><li>Move all references to ldap_&lt;entity&gt;_search_base to "advanced" section
+</li></ul><p>
+Martin Nagy (1):
+</p>
+<ul><li>Make ldap bind asynchronous
+</li></ul><p>
+Maxim (6):
+</p>
+<ul><li>Fix building sssd
+</li><li>Fix configure check for ldb
+</li><li>Add gentoo distrubutions
+</li><li>Add custom pam module dir
+</li><li>Add gentoo-specific init dir
+</li><li>Remove useless /etc/dbus-1/system.d directory from installation
+</li></ul><p>
+Ralf Haferkamp (2):
+</p>
+<ul><li>Shortcut for save_group() to accept sysdb DNs as member attributes
+</li><li>Return all group members from getgr(nam|gid)
+</li></ul><p>
+Simo Sorce (2):
+</p>
+<ul><li>Check if control is supported before using it.
+</li><li>Add option to limit nested groups
+</li></ul><p>
+Stephen Gallagher (36):
+</p>
+<ul><li>Fix chpass operations with LDAP provider
+</li><li>Remove common directory
+</li><li>Rewrite toplevel Makefile
+</li><li>Build SSSD RPMs with external libraries
+</li><li>Remove src/Makefile.am and src/configure.ac
+</li><li>Don't build SSSDConfig API when configured with --without-python-bindings
+</li><li>Treat a zero-length password as a failure
+</li><li>Properly handle errors from a password change operation
+</li><li>Handle multiple simultaneous enumeration requests
+</li><li>Remove generated manpages when performing "make clean"
+</li><li>Request all group attributes during initgroups processing
+</li><li>Fix missing variable substitution in DEBUG message
+</li><li>Initgroups on a non-cached user should go to the data provider
+</li><li>Fix assorted specfile issues
+</li><li>Initialize debug_level to zero in crypto tests
+</li><li>Return offline instead of error
+</li><li>Add common hash table setup
+</li><li>Add utility function sss_strnlen()
+</li><li>Store entry_cache_timeout in sss_domain_info object
+</li><li>Require explicit setting of callback context for check_cache
+</li><li>Netgroups sysdb API
+</li><li>netgroup tests
+</li><li>Rename group.c and passwd.c for clarity
+</li><li>Add support for netgroups to NSS sss_client
+</li><li>Add negative cache features for netgroups
+</li><li>Split out some helper functions for the NSS responder
+</li><li>Add netgroup support to the NSS responder
+</li><li>Rename upgrade_config.py and build it properly
+</li><li>Assorted specfile changes
+</li><li>Make sdap_save_users_send handle zero users gracefully
+</li><li>Handle nested groups in RFC2307bis
+</li><li>Modify sysdb_[add|remove]_group_member to accept users and groups
+</li><li>Add proper nested initgroup support for RFC2307bis servers
+</li><li>Updating translation files for release
+</li><li>Fix 'make distcheck' for XML documentation
+</li><li>Updating version for SSSD 1.4.0 release
+</li></ul><p>
+Sumit Bose (21):
+</p>
+<ul><li>Store rootdse supported features in sdap_handler
+</li><li>Handle host objects like other objects
+</li><li>Save all data to sysdb in one transaction
+</li><li>Use new MIT krb5 API for better password expiration warnings
+</li><li>Suppress some 'may be used uninitialized' warnings
+</li><li>Suppress some 'unchecked return value' warnings
+</li><li>Use POPT_TABLEEND to close option table
+</li><li>Add a missing include file
+</li><li>Rename index to idx
+</li><li>Distribute XML sources instead of man-pages
+</li><li>Remove unused defines
+</li><li>Raise the required version of libdhash
+</li><li>Add missing tevent_req_done()
+</li><li>Return NSS_STATUS_RETURN instead of NSS_STATUS_NOTFOUND
+</li><li>Add handling of nested netgroups to nss client
+</li><li>Do not fail if netgroup exists just update the attributes
+</li><li>Add sysdb_netgroup_base_dn()
+</li><li>Also return member groups to the client
+</li><li>Add infrastructure to LDAP provider for netgroup support
+</li><li>Implement netgroup support for LDAP provider
+</li><li>Avoid a global variable in netgroup client.
+</li></ul></body></html>

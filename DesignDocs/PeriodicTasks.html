@@ -1,0 +1,88 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h1 id="PeriodictaskAPI">Periodic task API</h1>
+<p>
+Related ticket(s):
+</p>
+<ul><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/1891"><span class="icon">​</span>unite periodic refresh API</a>
+</li></ul><h2 id="ProblemStatement">Problem Statement</h2>
+<p>
+SSSD contains several periodic tasks that implements custom periodic API. These APIs are more or less sophisticated but it does the same thing.
+</p>
+<p>
+Current periodic tasks are:
+</p>
+<ul><li>Enumeration
+</li><li>Dynamic DNS updates
+</li><li>SUDO - full and smart refresh
+</li><li>Refresh of expired NSS entries
+</li></ul><p>
+We want to replace these individual implementation with one back end wise API.
+</p>
+<h2 id="Implementationdetails">Implementation details</h2>
+<pre class="wiki">New error code:
+- ERR_STOP_PERIODIC_TASK
+
+struct be_ptask;
+
+typedef struct tevent_req *
+(*be_ptask_send_t)(TALLOC_CTX *mem_ctx,
+                   struct be_ctx *be_ctx,
+                   struct be_ptask *be_ptask,
+                   void *pvt);
+
+typedef errno_t
+(*be_ptask_recv_t)(struct tevent_req *req);
+
+enum be_ptask_offline {
+    BE_PTASK_OFFLINE_SKIP,
+    BE_PTASK_OFFLINE_DISABLE,
+    BE_PTASK_OFFLINE_EXECUTE
+};
+
+errno_t be_ptask_create(TALLOC_CTX *mem_ctx,
+                        struct be_ctx *be_ctx,
+                        time_t period,
+                        time_t first_delay,
+                        time_t enabled_delay,
+                        time_t timeout,
+                        enum be_ptask_offline offline,
+                        be_ptask_send_t send,
+                        be_ptask_recv_t recv,
+                        void *pvt,
+                        const char *name,
+                        struct be_ptask **_task);
+
+void be_ptask_enable(struct be_ptask *task);
+void be_ptask_disable(struct be_ptask *task);
+void be_ptask_destroy(struct be_ptask **task);
+</pre><h3 id="Terminology">Terminology</h3>
+<ul><li>task: object of type be_ptask
+</li><li>request: tevent request that is fired periodically and is managed by task
+</li></ul><h3 id="API">API</h3>
+<ul><li><em>struct be_ptask_task</em> is encapsulated.
+</li><li><em>be_ptask_create()</em> creates and starts new periodic task
+</li><li><em>be_ptask_enable(task)</em> enable <em>task</em> and schedule next execution <em>enabled_delay</em> from now
+</li><li><em>be_ptask_disable(task)</em> disable <em>task</em>, cancel current timer and wait until it is enabled again
+</li><li><em>be_ptask_destroy(task)</em> destroys <em>task</em> and sets it to <em>NULL</em>
+</li></ul><h3 id="Schedulerules">Schedule rules</h3>
+<ul><li>the first execution is scheduled <em>first_delay</em> seconds after the task is created
+</li><li>if request returns EOK, it will be scheduled again to 'last_execution_time + period'
+</li><li>if request returns ERR_STOP_PERIODIC_TASK, the task will be terminated
+</li><li>if request returns other error code (i.e. non fatal failure), it will be rescheduled to 'now + period'
+</li><li>if request does not complete in <em>timeout</em> seconds, it will be cancelled and rescheduled to 'now + period'
+</li><li>if the task is reenabled, it will be scheduled again to 'now + enabled_delay'
+</li></ul><h3 id="Whenoffline">When offline</h3>
+<p>
+Offline behaviour is controlled by <em>offline</em> parameter.
+</p>
+<ul><li>If <em>offline</em> is <em>BE_PTASK_OFFLINE_EXECUTE</em> and back end is offline, current request will be executed as planned.
+</li><li>If <em>offline</em> is <em>BE_PTASK_OFFLINE_SKIP</em> and back end is offline, current request will be skipped and rescheduled to 'now + period'.
+</li><li>If <em>offline</em> is <em>BE_PTASK_OFFLINE_DISABLE</em>, an offline and online callback is registered. The task is disabled immediately when back end goes offline and then enabled again when back end goes back online.
+</li></ul><h3 id="Debugging">Debugging</h3>
+<p>
+Task will provide enough debugging information so we can know exactly when a task is created and destroy, when it is executed and finished and when it will be executed in the future.
+</p>
+<h2 id="Authors">Author(s)</h2>
+<p>
+Pavel Březina &lt;<a class="mail-link" href="mailto:pbrezina@redhat.com"><span class="icon">​</span>pbrezina@redhat.com</a>&gt;
+</p>
+</body></html>

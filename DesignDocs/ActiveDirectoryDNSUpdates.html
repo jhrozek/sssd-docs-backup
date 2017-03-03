@@ -1,0 +1,169 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="ActiveDirectoryclientDNSupdates">Active Directory client DNS updates</h2>
+<p>
+Related ticket(s):
+</p>
+<ul><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/1504"><span class="icon">​</span>RFE AD dyndns updates</a>
+</li></ul><h3 id="ProblemStatement">Problem Statement</h3>
+<p>
+Clients enrolled to an Active Directory domain may be allowed to update
+their DNS records stored in AD dynamically. At the same time, Active
+Directory servers support DNS aging and scavenging, which means that stale
+DNS records might be removed from AD after a period of inactivity.
+</p>
+<p>
+While DNS scavenging is not enabled on Active Directory servers by default,
+the SSSD should support this use case and refresh its DNS records to simulate
+the behavior of Windows AD clients and keep their address records from
+being removed if scavenging is used. The SSSD should also enable the clients to update their
+DNS records if their IP address changes.
+</p>
+<h3 id="OverviewofWindowsclientsideDNSupdates">Overview of Windows client side DNS updates</h3>
+<p>
+This section provides a brief overview of how Windows clients may update their DNS records and how scavenging is configured and performed in a Windows domain. For more complete information, please follow the links at the bottom of this page.
+</p>
+<h4 id="WindowsResourceRecordinformation">Windows Resource Record information</h4>
+<p>
+To be able to detect if the resource record is stale, every dynamically
+created RR in the Windows DNS has a timestamp that is updated with the
+dynamic update if scavenging is enabled. Manually created DNS records do
+not have a timestamp. In order to update the timestamp, the DNS records
+are refreshed periodically even if they actually haven't changed, just to
+bump the timestamp.
+</p>
+<p>
+A special timestamp value of 0 can be set to the resource record, indicating unlimited lifetime of the record. Such record is never scavenged.
+</p>
+<h4 id="Updateandrefresh">Update and refresh</h4>
+<p>
+When a Windows client updates its DNS information, it may perform either an update or a refresh.
+</p>
+<ul><li>an <em>update</em> is performed when the IP address of a client changes. Involves a refresh and a change of the IP address(es).
+</li><li>a <em>refresh</em> does not change the IP addresses themselves, but rather only updates the timestamp of existing resource record, keeping it from being scavenged.
+</li></ul><p>
+    
+In order to maintain a heartbeat on the resource records, the Windows clients perform updates and/or refreshes under conditions outlined in the next section.
+</p>
+<h4 id="Scavengingtimeouts">Scavenging timeouts</h4>
+<p>
+In the zone properties, there are two timeout settings that are affecting the scavenging
+</p>
+<ul><li>No-refresh interval - minimal interval between last refresh after which the record can be refreshed again
+</li><li>Refresh interval - interval during which the refreshes are allowed. After the refresh interval passes, the stale records can be scavenged. In other words, the refresh interval starts at <tt>timestamp + no_refresh_interval</tt>.
+</li></ul><h4 id="Windowsclientsupdateandrefreshintervals">Windows clients update and refresh intervals</h4>
+<p>
+For Windows clients, refreshes or updates generally occur for the following reasons:
+</p>
+<ul><li>the computer is restarted
+</li><li>the DHCP lease is renewed
+</li><li>periodicaly every 24 hours by default
+<ul><li>this is configurable in the windows registry using the <tt>DefaultRegistrationRefreshInterval</tt> key under the <tt>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\TcpIp\Parameters</tt> subkey
+</li></ul></li></ul><p>
+The SSSD updates should be modeled to be close to what the Windows clients do.
+</p>
+<h4 id="SSSDclientsrefreshintervals">SSSD clients refresh intervals</h4>
+<p>
+The SSSD would perform the dynamic DNS update or refresh under the following conditions:
+</p>
+<ul><li>the back end becomes online
+<ul><li>this would also cover the case where computer is restarted. For long-running deployments where the SSSD is almost never offline, the back end would only ever become online after bootup
+</li></ul></li><li>periodically based on a configuration option
+<ul><li>the configuration option could be named <tt>dyndns_refresh_interval</tt> or similar and it would default to 24 hours
+</li><li>the granularity will be seconds. AD interface also allows to set the refresh and no-refresh interval in hours, too, so our granularity should not be lower. Seconds also allow expressing
+other values that might for instance map to DHCP leases easier.
+</li><li>admin could change the option to be same as DHCP lease for example to simulate the case where Windows workstations refresh the address after lease is renewed
+</li></ul></li></ul><h3 id="Overviewofthesolution">Overview of the solution</h3>
+<p>
+Because the DNS records scavenging is not on by default on the server side, the client side DNS updates would be off by default as well. A new configuration option, called
+<tt>dyndns_update</tt> (bool)  would control whether the DNS update should be performed.
+</p>
+<h4 id="Addressesusedduringtheupdate">Addresses used during the update</h4>
+<p>
+We will reuse a similar mechanism used in the IPA provider where the address used to connect to the AD server LDAP connection is used by default. Optionally, for machines that
+use IP aliasing or setups that wish to update both IPv4 and IPv6 addresses of an interface at the same time there will be an option <tt>dyndns_iface</tt>.
+</p>
+<p>
+Contrary to IPA dynamic DNS update that generates the PTR record in the bind dyndb plugin, AD wouldn't update the PTR record on its own when only A/AAAA record is updated. To be able to keep the forward and reverse zones in sync, the AD dynamic update message would also include updating the PTR records. PTR records update would not be on by default and could be turned on by setting an option (perhaps <tt>dyndns_update_ptr</tt>) to true.
+</p>
+<h4 id="Futureandoptionalenhancements">Future and optional enhancements</h4>
+<ul><li>Currently the information on whether scavenging is enabled and how
+often is it performed is stored in GPOs. When SSSD has the ability to
+process Group Policies, we would add a new special value to the
+periodical update option that would tell the SSSD to simply honour the
+Group Policies.
+</li><li>We could also integrate with netlink to perform IP address refresh on DHCP lease renewals. This could be filed as a separate ticket and implemented later.
+</li></ul><h3 id="Implementationdetails">Implementation details</h3>
+<p>
+For the update itself, we can simply use the nsupdate utility the way we
+use it in IPA domain. The update code is already there, it is mostly a
+matter of splitting the code to be IPA-agnostic.
+</p>
+<p>
+One change compared to the IPA code would be that IPA only sends the refresh when the addresses change, to avoid unnecessary zone transfers on the IPA server.
+As stated above Windows clients typically refresh their address even if nothing changed, so our update code would run unconditionally, too, based on timed events.
+</p>
+<ol><li>The use of <tt>resolv_init</tt> in the dynamic DNS update code should be inspected. If it is not needed anymore and the resolver code could already be told per-request to only go to DNS and ignore <tt>/etc/hosts</tt>, the initialization should be removed.
+</li><li>A new module shared between IPA and AD providers shall be created. This module will contain generic functions related to dynamic DNS update such as:
+<ul><li>a variant of <tt>ipa_dyndns_add_ldap_iface</tt> decoupled from IPA dependencies
+</li><li>function to gather all addresses of an interface
+</li><li>utility functions
+</li></ul></li><li>The existing <tt>fork_nsupdate_send</tt> request would be split out to a generic request that calls nsupdate with a specified message. This request would be placed in the module created in the previous step. The IPA provider would be converted to use these new generic request. The interface might look like:
+<pre class="wiki">    struct tevent_req *be_nsupdate_send(struct tevent_context *ev, const char *nsupdate_msg);
+    errno_t be_nsupdate_recv(struct tevent_req *req, int *child_retval);
+</pre></li><li>In the AD provider, a variant of IPA dyndns code would be created, using AD specific data structures and options. This interface would consist of a tevent request that would wrap <tt>fork_nsupdate_send</tt> using <tt>struct ad_options</tt> and an initializer function called on provider startup.
+</li><li>If the <tt>dyndns_update</tt> option was set to <tt>true</tt>, then the AD provider would:
+<ul><li>set up a periodic task running each <tt>dyndns_refresh_interval</tt> hours updating the DNS records
+</li><li>set up an online callback to run the DNS update when the back end goes online
+</li></ul></li></ol><h3 id="Listofallnewconfigurationoptions">List of all new configuration options</h3>
+<p>
+During design discussion, it was decided that the new options should be not include the provider-specific prefix but rather be provider agnostic to ease sharing the code and possibly allow other providers to use dynamic DNS updates as well. The new options are: 
+</p>
+<ol><li><tt>dynds_update</tt> <tt>(bool)</tt> - whether to perform the dynamic DNS update. Defaults to false.
+</li><li><tt>dyndns_refresh_interval</tt> <tt>(integer)</tt> - how often to run the periodic task to refresh the resource record
+</li><li><tt>dyndns_iface</tt> <tt>(string)</tt> - instead of updating the DNS with the address used to connect to LDAP, which is the default, use all addresses configured on a particular interface
+</li><li><tt>dyndns_update_ptr</tt> <tt>(bool)</tt> - whether to also update the reverse zone when updating the forward zone
+</li><li><tt>dyndns_auth</tt> <tt>(string)</tt> - how should the <tt>nsupdate</tt> utility authenticate to DNS. Supported values would be <tt>gss-tsig</tt> and <tt>none</tt>. IPA and AD providers would default to <tt>gss-tsig</tt>. In 1.10 this option would be undocumented and the only providers that would document the other options in their man pages would be IPA and AD. Future expansion of this feature into other providers would be as easy as hooking online callbacks into dynamic DNS update handler.
+</li></ol><p>
+The existing <tt>ipa_dyndns_update</tt>, <tt>ipa_dyndns_ttl</tt> and <tt>ipa_dyndns_iface</tt> options would map to these new options. The <tt>sssd-ipa</tt> manual page would be amended to list the new options primarily and also list the old ones as a fallback, which would eventually be removed.
+</p>
+<h3 id="Howtotest">How to test</h3>
+<ol><li>Test that forward and reverse zone updates work
+<ul><li>Make sure DNS updates are enabled on the zone
+<ul><li>Right-click the zone and select the "General" tab
+</li><li>There is a combo-box labeled "Dynamic updates". Toggle it to "Secure only".
+</li><li>Click "Apply"
+</li></ul></li><li>Prepare a client with dynamically updated DNS address
+<ul><li>the easiest way is to join the client with realmd - <tt>realm join ad.domain.example.com</tt>
+</li></ul></li><li>Test updates when the address has changed
+<ul><li>Change the address of a client
+</li><li>Perform an action that would trigger an online callback such as login
+</li><li>In the AD MMC check if the DNS address is the same as the new address on the client
+</li><li>Depending on the settings of <tt>dyndns_iface</tt> or <tt>dyndns_update_ptr</tt> also check if all expected addresses have been updated in both forward and reverse zones.
+</li></ul></li><li>Test periodic refresh
+<ul><li>Set the periodic refresh (<tt>dyndns_refresh_interval</tt> in this document) to some low value
+</li><li>Wait until that value passes or modify the system time
+</li><li>The timestamp of the resource records would be changed after SSSD ran its periodic task. The timestamp will be rounded down to the nearest hour by AD.
+</li></ul></li></ul></li><li>Test DNS scavenging
+<ul><li>Enroll two SSSD clients into AD
+<ul><li>Turn one of them off after enrollment. This client will be scavenged.
+</li><li>Let the other one up and set its <tt>dyndns_refresh_interval</tt> to a value shorter than the scavenging interval
+</li></ul></li><li>Enable DNS scavenging on the server
+<ul><li>In the DNS MMC console, right-click the DNS server in the tree view, select Properties and navigate to the "Advanced" tab
+</li><li>Enable the "Enable automatic scavenging of stale records" toggle and select a meaningful period
+</li><li>Hit apply
+</li></ul></li><li>Enable DNS scavenging for the zone
+<ul><li>Open the DNS administrative console
+</li><li>Right-click the zone and select the "General" tab.
+</li><li>Click the "Aging" button
+</li><li>Enable the "Scavenge stale resource records" toggle
+</li><li>Set the no refresh and refresh interval to a low value.
+</li><li>Check the "This zone can be scavenged after" text box. It should list a date and time shortly in the future.
+</li></ul></li><li>Let the scavenging interval pass
+<ul><li>The client that was turned off after enrollment should be scavenged. You should no longer be able to see its records in the DNS zones on the server.
+</li><li>The other client's DNS records should remain intact in the DNS MMC console
+</li></ul></li></ul></li></ol><h3 id="Linksandrecources">Links and recources</h3>
+<ul><li><a class="ext-link" href="http://technet.microsoft.com/en-us/library/cc759204%28v=ws.10%29.aspx"><span class="icon">​</span>Understanding aging and scavenging</a>
+</li><li><a class="ext-link" href="http://technet.microsoft.com/en-us/library/cc757041%28v=ws.10%29.aspx"><span class="icon">​</span>Using DNS Aging and Scavenging</a>
+</li><li><a class="ext-link" href="http://blogs.technet.com/b/networking/archive/2008/03/19/don-t-be-afraid-of-dns-scavenging-just-be-patient.aspx"><span class="icon">​</span>Don't be afraid of DNS Scavenging. Just be patient. by MSFT Networking Team</a>
+</li></ul><h3 id="Authors">Author(s)</h3>
+<ul><li>Jakub Hrozek &lt;<a class="mail-link" href="mailto:jhrozek@redhat.com"><span class="icon">​</span>jhrozek@redhat.com</a>&gt;
+</li></ul></body></html>

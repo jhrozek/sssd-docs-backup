@@ -1,0 +1,37 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><p>
+This is a summary of recent discussion on sssd-devel and freeipa-users mailing lists.
+</p>
+<strong>Winbind:</strong>
+<ul style="padding-left: 15px; margin: 0px 0px 33px 0px">
+  <li style="color: #058A01">support for cross forest trusts</li>
+    <ul style="padding-left: 15px">
+        <li>SSSD didn't support trusted domains until 1.10 at all. Starting with 1.10, trusted domains in a single forest are supported.</li>
+    </ul>
+  <li style="color: #058A01">can use MS-RPC to handle legacy NT/Samba3 domains</li>
+  <li style="color: #058A01">can do NTLM authentication</li>
+  <li style="color: #f00">very exotic crashes sometimes occur, winbind doesn't recover from them</li>
+  <li style="color: #f00">low performance in comparison with nss_ldap + nscd</li>
+  <li style="color: #f00">the need for system to be a domain member</li>
+  <li style="color: #f00">in environments with several different flavors of Linux, it's wasn't always possible to use Winbind the same way on all machines; RHEL3's Samba for example was not quite up to the task</li>
+  <li style="color: #f00">uncomfortable debugging (obscure protocol in comparison with LDAP/krb5)</li>
+</ul>
+<strong>SSSD:</strong>
+<ul style="padding-left: 15px; margin: 0px 0px 33px 0px">
+  <li style="color: #058A01">more stable and faster than winbind</li>
+  <li style="color: #058A01">1:1 mapping between ID and AUTH domains</li>
+  <li style="color: #058A01">if anything goes wrong, it is generally easy to debug, since all business logic is in SSSD code</li>
+  <li> option to run without joining the domain
+    <ul style="padding-left: 15px">
+      <li style="color: #058A01">definitely convenient in many cases</li>
+    </ul>
+  </li>
+</ul>
+<p>
+In general, some support for Active Directory integration landed in 1.9, such as support for mapping SIDs to IDs or the Active Directory provider. More features were introduced in 1.10 such as the ability to perform site discovery
+or DNS updates.
+</p>
+<strong>misc:</strong>
+<ul style="padding-left: 15px; margin: 0px 0px 33px 0px">
+  <li>it is possible to configure winbind with sssd on one system</li>
+</ul>
+</body></html>

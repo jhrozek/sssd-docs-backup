@@ -1,0 +1,50 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><p>
+<strong>Nothing on this page truly exists. It contains only ramblings on what SSSD might become in the future.</strong>
+These are mostly unordered notes.
+</p>
+<h2 id="SSSD2.0">SSSD 2.0</h2>
+<p>
+Major themes
+</p>
+<ul><li>Powered by systemd wherever possible
+</li><li>Eliminate the monitor process
+</li><li>Support socket activation and idle termination
+</li><li>Simplify configuration
+</li><li>Fast support for local users
+</li></ul><h3 id="systemd">systemd</h3>
+<p>
+This init system supports many powerful features that could make large parts of SSSD <em>infrastructure</em> irrelevant.
+</p>
+<ul><li>Supports process monitoring and automatic restart
+</li><li>Can support chaining multiple child processes together
+</li><li>Manages socket-activation for registered processes
+</li><li>Supports kdbus for secure and fast D-BUS communication between processes
+</li></ul><h3 id="Processstart-up">Process start-up</h3>
+<ul><li>Use the <tt>sssd</tt> process (formerly the monitor) solely to parse sssd.conf and convert it to the config LDB, which the other processes will be able to read at startup.
+</li><li>Eliminate the services= line. All supported responders should simply be invoked (socket-activated) when their client asks for them and then proceed according to the config LDB (which may just tell it to terminate again with an appropriate error reply)
+</li><li>We may want to load different providers as separate processes to make it easier to decide when to terminate them. It would be better to rethink whether it makes more sense to have one process per domain as opposed to one process per configured provider back-end.
+</li><li>systemd now has a D-BUS method for setting up persistent or non-persistent units (such as service units), so we can take advantage of this to start up only the processes we really need.
+</li></ul><h3 id="idletermination">idle termination</h3>
+<p>
+Shutting down any SSSD process that is not actively doing work would be advantageous for several reasons (most notably memory and CPU resource reduction during idle periods). Designing for this would also force us to optimize for making SSSD operations stateless (or at least tracking in-progress operations more carefully).
+</p>
+<p>
+Some random thoughts on provider implementations:
+ 
+</p>
+<ul><li>LDAP provider (and derivatives) should auto-terminate once the the ldap_connection_expire_timeout is reached, since we can then assume that nothing has been happening on the connection for quite some time (15 minutes by default).
+</li><li>Other providers should terminate after a similar reasonable amount of time.
+</li><li>Providers that have computationally-rare periodic tasks (such as cache cleanup or kerberos ticket renewal) should be stored in a persistent manner between process startups and should automatically be invoked if their period has passed. We can take advantage of systemd timer units to have the process periodically woken up to process these events, rather than simply holding the process alive and idle for long periods.
+</li></ul><h3 id="Localusers">Local users</h3>
+<ul><li>We need to rework the local provider to behave more similarly to the other providers (even if this just means a provider backend that always returns "offline"). This way, the local id_provider can be configured with other providers like kerberos.
+</li><li>We need to optimize the local user behavior such that it is acceptable to have <tt>sss</tt> first in the nsswitch.conf lines everywhere. This will solve the performance problem caused by disabling nscd for local users (which results in disk reads for all lookups prior to trying sssd)
+</li><li>We need to work on <a class="ext-link" href="https://sourceware.org/glibc/wiki/Proposals/GroupMerging"><span class="icon">​</span>https://sourceware.org/glibc/wiki/Proposals/GroupMerging</a> and finish it.
+</li></ul><h3 id="Enumeration">Enumeration</h3>
+<p>
+Enumeration mode should be deprecated in SSSD 2.0 with a strong recommendation being placed on a D-BUS API for doing enumeration that supports paging and filtering. Most uses of enumeration are for presenting a user/group list in a UI, so this will be a better fit for that anyway.
+</p>
+<h3 id="SBUS">SBUS</h3>
+<p>
+The original point-to-point SBUS should be retired. Now that SSSD supports running as non-root, we should instead set up a session bus and use that (which will also be advantageous as we get into the kdbus-enabled world).
+</p>
+</body></html>

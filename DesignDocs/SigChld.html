@@ -1,0 +1,169 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><p>
+</p><div class="wiki-toc">
+<ol>
+  <li>
+    <ol>
+      <li>
+        <a href="#CommonSIGCHLDhandler">Common SIGCHLD handler</a>
+      </li>
+      <li>
+        <a href="#AlternateProposal">Alternate Proposal</a>
+        <ol>
+          <li>
+            <a href="#structsss_child_ctxchild_ctx">struct sss_child_ctx *child_ctx</a>
+            <ol>
+              <li>
+                <a href="#members">members</a>
+              </li>
+            </ol>
+          </li>
+          <li>
+            <a href="#structsss_sigchild_ctxsigchld_ctx">struct sss_sigchild_ctx *sigchld_ctx</a>
+            <ol>
+              <li>
+                <a href="#members1">members</a>
+              </li>
+              <li>
+                <a href="#Function">Function</a>
+              </li>
+            </ol>
+          </li>
+          <li>
+            <a href="#sss_child_register">sss_child_register</a>
+            <ol>
+              <li>
+                <a href="#Prototype">Prototype</a>
+              </li>
+              <li>
+                <a href="#Function1">Function</a>
+              </li>
+            </ol>
+          </li>
+          <li>
+            <a href="#sss_child_handler">sss_child_handler</a>
+            <ol>
+              <li>
+                <a href="#Prototype1">Prototype</a>
+              </li>
+              <li>
+                <a href="#Function2">Function</a>
+              </li>
+            </ol>
+          </li>
+          <li>
+            <a href="#sss_child_fn_t">sss_child_fn_t</a>
+            <ol>
+              <li>
+                <a href="#Prototype2">Prototype</a>
+              </li>
+            </ol>
+          </li>
+          <li>
+            <a href="#sss_child_destructor">sss_child_destructor</a>
+          </li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+</ol>
+</div><p>
+</p>
+<p>
+This design page is related to the following ticket: <a class="ext-link" href="https://fedorahosted.org/sssd/ticket/1004"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/1004</a>
+</p>
+<h2 id="CommonSIGCHLDhandler">Common SIGCHLD handler</h2>
+<p>
+I took some inspiration in the SIGUSR1 signal handling in data_provider_be.c.
+The SIGUSR1 signal is apparently used to force offline behavior on providers.
+</p>
+<p>
+DP backend enables providers to register callbacks for the online/offline event. I thought
+it would be a good idea to make SIGCHLD handling consistent with what is already in place.
+</p>
+<p>
+For online/offline event, these functions are defined:
+</p>
+<p>
+be_add_online_cb
+</p>
+<p>
+be_run_online_cb
+</p>
+<p>
+be_add_offline_cb
+</p>
+<p>
+be_run_offline_cb
+</p>
+<p>
+They give providers the option to register additional callbacks to handle these event in their own
+way. The list of callbacks is stored on the backend context (struct be_ctx).
+</p>
+<p>
+However there is one difference between the SIGCHLD and SIGUSR1 scenarios: online/offline callbacks are
+called serially - always all of them. While the SIGCHLD handler has to invoke callbacks for the appropriate PIDs
+only. This means we can't use the underlying callbacks handling functions already in place (be_run_cb and be_run_cb_step).
+</p>
+<p>
+I propose creating new similar functions (be_run_sigchld_cb and be_run_sigchld_cb_step). They would work in a similar manner
+to the previously mentioned (be_run_cb and be_run_cb_step respectively) with the difference that:
+</p>
+<ol><li>each step would check with waitpid first and invoke the callback only if the child has exited
+</li></ol><ol start="2"><li>we would use tevent_immediate events instead of timers (as discussed on IRC with Stephen)
+</li></ol><p>
+Advantages of this approach:
+</p>
+<ol><li>consistent with online/offline callbacks for providers
+</li></ol><ol start="2"><li>relatively easy to implement
+</li></ol><h2 id="AlternateProposal">Alternate Proposal</h2>
+<h3 id="structsss_child_ctxchild_ctx">struct sss_child_ctx *child_ctx</h3>
+<h4 id="members">members</h4>
+<ul><li><tt>pid_t pid</tt>
+</li><li><tt>sss_child_cb_fn cb</tt>
+</li><li><tt>void *pvt</tt>
+</li><li><tt>struct sss_sigchild_ctx *sigchld_ctx</tt>
+</li></ul><h3 id="structsss_sigchild_ctxsigchld_ctx">struct sss_sigchild_ctx *sigchld_ctx</h3>
+<h4 id="members1">members</h4>
+<ul><li><tt>struct tevent_context *ev</tt>
+</li><li><tt>hash_table_t *children</tt>
+</li><li><tt>int options</tt>
+</li></ul><h4 id="Function">Function</h4>
+<p>
+This object should be initialized at process startup time. The hash_table should be initialized with <tt>sss_hash_create()</tt> to maintain talloc compatibility. This hash should be keyed by integer (the PID) and should contain <tt>struct sss_child_ctx *</tt> objects as its values. The <tt>options</tt> member should be a bitmask allowing WUNTRACED and/or WCONTINUED. The handler will ALWAYS add WNOHANG.
+</p>
+<h3 id="sss_child_register">sss_child_register</h3>
+<h4 id="Prototype">Prototype</h4>
+<pre class="wiki">errno_t sss_child_register(TALLOC_CTX *memctx,
+                           struct sss_sigchild_ctx *sigchld_ctx,
+                           pid_t pid,
+                           sss_child_fn_t cb,
+                           void *pvt,
+                           struct sss_child_ctx **child_ctx);
+</pre><h4 id="Function1">Function</h4>
+<p>
+This function registers a callback with private data in a hash table contained within sigchld_ctx. It constructs a <tt>struct sss_child_ctx *</tt> consisting of the pid, cb and pvt. It will also create a destructor for this object which will remove the entry from the hash. This is so that it the consumer can choose when to stop monitoring the child (such as if the <tt>waitpid()</tt> call returned SIGSTOP/SIGCONT or other non-terminating results. It can also be used to programmatically change the callback at need.
+</p>
+<h3 id="sss_child_handler">sss_child_handler</h3>
+<h4 id="Prototype1">Prototype</h4>
+<pre class="wiki">void
+sss_child_handler(struct tevent_context *ev,
+                  struct tevent_signal *se,
+                  int signum,
+                  int count,
+                  void *siginfo,
+                  void *private_data);
+</pre><h4 id="Function2">Function</h4>
+<p>
+This is the master SIGCHLD handler. It would be invoked any time that the process receives a SIGCHLD signal.
+</p>
+<p>
+When the signal is removed, it should call <tt>waitpid(-1, &amp;status, WNOHANG &amp; sigchld_ctx-&gt;options);</tt> repeatedly until <tt>waitpid()</tt> returns 0. For each child received, the pid should be looked up in the hash table and the matching callback should be invoked.
+</p>
+<h3 id="sss_child_fn_t">sss_child_fn_t</h3>
+<h4 id="Prototype2">Prototype</h4>
+<pre class="wiki">typedef void (*sss_child_fn_t)(int pid, int wait_status, void *pvt);
+</pre><h3 id="sss_child_destructor">sss_child_destructor</h3>
+<p>
+Talloc_destructor to remove a <tt>struct sss_child_ctx *</tt> from the hash table of the <tt>struct sss_sigchild_ctx *</tt> that contains it.
+</p>
+</body></html>

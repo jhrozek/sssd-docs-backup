@@ -1,0 +1,259 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<ul><li>This is mostly a bug fixing release with only minor enhancements visible to the end user
+</li><li>Contains many fixes and enhancements related to the ID views functionality of FreeIPA servers
+<ul><li>SSSD now allows the IPA client to move from one ID view to another after SSSD restart
+</li><li>It is possible to apply ID views to IPA domains as well. Previous SSSD versions only allowed views to be applied to AD trusted domains
+</li><li>Overriding SSH public keys is supported in this release
+</li></ul></li><li>This release contains several fixes and enhancements related to users and groups from trusted AD domains
+<ul><li>When a trusted AD domain is disabled on the server side, access is denied for users logging in from these domains
+</li><li>External group memberships (i.e. memberships in IPA groups) are now resolved correctly for trusted AD users
+</li><li>The localauth plugin configuration is written into the pubconf directory which should be included from krb5.conf on IPA clients. As a result, the localauth plugin should be configured automatically on IPA clients.
+</li></ul></li><li>Password change when One-Time-Passwords are used was fixed
+</li><li>The tokenGroups support was disabled by default in the LDAP provider. The tokenGroups support is still enabled by default in the AD provider
+</li><li>Simple access provider skips user or group names that can't be resolved if only allow rules are configured
+</li></ul><h2 id="PackagingChanges">Packaging Changes</h2>
+<ul><li>Support for running SSSD as a non-privileged user was added. SSSD's directories must be owned by this user, hence SSSD needs to be configured properly at build time, using the new configure option <tt>--with-sssd-user</tt>. Additionally, the non-privileged user must also be selected in sssd.conf using the <tt>user</tt> configuration option.
+</li></ul><h2 id="DocumentationChanges">Documentation Changes</h2>
+<ul><li>A new configuration option <tt>krb5_confd_path</tt> was added. This option specifies the directory where SSSD places Kerberos configuration snippets.
+</li><li>The default value of <tt>ldap_user_uuid</tt> was changed to be <tt>objectSID</tt> for the AD back end and unset for all other back ends.
+</li><li>The option <tt>ldap_use_tokengroups</tt> changed its default value to True for AD and IPA providers only.
+</li><li>The <tt>allowed_shells</tt> option newly accepts the wildcard (<tt>*</tt>) value, allowing any shell
+</li></ul><h2 id="TicketsFixed">Tickets Fixed</h2>
+<p>
+</p><div><dl class="wiki compact"><dt><a class="closed" href="/sssd/ticket/1195" title="4 functions with reference leaks within sssd (src/python/pyhbac.c)">#1195</a></dt><dd>4 functions with reference leaks within sssd (src/python/pyhbac.c)</dd><dt><a class="closed" href="/sssd/ticket/1939" title="Create unit test for be_ptask">#1939</a></dt><dd>Create unit test for be_ptask</dd><dt><a class="closed" href="/sssd/ticket/2102" title="disable midpoint refresh for netgroups if ptask refresh is enabled">#2102</a></dt><dd>disable midpoint refresh for netgroups if ptask refresh is enabled</dd><dt><a class="closed" href="/sssd/ticket/2219" title="Shell fallback mechanism in SSSD">#2219</a></dt><dd>Shell fallback mechanism in SSSD</dd><dt><a class="closed" href="/sssd/ticket/2370" title="sssd should run under unprivileged user">#2370</a></dt><dd>sssd should run under unprivileged user</dd><dt><a class="closed" href="/sssd/ticket/2372" title="SELinux: Audit changes to the SELinux label files">#2372</a></dt><dd>SELinux: Audit changes to the SELinux label files</dd><dt><a class="closed" href="/sssd/ticket/2404" title="Remove password from the PAM stack if OTP is used">#2404</a></dt><dd>Remove password from the PAM stack if OTP is used</dd><dt><a class="closed" href="/sssd/ticket/2430" title="sssd segfaults repeatedly with error 4 in memberof.so">#2430</a></dt><dd>sssd segfaults repeatedly with error 4 in memberof.so</dd><dt><a class="closed" href="/sssd/ticket/2439" title="Return a different errno from client when sssd is not running.">#2439</a></dt><dd>Return a different errno from client when sssd is not running.</dd><dt><a class="closed" href="/sssd/ticket/2445" title="Race condition while invalidating memory cache in client code">#2445</a></dt><dd>Race condition while invalidating memory cache in client code</dd><dt><a class="closed" href="/sssd/ticket/2451" title="sssd-ldap man page changes, add 'access_provider = ldap' as a requirement ...">#2451</a></dt><dd>sssd-ldap man page changes, add 'access_provider = ldap' as a requirement 'ldap_access_order = for lockout'</dd><dt><a class="closed" href="/sssd/ticket/2454" title="[RFE] Views: apply user SSH public key override">#2454</a></dt><dd>[RFE] Views: apply user SSH public key override</dd><dt><a class="closed" href="/sssd/ticket/2456" title="Error message not helpful if extdom lookup fails">#2456</a></dt><dd>Error message not helpful if extdom lookup fails</dd><dt><a class="closed" href="/sssd/ticket/2460" title="service lookups returned in lowercase with case_sensitive=preserving">#2460</a></dt><dd>service lookups returned in lowercase with case_sensitive=preserving</dd><dt><a class="closed" href="/sssd/ticket/2461" title="Proxy Provider: Fails to lookup case sensitive users and groups with ...">#2461</a></dt><dd>Proxy Provider: Fails to lookup case sensitive users and groups with case_sensitive=preserving</dd><dt><a class="closed" href="/sssd/ticket/2462" title="Manpage description of case_sensitive=preserving is incomplete">#2462</a></dt><dd>Manpage description of case_sensitive=preserving is incomplete</dd><dt><a class="closed" href="/sssd/ticket/2464" title="Use ldap_extra_attrs when requesting attributes from extdom plugin">#2464</a></dt><dd>Use ldap_extra_attrs when requesting attributes from extdom plugin</dd><dt><a class="closed" href="/sssd/ticket/2467" title="Set the right permissions in Makefile.am when installing from source">#2467</a></dt><dd>Set the right permissions in Makefile.am when installing from source</dd><dt><a class="closed" href="/sssd/ticket/2468" title="Don't set the umask in the utility function that creates sockets">#2468</a></dt><dd>Don't set the umask in the utility function that creates sockets</dd><dt><a class="closed" href="/sssd/ticket/2470" title="refactor create_pipe_fd()">#2470</a></dt><dd>refactor create_pipe_fd()</dd><dt><a class="closed" href="/sssd/ticket/2473" title="RFE: Add a configuration option to specify where a snippet with ...">#2473</a></dt><dd>RFE: Add a configuration option to specify where a snippet with sssd_krb5_localauth_plugin.so is generated</dd><dt><a class="closed" href="/sssd/ticket/2475" title="Wrong results returned with enumeration">#2475</a></dt><dd>Wrong results returned with enumeration</dd><dt><a class="closed" href="/sssd/ticket/2477" title="SSSD doesn't tell that it can't start because of no longer existent ID ...">#2477</a></dt><dd>SSSD doesn't tell that it can't start because of no longer existent ID range</dd><dt><a class="closed" href="/sssd/ticket/2481" title="ID Views implementation does not support IPA user&amp;group overrides">#2481</a></dt><dd>ID Views implementation does not support IPA user&amp;group overrides</dd><dt><a class="closed" href="/sssd/ticket/2484" title="Password change over ssh doesn't work with OTP and FreeIPA">#2484</a></dt><dd>Password change over ssh doesn't work with OTP and FreeIPA</dd><dt><a class="closed" href="/sssd/ticket/2487" title="sssd does not work with custom value of option re_expression">#2487</a></dt><dd>sssd does not work with custom value of option re_expression</dd><dt><a class="closed" href="/sssd/ticket/2490" title="dereferencing failure against openldap server">#2490</a></dt><dd>dereferencing failure against openldap server</dd><dt><a class="closed" href="/sssd/ticket/2492" title="Group membership gets lost in IPA server mode">#2492</a></dt><dd>Group membership gets lost in IPA server mode</dd><dt><a class="closed" href="/sssd/ticket/2498" title="&#34;debug_timestamps = false&#34; and &#34;debug_microseconds = true&#34; do not work ...">#2498</a></dt><dd>"debug_timestamps = false" and "debug_microseconds = true" do not work after enabling journald with sssd.</dd><dt><a class="closed" href="/sssd/ticket/2501" title="pam_sss domains option: Untrusted users from the same domain are allowed ...">#2501</a></dt><dd>pam_sss domains option: Untrusted users from the same domain are allowed to auth.</dd><dt><a class="closed" href="/sssd/ticket/2503" title="Use the MEMORY ccache to pass around keytab contents">#2503</a></dt><dd>Use the MEMORY ccache to pass around keytab contents</dd><dt><a class="closed" href="/sssd/ticket/2506" title="Check unlink return values to silence Coverity warnings">#2506</a></dt><dd>Check unlink return values to silence Coverity warnings</dd><dt><a class="closed" href="/sssd/ticket/2510" title="The Kerberos provider is not properly views-aware">#2510</a></dt><dd>The Kerberos provider is not properly views-aware</dd><dt><a class="closed" href="/sssd/ticket/2512" title="selinuxusermap rule does not apply to trusted AD users">#2512</a></dt><dd>selinuxusermap rule does not apply to trusted AD users</dd><dt><a class="closed" href="/sssd/ticket/2514" title="gid is overridden by uid in default trust view">#2514</a></dt><dd>gid is overridden by uid in default trust view</dd><dt><a class="closed" href="/sssd/ticket/2516" title="pam_sss domains option: User auth should fail when domains=&lt;emtpy value&gt;">#2516</a></dt><dd>pam_sss domains option: User auth should fail when domains=&lt;emtpy value&gt;</dd><dt><a class="closed" href="/sssd/ticket/2518" title="SSSD master doesn't build on RHEL-6">#2518</a></dt><dd>SSSD master doesn't build on RHEL-6</dd><dt><a class="closed" href="/sssd/ticket/2519" title="SSSD should not fail authentication when only allow rules are used">#2519</a></dt><dd>SSSD should not fail authentication when only allow rules are used</dd><dt><a class="closed" href="/sssd/ticket/2520" title="Crash in function get_object_from_cache">#2520</a></dt><dd>Crash in function get_object_from_cache</dd><dt><a class="closed" href="/sssd/ticket/2521" title="be_ptask unit test fails sometimes">#2521</a></dt><dd>be_ptask unit test fails sometimes</dd><dt><a class="closed" href="/sssd/ticket/2524" title="getent fails for posix group with AD users after login">#2524</a></dt><dd>getent fails for posix group with AD users after login</dd><dt><a class="closed" href="/sssd/ticket/2526" title="User is unable to authenticate if the option krb5_fast_principal is NULL">#2526</a></dt><dd>User is unable to authenticate if the option krb5_fast_principal is NULL</dd><dt><a class="closed" href="/sssd/ticket/2529" title="IPA: incomplete group memberships for AD users on IPA clients">#2529</a></dt><dd>IPA: incomplete group memberships for AD users on IPA clients</dd><dt><a class="closed" href="/sssd/ticket/2530" title="MAN: Document that only usernames are checked for pam_trusted_uids">#2530</a></dt><dd>MAN: Document that only usernames are checked for pam_trusted_uids</dd><dt><a class="closed" href="/sssd/ticket/2535" title="Access is not rejected for disabled domain">#2535</a></dt><dd>Access is not rejected for disabled domain</dd><dt><a class="closed" href="/sssd/ticket/2537" title="sssd-libwbclient conflicts with Samba's and causes crash in wbinfo">#2537</a></dt><dd>sssd-libwbclient conflicts with Samba's and causes crash in wbinfo</dd></dl></div><p>
+</p>
+<h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Carlos A. Munoz (1):
+</p>
+<ul><li>Add zanata.xml file for integration with Zanata command line client
+</li></ul><p>
+Dan Lavu (3):
+</p>
+<ul><li>MAN PAGE: modified sssd-ldap.5.xml for sssd ticket <a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/2451" title="defect: sssd-ldap man page changes, add 'access_provider = ldap' as a requirement ... (closed: fixed)">#2451</a>
+</li><li>MAN: page edit for ldap_use_tokengroups
+</li><li>MAN: Clarify ad_gpo_map* options
+</li></ul><p>
+Denis Kutin (1):
+</p>
+<ul><li>NSS: Possibility to use any shells in 'allowed_shells'
+</li></ul><p>
+Jakub Hrozek (68):
+</p>
+<ul><li>Updating the version for the 1.12.3 development
+</li><li>SSSD: Add the options to specify a UID and GID to run as
+</li><li>SSSD: Chown the log files
+</li><li>UTIL: Use a custom PID_PATH and DB_PATH when unit testing server.c
+</li><li>TESTS: Unit tests can use confdb without using sysdb
+</li><li>TESTS: Unit tests for server_setup
+</li><li>RPM: Package the libsss_semanage.so library
+</li><li>IPA: Handle NULL members in process_members()
+</li><li>UTIL: Add a function to convert id_t from a number or a name
+</li><li>BUILD: Add a config option for sssd user, own private directories as the user
+</li><li>RPM: Change file ownership to sssd.sssd
+</li><li>SSSD: Load a user to run a service as from configuration
+</li><li>SBUS: Chown the sbus socket if needed
+</li><li>SBUS: Allow connections from other UIDs
+</li><li>BE: Own the sbus socket as the SSSD user
+</li><li>NSS: Run as a user specified by monitor
+</li><li>TEST: Unit test for create_pipe_fd
+</li><li>AUTOFS: Run the autofs responder as the SSSD user
+</li><li>PAC: Run the pac responder as the SSSD user
+</li><li>SUDO: Run the sudo responder as the SSSD user
+</li><li>SSH: Run the ssh responder as the SSSD user
+</li><li>GPO: Terminate request on error
+</li><li>TESTS: Add tests for the views-related option maps
+</li><li>IPA: Don't fail the request when BE doesn't find the object
+</li><li>IPA: Rename user_dom into obj_dom
+</li><li>BUILD: Install ldap_child and as setuid if running under non-privileged user
+</li><li>LDAP: Move sss_krb5_verify_keytab_ex to ldap_child
+</li><li>LDAP: read the correct data type from ldap_child's input buffer
+</li><li>LDAP: Drop privileges after kinit in ldap_child
+</li><li>UTIL: Remove code duplication of struct io
+</li><li>UTIL: Remove more code duplication setting up child processes
+</li><li>IPA: Move setting the SELinux context to a child process
+</li><li>BE: Make struct bet_queue_item private to sssd_be
+</li><li>BUILD: Install krb5_child as suid if running under non-privileged user
+</li><li>KRB5: Drop privileges in the child, not the back end
+</li><li>KRB5: Move ccache-related functions to krb5_ccache.c
+</li><li>KRB5: Move checking for illegal RE to krb5_utils.c
+</li><li>KRB5: Move all ccache operations to krb5_child.c
+</li><li>KRB5: Do not switch_creds() if already the specified user
+</li><li>BUILD: Use separate chown to make changing ownership to the sssd user non-fatal
+</li><li>BUILD: Make chown of files to sssd user non-fatal
+</li><li>BUILD: Touch files in DESTDIR
+</li><li>BE: Become a regular user after initialization
+</li><li>BE: Fix a debug message
+</li><li>IPA: Handle IPA groups returned from extop plugin
+</li><li>Hint about removing sysdb if initializing ID map fails
+</li><li>PAM: Make pam_forwarder_parse_data static
+</li><li>SBUS: Initialize DBusError before using it
+</li><li>PAM: Check for trusted domain before sending the request to BE
+</li><li>PAM: Move is_uid_trusted from pam_ctx to preq
+</li><li>TESTS: Basic child tests
+</li><li>Add extra_args to exec_child()
+</li><li>KRB5: Create the fast ccache in a child process
+</li><li>LDAP: Remove useless include
+</li><li>sss_atomic_write_s() return value is signed
+</li><li>KRB5: Relax DEBUG message
+</li><li>TESTS: Build test_child even without cmocka
+</li><li>Rename test-child to dummy-child
+</li><li>CI: Suppress memory errors from poptGetNextOpt
+</li><li>tests: Free popt_context
+</li><li>IFP: Return group names with the right case
+</li><li>KRB5: Check FAST kinit errors using get_tgt_times()
+</li><li>Skip CHAUTHTOK_PRELIM when using OTPs
+</li><li>PAM: Domain names are case-insensitive
+</li><li>PAM: Missing argument to domains= should fail auth
+</li><li>MAN: Misspelled username in pam_trusted_users is not fatal
+</li><li>RESPONDER: Log failures to resolve user names in csv_string_to_uid_array
+</li><li>Updating translations for the 1.12.3 release
+</li></ul><p>
+Lukas Slebodnik (28):
+</p>
+<ul><li>BUILD: Fix automake warning
+</li><li>test_server: Fix waiting for background process
+</li><li>SPEC: Print testsuite log for failed test
+</li><li>SBUS: Fix error handling after closing container
+</li><li>BUILD: Fix linking cwrap tests with -Wl,--as-needed
+</li><li>test_sysdb_views: Use unique directory for cache
+</li><li>IPA: Store right username to selinux child context
+</li><li>PAM: Remove authtok from PAM stack with OTP
+</li><li>NSS: Fix warning enumerated type mixed with another type
+</li><li>Revert "LDAP: Change defaults for ldap_user/group_objectsid"
+</li><li>AD: Change level of debug message
+</li><li>CI: Build sssd on debian with samba support
+</li><li>LDAP: Disable token groups by default
+</li><li>sss_client: Extract destroying of mmap cache to function
+</li><li>sss_client: Fix race condition in memory cache
+</li><li>krb5: Check return value of krb5_principal_get_realm
+</li><li>krb5: Check return value of sss_krb5_princ_realm
+</li><li>AD: Set dp_error if gc was not used
+</li><li>TOOLS: sss_debuglevel should worh with ifp responder
+</li><li>CI: Update valgrind suppresion database for libselinux
+</li><li>IPA: Do not append domain name to fq name
+</li><li>sss_client: Work around glibc bug
+</li><li>MAKE: Fix linking of test_child_common
+</li><li>UTIL: Fix dependencies of internal sss libraries
+</li><li>BUILD: Install libsss_crypt after its dependencies
+</li><li>MONITOR: Disable inlining of function load_configuration
+</li><li>krb5_child: Initialize REALM earlier
+</li><li>IPA: properly handle groups from different domains
+</li></ul><p>
+Michal Zidek (21):
+</p>
+<ul><li>util: Move semanage related functions to src/util
+</li><li>sss_semanage: Add mlsrange parameter to set_seuser
+</li><li>IPA: Use set_seuser instead of writing selinux login file
+</li><li>MONITOR: Allow confdb to be accessed by nonroot user
+</li><li>SYSDB: Allow calling chown on the sysdb file from monitor
+</li><li>responder_common: Create fd for pipe in helper
+</li><li>responders: Do not initialize pipe fd if already present
+</li><li>PAM: Create pipe file descriptors before privileges are dropped
+</li><li>PAM: Run pam responder as nonroot
+</li><li>nss: preserve service name in getsrv call
+</li><li>MONITOR: Fix warning may be used uninitialized
+</li><li>selinux_child: Do not ignore return values.
+</li><li>proxy: Do not try to store same alias twice
+</li><li>PROXY: Preserve service name in proxy provider
+</li><li>MAN: Update case_sensitive=Preserving in man pages.
+</li><li>Man: debug_timestamps and debug_microseconds
+</li><li>test: Wrong parameter type in sss_parse_name_check
+</li><li>util: Special-case PCRE_ERROR_NOMATCH in sss_parse_name
+</li><li>util: sss_get_domain_name regex mismatch not fatal
+</li><li>confdb: Make confdb_set_string accept const char pointer
+</li><li>AD: Never store case_sensitive as "true" to confdb
+</li></ul><p>
+Nikolai Kondrashov (1):
+</p>
+<ul><li>CI: Remove Clang analyzer
+</li></ul><p>
+Pavel Březina (8):
+</p>
+<ul><li>IPA: use ipaUserGroup object class for groups
+</li><li>be_ptask: create a private header file
+</li><li>be_ptask: handle OFFLINE_DISABLE mode before task execution
+</li><li>be_ptask: add next_execution time to struct be_ptask
+</li><li>be_ptask: do not store sync ctx to _task
+</li><li>tests: be_ptask
+</li><li>be_ptask: let backoff affect only period
+</li><li>be_ptask: use gettimeofday() instead of time()
+</li></ul><p>
+Pavel Reichl (20):
+</p>
+<ul><li>TESTS: Add -std=gnu99 to cwrap tests CFLAGS
+</li><li>Fix debug messages - trailing '.'
+</li><li>pyhbac,pysss: fix reference leaks
+</li><li>RESPONDERS: refactor create_pipe_fd()
+</li><li>RESPONDERS: Don't hard-code umask value in utility function
+</li><li>RESPONDERS: Set default value for umask
+</li><li>CONFDB: Detect&amp;fix misconf opt refresh_expired_interval
+</li><li>NSS: disable midpoint refresh for netgroups
+</li><li>SYSDB: sysdb_idmap_get_mappings returns ENOENT
+</li><li>Fix: always check return value of unlink()
+</li><li>BUILD: restrict perms. when installing from source
+</li><li>SYSDB: sysdb_get_bool() return ENOENT &amp; unit tests
+</li><li>simple access provider: non-existing object
+</li><li>simple-access-provider: break matching allowed users
+</li><li>LDAP: retain external members
+</li><li>TESTS: sysdb_delete_by_sid() test return value
+</li><li>NSS: nss_cmd_getbysid_search return ENOENT
+</li><li>SYSDB: sysdb_search_object_by_sid returns ENOENT
+</li><li>CONFDB: Typo in debug message
+</li><li>TESTS: typo in 'assert message'
+</li></ul><p>
+Stephen Gallagher (1):
+</p>
+<ul><li>monitor: Service restart fixes
+</li></ul><p>
+Sumit Bose (48):
+</p>
+<ul><li>ipa: fix issues with older servers not supporting views
+</li><li>ipa: improve error reporting for extdom LDAP exop
+</li><li>ipa_subdomains_handler_master_done: initialize reply_count
+</li><li>nss: group enumeration fix
+</li><li>sdap_print_server: use getpeername() to get server address
+</li><li>IFP: Fix typo in debug message
+</li><li>memberof: check for empty arrays to avoid segfaults
+</li><li>Add add_strings_lists() utility function
+</li><li>IPA: inherit ldap_user_extra_attrs to AD subdomains
+</li><li>Add parse_attr_list_ex() helper function
+</li><li>nss: parse user_attributes option
+</li><li>nss: return user_attributes in origbyname request
+</li><li>sysdb_get_user_attr_with_views: add mandatory override attributes
+</li><li>sysdb_add_overrides_to_object: add new parameter and multi-value support
+</li><li>Views: apply user SSH public key override
+</li><li>Add test for sysdb_add_overrides_to_object()
+</li><li>Add ssh pubkey to origbyname request
+</li><li>Revert "LDAP: Remove unused option ldap_user_uuid"
+</li><li>Revert "LDAP: Remove unused option ldap_group_uuid"
+</li><li>Fix uuid defaults
+</li><li>sysdb: add sysdb_search_object_by_uuid()
+</li><li>ipa: add split_ipa_anchor()
+</li><li>LDAP: add support for lookups by UUID
+</li><li>LDAP: always store UUID if available
+</li><li>ipa: add get_be_acct_req_for_uuid()
+</li><li>IPA: make get_object_from_cache() public
+</li><li>IPA: check overrrides for IPA users as well
+</li><li>Enable views for all domains
+</li><li>Fix KRB5_CONF_PATH
+</li><li>AD/IPA: add krb5_confd_path configuration option
+</li><li>sysdb: add sysdb_delete_view_tree()
+</li><li>sysdb: add sysdb_invalidate_overrides()
+</li><li>views: allow view name change at startup
+</li><li>krb5: make krb5 provider view aware
+</li><li>IPA: only update view data if it really changed
+</li><li>krb5: do not fail if checking the old ccache failed
+</li><li>test: avoid leaks in leak tests
+</li><li>krb5: add copy_ccache_into_memory()
+</li><li>krb5: add copy_keytab_into_memory()
+</li><li>ldap_child: copy keytab into memory to drop privileges earlier
+</li><li>krb5_child: become user earlier
+</li><li>krb5: add wrapper for krb5_kt_have_content()
+</li><li>krb5: handle KRB5KRB_ERR_GENERIC as unspecific error
+</li><li>IPA: verify group memberships of trusted domain users
+</li><li>IPA: do not try to add override gid twice
+</li><li>IPA: handle GID overrides for MPG domains on clients
+</li><li>libwbclient: initialize some return values
+</li><li>Add test for sysdb_store_override
+</li></ul></body></html>

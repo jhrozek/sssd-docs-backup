@@ -1,0 +1,82 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<ul><li>Improved handling of users and groups with multi-valued name attributes (aliases)
+</li><li>Performance enhancements
+<ul><li>Initgroups on RFC2307bis/FreeIPA
+</li><li>HBAC rule processing
+</li></ul></li><li>Improved process-hang detection and restarting
+</li><li>Enabled the midpoint cache refresh by default (fewer cache misses on commonly-used entries)
+</li><li>Cleaned up the example configuration
+</li></ul><h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Jakub Hrozek (23):
+</p>
+<ul><li>Improve error message for LDAP password constraint violation
+</li><li>Keep deref controls until the whole request is finished
+</li><li>Fix uninitialized pointer read in sdap_gssapi_get_default_realm()
+</li><li>IPA access: hostname comparison should be case-insensitive
+</li><li>Add sysdb interface to get name aliases
+</li><li>Add a sysdb_get_direct_parents function
+</li><li>Store name aliases for users, groups
+</li><li>Return users and groups based on alias
+</li><li>Use explicit base 10 for converting strings to integers
+</li><li>Fix typo in sysdb_get_direct_parents
+</li><li>Add option to follow symlinks to check_file()
+</li><li>Append PID to sbus server socket name, let clients use a symlink
+</li><li>Streamline the example config
+</li><li>Do not delete requests inside hash_iterate loop
+</li><li>Check if dp_requests hash table exists before using it
+</li><li>Fix off-by-one error in remove_socket_symlink()
+</li><li>Report on errno, not return code in create_socket_symlink
+</li><li>Add a missing break
+</li><li>Sanitize DN in sysdb_get_direct_parents
+</li><li>gitignore additions
+</li><li>Utility functions for LDAP nested schema initgroups
+</li><li>Use fewer transactions during RFC2307bis initgroups
+</li><li>Use fewer transactions during IPA initgroups
+</li></ul><p>
+Jan Zeleny (2):
+</p>
+<ul><li>man page fix (lists are comma-separated)
+</li><li>Fixed timeout handling in responders
+</li></ul><p>
+Marko Myllynen (3):
+</p>
+<ul><li>Add missing options to sssd.api.conf
+</li><li>Unbreak ./configure
+</li><li>Update sssd-example.conf
+</li></ul><p>
+Pavel Březina (3):
+</p>
+<ul><li>sss_ldap_err2string() - function created
+</li><li>sss_ldap_err2string() - ldap_err2string() to sss_ldap_err2string()
+</li><li>Added quiet option to pam_sss
+</li></ul><p>
+Pavel Zuna (1):
+</p>
+<ul><li>Fix small bug where TALLOC_CTX could end up unfreed.
+</li></ul><p>
+Stephen Gallagher (18):
+</p>
+<ul><li>Bumping version to 1.6.2
+</li><li>Add option to specify the kerberos replay cache dir
+</li><li>Fix typo in %configure
+</li><li>Remove all libtool .la files from RPM
+</li><li>Improve documentation of libipa_hbac
+</li><li>Add libipa_hbac documentation to the -devel package
+</li><li>MONITOR: Correctly detect lack of response from services
+</li><li>Do not build documentation on RHEL 5
+</li><li>Fix typo in specfile
+</li><li>MAN: Add more information about internal credential storage
+</li><li>Enable the midpoint cache update by default
+</li><li>HBAC: fix typos preventing proper hostgroup evaluation
+</li><li>HBAC: Do not save member/memberOf links
+</li><li>HBAC: Use originalMember for identifying servicegroups
+</li><li>HBAC: Use originalMember for identifying hostgroups
+</li><li>BUILDSYS: Fix --without-manpages
+</li><li>MONITOR: fix timeout conversion
+</li><li>Updating translation files for string freeze
+</li></ul><p>
+Sumit Bose (1):
+</p>
+<ul><li>Do not access memory out of bounds
+</li></ul></body></html>

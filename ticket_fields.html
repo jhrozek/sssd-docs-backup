@@ -1,0 +1,59 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="fedorahostedmigration">fedorahosted migration</h2>
+<p>
+We need to migrate from Trac before fedorahosted.org shuts down. This page lists what we currently use from trac and can be used to list options.
+</p>
+<h3 id="Tracfieldsweuse">Trac fields we use</h3>
+<ul><li><strong>summary</strong> - needed
+</li><li><strong>long description</strong> - needed
+</li><li><strong>type (defect/rfe/task)</strong> - needed
+</li><li><strong>priority</strong> - needed
+</li><li><strong>milestone</strong> - needed
+</li><li>component (nss, pam, ldap, ...) - not really used, so not needed
+</li><li>blocked-by/blocking - rarely used
+</li><li>sensitive - would be really nice to have
+</li><li><strong>patch submitted (yes/no)</strong> - used, would be nice to have some indication like this
+</li><li><strong>design link</strong> - used
+</li><li>tests update - unused
+</li><li>coverity bug - rarely used
+</li><li><strong>red hat bugzilla</strong> - used and needed
+</li><li><strong>keywords</strong> - sometimes used (for easyfix)
+</li><li>design review - unused
+</li><li>fedora test page - unused
+</li><li>chosen - unused
+</li><li>candidate to push out - unused
+</li><li>release notes - rarely used
+</li><li>temp mark - unused
+</li></ul><h3 id="ProposedTracreplacements">Proposed Trac replacements</h3>
+<p>
+Here is a unstructured discussion on what can we replace Trac with.
+</p>
+<h4 id="github.com">github.com</h4>
+<ul><li>Pros:
+<ul><li>widely used
+</li><li>we already have a mirror there
+</li></ul></li><li>Cons:
+<ul><li>no custom fields in tickets and no way to add then except labels
+</li><li>closed
+</li></ul></li><li>Missing features:
+<ul><li>custom fields in tickets, especially for RHBZ
+</li></ul></li></ul><h4 id="pagure.io">pagure.io</h4>
+<ul><li>Pros:
+<ul><li>open and developed by Fedora community, so the chance of having something implemented is larger than with github
+</li></ul></li><li>Cons:
+<ul><li>very immature
+</li></ul></li><li>Missing features
+<ul><li>custom fields
+</li><li>no way to CC to ticket except adding a comment
+</li><li>not sure if PRs can be replied to by mail, needs to be investigated
+</li></ul></li><li>Tickets filed:
+<ul><li><a class="ext-link" href="https://pagure.io/pagure/issue/1308"><span class="icon">​</span>Arbitrary ticket metadata</a>
+</li><li><a class="ext-link" href="https://pagure.io/pagure/issue/1293"><span class="icon">​</span>Watch / follow / subscribe to issues</a>
+</li><li><a class="ext-link" href="https://pagure.io/pagure/issue/1258"><span class="icon">​</span>Adding a mailing list address to any project to receive updates from issues</a>
+</li><li><a class="ext-link" href="https://pagure.io/pagure/issue/746"><span class="icon">​</span>Ability to be CCed in bugs</a>
+</li><li><a class="ext-link" href="https://pagure.io/pagure/issue/15"><span class="icon">​</span>pull-request/email integration</a>
+</li></ul></li></ul><h4 id="self-hosted">self-hosted</h4>
+<ul><li>Pros:
+<ul><li>we have control over the instance
+</li></ul></li><li>Cons:
+<ul><li>we need to maintainer the instance..
+</li></ul></li></ul></body></html>

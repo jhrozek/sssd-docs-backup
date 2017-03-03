@@ -1,0 +1,65 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<ul><li>Users or groups from trusted domains can be retrieved by UID or GID as well
+</li><li>Several fixes that mitigate file descriptor leak during logins
+</li><li>SSH host keys are also removed from the cache after being removed from the server
+</li><li>Fix intermittent crash in responders if the responder was shutting down while requests were still pending
+</li><li>Catch an error condition that might have caused a tight loop in the sssd_nss process while refreshing expired enumeration request
+</li><li>Fixed memory hierarchy of subdomains discovery requests that caused use-after-free access bugs
+</li><li>The krb5_child and ldap_child processes can print libkrb5 tracing information in the debug logs
+</li></ul><h2 id="TicketsFixed">Tickets Fixed</h2>
+<p>
+</p><div><dl class="wiki compact"><dt><a class="closed" href="/sssd/ticket/1008" title="Make sssd api conf file location configurable">#1008</a></dt><dd>Make sssd api conf file location configurable</dd><dt><a class="closed" href="/sssd/ticket/1319" title="group lookups optimizations for IPA">#1319</a></dt><dd>group lookups optimizations for IPA</dd><dt><a class="closed" href="/sssd/ticket/1361" title="sssd_pam file descriptor leak /var/lib/sss/pipes/private/pam">#1361</a></dt><dd>sssd_pam file descriptor leak /var/lib/sss/pipes/private/pam</dd><dt><a class="closed" href="/sssd/ticket/1499" title="Add details about TGT validation to sssd-krb5 man page">#1499</a></dt><dd>Add details about TGT validation to sssd-krb5 man page</dd><dt><a class="closed" href="/sssd/ticket/1514" title="[abrt] sssd-1.8.4-13.fc16: __GI_exit: Process /usr/libexec/sssd/sssd_pam ...">#1514</a></dt><dd>[abrt] sssd-1.8.4-13.fc16: __GI_exit: Process /usr/libexec/sssd/sssd_pam was killed by signal 6 (SIGABRT)</dd><dt><a class="closed" href="/sssd/ticket/1539" title="Collect Krb5 Trace on High Debug Levels">#1539</a></dt><dd>Collect Krb5 Trace on High Debug Levels</dd><dt><a class="closed" href="/sssd/ticket/1551" title="sssd_nss process hangs, stuck in loop; &#34;self restart&#34; does recover, but ...">#1551</a></dt><dd>sssd_nss process hangs, stuck in loop; "self restart" does recover, but old process hangs around using 100% CPU</dd><dt><a class="closed" href="/sssd/ticket/1561" title="getting user/group entry by uid/gid sometimes fails">#1561</a></dt><dd>getting user/group entry by uid/gid sometimes fails</dd><dt><a class="closed" href="/sssd/ticket/1569" title="Use pam_set_data to close the fd in the pam module">#1569</a></dt><dd>Use pam_set_data to close the fd in the pam module</dd><dt><a class="closed" href="/sssd/ticket/1571" title="sssd_nss intermittent crash">#1571</a></dt><dd>sssd_nss intermittent crash</dd><dt><a class="closed" href="/sssd/ticket/1574" title="SSH host keys are not being removed from the cache">#1574</a></dt><dd>SSH host keys are not being removed from the cache</dd></dl></div><p>
+</p>
+<h2 id="PackagingChanges">Packaging Changes</h2>
+<ul><li>The libsss_sudo-devel package no longer contains the package-config file. The libsss_sudo-devel shared object has been moved to the libsss_sudo package.
+</li></ul><h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+E Deon Lackey (1):
+</p>
+<ul><li>Fix language errors in the sssd-krb5.conf man page
+</li></ul><p>
+Jakub Hrozek (14):
+</p>
+<ul><li>Bumping the version to 1.9.1 release
+</li><li>Fix uninitialized pointer read in ssh_host_pubkeys_update_known_hosts
+</li><li>Fix segfault when ID-mapping an entry without a SID
+</li><li>Fix memory hierarchy in subdomains discovery
+</li><li>PAM: close socket fd with pam_set_data
+</li><li>Couple of specfile fixes
+</li><li>Remove libsss_sudo.pc and move libsss_sudo.so to libsss_sudo
+</li><li>Two fixes to child processes
+</li><li>Collect krb5 trace on high debug levels
+</li><li>PAM: fix handling the client fd in pam destructor
+</li><li>Create ghost users when a user DN is encountered in IPA
+</li><li>Only call krb5_set_trace_callback on platforms that support it
+</li><li>MAN: improve wording of default_domain parameter
+</li><li>Updating the translations for the 1.9.2 release
+</li></ul><p>
+Jan Cholasta (1):
+</p>
+<ul><li>SSH: When host keys are removed from LDAP, remove them from the cache as well
+</li></ul><p>
+Ondrej Kos (1):
+</p>
+<ul><li>Add more info about ticket validation
+</li></ul><p>
+Pavel Březina (3):
+</p>
+<ul><li>do not fail if POLLHUP occurs while reading data
+</li><li>do not call dp callbacks when responder is shutting down
+</li><li>nss_cmd_retpwent(): do not go into infinite loop if n &lt; 0
+</li></ul><p>
+Sumit Bose (3):
+</p>
+<ul><li>Save time of last get_domains request
+</li><li>Check for subdomains if getpwuid or getgrgid are the first requests
+</li><li>Allow extdom exop to return flat domain name as well
+</li></ul><p>
+Thorsten Scherf (1):
+</p>
+<ul><li>Fixed: translation bug
+</li></ul><p>
+Yuri Chornoivan (1):
+</p>
+<ul><li>Fix typos
+</li></ul></body></html>

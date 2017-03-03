@@ -1,0 +1,34 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><p>
+<a style="padding:0; border:none" href="https://fedorahosted.org/sssd/attachment/wiki/DesignDocs/SUDOIntegrationNewApproach/sudo_highlevel_v2.png"><img src="https://fedorahosted.org/sssd/raw-attachment/wiki/DesignDocs/SUDOIntegrationNewApproach/sudo_highlevel_v2.png" /></a>
+</p>
+<h1 id="CacheformatofSUDOrules">Cache format of SUDO rules</h1>
+<p>
+We have decided to use the current schema used by SUDO. The schema is described <a class="ext-link" href="http://www.gratisoft.us/sudo/man/1.8.2/sudoers.ldap.man.html"><span class="icon">​</span>here</a>.
+</p>
+<p>
+The reason is that Sudo can only understand the native schema anyway. We will have to do a conversion when we implement support for the IPA sudo
+schema down the road, but it's simply not needed now.
+</p>
+<p>
+All rules are store under <strong>cn=sudorules,cn=custom,cn=$domain,cn=sysdb</strong> subtree.
+</p>
+<h1 id="Communicationprotocols">Communication protocols</h1>
+<h2 id="SUDO-Responder">SUDO -&gt; Responder</h2>
+<p>
+SUDO calls <strong>SSS_SUDO_GET_SUDORULES</strong> command, providing a user name of the requesting user.
+</p>
+<pre class="wiki">&lt;username(char*)&gt;
+</pre><h2 id="Responder-SUDO">Responder -&gt; SUDO</h2>
+<p>
+Sends all sudo rules entries that contains keyword ALL or matches requested user name, his groups or netgroups.
+</p>
+<pre class="wiki">&lt;error_code(uint32_t)&gt;&lt;num_rules(uint32_t)&gt;&lt;rule1&gt;&lt;rule2&gt;...
+&lt;ruleN&gt; = &lt;num_attrs(uint32_t)&gt;&lt;attr1&gt;&lt;attr2&gt;...
+&lt;attrN&gt; = &lt;name(char*)&gt;&lt;num_values(uint32_t)&gt;&lt;value1(char*)&gt;&lt;value2(char*)&gt;...
+</pre><p>
+All strings are terminated with zero character.
+</p>
+<p>
+If &lt;error_code&gt; signals an error (i.e. it does not equal to <em>SSS_SUDO_ERROR_OK</em>), the remaining fields are omitted.
+</p>
+</body></html>

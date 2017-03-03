@@ -1,0 +1,85 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<h3 id="libini_config">libini_config</h3>
+<ul><li>Ability to convert input INI file from UTF 16/32 to UTF8 during parsing
+</li><li>Support C style comments in INI file parsing
+</li><li>Ability to read configuration data from a memory buffer
+</li><li>Fixed processing of multi-valued strings
+</li><li>Fixed parsing of line with multiple tokens
+</li></ul><h2 id="Notefordistributionpackagers">Note for distribution packagers</h2>
+<ul><li>This release bumps the soname of subpackages (libcollection, libini_config)
+</li><li>A new version script was added (for more detailed information please see <a class="closed ticket" href="https://fedorahosted.org/sssd/ticket/2193" title="task: Use version script file for libraries from ding-libs (closed: fixed)">#2193</a>)
+</li></ul><h2 id="TicketsFixed">Tickets Fixed</h2>
+<p>
+</p><div><dl class="wiki compact"><dt><a class="closed" href="/sssd/ticket/2106" title="[RFE] Add ability to convert input ini file from UTF 16/32 to UTF8 during ...">#2106</a></dt><dd>[RFE] Add ability to convert input ini file from UTF 16/32 to UTF8 during parsing</dd><dt><a class="closed" href="/sssd/ticket/2107" title="Description of the parse flags use is missing in header file">#2107</a></dt><dd>Description of the parse flags use is missing in header file</dd><dt><a class="closed" href="/sssd/ticket/2108" title="[RFE] Support C/C++ style comments in INI file parsing">#2108</a></dt><dd>[RFE] Support C/C++ style comments in INI file parsing</dd><dt><a class="closed" href="/sssd/ticket/2110" title="Processing miltivalue strings does not return last token">#2110</a></dt><dd>Processing miltivalue strings does not return last token</dd><dt><a class="closed" href="/sssd/ticket/2119" title="Double parsing failes for a complex file">#2119</a></dt><dd>Double parsing failes for a complex file</dd><dt><a class="closed" href="/sssd/ticket/2192" title="refactor the UTF-8 conversion function">#2192</a></dt><dd>refactor the UTF-8 conversion function</dd><dt><a class="closed" href="/sssd/ticket/2193" title="Use version script file for libraries from ding-libs">#2193</a></dt><dd>Use version script file for libraries from ding-libs</dd></dl></div><p> 
+</p>
+<h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Dmitri Pal (20):
+</p>
+<ul><li>Trim trailing spaces
+</li><li>Adding missing argument to docs
+</li><li>Fix for ini_get_string_config_array
+</li><li>Do not check validity of comments
+</li><li>Extend error set and add parsing error
+</li><li>Process c-style comments
+</li><li>Test files for unit test
+</li><li>Unit test for c-style comments
+</li><li>Expose buffer context as void
+</li><li>Extend internal file handle
+</li><li>Convert files to UTF
+</li><li>Updated unit test for UTF8 conversion
+</li><li>Fix typo in trace message
+</li><li>Fix processing of the white space at the end of the line
+</li><li>Unit test for space trimming in multiline values
+</li><li>Adding more unit tests
+</li><li>Refactor conversion function
+</li><li>New entry to read data from mem
+</li><li>Prevent tight loop
+</li><li>Unit test for the new interface
+</li></ul><p>
+Jakub Hrozek (2):
+</p>
+<ul><li>libiniconfig_devel must require libref_array-devel and libbasicobjects-devel
+</li><li>rpm: Include the right filename of libini_config
+</li></ul><p>
+Jan Engelhardt (1):
+</p>
+<ul><li>build: add missing Requires to pkgconfig file
+</li></ul><p>
+Lukas Slebodnik (19):
+</p>
+<ul><li>Fix warning format string is not a string literal.
+</li><li>Fix linking of tests on debian
+</li><li>DHASH: Remove dead code.
+</li><li>AUTOTOOLS: fix warning: macro xyz not found in library
+</li><li>DOC: Fix problems in documentation comments.
+</li><li>SPEC: path-utils unit test requires libcheck
+</li><li>INI: run also negative_test
+</li><li>Collection: Fix typo in function declarations
+</li><li>INI: Use static modifier for non public functions
+</li><li>Use static modifier for unit test functions
+</li><li>INI: Fix warning missing-prototypes for some functions.
+</li><li>INI: Include missing header file with declarations
+</li><li>REFARRAY: Move declaration of ref_array_debug to public header file
+</li><li>DHASH: Use ifdef for testing DEBUG macro
+</li><li>Enable extra compiler warning flags
+</li><li>Add version symbol files
+</li><li>AUTOMAKE: Do not treat warnings as errors
+</li><li>Bump version-info
+</li><li>Bump versions for 0.4.0 release
+</li></ul><p>
+Ondrej Kos (8):
+</p>
+<ul><li>COLLECTION: Fix comparision
+</li><li>DHASH: Check before dereferencing
+</li><li>PATH_UTILS: check against character representation of NULL
+</li><li>INI: Remove dead code
+</li><li>DHASH: Don't use backward jumps
+</li><li>DHASH: minor fixes
+</li><li>INI: Bump version-info
+</li><li>DOXY: Don't generate timestamp
+</li></ul><p>
+Peter Robinson (1):
+</p>
+<ul><li>Fix build with automake 1.14
+</li></ul></body></html>

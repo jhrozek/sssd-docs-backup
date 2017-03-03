@@ -1,0 +1,177 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><p>
+</p><div class="wiki-toc">
+<ol>
+  <li>
+    <ol>
+      <li>
+        <a href="#Highlights">Highlights</a>
+      </li>
+      <li>
+        <a href="#PackagingChanges">Packaging Changes</a>
+      </li>
+      <li>
+        <a href="#TicketsFixed">Tickets Fixed</a>
+      </li>
+      <li>
+        <a href="#DetailedChangelog">Detailed Changelog</a>
+      </li>
+    </ol>
+  </li>
+</ol>
+</div><p>
+</p>
+<pre class="wiki">================= A security bug in 1.9.0 beta6 ===============
+=
+= Subject:          HBAC rules ignored if SELinux processing
+=                   is enabled
+=
+= CVE ID#:          CVE-2012-3462
+=
+= Summary:          A flaw in the SSSD's access-provider
+=                   logic causes the result of the HBAC
+=                   rule processing to be ignored in the
+=                   event that the access-provider is
+=                   also handling the setup of the user's
+=                   SELinux user context.
+=                   
+=
+=
+= Impact:           moderate
+=
+= Affects default
+=  configuration:   yes (IPA provider only)
+=
+= Introduced with:  1.9.0 beta6
+=
+===============================================================
+
+==== DESCRIPTION ====
+
+The latest development release of the SSSD is vulnerable to a security bug.
+
+When the SSSD is configured as an IPA client and the access provider is
+also handling the evaluation of user's SELinux user context, the result
+of Host Based Access Control rules is ignored.
+
+We decided not to release a full release, for two reasons:
+    * the number of users running the beta is very small. Furthermore,
+      the beta releases are not fully tested and suitable for production
+      anyway
+    * the next release - 1.9.0 RC1 is coming very soon. It is tentatively
+      scheduled for 2012-08-23
+
+==== WORKAROUND ====
+
+If you don't rely on the evaluation of user's SELinux user context, you
+can turn off their processing by setting:
+
+    selinux_provider = none
+
+in the sssd.conf config file. That would cause the correct access control
+code to be returned to the PAM service.
+
+==== PATCH AVAILABILITY ====
+
+The patch is available at:
+http://git.fedorahosted.org/cgit/sssd.git/commit/?id=ffcf27b0b773b580289d596f796aaf86c45ba920
+</pre><h2 id="Highlights">Highlights</h2>
+<ul><li>A new option, override_shell was added. If this option is set, all users managed by SSSD will have their shell set to its value.
+</li><li>Many fixes for the support for setting default SELinux user context from FreeIPA. Most notably, the SELinux mappings can now link to HBAC rules as the source of users and hosts they apply to.
+</li><li>Fixed a regression introduced in beta 5 that prevented LDAP SASL binds from working unless the value of ldap_sasl_minssf was explicitly specified.
+</li><li>The SSSD supports the concept of a Primary Server and a Back Up Server. Certain servers in the fail over list can be marked as back up only. If the SSSD switches to a back up server because a primary server is not available, it would later try to re-establish a connection to the primary server. This feature would mainly benefit users who configure fail over servers from different data centers or geographies.
+</li><li>A new command-line tool sss_seed is available. This tool is able to prime the internal cache with a user record and a cached password to support the scenario when a user needs to log in to the client before the network connection to the centralized identity source is established, such as the first log in to a new machine.
+</li><li>In scenarios, where the SSSD is acting as an IPA client, it is able to discover and save the DNS domain-Kerberos realm mappings between an IPA server and a trusted Active Directory server.
+</li></ul><h2 id="PackagingChanges">Packaging Changes</h2>
+<ul><li>a new binary, called sss_seed is available. The binary is installed to /usr/sbin/sss_seed by default and includes its own manual page.
+</li><li>The SSSD uses a new directory to store the DNS domain - Kerberos realm mappings. The default location is /var/lib/sss/pubconf/krb5.include.d
+</li></ul><h2 id="TicketsFixed">Tickets Fixed</h2>
+<p>
+</p><div><dl class="wiki compact"><dt><a class="closed" href="/sssd/ticket/904" title="Create tool to seed a user for first-boot">#904</a></dt><dd>Create tool to seed a user for first-boot</dd><dt><a class="closed" href="/sssd/ticket/1087" title="RFE: Allow Forcing User Shell">#1087</a></dt><dd>RFE: Allow Forcing User Shell</dd><dt><a class="closed" href="/sssd/ticket/1128" title="Introduce the concept of a Primary Server in SSSD">#1128</a></dt><dd>Introduce the concept of a Primary Server in SSSD</dd><dt><a class="closed" href="/sssd/ticket/1185" title="[Feature] AD Extensions">#1185</a></dt><dd>[Feature] AD Extensions</dd><dt><a class="closed" href="/sssd/ticket/1318" title="RFE: make the NSS memory cache timeout configurable">#1318</a></dt><dd>RFE: make the NSS memory cache timeout configurable</dd><dt><a class="closed" href="/sssd/ticket/1368" title="Missing hostid and subdomains sections in sssd-ipa.conf">#1368</a></dt><dd>Missing hostid and subdomains sections in sssd-ipa.conf</dd><dt><a class="closed" href="/sssd/ticket/1380" title="domain_realm mappings manipulation by sssd">#1380</a></dt><dd>domain_realm mappings manipulation by sssd</dd><dt><a class="closed" href="/sssd/ticket/1418" title="document how sudo works with sssd">#1418</a></dt><dd>document how sudo works with sssd</dd><dt><a class="closed" href="/sssd/ticket/1420" title="sudo: provide automatic configuration of machine hostnames">#1420</a></dt><dd>sudo: provide automatic configuration of machine hostnames</dd><dt><a class="closed" href="/sssd/ticket/1427" title="Don't refersh HBAC rules when looking up SELinux rules">#1427</a></dt><dd>Don't refersh HBAC rules when looking up SELinux rules</dd><dt><a class="closed" href="/sssd/ticket/1429" title="IPA session code returns error when SELinux mapping rule links to an HBAC ...">#1429</a></dt><dd>IPA session code returns error when SELinux mapping rule links to an HBAC rule</dd><dt><a class="closed" href="/sssd/ticket/1432" title="Mention AD Provider in manpage of sssd.conf">#1432</a></dt><dd>Mention AD Provider in manpage of sssd.conf</dd><dt><a class="closed" href="/sssd/ticket/1433" title="Suggested additions to manpage of sssd-ad">#1433</a></dt><dd>Suggested additions to manpage of sssd-ad</dd><dt><a class="closed" href="/sssd/ticket/1435" title="SELinux specifity does not work with HBAC rules">#1435</a></dt><dd>SELinux specifity does not work with HBAC rules</dd><dt><a class="closed" href="/sssd/ticket/1439" title="sss_pam needs to write out SELinux login file during the account phase">#1439</a></dt><dd>sss_pam needs to write out SELinux login file during the account phase</dd><dt><a class="closed" href="/sssd/ticket/1445" title="The SELinux login file needs to be created by the responder, not PAM ...">#1445</a></dt><dd>The SELinux login file needs to be created by the responder, not PAM module</dd><dt><a class="closed" href="/sssd/ticket/1448" title="sss_seed tool review issues">#1448</a></dt><dd>sss_seed tool review issues</dd></dl></div><p>
+</p>
+<h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Jakub Hrozek (6):
+</p>
+<ul><li>Bumping version to 1.9.0 beta 6
+</li><li>Fix sysdb_search_selinux_usermap_by_username return value
+</li><li>Fix SSSDConfigTest
+</li><li>Fix bad check
+</li><li>Create a domain-realm mapping for krb5.conf to be included
+</li><li>Update translations for 1.9.0 beta 6 release
+</li></ul><p>
+Jan Zeleny (25):
+</p>
+<ul><li>Added some DEBUG statements into SELinux related code
+</li><li>Extend category support in SELinux user maps
+</li><li>Remove ipa_selinux_map_merge()
+</li><li>Fix linking of HBAC rules and SELinux user maps
+</li><li>Provide counter of possible matches in SELinux IPA provider
+</li><li>Always free request in data provider PAM callback
+</li><li>Renamed session provider to selinux provider
+</li><li>Move SELinux processing from session to account PAM stack
+</li><li>Remove unused member of be_req
+</li><li>Write SELinux config files in responder instead of PAM module
+</li><li>Modify hbac_get_cached_rules() so it can be used outside of HBAC code
+</li><li>Support fetching of HBAC rules from sysdb in SELinux code
+</li><li>Support fetching of host from sysdb in SELinux code
+</li><li>Primary server support: introduce concept of reconnection
+</li><li>Primary server support: basic support in failover code
+</li><li>Primary server support: support for "disconnecting" connections in LDAP
+</li><li>Primary server support: IPA adaptation
+</li><li>Primary server support: krb5 adaptation
+</li><li>Primary server support: LDAP adaptation
+</li><li>Primary server support: AD adaptation
+</li><li>Primary server support: man page, failover section
+</li><li>Primary server support: new option in ldap provider
+</li><li>Primary server support: new options in krb5 provider
+</li><li>Primary server support: new option in IPA provider
+</li><li>Primary server support: new option in AD provider
+</li></ul><p>
+Michal Zidek (1):
+</p>
+<ul><li>Added unit test for sysdb_ssh.c
+</li></ul><p>
+Nick Guay (1):
+</p>
+<ul><li>First-boot sss_seed tool
+</li></ul><p>
+Pavel Březina (7):
+</p>
+<ul><li>sdap_sudo.c: add missing end of line in few debug messages
+</li><li>add hostid and subdomains sections in sssd-ipa.conf
+</li><li>manpage: seealso - include ssh conditionally
+</li><li>tests: allow changing cwd in all tests
+</li><li>manpage: sssd-sudo - documents how sudo works with sssd
+</li><li>sudo ldap provider: support autoconfiguration of hostnames
+</li><li>Unbreak SASL
+</li></ul><p>
+Simo Sorce (16):
+</p>
+<ul><li>Change subdomain_info
+</li><li>tests: Remove useless consts
+</li><li>80 columns police
+</li><li>Fix double semi-colons
+</li><li>Fix wrong elements used in comparison
+</li><li>Use ldb_msg_add_string with bare strings
+</li><li>Fix return error and debug message
+</li><li>Make structure initializer more readable
+</li><li>80 col and style fixes
+</li><li>Use a more tractable name for subdomain request
+</li><li>Add realm paramter to subdomain list
+</li><li>Expose an initializer function from subdomain
+</li><li>Change refreshing of subdomains
+</li><li>Limit refreshes keeping track of last refresh time
+</li><li>Add online callback to enumerate subdomains
+</li><li>Add automatic periodic retrieval of subdomains
+</li></ul><p>
+Stephen Gallagher (4):
+</p>
+<ul><li>MAN: List all available backends for provider options
+</li><li>MAN: Improvements to the AD provider manpage
+</li><li>NSS: Add override_shell option
+</li><li>SYSDB: Add log message for unexpected LDB errors
+</li></ul><p>
+Ville Skyttä (1):
+</p>
+<ul><li>Require and call ldconfig from subpackages if appropriate
+</li></ul></body></html>

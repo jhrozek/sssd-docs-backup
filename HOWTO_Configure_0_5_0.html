@@ -1,0 +1,543 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><p>
+</p><div class="wiki-toc">
+<ol>
+  <li>
+    <ol>
+      <li>
+        <a href="#About">About</a>
+      </li>
+      <li>
+        <a href="#Installation">Installation</a>
+      </li>
+      <li>
+        <a href="#RunningSSSD">Running SSSD</a>
+      </li>
+      <li>
+        <a href="#Configuration">Configuration</a>
+        <ol>
+          <li>
+            <a href="#ConfigureNSSforfetchinguserandgroupinformation">Configure NSS for fetching user and group information</a>
+          </li>
+          <li>
+            <a href="#ConfigurePAMforauthentication">Configure PAM for authentication</a>
+          </li>
+          <li>
+            <a href="#SSSDdaemonconfiguration">SSSD daemon configuration</a>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <a href="#Configuringservices">Configuring services</a>
+        <ol>
+          <li>
+            <a href="#Generalconfigurationoptions">General configuration options</a>
+          </li>
+          <li>
+            <a href="#NSSconfigurationoptions">NSS configuration options</a>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <a href="#Configuringdomains">Configuring domains</a>
+        <ol>
+          <li>
+            <a href="#Domainconfigurationoptions">Domain configuration options</a>
+          </li>
+          <li>
+            <a href="#Optionsvalidforproxydomains">Options valid for proxy domains</a>
+          </li>
+          <li>
+            <a href="#TheLOCALdomain">The LOCAL domain</a>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <a href="#Domainconfigurationexamples">Domain configuration examples</a>
+        <ol>
+          <li>
+            <a href="#Example1:ALOCALdomainthatproxiestofiles">Example 1: A LOCAL domain that proxies to files</a>
+            <ol>
+              <li>
+                <a href="#PAMconfigfortheproxiedLOCALdomain">PAM config for the proxied LOCAL domain</a>
+              </li>
+            </ol>
+          </li>
+          <li>
+            <a href="#Example2:AstandaloneLOCALdomain">Example 2: A standalone LOCAL domain</a>
+          </li>
+          <li>
+            <a href="#Example3:AnLDAPdomainusingtheproxydataprovider">Example 3: An LDAP domain using the proxy data provider</a>
+            <ol>
+              <li>
+                <a href="#PAMconfigfortheLDAPdomain">PAM config for the LDAP domain</a>
+              </li>
+            </ol>
+          </li>
+          <li>
+            <a href="#Example4:AuthenticatingagainstanativeLDAPdomain">Example 4: Authenticating against a native LDAP domain</a>
+          </li>
+          <li>
+            <a href="#Example5:AuthenticatingagainstaKerberosserver">Example 5: Authenticating against a Kerberos server</a>
+          </li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+</ol>
+</div><p>
+</p>
+<h2 id="About">About</h2>
+<p>
+SSSD provides a set of daemons to manage access to remote directories and authentication mechanisms, it provides an NSS and PAM interface toward the system and a pluggable backend system to connect to multiple different account sources. It is also the basis to provide client auditing and policy services for projects like FreeIPA.
+</p>
+<p>
+SSSD takes advantage of the common set of tools. More information about those tools can be found <a class="wiki" href="https://docs.pagure.org/sssd-test2/WikiPage/SSSDTools.html">here.</a>    
+</p>
+<p>
+This page is intended to outline a series of steps needed to install and configure SSSD. 
+It is aimed at Fedora primarily in terms of commands and config file placement, but in general, things should work on other distributions, too.
+</p>
+<p>
+More information about SSSD can be found on its <a class="ext-link" href="https://fedorahosted.org/sssd/"><span class="icon">​</span>project page</a> 
+or on the Fedora 11 <a class="ext-link" href="http://fedoraproject.org/wiki/Features/SSSD"><span class="icon">​</span>Feature Page</a>.
+</p>
+<p>
+This document was last updated for the 0.5.0 release of SSSD.
+</p>
+<h2 id="Installation">Installation</h2>
+<p>
+On Fedora (since F11), all that is needed is:
+</p>
+<pre class="wiki">yum install sssd
+</pre><p>
+If you're using another distribution or want to get the latest bits from the git repository, clone the SSSD repository:
+</p>
+<pre class="wiki">git-clone git://fedorahosted.org/sssd/ sssd.git
+cd sssd.git
+</pre><p>
+You can now build and install SSSD locally. The complete process is described into great detail in a text file <tt>BUILD.txt</tt> in sssd's source tree.
+</p>
+<p>
+Another option is to build and install RPMs from the git tree, issue:
+</p>
+<pre class="wiki">make rpms
+</pre><p>
+For this to work, you'll also need to have git, and all the build requirements of SSSD installed.
+The built RPMs will be in the <tt>rpmbuild/RPMS</tt> subdirectory.
+</p>
+<h2 id="RunningSSSD">Running SSSD</h2>
+<p>
+To start the deamon, just start the sssd service:
+</p>
+<pre class="wiki">service sssd start
+</pre><p>
+For debugging, it may be more comfortable to run the daemon in foreground:
+</p>
+<pre class="wiki">/usr/sbin/sssd -i
+</pre><p>
+Another option that might be of interest especially for testing a
+configuration is <tt>-d/--debug-level</tt>, that tells sssd to print more debug
+information according to debug level specified. The debug level can also be
+specified per-service (see below).
+</p>
+<h2 id="Configuration">Configuration</h2>
+<p>
+The configuration of the deamon itself is done via editing
+<tt>/etc/sssd/sssd.conf</tt>. The file has a ini-style syntax -  the file consists
+of sections that in turn consist of key=value pairs. If you need to use
+more values, separate them with commas. For example:
+</p>
+<pre class="wiki">[section]
+key = value
+key2 = val,val2
+</pre><p>
+A comment starts with a hash sign (<tt>#</tt>) or a semicolon (<tt>;</tt>). The data types used
+are string, integer and bool (with values of <tt>TRUE/FALSE</tt>).
+</p>
+<p>
+It is also possible to use an alternate config file by using the <tt>-c/--config</tt> parameter of sssd.
+</p>
+<p>
+For more information on configuring SSSD, see the <tt>sssd.conf(5)</tt> man page that
+comes with SSSD.
+</p>
+<h3 id="ConfigureNSSforfetchinguserandgroupinformation">Configure NSS for fetching user and group information</h3>
+<p>
+In order to configure your system to use sssd for user information, SSSD provides a new <em>nss_sss</em> NSS module. To use it, you
+need to configure NSS to use the <em>sss</em> name database along the classic UNIX file database. Edit your <tt>/etc/nsswitch.conf</tt>:
+</p>
+<pre class="wiki">passwd:     files sss
+group:      files sss
+</pre><h3 id="ConfigurePAMforauthentication">Configure PAM for authentication</h3>
+<p>
+Configuring PAM should be done with extreme care. A mistake or typo in the PAM config file can lock you out of the system completely. Always backup your config files before doing any changes and keep a session open in order to be able to revert changes you do.
+</p>
+<p>
+Enable the use of the SSSD for PAM. If you are changing the default PAM config on Fedora, it should look like:
+</p>
+<pre class="wiki">#%PAM-1.0
+auth        required      pam_env.so
+auth        sufficient    pam_fprintd.so
+auth        sufficient    pam_unix.so nullok
+auth        sufficient    pam_sss.so use_first_pass
+auth        requisite     pam_succeed_if.so uid &gt;= 500 quiet
+auth        required      pam_deny.so
+
+account     required      pam_unix.so broken_shadow
+account     sufficient    pam_sss.so
+account     sufficient    pam_localuser.so
+account     sufficient    pam_succeed_if.so uid &lt; 500 quiet
+account     required      pam_permit.so
+
+password    requisite     pam_cracklib.so try_first_pass retry=3
+password    sufficient    pam_unix.so sha512 shadow nullok use_authtok
+password    sufficient    pam_sss.so use_first_pass
+password    required      pam_deny.so
+
+session     optional      pam_keyinit.so revoke
+session     required      pam_limits.so
+session     [success=1 default=ignore] pam_succeed_if.so service in crond quiet use_uid
+session     sufficient    pam_unix.so
+session     required      pam_sss.so
+</pre><p>
+If your operating system provides a tool to configure PAM, e.g. authconfig for Fedora
+based systems, you can use this, too. Select LDAP authentication with this tool and then
+substitute pam_ldap.so by pam_sss.so in all files below /etc/pam.d or in /etc/pam.conf.
+</p>
+<p>
+Recent PAM implementations allow to include PAM configurations, e.g.
+</p>
+<pre class="wiki">...
+session     include      system-auth
+session     optional     pam_console.so
+...
+</pre><p>
+If you use includes please note that in the example above pam_console.so is not executed
+if a sufficient condition from system-auth returns PAM_SUCCESS. 
+</p>
+<p>
+Some of the later examples use a proxy auth provider between pam_sss and other
+PAM modules using the <tt>pam-target</tt> configuration directive that
+references a file in <tt>/etc/pam.d</tt>. It is important <strong>not</strong> to include
+<tt>pam_sss.so</tt> modules in these proxied targets, otherwise the PAM stack may go
+into a loop.
+</p>
+<h3 id="SSSDdaemonconfiguration">SSSD daemon configuration</h3>
+<p>
+I suggest that you start with the <tt>/etc/sssd/sssd.conf</tt> file that comes
+with the Fedora RPMs as most of the stuff is already there.  The source
+distribution contains an example config file in the <tt>server/examples</tt>
+subdirectory.
+</p>
+<h2 id="Configuringservices">Configuring services</h2>
+<p>
+Individual pieces of SSSD functionality are provided by special SSSD
+services that are started and stopped together with SSSD. The services
+provided by SSSD have their own configuration inside <tt>[services/&lt;NAME&gt;]</tt>
+sections. The <tt>[services]</tt> section also lists the services that are active
+and should be started when sssd starts within the <tt>activeServices</tt> directive.
+</p>
+<p>
+We use several services in this HOWTO - NSS, Data Provider, PAM and a service called monitor
+that watches over other services, starts or restarts them as needed.
+</p>
+<ul><li>An NSS provider service that answers NSS requests from the <tt>nss_sss</tt> module
+</li><li>A PAM provider service that manages a PAM conversation through the <tt>pam_sss</tt> PAM module
+</li><li>A data provider front-end service for populating cache data from back-ends 
+</li></ul><pre class="wiki">[services]
+description = Local Service Configuration
+activeServices = nss, dp, pam
+
+[services/monitor]
+description = Service Monitor Configuration
+sbusTimeout = 30
+
+[services/dp]
+description = Data Provider Configuration
+
+[services/pam]
+description = PAM Responder Configuration
+
+[services/nss]
+description = NSS Responder Configuration
+filterGroups = root
+filterUsers = root
+</pre><p>
+The following subsections list only the most important configuration optiosn. See the <tt>sssd.conf(5)</tt> manual page that is shipped with SSSD for all the configuration options available.
+</p>
+<h3 id="Generalconfigurationoptions">General configuration options</h3>
+<dl class="wiki"><dt><strong>debug-level</strong> (integer)</dt><dd>
+This is a per-service setting (that is, it can appear in any of [services/&lt;NAME&gt;] sections that sets the debug level for that service.
+</dd><dt><strong>reconnection_retries</strong> (integer)</dt><dd>
+Number of times services should attempt to reconnect in the event of a Data Provider crash or restart before they give up
+</dd></dl>
+<h3 id="NSSconfigurationoptions">NSS configuration options</h3>
+<dl class="wiki"><dt><strong>EnumCacheTimeout</strong> (integer)</dt><dd>
+How long should <tt>nss_sss</tt> cache enumerations (requests for info about all users)
+</dd><dt><strong>EntryCacheTimeout</strong> (integer)</dt><dd>
+How long should <tt>nss_sss</tt> cache positive cache hits (that is, queries for valid database entries) before asking the backend again
+</dd><dt><strong>EntryNegativeTimeout</strong> (integer)</dt><dd>
+How long should <tt>nss_sss</tt> cache negative cache hits (that is, queries for invalid database entries, like nonexitent ones) before asking the backend again
+</dd><dt><strong>filterUsers</strong>, <strong>filterGroups</strong> (string)</dt><dd>
+Exclude certain users from being fetched from the <tt>sss</tt> NSS database. This is particularly useful for system accounts like root.
+</dd><dt><strong>filterUsersInGroups</strong> (bool)</dt><dd>
+If you want filtered user still be group members set this option to false.
+</dd></dl>
+<h2 id="Configuringdomains">Configuring domains</h2>
+<p>
+A domain is a database containing user information. SSSD can use more domains at the same time, but at least one must be configured or SSSD won't start. Using SSSD domains, it is possible to use several LDAP servers providing several unique namespaces.
+</p>
+<p>
+Add new domains configurations into <tt>[domains/&lt;NAME&gt;]</tt> sections.  Then add
+the list of domains (in the order you want them to be queried) in the
+'domains' attribute of the domains section. For example, to use only <tt>LOCAL</tt> domain:
+</p>
+<pre class="wiki">[domains]
+description = Domains served by SSSD
+domains = LOCAL
+</pre><p>
+The following subsections will list examples of configuring different types of domains.
+</p>
+<h3 id="Domainconfigurationoptions">Domain configuration options</h3>
+<p>
+These configuration options can be present in a domain configuration section,
+that is, in a section called <tt>[domains/&lt;NAME&gt;]</tt>.
+</p>
+<dl class="wiki"><dt><strong>minId,maxId</strong> (integer)</dt><dd>
+UID limits for the domain. If a domain contains entry that is outside these limits, it is ignored
+</dd><dt><strong>magicPrivateGroups</strong> (bool)</dt><dd>
+By using the Magic Private Groups option, you are imposing two limitations to the ID space and name space:
+<ol><li>users and groups share a common name space, there can never be a group with a same name as a user
+</li><li>users and groups share a common ID space, there can never be a group with a same ID as a user
+</li></ol></dd></dl>
+<p>
+Using Magic Private groups bring the benefit of better Windows
+Interoperability (in Windows, the ID and name spaces are unique) and also
+avoids creating a group for every user, thus cluttering the group space. Also,
+for NSS calls, every user is actually returned as user's private group without
+having to explicitly create the group, thus having the same effect as User
+Private Groups
+</p>
+<dl class="wiki"><dt><strong>enumerate</strong> (integer)</dt><dd>
+Determines if a domain can be enumerated. This parameter can have one of the following values:
+<ul><li>1 = Enumerate users
+</li><li>2 = Enumerate groups
+</li><li>3 = Enumerate both
+</li></ul></dd><dt><strong>timeout</strong> (integer)</dt><dd>
+Timeout in seconds for this particular domain. Raising this timeout might prove useful for slower backends like distant LDAP servers. The default is 0 (no timeout).
+</dd><dt><strong>cache-credentials</strong> (bool)</dt><dd>
+Determines if user credentials are also cached in the local LDB cache
+</dd><dt><strong>legacy</strong> (bool)</dt><dd>
+A legacy domain is a strictly POSIX domain in terms of attributes it has, also groups can't be nested.
+</dd><dt><strong>store-legacy-passwords</strong> (bool)</dt><dd>
+Whether to also store passwords in a legacy domain
+</dd><dt><strong>provider</strong> (string)</dt><dd>
+The Data Provider backend to use for this domain. Currently supported
+backends are:
+<ul><li>proxy: Support a legacy NSS provider
+</li><li>local: SSSD internal local provider
+</li><li>ldap: ldap provider
+</li><li>files: Support for legacy /etc/passwd and /etc/shadow
+</li></ul></dd><dt><strong>useFullyQualifiedNames</strong> (bool)</dt><dd>
+If set to TRUE, all requests to this domain must use fully qualified names. For example, if used in LOCAL domain that contains a "test" user, <tt>getent passwd test</tt> wouldn't find the user while <tt>getent passwd test@LOCAL</tt> would
+</dd><dt><strong>auth-module</strong> (string)</dt><dd>
+The authentication module used for the domain. Supported auth modules are:
+<ul><li>ldap for native LDAP authentication. See sssd-ldap(5) for more information on configuring LDAP.
+</li><li>krb5 for Kerberos authentication. See sssd-krb5(5) for more information on configuring Kerberos.
+</li><li>proxy for relaying authentication to some other PAM target.
+</li></ul></dd></dl>
+<h3 id="Optionsvalidforproxydomains">Options valid for proxy domains</h3>
+<dl class="wiki"><dt><strong>pam-target</strong> (string)</dt><dd>
+The proxy target PAM proxies to. If not set, a default setting of <tt>sssd_pam_proxy_default</tt> is used.
+</dd><dt><strong>libName</strong> (string)</dt><dd>
+The name of NSS library. The NSS functions searched for in the library are in the form of <tt>_nss_$(libName)_$(function)</tt>, for example <tt>_nss_files_getpwent</tt>.
+</dd></dl>
+<h3 id="TheLOCALdomain">The LOCAL domain</h3>
+<p>
+There is a special domain in SSSD named <em>LOCAL</em>. Its backend is stored on disk in a 
+format called <em>LDB</em>, an on-disk LDAP-like database. This domain can be used together with 
+classic UNIX files (<tt>/etc/passwd, /etc/shadow</tt>) or completely substitute it.
+</p>
+<p>
+One difference in comparison with the classic files is that groups in the LOCAL backend can be nested (only non-legacy LOCAL backend, see below). The LOCAL domain is also meant to contain additional user information such as user picture or keyboard settings.
+</p>
+<p>
+To manage users in the LOCAL backend, SSSD comes with a set of tools that resemble their
+shadow-utils counterparts in names as well as parameters. The tools include <em>sss_useradd</em>, 
+<em>sss_groupadd</em> for adding users and groups, <em>sss_userdel</em>, <em>sss_groupdel</em> for removing them and
+<em>sss_usermod</em>, <em>sss_groupmod</em> for changing their attributes. You can see details about tools usage by running them with the <tt>--help</tt> argument.
+</p>
+<h2 id="Domainconfigurationexamples">Domain configuration examples</h2>
+<h3 id="Example1:ALOCALdomainthatproxiestofiles">Example 1: A LOCAL domain that proxies to files</h3>
+<p>
+Example <tt>LOCAL</tt> domain that proxies to <tt>/etc/passwd</tt> and <tt>/etc/group</tt> files. This configuration is meant mostly as a migration path to be able to store additional information about users while still keeping <tt>/etc/passwd</tt> authoritative.
+</p>
+<pre class="wiki">[domains/LOCAL]
+description = LOCAL migration domain
+enumerate = 3
+minId = 500
+magicPrivateGroups = FALSE
+legacy = TRUE
+
+provider = files
+</pre><p>
+Note that the "files" provider is really an alias for 
+</p>
+<pre class="wiki">provider = proxy
+libName = files
+</pre><h4 id="PAMconfigfortheproxiedLOCALdomain">PAM config for the proxied LOCAL domain</h4>
+<p>
+To enable authentication via the PAM stack, add these options to the domain
+config:
+</p>
+<pre class="wiki">auth-module = proxy
+pam-target = sssdproxylocal
+</pre><p>
+This way, the authentication requests will be proxied via file
+<tt>/etc/pam.d/sssdproxylocal</tt> that will provide the usual module
+interfaces.
+</p>
+<p>
+This is how the <tt>/etc/pam.d/sssdproxylocal</tt> file should look like:
+</p>
+<pre class="wiki">auth        required      pam_unix.so
+account     required      pam_unix.so
+password    required      pam_unix.so
+session     required      pam_unix.so
+</pre><h3 id="Example2:AstandaloneLOCALdomain">Example 2: A standalone LOCAL domain</h3>
+<p>
+Put the following definition of LOCAL domain into your sssd config file:
+</p>
+<pre class="wiki">[domains/LOCAL]
+description = LOCAL Users domain
+enumerate = 3
+minId = 500
+maxId = 999
+legacy = FALSE
+magicPrivateGroups = TRUE
+provider = local
+</pre><p>
+Now, add a LOCAL user using sssd management tools:
+</p>
+<pre class="wiki">sss_useradd testuser1
+</pre><p>
+Note that contrary to useradd from shadow-utils sss_useradd does not create
+home directory of the new user. One option to create it might be using <em>pam_mkhomedir</em>.
+</p>
+<p>
+If you configured NSS to use the SSS domain, you should be able to request the user information now:
+</p>
+<pre class="wiki">getent passwd testuser1@LOCAL
+</pre><p>
+Changing the user's password and logging in should be also possible now:
+</p>
+<pre class="wiki">passwd testuser1
+ssh testuser1@localhost
+</pre><h3 id="Example3:AnLDAPdomainusingtheproxydataprovider">Example 3: An LDAP domain using the proxy data provider</h3>
+<p>
+Configuring a domain that uses user information in LDAP requires a running
+LDAP server and your machine configured as an LDAP client for that server. For example, for 
+a server running on ldap.example.com with base of "dc=example,dc=com" using simple bind authentication, 
+your /etc/ldap.conf would include the following:
+</p>
+<pre class="wiki">base dc=example,dc=com
+uri ldap://ldap.example.com:389
+ssl no
+</pre><p>
+The domain configuration in sssd config would look like this:
+</p>
+<pre class="wiki">[domains/LDAP]
+description = Proxy request to our LDAP server
+enumerate = 3
+minId = 1000
+legacy = TRUE
+provider = proxy
+libName = ldap
+cache-credentials = TRUE
+</pre><p>
+Also, don't forget to add the domain to the list of active domains:
+</p>
+<pre class="wiki">domains = LOCAL,LDAP
+</pre><p>
+You should be able to authenticate using LDAP credentials:
+</p>
+<pre class="wiki">ssh ldapuser@localhost
+</pre><p>
+Now comes the fun part - the caching mechanism. Measure the time to get information about user from the LDAP server:
+</p>
+<pre class="wiki">time getent passwd ldapuser
+</pre><p>
+OK, it may have taken even few seconds, depending on the connection to your LDAP server. Do the same again:
+</p>
+<pre class="wiki">time getent passwd ldapuser
+</pre><p>
+The second <tt>getent</tt> should return almost immediatelly, leveraging the caching mechanism.
+</p>
+<p>
+Go to your LDAP server and turn it off (or shutdown the network). You should still be able to get information from the cache, even log in using the LDAP credentials - that is possible because the credentials are cached in LDB, the same on-disk LDAP database that is used for storing LOCAL accounts.
+</p>
+<pre class="wiki">service network stop
+getent passwd ldapuser
+ssh ldapuser@localhost
+</pre><p>
+The results are retreived from cache <em>after</em> the timeout interval.
+</p>
+<h4 id="PAMconfigfortheLDAPdomain">PAM config for the LDAP domain</h4>
+<p>
+To enable authentication via the PAM stack, add these options to the domain
+config:
+</p>
+<pre class="wiki">auth-module = proxy
+pam-target = sssdproxyldap
+</pre><p>
+This way, the authentication requests will be proxied via file
+<tt>/etc/pam.d/sssdproxyldap</tt> that will provide the usual module
+interfaces.
+</p>
+<p>
+This is how the <tt>/etc/pam.d/sssdproxyldap</tt> file should look like:
+</p>
+<pre class="wiki">auth        required      pam_ldap.so
+account     required      pam_ldap.so
+password    required      pam_ldap.so
+session     required      pam_ldap.so
+</pre><h3 id="Example4:AuthenticatingagainstanativeLDAPdomain">Example 4: Authenticating against a native LDAP domain</h3>
+<p>
+Similarly to configuring a proxy LDAP domain, a native LDAP domain requires a
+running LDAP server to authenticate against. The client configuration is done
+in <tt>/etc/sssd/sssd.conf</tt>.
+</p>
+<p>
+The domain configuration in sssd config would look like this:
+</p>
+<pre class="wiki">[domains/LDAP]
+description = A native LDAP domain
+enumerate = 3
+legacy = TRUE
+cache-credentials = TRUE
+
+provider = ldap
+
+auth-module = ldap
+ldapUri = ldap://ldap.mydomain.org
+userSearchBase = dc=mydomain,dc=org
+tls_reqcert = demand
+</pre><p>
+All the parameters for a native LDAP domain are described in the
+<tt>sssd-ldap(5)</tt> manual page. 
+</p>
+<h3 id="Example5:AuthenticatingagainstaKerberosserver">Example 5: Authenticating against a Kerberos server</h3>
+<p>
+In order to set up Kerberos authentication, you need to know the address of
+your KDC and the Kerberos realm. Using these parameters, the configuration is
+very simple:
+</p>
+<pre class="wiki">[domains/KRBDOMAIN]
+auth-module = krb5
+krb5KDCIP = 192.168.1.1
+krb5REALM = EXAMPLE.COM
+</pre><p>
+All the parameters for a configuring Kerberos authentication are described in
+the <tt>sssd-krb5(5)</tt> manual page. 
+</p>
+</body></html>

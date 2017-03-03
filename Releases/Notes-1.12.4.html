@@ -1,0 +1,107 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<ul><li>This is mostly a bug fixing release with only minor enhancements visible to the end user
+</li><li>Contains many fixes and enhancements related to the ID views functionality of FreeIPA servers
+</li><li>Several fixes related to retrieving AD group membership in an IPA-AD trust scenario
+</li><li>Fixes a bug where the GPO access control previously didn't work at all if debugging was enabled in smb.conf.
+</li><li>SSSD can now be pinned to a particular AD site instead of autodiscovering the site
+</li><li>A regression that caused setting the SELinux context for IPA users to fail, was fixed
+</li><li>Fixed a potential crash caused by a double-free error when an SSSD service was killed by the monitor process
+</li></ul><h2 id="PackagingChanges">Packaging Changes</h2>
+<ul><li>Several patches that allow building the Python code in SSSD with python3 were merged
+</li></ul><h2 id="DocumentationChanges">Documentation Changes</h2>
+<ul><li>A new option <tt>ad_site</tt> was added. When this option is set, SSSD will attempt to connect to DCs from this particular AD site instead of looking up the site via DNS
+</li><li>The <tt>ad_gpo_map_permit</tt> option now also includes the <tt>systemd-user</tt> service to avoid errors in processing of the PAM session stack
+</li></ul><h2 id="TicketsFixed">Tickets Fixed</h2>
+<p>
+</p><div><dl class="wiki compact"><dt><a class="closed" href="/sssd/ticket/1991" title="Make return codes of basic sysdb operations consistent">#1991</a></dt><dd>Make return codes of basic sysdb operations consistent</dd><dt><a class="closed" href="/sssd/ticket/2203" title="Write message to syslog about users with duplicated UID">#2203</a></dt><dd>Write message to syslog about users with duplicated UID</dd><dt><a class="closed" href="/sssd/ticket/2376" title="Investigate Kerberized NFS4 setup with the new NFS plugin">#2376</a></dt><dd>Investigate Kerberized NFS4 setup with the new NFS plugin</dd><dt><a class="closed" href="/sssd/ticket/2486" title="[RFE] ad provider dns_discovery_domain option: kerberos discovery is not ...">#2486</a></dt><dd>[RFE] ad provider dns_discovery_domain option: kerberos discovery is not using this option</dd><dt><a class="closed" href="/sssd/ticket/2515" title="sssd-ad: The man page description to enable GPO HBAC Policies are unclear">#2515</a></dt><dd>sssd-ad: The man page description to enable GPO HBAC Policies are unclear</dd><dt><a class="closed" href="/sssd/ticket/2527" title="sssd.conf(5) man page gives bad advice about domains parameter">#2527</a></dt><dd>sssd.conf(5) man page gives bad advice about domains parameter</dd><dt><a class="closed" href="/sssd/ticket/2531" title="sssd_be crashes in nested LDAP code with a use-after-free error">#2531</a></dt><dd>sssd_be crashes in nested LDAP code with a use-after-free error</dd><dt><a class="closed" href="/sssd/ticket/2542" title="GPO offline processing rejects access if no applicable GPOs are find in ...">#2542</a></dt><dd>GPO offline processing rejects access if no applicable GPOs are find in the cache</dd><dt><a class="closed" href="/sssd/ticket/2543" title="GPO code fails if no LDAP URI can be resolved">#2543</a></dt><dd>GPO code fails if no LDAP URI can be resolved</dd><dt><a class="closed" href="/sssd/ticket/2544" title="GPO: libsmbclient logs to stdout by default, cluttering gpo_child output">#2544</a></dt><dd>GPO: libsmbclient logs to stdout by default, cluttering gpo_child output</dd><dt><a class="closed" href="/sssd/ticket/2547" title="gzip: stdin: file size changed while zipping when rotating logfile">#2547</a></dt><dd>gzip: stdin: file size changed while zipping when rotating logfile</dd><dt><a class="closed" href="/sssd/ticket/2548" title="Document that dyndns_iface only supports a single interface">#2548</a></dt><dd>Document that dyndns_iface only supports a single interface</dd><dt><a class="closed" href="/sssd/ticket/2550" title="libsss_simpleifp should pull sssd-dbus">#2550</a></dt><dd>libsss_simpleifp should pull sssd-dbus</dd><dt><a class="closed" href="/sssd/ticket/2556" title="add systemd-user to default gpo list">#2556</a></dt><dd>add systemd-user to default gpo list</dd><dt><a class="closed" href="/sssd/ticket/2557" title="pam_sss(sshd:auth): authentication failure with user from AD">#2557</a></dt><dd>pam_sss(sshd:auth): authentication failure with user from AD</dd><dt><a class="closed" href="/sssd/ticket/2559" title="PAC responder is called after krb5_child switches to the user logging in">#2559</a></dt><dd>PAC responder is called after krb5_child switches to the user logging in</dd><dt><a class="closed" href="/sssd/ticket/2560" title="Users saved throug extop don't have the originalMemberOf attribute">#2560</a></dt><dd>Users saved throug extop don't have the originalMemberOf attribute</dd><dt><a class="closed" href="/sssd/ticket/2563" title="Need to set different umask in selinux_child">#2563</a></dt><dd>Need to set different umask in selinux_child</dd><dt><a class="closed" href="/sssd/ticket/2564" title="selinux_child needs to setuid(0) to make libselinux work as non-root">#2564</a></dt><dd>selinux_child needs to setuid(0) to make libselinux work as non-root</dd><dt><a class="closed" href="/sssd/ticket/2566" title="Uncached SIDs cannot be resolved">#2566</a></dt><dd>Uncached SIDs cannot be resolved</dd><dt><a class="closed" href="/sssd/ticket/2567" title="Same member saved as ghost and as member in IPA server mode">#2567</a></dt><dd>Same member saved as ghost and as member in IPA server mode</dd><dt><a class="closed" href="/sssd/ticket/2571" title="IPA initgroups don't work correctly in non-default view">#2571</a></dt><dd>IPA initgroups don't work correctly in non-default view</dd><dt><a class="closed" href="/sssd/ticket/2572" title="[abrt] sssd-common: talloc_abort(): sssd killed by SIGABRT">#2572</a></dt><dd>[abrt] sssd-common: talloc_abort(): sssd killed by SIGABRT</dd><dt><a class="closed" href="/sssd/ticket/2586" title="user_attributes missing from ifp schema">#2586</a></dt><dd>user_attributes missing from ifp schema</dd></dl></div><p>
+</p>
+<h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Bohuslav Kabrda (1):
+</p>
+<ul><li>Python3 support in SSSD
+</li></ul><p>
+Jakub Hrozek (23):
+</p>
+<ul><li>Updating the version to the 1.12.4 release
+</li><li>GPO: Ignore ENOENT result from sysdb_gpo_get_gpo_result_setting()
+</li><li>TESTS: Cover sysdb_gpo.c with unit tests
+</li><li>GPO: Set libsmb debugging to stderr
+</li><li>UTIL: Allow dup-ing child pipe to a different FD
+</li><li>GPO: Don't use stdout for output in gpo_child
+</li><li>GPO: Extract server hostname after connecting
+</li><li>krb5_child: Return ERR_NETWORK_IO on KRB5_KDCREP_SKEW
+</li><li>Open the PAC socket from krb5_child before dropping root
+</li><li>IPA: Use attr's dom for users, too
+</li><li>SELINUX: Call setuid(0)/setgid(0) to also set the real IDs to root
+</li><li>SELINUX: Set and reset umask when caling set_seuser from deamon code
+</li><li>LDAP: Add UUID when saving incomplete groups
+</li><li>IPA: Resolve IPA user groups' overrideDN in non-default view
+</li><li>LDAP: Rename the _res output parameter to avoid clashing with libresolv in tests
+</li><li>RESOLV: Add an internal function to read TTL from a DNS packet
+</li><li>resolv: Fix a typo
+</li><li>SELINUX: Check the return value of setuid and setgid
+</li><li>BUILD: Include python-test.py in the tarball
+</li><li>GPO: Better debugging for gpo_child's mkdir
+</li><li>LDAP: Add better DEBUG messages to the cleanup task
+</li><li>LDAP: Handle ENOENT better in the cleanup task
+</li><li>Updating translations for the 1.12.4 release
+</li></ul><p>
+Lukas Slebodnik (11):
+</p>
+<ul><li>logrotate: Fix warning file size changed while zipping
+</li><li>PROXY: Fix use after free
+</li><li>pysss: Fix double free
+</li><li>MONITOR: Fix double free
+</li><li>SSSDConfig: Remove unused exception name
+</li><li>SSSDConfig: Port missing parts to python3
+</li><li>Remove strict requirements of python2
+</li><li>sbus_codegen: Port to python3
+</li><li>Add missing new lines to debug messages
+</li><li>CONFIGURE: Do not use macro AC_PROG_MKDIR_P twice
+</li><li>RESPONDERS: Warn to syslog about colliding objects
+</li></ul><p>
+Pavel Březina (1):
+</p>
+<ul><li>spec: sifp requires sssd-dbus
+</li></ul><p>
+Pavel Reichl (6):
+</p>
+<ul><li>GPO: add systemd-user to gpo default permit list
+</li><li>MAN: dyndns_iface supports only one interface
+</li><li>MAN: add dots as valid character in domain names
+</li><li>AD: add new option ad_site
+</li><li>AD: support for AD site override
+</li><li>MAN: amend sss_ssh_authorizedkeys
+</li></ul><p>
+Rob Crittenden (1):
+</p>
+<ul><li>Add user_attributes to ifp section of API schema
+</li></ul><p>
+Sumit Bose (24):
+</p>
+<ul><li>IPA: add get_be_acct_req_for_user_name()
+</li><li>IPA: resolve ghost members if a non-default view is applied
+</li><li>sysdb: fix group members with overridden names
+</li><li>IPA: ipa_resolve_user_list_send() take care of overrides
+</li><li>IPA: do not look up overrides on client with default view
+</li><li>IPA: make version check more precise
+</li><li>IPA: add missing break
+</li><li>IPA: process_members() optionally return missing members list
+</li><li>IPA: rename ipa_s2n_get_groups_send() to ipa_s2n_get_fqlist_send()
+</li><li>IPA: resolve missing members
+</li><li>IPA: set SYSDB_INITGR_EXPIRE for RESP_USER_GROUPLIST
+</li><li>krb5: fix entry order in MEMORY keytab
+</li><li>nss: make fill_orig() multi-value aware
+</li><li>nss: refactor fill_orig()
+</li><li>nss: Add original DN and memberOf to origbyname request
+</li><li>views: fix GID overrride for mpg domains
+</li><li>IPA: properly handle mixed-case trusted domains
+</li><li>nss: fix SID lookups
+</li><li>sysdb: remove ghosts in all sub-domains as well
+</li><li>IPA: resolve IPA group-memberships for AD users
+</li><li>IPA: process_members() add ghosts only once
+</li><li>ipa_s2n_save_objects: properly handle fully-qualified group names
+</li><li>AD: use GC for SID requests as well
+</li><li>fill_id() fix LE/BE issue with wrong data type
+</li></ul></body></html>

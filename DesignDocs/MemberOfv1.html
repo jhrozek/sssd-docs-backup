@@ -1,0 +1,128 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><p>
+</p><div class="wiki-toc">
+<ol>
+  <li>
+    <ol>
+      <li>
+        <a href="#ProposaltoredesignthememberOfplugin">Proposal to redesign the memberOf plugin</a>
+      </li>
+      <li>
+        <a href="#Actions">Actions</a>
+        <ol>
+          <li>
+            <a href="#Addnewmembertoagroupwithnoparents">Add new member to a group with no parents</a>
+          </li>
+          <li>
+            <a href="#Addnewmembertoagroupwithparents">Add new member to a group with parents</a>
+          </li>
+          <li>
+            <a href="#Addnewgrouptoagroupwithnoparentsnoloops">Add new group to a group with no parents (no loops)</a>
+          </li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+</ol>
+</div><p>
+</p>
+<h2 id="ProposaltoredesignthememberOfplugin">Proposal to redesign the memberOf plugin</h2>
+<p>
+Let us start with the following setup:
+</p>
+<p>
+<a style="padding:0; border:none" href="https://fedorahosted.org/sssd/attachment/wiki/DesignDocs/MemberOfv2/nestedgroups.png"><img src="https://fedorahosted.org/sssd/raw-attachment/wiki/DesignDocs/MemberOfv2/nestedgroups.png" /></a>
+</p>
+<pre class="wiki">dn: name=Group A, cn=Groups, cn=default, cn=sysdb
+objectClass: group
+member: name=Group D, cn=Groups, cn=default, cn=sysdb
+member: name=User 1, cn=Users, cn=default, cn=sysdb
+member: name=User 2, cn=Users, cn=default, cn=sysdb
+member: name=User 3, cn=Users, cn=default, cn=sysdb
+member: name=User 4, cn=Users, cn=default, cn=sysdb
+member: name=User 5, cn=Users, cn=default, cn=sysdb
+memberOf: name=Group C, cn=Groups, cn=default, cn=sysdb
+
+dn: name=Group B, cn=Groups, cn=default, cn=sysdb
+objectClass: group
+member: name=Group D, cn=Groups, cn=default, cn=sysdb
+member: name=User 1, cn=Users, cn=default, cn=sysdb
+member: name=User 2, cn=Users, cn=default, cn=sysdb
+memberOf: name=Group C, cn=Groups, cn=default, cn=sysdb
+
+dn: name=Group C, cn=Groups, cn=default, cn=sysdb
+objectClass: group
+member: name=Group A, cn=Groups, cn=default, cn=sysdb
+member: name=Group B, cn=Groups, cn=default, cn=sysdb
+member: name=Group F, cn=Groups, cn=default, cn=sysdb
+member: name=User 3, cn=Users, cn=default, cn=sysdb
+
+dn: name=Group D, cn=Groups, cn=default, cn=sysdb
+objectClass: group
+member: name=User 4, cn=Users, cn=default, cn=sysdb
+memberOf: name=Group A, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group B, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group C, cn=Groups, cn=default, cn=sysdb
+
+dn: name=Group E, cn=Groups, cn=default, cn=sysdb
+objectClass: group
+member: name=User 5, cn=Users, cn=default, cn=sysdb
+memberOf: name=Group B, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group C, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group F, cn=Groups, cn=default, cn=sysdb
+
+dn: name=Group F, cn=Groups, cn=default, cn=sysdb
+objectClass: group
+memberOf: name=Group C, cn=Groups, cn=default, cn=sysdb
+
+
+dn: name=User 1, cn=Users, cn=default, cn=sysdb
+objectClass: user
+memberOf: name=Group A, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group B, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group C, cn=Groups, cn=default, cn=sysdb
+
+dn: name=User 2, cn=Users, cn=default, cn=sysdb
+objectClass: user
+memberOf: name=Group A, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group B, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group C, cn=Groups, cn=default, cn=sysdb
+
+dn: name=User 3, cn=Users, cn=default, cn=sysdb
+objectClass: user
+memberOf: name=Group A, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group C, cn=Groups, cn=default, cn=sysdb
+
+dn: name=User 4, cn=Users, cn=default, cn=sysdb
+objectClass: user
+memberOf: name=Group A, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group B, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group C, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group D, cn=Groups, cn=default, cn=sysdb
+
+dn: name=User 5, cn=Users, cn=default, cn=sysdb
+objectClass: user
+memberOf: name=Group A, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group B, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group C, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group E, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group F, cn=Groups, cn=default, cn=sysdb
+</pre><h2 id="Actions">Actions</h2>
+<h3 id="Addnewmembertoagroupwithnoparents">Add new member to a group with no parents</h3>
+<p>
+We send an ldb message to add "User 4" to "Group C"
+</p>
+<ol><li>Check whether the member attribute matches the DN of Group C (it does not)
+</li><li>Examine "Group C" for memberOf attributes.
+</li><li>No memberOf attributes exist
+</li><li>Add memberOf(Group C) to "User 4"
+</li></ol><h3 id="Addnewmembertoagroupwithparents">Add new member to a group with parents</h3>
+<p>
+We send an ldb message to add "User 5" to "Group B"
+</p>
+<ol><li>Check whether the member attribute matches the DN of Group C (it does not)
+</li><li>Examine "Group B" for memberOf attributes.
+</li><li>"Group B" has memberOf attributes: "Group C"
+</li><li>Check whether any of these memberOf values match "User 5" (none do)
+</li><li>Add memberOf(Group B) and memberOf(Group C) to "User 4" and return
+</li></ol><h3 id="Addnewgrouptoagroupwithnoparentsnoloops">Add new group to a group with no parents (no loops)</h3>
+</body></html>

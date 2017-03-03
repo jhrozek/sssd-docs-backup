@@ -1,0 +1,107 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h1 id="Importantsudoattributes">Important sudo attributes</h1>
+<ul><li><strong>sudoHost</strong> - to what host does the rule apply
+<ul><li><em>ALL</em> - all hostnames
+</li><li><em>hostname</em>
+</li><li><em>IP address</em>
+</li><li><em>+netgroup</em>
+</li><li><em>regular expression</em> - contains one of "\?*[]"
+</li></ul></li><li><strong>sudoUser</strong> - to what user does the rule apply
+<ul><li><em>username</em>
+</li><li><em>#uid</em>
+</li><li><em>%group</em>
+</li><li><em>+netgroup</em>
+</li></ul></li><li><strong>sudoOrder</strong> - rules ordering
+</li><li><strong>sudoNotBefore</strong> and <strong>sudoNotAfter</strong> - time constraints
+</li></ul><p>
+Complete LDAP schema can be found <a class="ext-link" href="http://www.gratisoft.us/sudo/man/1.8.4/sudoers.ldap.man.html"><span class="icon">​</span>here</a>.
+</p>
+<h1 id="Common">Common</h1>
+<h2 id="Perhostupdate">Per host update</h2>
+<p>
+Per host update returns all rules that:
+</p>
+<ul><li>sudoHost equals to ALL
+</li><li>direct match with sudoHost (by hostname or address)
+</li><li>contains regular expression (will be filtered by sudo)
+</li><li>contains netgroup (will be filtered by sudo)
+</li></ul><p>
+Hostname match is performed in sudo source in <em>plugin/sudoers/ldap.c/sudo_ldap_check_host()</em>.
+</p>
+<h2 id="Peruserupdate">Per user update</h2>
+<p>
+Per user update returns all rules that:
+</p>
+<ul><li>sudoUser equals to ALL
+</li><li>direct match with username, #uid or %group names
+</li><li>contains +netgroup (will be filtered by sudo)
+</li></ul><p>
+Username match is performed via LADP filter in sudo source in <em>plugin/sudoers/ldap.c/sudo_ldap_result_get()</em>.
+</p>
+<h2 id="Smartrefresh">Smart refresh</h2>
+<p>
+Download only rules that were modified or newly created since the last refresh.
+</p>
+<h1 id="Implementation">Implementation</h1>
+<p>
+We will be looking for modified and newly created rules in short intervals. Expiration of the rules is handled per user during the execution time of <em>sudo</em>. We will also do periodical full refresh to ensure consistency even if the <em>sudo</em> command is not used.
+</p>
+<h2 id="SysDBattributes">SysDB attributes</h2>
+<p>
+<strong>sudoLastSmartRefreshTime</strong> on <em>ou=SUDOers</em> - when the last smart refresh was performed<br />
+<strong>sudoLastFullRefreshTime</strong> on <em>ou=SUDOers</em> - when the last full refresh was performed<br />
+<strong>sudoNextFullRefreshTime</strong> on <em>ou=SUDOers</em> - when the next full is scheduled<br />
+<strong>dataExpireTimestamp</strong> on each rule - when the rule will be considered as expired
+</p>
+<h2 id="Dataprovider">Data provider</h2>
+<p>
+Data provider will be performing following actions:
+</p>
+<h3 id="A.Periodicaldownloadofchangedornewlycreatedrulesperhostsmartrefresh">A. Periodical download of changed or newly created rules (per host smart refresh)</h3>
+<p>
+Interval is configurable via <strong>ldap_sudo_changed_refresh_interval</strong> (default: 15 minutes)<br />
+Enable <em>modifyTimestamp</em> with <strong>ldap_sudo_modify_timestamp_enabled</strong> (default: false)
+</p>
+<ol><li><strong>if</strong> server has changed <strong>then</strong> do <strong>C</strong>
+</li><li><strong>else if</strong> <em>entryUSN</em> is available <strong>then</strong>
+<ol><li>refresh rules per host, where entryUSN &gt; currentHighestUSN
+</li><li><strong>goto</strong> 3.2.
+</li></ol></li><li><strong>else if</strong> <em>modifyTimestamp</em> is enabled <strong>then</strong>
+<ol><li>refresh rules per host, where entryUSN &gt; currentHighestUSN
+</li><li><em>sudoLastSmartRefreshTime</em> := current time
+</li><li>nextrefrest := (current time + <em>ldap_sudo_changed_refresh_interval</em>)
+</li><li><strong>if</strong> nextrefresh &gt;= <em>sudoNextFullRefreshTime</em> AND nextrefresh &lt; (<em>sudoNextFullRefreshTime</em> + <em>ldap_sudo_changed_refresh_interval</em>) <strong>then</strong>
+<ol><li>nextrefresh := (<em>sudoNextFullRefreshTime</em> + <em>ldap_sudo_changed_refresh_interval</em>)
+</li></ol></li><li>schedule next smart refresh
+</li></ol></li><li><strong>else</strong> do nothing
+</li></ol><h3 id="B.Periodicalfullrefreshofallrules">B. Periodical full refresh of all rules</h3>
+<p>
+Configurable via <strong>ldap_sudo_full_refresh_interval</strong> (default: 360 minutes)
+</p>
+<ol><li>do <strong>C</strong>
+</li><li><em>sudoLastFullRefreshTime</em> := current time
+</li><li><em>sudoNextFullRefreshTime</em> := (current time + <em>ldap_sudo_full_refresh_interval</em>)
+</li><li>schedule next full refresh
+</li></ol><h3 id="C.Ondemandfullrefreshofallrules">C. On demand full refresh of all rules</h3>
+<ol><li>Download all rules per host
+</li><li>Deletes all rules from the sysdb
+</li><li>Store downloaded rule in the sysdb
+</li></ol><h3 id="D.Ondemandrefreshofspecificrules">D. On demand refresh of specific rules</h3>
+<ol><li>Download the rules
+</li><li>Delete them from the sysdb
+</li><li>Store downloaded rule in the sysdb
+</li></ol><h2 id="Responder">Responder</h2>
+<p>
+<strong>sudo_timed</strong> (default: false) - filter rules by time constraints?
+</p>
+<ol><li>search sysdb per user
+</li><li>refresh all expired rules
+</li><li><strong>if</strong> any rule was deleted <strong>then</strong>
+<ol><li>schedule <strong>C</strong> (out of band)
+</li><li>search sysdb per user
+</li></ol></li><li><strong>if</strong> <em>sudo_timed</em> = false <strong>then</strong> filter rules by time constraints
+</li><li>sort rules
+</li><li>return rules to sudo
+</li></ol><h1 id="Questions">Questions</h1>
+<ol><li>Should we also do per user smart updates when the user runs <em>sudo</em>?
+</li><li>Should we create a tool to force full refresh of the rules immediately?
+</li></ol></body></html>

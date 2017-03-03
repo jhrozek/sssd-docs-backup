@@ -1,0 +1,87 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><p>
+</p><div class="wiki-toc">
+<ol>
+  <li>
+    <ol>
+      <li>
+        <a href="#Highlights">Highlights</a>
+      </li>
+      <li>
+        <a href="#Ticketsfixed">Tickets fixed</a>
+      </li>
+      <li>
+        <a href="#DetailedChangelog">Detailed Changelog</a>
+      </li>
+    </ol>
+  </li>
+</ol>
+</div><p>
+</p>
+<h2 id="Highlights">Highlights</h2>
+<ul><li>A security bug assigned CVE-2013-0219 was fixed - TOCTOU race conditions when creating or removing home directories for users in local domain
+</li><li>Monitoring and restarting child processes was made more robust
+</li><li>The ipa_hbac_support_srchost option was backported, defaulting to false.
+</li><li>The limit of file descriptors a responder is allowed to open is configurable using the fd_limit option
+</li><li>Idle client connections are terminated in the responder
+</li></ul><h2 id="Ticketsfixed">Tickets fixed</h2>
+<ul><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/1139"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/1139</a>
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/1214"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/1214</a>
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/1324"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/1324</a>
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/1226"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/1226</a>
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/1227"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/1227</a>
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/1130"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/1130</a>
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/1197"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/1197</a>
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/1078"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/1078</a>
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/1782"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/1782</a>
+</li></ul><h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Jakub Hrozek (8):
+</p>
+<ul><li>Rename fo_get_server_name to fo_get_server_str_name
+</li><li>fo_get_server_name() getter for a server name
+</li><li>Only do one cycle when resolving a server
+</li><li>Detect cycle in the fail over on subsequent resolve requests only
+</li><li>Try all KDCs when getting TGT for LDAP
+</li><li>HBAC: create empty groups with one NULL element
+</li><li>Process all groups from a single nesting level
+</li><li>TOOLS: Use openat/unlinkat when removing the homedir
+</li></ul><p>
+Jan Zeleny (1):
+</p>
+<ul><li>Add ipa_hbac_support_srchost option to IPA provider
+</li></ul><p>
+Ondrej Kos (7):
+</p>
+<ul><li>Add common SIGCHLD handling for providers
+</li><li>Cancel ping-check if service goes away
+</li><li>MONITOR: use sigchld handler for monitoring SSSD services
+</li><li>Add new debug level macros
+</li><li>UTIL: Add function for atomic I/O
+</li><li>TOOLS: Use file descriptor to avoid races when creating a home directory
+</li><li>TOOLS: Compile on old platforms such as RHEL5
+</li></ul><p>
+    
+Shantanu Goel (4):
+</p>
+<ul><li>Set return errno to the value prior to calling close().
+</li><li>Log message if close() fails in destructor.
+</li><li>Do not send SIGPIPE on disconnection
+</li><li>Add support for terminating idle connections
+</li></ul><p>
+Stephen Gallagher (14):
+</p>
+<ul><li>Bumping version to 1.5.17
+</li><li>Fix potential resource leak in backup_file.c
+</li><li>Log fixes for sdap_call_conn_cb
+</li><li>LDAP: Copy URI instead of pointing at failover service record
+</li><li>IPA: Detect nsupdate support for the realm directive
+</li><li>DP: Reorganize memory hierarchy of requests
+</li><li>Make the client idle timeout configurable
+</li><li>LDAP: Make sdap_access_send/recv public
+</li><li>IPA: Check nsAccountLock during PAM_ACCT_MGMT
+</li><li>Also expire connections on the privileged pipe
+</li><li>RESPONDERS: Allow increasing the file-descriptor limit
+</li><li>RESPONDERS: Make the fd_limit setting configurable
+</li><li>Converge accept_fd_handler and accept_priv_fd_handler
+</li><li>SYSDB: Make sysdb_attrs_get_el_int() public
+</li></ul></body></html>

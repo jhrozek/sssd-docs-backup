@@ -1,0 +1,178 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><p>
+</p><div class="wiki-toc">
+<ol>
+  <li>
+    <a href="#classSSSDService">class SSSDService</a>
+    <ol>
+      <li>
+        <a href="#__init__nameapischema"><tt>__init__(name, apischema)</tt></a>
+        <ol>
+          <li>
+            <a href="#Returns">Returns</a>
+          </li>
+          <li>
+            <a href="#Errors">Errors</a>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <a href="#list_options"><tt>list_options()</tt></a>
+        <ol>
+          <li>
+            <a href="#Returns1">Returns</a>
+          </li>
+          <li>
+            <a href="#Errors1">Errors</a>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <a href="#set_optionoptionnamevalue"><tt>set_option(optionname, value)</tt></a>
+        <ol>
+          <li>
+            <a href="#Returns2">Returns</a>
+          </li>
+          <li>
+            <a href="#Errors2">Errors</a>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <a href="#get_optionoptionname"><tt>get_option(optionname)</tt></a>
+        <ol>
+          <li>
+            <a href="#Returns3">Returns</a>
+          </li>
+          <li>
+            <a href="#Errors3">Errors</a>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <a href="#get_all_options"><tt>get_all_options()</tt></a>
+        <ol>
+          <li>
+            <a href="#Returns4">Returns</a>
+          </li>
+          <li>
+            <a href="#Errors4">Errors</a>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <a href="#remove_optionoptionname"><tt>remove_option(optionname)</tt></a>
+        <ol>
+          <li>
+            <a href="#Returns5">Returns</a>
+          </li>
+          <li>
+            <a href="#Errors5">Errors</a>
+          </li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+</ol>
+</div><p>
+</p>
+<h1 id="classSSSDService">class SSSDService</h1>
+<h2 id="__init__nameapischema"><tt>__init__(name, apischema)</tt></h2>
+<p>
+<em>Create a new <a class="wiki" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDService.html#classSSSDService">SSSDService</a>, setting its defaults to those found in the scema. This constructor should not be used directly. Use <a class="wiki" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#new_servicename">SSSDConfig.new_service()</a> instead.</em>
+<dl class="wiki"><dt><strong>name</strong></dt><dd>
+The service name
+</dd><dt><strong>apischema</strong></dt><dd>
+An <a class="missing wiki" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfigSchema.html" rel="nofollow">SSSDConfigSchema?</a> object created by <a class="wiki" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#__init__schemafileschemaplugindir">SSSDConfig.__init__()</a>
+</p>
+</dd></dl>
+<h3 id="Returns">Returns</h3>
+<p>
+The newly-created <a class="wiki" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDService.html#classSSSDService">SSSDService</a> object.
+</p>
+<h3 id="Errors">Errors</h3>
+<dl class="wiki"><dt><strong>TypeError</strong></dt><dd>
+The API schema passed in was unusable or the name was not a string.
+</dd><dt><strong>ServiceNotRecognizedError</strong></dt><dd>
+The service was not listed in the schema
+</dd></dl>
+<p>
+<br /><br />
+</p>
+<h2 id="list_options"><tt>list_options()</tt></h2>
+<p>
+<em>List all options that apply to this service
+</em></p>
+<h3 id="Returns1">Returns</h3>
+<p>
+A dictionary of configurable options. This dictionary is keyed on the option name with a tuple of the variable type and subtype (if the type is a collection type) as the value.
+</p>
+<h3 id="Errors1">Errors</h3>
+<p>
+No Errors
+<br /><br /><br />
+</p>
+<h2 id="set_optionoptionnamevalue"><tt>set_option(optionname, value)</tt></h2>
+<p>
+<em>Set a service option to the specified value (or values)</em>
+<dl class="wiki"><dt><strong>optionname</strong></dt><dd>
+The option to change
+</dd><dt><strong>value</strong></dt><dd>
+The value to set. This may be a single value or a list of values. If it is set to None, it resets the option to its default.
+</p>
+</dd></dl>
+<h3 id="Returns2">Returns</h3>
+<p>
+No return value
+</p>
+<h3 id="Errors2">Errors</h3>
+<dl class="wiki"><dt><strong>NoOptionError</strong></dt><dd>
+The specified option is not listed in the schema
+</dd><dt><strong>TypeError</strong></dt><dd>
+The value specified was not of the expected type
+</dd></dl>
+<p>
+<br /><br />
+</p>
+<h2 id="get_optionoptionname"><tt>get_option(optionname)</tt></h2>
+<p>
+<em>Return the value of a service option</em>
+<dl class="wiki"><dt><strong>optionname</strong></dt><dd>
+The option to get.
+</p>
+</dd></dl>
+<h3 id="Returns3">Returns</h3>
+<p>
+The value for the requested option.
+</p>
+<h3 id="Errors3">Errors</h3>
+<dl class="wiki"><dt><strong>NoOptionError</strong></dt><dd>
+The specified option was not listed in the service
+</dd></dl>
+<p>
+<br /><br />
+</p>
+<h2 id="get_all_options"><tt>get_all_options()</tt></h2>
+<p>
+<em>Return a dictionary of name/value pairs for this service</em>
+</p>
+<h3 id="Returns4">Returns</h3>
+<p>
+A dictionary of name/value pairs currently in use for this service
+</p>
+<h3 id="Errors4">Errors</h3>
+<p>
+<br /><br /><br />
+</p>
+<h2 id="remove_optionoptionname"><tt>remove_option(optionname)</tt></h2>
+<p>
+<em>Remove an option from the service. If the option does not exist, it is ignored.</em>
+</p>
+<h3 id="Returns5">Returns</h3>
+<p>
+No return value.
+</p>
+<h3 id="Errors5">Errors</h3>
+<p>
+No errors
+</p>
+</body></html>

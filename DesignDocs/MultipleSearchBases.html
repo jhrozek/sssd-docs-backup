@@ -1,0 +1,70 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><p>
+</p><div class="wiki-toc">
+<ol>
+  <li>
+    <ol>
+      <li>
+        <a href="#Purpose">Purpose</a>
+      </li>
+      <li>
+        <a href="#ExpectedBehaviour">Expected Behaviour</a>
+        <ol>
+          <li>
+            <a href="#IndividualLookups">Individual Lookups</a>
+          </li>
+          <li>
+            <a href="#Enumeration">Enumeration</a>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <a href="#Implementation">Implementation</a>
+        <ol>
+          <li>
+            <a href="#Parsing">Parsing</a>
+          </li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+</ol>
+</div><p>
+</p>
+<h2 id="Purpose">Purpose</h2>
+<p>
+Some deployments use search bases to limit or extend the set of users and groups visible to a system.
+</p>
+<p>
+One common example is for applications granting access only to users in a hard-coded group name. In this case, the group search base would generally be set differently for each machine running this application. Other machines running the same application providing access to other users would receive a different "view" of LDAP through the use of search bases.
+</p>
+<h2 id="ExpectedBehaviour">Expected Behaviour</h2>
+<h3 id="IndividualLookups">Individual Lookups</h3>
+<p>
+For targeted lookups (e.g. <tt>getpwuid()</tt>, <tt>getgrnam()</tt>) we should try each of the search bases in order until one of them returns the entry we are looking for, or we have exhausted all of the search bases. Each search will be performed with the search scope provided.
+</p>
+<h3 id="Enumeration">Enumeration</h3>
+<p>
+For enumeration, we will need to iterate through ALL search bases to retrieve users, groups, etc. For each search base, we need to examine each entry retrieved and compare it against the entries received from earlier search bases. If there are conflicts, we will discard the conflicting value from the later search base. (Therefore the entry in the earlier search bases will always win.
+</p>
+<h2 id="Implementation">Implementation</h2>
+<p>
+We will extend the <tt>ldap_*_search_base</tt> options to support behavior similar to that of <tt>nss_base_passwd</tt> and <tt>nss_base_group</tt> from nss-ldapd.
+</p>
+<p>
+The standard search base (<tt>ldap_search_base</tt> will be left alone as a single value with scope "subtree".
+</p>
+<p>
+The new <tt>ldap_*_search_base</tt> options will include a new delimiter, '<tt>?</tt>'. If this is present, we will divide the string up into triples as follows:
+</p>
+<pre class="wiki">search_base?scope?filter[?search_base?scope?filter...]
+</pre><h3 id="Parsing">Parsing</h3>
+<p>
+We will split the input string on the '?' delimiter. If the resulting array is exactly one, or is a multiple of three, we will continue. Otherwise it will fail validation.
+</p>
+<p>
+The scope must be one of 'subtree', 'onelevel' or 'base' (case-insensitive).
+</p>
+<p>
+The filter will be optional and may be a zero-length string. The filter must be pre-sanitized and must pass filter validation with <tt>ldb_parse_tree()</tt>
+</p>
+</body></html>

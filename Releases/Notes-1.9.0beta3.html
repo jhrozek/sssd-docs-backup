@@ -1,0 +1,76 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><p>
+</p><div class="wiki-toc">
+<ol>
+  <li>
+    <ol>
+      <li>
+        <a href="#Highlights">Highlights</a>
+      </li>
+      <li>
+        <a href="#TicketsFixed">Tickets Fixed</a>
+      </li>
+      <li>
+        <a href="#DetailedChangelog">Detailed Changelog</a>
+      </li>
+    </ol>
+  </li>
+</ol>
+</div><p>
+</p>
+<h2 id="Highlights">Highlights</h2>
+<ul><li>Add a new PAC responder for dealing with cross-realm Kerberos trusts
+</li><li>Terminate idle connections to the NSS and PAM responders
+</li><li>Switch from libunistring to glib2 for unicode support
+</li></ul><h2 id="TicketsFixed">Tickets Fixed</h2>
+<p>
+</p><div><dl class="wiki compact"><dt><a class="closed" href="/sssd/ticket/1163" title="[Feature] SSSD AD Integration Feature (Cross Realm Kerberos Trusts)">#1163</a></dt><dd>[Feature] SSSD AD Integration Feature (Cross Realm Kerberos Trusts)</dd><dt><a class="closed" href="/sssd/ticket/1354" title="Add support for terminating idle connections in sssd_nss">#1354</a></dt><dd>Add support for terminating idle connections in sssd_nss</dd><dt><a class="closed" href="/sssd/ticket/1383" title="sssd_nss segfaults performing netgroup lookups without a specified domain">#1383</a></dt><dd>sssd_nss segfaults performing netgroup lookups without a specified domain</dd></dl></div><p>
+</p>
+<h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Jan Zeleny (5):
+</p>
+<ul><li>Fix possible segfault in sdap_save_group()
+</li><li>PAC responder: add some utility functions
+</li><li>PAC responder: test suite
+</li><li>Fix re_expression matching with subdomains
+</li><li>SELinux user maps: pick just one map
+</li></ul><p>
+Shantanu Goel (4):
+</p>
+<ul><li>Set return errno to the value prior to calling close().
+</li><li>Log message if close() fails in destructor.
+</li><li>Do not send SIGPIPE on disconnection
+</li><li>Add support for terminating idle connections
+</li></ul><p>
+Simo Sorce (2):
+</p>
+<ul><li>Do not leak file descriptors in client libs.
+</li><li>Add close on exec support for old platforms
+</li></ul><p>
+Stef Walter (1):
+</p>
+<ul><li>Move some debug lines to new debug log levels
+</li></ul><p>
+Stephen Gallagher (6):
+</p>
+<ul><li>Bumping version to 1.9.0 beta 3
+</li><li>Fix typo breaking DIR cache detection
+</li><li>Make the client idle timeout configurable
+</li><li>UTILS: Fix segfault due to sss_parse_name_for_domains
+</li><li>BUILD: Change default unicode library to glib2
+</li><li>Update translations for 1.9.0 beta 3 release
+</li></ul><p>
+Sumit Bose (11):
+</p>
+<ul><li>PAC responder: add basic infrastructure
+</li><li>PAC responder: add the core functionality
+</li><li>PAC responder: support in spec file
+</li><li>PAC client: add basic support in common client code
+</li><li>PAC client: add krb5 authdata plugin
+</li><li>Add support for ID ranges
+</li><li>Add range support to PAC responder
+</li><li>Try to build PAC responder only if all dependencies are available
+</li><li>Build pac responder tests only if pac responder is build
+</li><li>Add man page section for the PAC responder
+</li><li>Set default for subdomain_homedir
+</li></ul></body></html>

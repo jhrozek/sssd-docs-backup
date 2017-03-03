@@ -1,0 +1,154 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<ul><li>This release focuses on backporting bug fixes from the 1.12 and 1.13 releases. At the moment, the SSSD upstream does not plan on releasing 1.11.9, barring security issues or regressions in this release. We recommend that all users of 1.11 upgrade to 1.12 or 1.13.
+</li><li>Several bugs related to using <tt>id_provider=ldap</tt> together with ID mapping enabled were fixed
+</li><li>Fixed a potential use-after-free error in the nested groups resolution code
+</li><li>The service restart code in the main "sssd" process was improved
+</li><li>The PAC responder can be built with MIT Kerberos versions 1.13 and 1.14
+</li><li>A potential segfault in the memberof ldb plugin was fixed
+</li><li>The LDAP child no longer leaves a stray temporary file behind in case acquiring the credentials fails
+</li><li>The sudo responder works correctly even for users or groups whose name contains an LDAP special character such as <tt>)</tt>
+</li><li>The <tt>autofs</tt> responder now works even with setups that enable the <tt>default_domain_suffix</tt> option
+</li><li>A memory leak in the NSS responder when a non-existing netgroup was requested is fixed in this release
+</li><li>The SSSD no longer leaks a file descriptor if service discovery times out when discovering an LDAP server
+</li><li>The sudo responder fixed the logic to sort entries with the sudoOrder attribute to match the sudo's native LDAP code
+</li></ul><h2 id="DocumentationChanges">Documentation Changes</h2>
+<ul><li>The <tt>ldap_use_tokengroups</tt> option defaults to <tt>false</tt> in the generic LDAP provider. Previously, both the AD and LDAP provider (with <tt>ldap_schema</tt> set to <tt>ad</tt>) attempted to use the <tt>tokenGroups</tt>, resulting in numerous bugs.
+</li></ul><h2 id="TicketsFixed">Tickets Fixed</h2>
+<ul><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2412"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2412</a> - Error processing universal groups with cross-domain membership in SSSD server mode
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2471"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2471</a> - RHEL6.6 sssd (1.11) fails if IPA permissions and roles have the same name
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2484"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2484</a> - Password change over ssh doesn't work with OTP and FreeIPA
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2448"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2448</a> - MAN: If ldap_group_base is set, tokengroups might not be able to convert all GIDs to names
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2445"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2445</a> - Race condition while invalidating memory cache in client code
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2492"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2492</a> - Group membership gets lost in IPA server mode
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2573"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2573</a> - Use after free in proxy provider.
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2611"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2611</a> - sssd_be dumping core if enumeration times out
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2525"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2525</a> - Monitor SIGKILL timer issue and service restart failure
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2572"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2572</a> - [abrt] sssd-common: talloc_abort(): sssd killed by SIGABRT
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2430"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2430</a> - sssd segfaults repeatedly with error 4 in memberof.so
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/1096"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/1096</a> - Clock skew in krb5 auth should result in offline operation, not failure
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2592"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2592</a> - ccname_file_dummy is not unlinked on error
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2613"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2613</a> - sysdb sudo search doesn't escape special characters
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2625"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2625</a> - Sudo responder does not respect filter_users and filter_groups
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2643"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2643</a> - autofs provider fails when default_domain_suffix and use_fully_qualified_names set
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2634"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2634</a> - sssd nss responder gets wrong number of secondary groups
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2644"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2644</a> - ignore_group_members doesn't work for subdomains
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2659"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2659</a> - IPA enumeration provider crashes
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2663"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2663</a> - id lookup for non-root domain users doesn't return all groups on first attempt
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2681"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2681</a> - SSSD cache is not updated after user is deleted from ldap server
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2744"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2744</a> - cleanup_groups should sanitize dn of groups
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2800"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2800</a> - Relax POSIX check
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2803"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2803</a> - Memory leak / possible DoS with krb auth.
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2792"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2792</a> - SSSD is not closing sockets properly
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2888"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2888</a> - SRV lookups with id_provider=proxy and auth_provider=krb5
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2865"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2865</a> - sssd_nss memory usage keeps growing on sssd-1.12.4-47.el6.x86_64 (RHEL6.7) when trying to retrieve non-existing netgroups
+</li><li><a class="ext-link" href="https://fedorahosted.org/sssd/ticket/2682"><span class="icon">​</span>https://fedorahosted.org/sssd/ticket/2682</a> - sudoOrder not honored as expected
+</li></ul><h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Adam Tkac (1):
+</p>
+<ul><li>Option filter_users had no effect for retrieving sudo rules
+</li></ul><p>
+Aron Parsons (1):
+</p>
+<ul><li>autofs: fix 'Cannot allocate memory' with FQDNs
+</li></ul><p>
+Dan Lavu (1):
+</p>
+<ul><li>MAN: page edit for ldap_use_tokengroups
+</li></ul><p>
+Daniel Hjorth (1):
+</p>
+<ul><li>LDAP: unlink ccname_file_dummy if there is an error
+</li></ul><p>
+Jakub Hrozek (8):
+</p>
+<ul><li>Updating the version for the 1.11.8 development
+</li><li>IPA: Use GC for group lookups in server mode
+</li><li>LDAP: Do not clobber return value when multiple controls are returned
+</li><li>PAC: krb5_pac_verify failures should not be fatal
+</li><li>LDAP: return after tevent_req_error
+</li><li>KRB5: Go offline in case of clock skew
+</li><li>Download complete groups if ignore_group_members is set with tokengroups
+</li><li>DP: Set extra_value to NULL for enum requests
+</li></ul><p>
+Jan Engelhardt (1):
+</p>
+<ul><li>build: call AC_BUILD_AUX_DIR before anything else
+</li></ul><p>
+Lukas Slebodnik (16):
+</p>
+<ul><li>Revert "LDAP: Change defaults for ldap_user/group_objectsid"
+</li><li>LDAP: Disable token groups by default
+</li><li>sss_client: Extract destroying of mmap cache to function
+</li><li>sss_client: Fix race condition in memory cache
+</li><li>PROXY: Fix use after free
+</li><li>pysss_nss_idmap: Use wrapper for older python
+</li><li>MONITOR: Fix double free
+</li><li>TEST: Test empty results from functions sysdb_search_*
+</li><li>SDAP: Do not set gid 0 twice
+</li><li>nss: Do not ignore default vaue of SYSDB_INITGR_EXPIRE
+</li><li>SDAP: Set initgroups expire attribute at the end
+</li><li>SDAP: Remove user from cache for missing user in LDAP
+</li><li>LDAP: Sanitize group dn before using in filter
+</li><li>LDAP: Fix leak of file descriptors
+</li><li>BUILD: Accept krb5 1.14 for building the PAC plugin
+</li><li>BUILD: Fix linking issues on debian
+</li></ul><p>
+Michal Zidek (1):
+</p>
+<ul><li>LDAP: Change defaults for ldap_user/group_objectsid
+</li></ul><p>
+Nalin Dahyabhai (1):
+</p>
+<ul><li>Accept krb5 1.13 for building the PAC plugin
+</li></ul><p>
+Nikolai Kondrashov (1):
+</p>
+<ul><li>build: Don't install ad and ipa man pages unnecessarily
+</li></ul><p>
+Pavel Březina (4):
+</p>
+<ul><li>IPA: use ipaUserGroup object class for groups
+</li><li>enumeration: fix talloc context
+</li><li>sudo: sanitize filter values
+</li><li>sudo: use "higher value wins" when ordering rules
+</li></ul><p>
+Pavel Reichl (14):
+</p>
+<ul><li>LDAP: retain external members
+</li><li>SDAP: return after tevent_req_error
+</li><li>sudo: return after tevent_req_error
+</li><li>monitor: use-after-free bugfix
+</li><li>monitor: monitor_kill_service - refactor
+</li><li>monitor: memory-leak bug
+</li><li>SYSDB: sysdb_search_entry fix memory leak
+</li><li>SYSDB: sysdb_search_custom fix memory leak
+</li><li>TESTS: sysdb_search_return_ENOENT - check mem leaks
+</li><li>SDAP: Relax POSIX check
+</li><li>NSS: sysdb_getnetgr check return value first
+</li><li>NSS: sysdb_getnetgr refactor
+</li><li>NSS: fix memory leak in sysdb_getnetgr
+</li><li>NSS: Fix memory leak netgroup
+</li></ul><p>
+Petr Cech (1):
+</p>
+<ul><li>KRB5: Adding DNS SRV lookup for krb5 provider
+</li></ul><p>
+Simo Sorce (1):
+</p>
+<ul><li>Signals: Remove unused functions
+</li></ul><p>
+Stephen Gallagher (2):
+</p>
+<ul><li>monitor: Service restart fixes
+</li><li>UTIL: Do not change SSSD domains in get_domains_head
+</li></ul><p>
+Sumit Bose (2):
+</p>
+<ul><li>memberof: check for empty arrays to avoid segfaults
+</li><li>ldap: use proper sysdb name in groups_by_user_done()
+</li></ul><p>
+Thomas Oulevey (1):
+</p>
+<ul><li>Fix memory leak in sssdpac_verify()
+</li></ul></body></html>

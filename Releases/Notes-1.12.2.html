@@ -1,0 +1,157 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="Highlights">Highlights</h2>
+<ul><li>Fixed a regression where the IPA provider didn't fetch User Private Groups correctly
+</li><li>An important bug in the GPO access control which resulted in a wrong principal being used was fixed
+</li><li>Several new options are available for deployments that need to restrict a certain PAM service from connecting to a certain SSSD domain. For more details, see the description of <tt>pam_trusted_users</tt> and <tt>pam_public_domains</tt> options in the <a class="ext-link" href="https://jhrozek.fedorapeople.org/sssd/1.12.2/man/sssd.conf.5.html"><span class="icon">​</span>sssd.conf(5)</a> man page and the <tt>domains</tt> option in the <a class="ext-link" href="https://jhrozek.fedorapeople.org/sssd/1.12.2/man/pam_sss.8.html"><span class="icon">​</span>pam_sss(8)</a> man page.
+</li><li>When SSSD is acting as an IPA client in setup with trusted AD domains, it is able to return group members or full group memberships for users from trusted AD domains. Please note that this feature requires a recent (4.1 Alpha or newer) release of FreeIPA server
+</li><li>Suport for the 'views' feature of IPA. Please note that this feature requires a recent (4.1 Alpha or newer) release of FreeIPA server. Additionally, this feature will be improved in future versions of SSSD.
+</li></ul><h2 id="PackagingChanges">Packaging Changes</h2>
+<ul><li>Some unit tests depend on nss_wrapper and uid_wrapper libraries. These dependencies are optional, if the libraries are not detected during build, the tests are skipped
+</li></ul><h2 id="DocumentationChanges">Documentation Changes</h2>
+<ul><li>New PAM responder options <tt>pam_trusted_users</tt> and <tt>pam_public_domains</tt> options 
+</li><li>New pam_sss module option called <tt>domains</tt>
+</li><li>A new template expansion <tt>%U</tt> that expands into the user's User Principal Name
+</li><li>The default value of <tt>ldap_user_objectsid</tt> and <tt>ldap_group_objectsid</tt> changed from "Not set" to <tt>objectSID</tt> in the LDAP provider
+</li></ul><h2 id="TicketsFixed">Tickets Fixed</h2>
+<p>
+</p><div><dl class="wiki compact"><dt><a class="closed" href="/sssd/ticket/1021" title="[RFE] Add domains= option to pam_sss">#1021</a></dt><dd>[RFE] Add domains= option to pam_sss</dd><dt><a class="closed" href="/sssd/ticket/1644" title="[RFE] Make SSSD capable of downloading GPO policies">#1644</a></dt><dd>[RFE] Make SSSD capable of downloading GPO policies</dd><dt><a class="closed" href="/sssd/ticket/1645" title="[RFE] Leverage GPO policies to define HBAC">#1645</a></dt><dd>[RFE] Leverage GPO policies to define HBAC</dd><dt><a class="closed" href="/sssd/ticket/2041" title="[RFE] User's home directories and shells are not taken from AD when there ...">#2041</a></dt><dd>[RFE] User's home directories and shells are not taken from AD when there is an IPA trust with AD</dd><dt><a class="closed" href="/sssd/ticket/2159" title="[RFE] Support initgroups for unauthenticated AD users">#2159</a></dt><dd>[RFE] Support initgroups for unauthenticated AD users</dd><dt><a class="closed" href="/sssd/ticket/2340" title="[RFE] User Principal Name as a template expansion for homedir mappings">#2340</a></dt><dd>[RFE] User Principal Name as a template expansion for homedir mappings</dd><dt><a class="closed" href="/sssd/ticket/2375" title="[RFE] SSSD side of IPA user-views">#2375</a></dt><dd>[RFE] SSSD side of IPA user-views</dd><dt><a class="closed" href="/sssd/ticket/2412" title="Error processing universal groups with cross-domain membership in SSSD ...">#2412</a></dt><dd>Error processing universal groups with cross-domain membership in SSSD server mode</dd><dt><a class="closed" href="/sssd/ticket/2435" title="SSSD connection terminated after failing anonymous bind to IBM Tivoli ...">#2435</a></dt><dd>SSSD connection terminated after failing anonymous bind to IBM Tivoli Directory Server</dd><dt><a class="closed" href="/sssd/ticket/2437" title="conflicting gpo policy settings not being resolved correctly">#2437</a></dt><dd>conflicting gpo policy settings not being resolved correctly</dd><dt><a class="closed" href="/sssd/ticket/2442" title="sssd.conf man page missing subdomains_provider ad support">#2442</a></dt><dd>sssd.conf man page missing subdomains_provider ad support</dd><dt><a class="closed" href="/sssd/ticket/2443" title="Password expiration policies are not being enforced by SSSD">#2443</a></dt><dd>Password expiration policies are not being enforced by SSSD</dd><dt><a class="closed" href="/sssd/ticket/2447" title="AD Provider crashes when looking up the &#34;Domain Users&#34; group">#2447</a></dt><dd>AD Provider crashes when looking up the "Domain Users" group</dd><dt><a class="closed" href="/sssd/ticket/2452" title="authconfig crashes if case_sensitive=preserving in sssd.conf">#2452</a></dt><dd>authconfig crashes if case_sensitive=preserving in sssd.conf</dd><dt><a class="closed" href="/sssd/ticket/2453" title="group members returned in lowercase with case_sensitive=preserving">#2453</a></dt><dd>group members returned in lowercase with case_sensitive=preserving</dd></dl></div><p>
+</p>
+<h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Daniel Gollub (2):
+</p>
+<ul><li>sysdb: Write additional attrs in sysdb_add_user
+</li><li>PAM: Add domains= option to pam_sss
+</li></ul><p>
+Jakub Hrozek (22):
+</p>
+<ul><li>Updating version for the 1.12.2 release
+</li><li>LDAP: Always free talloc_req
+</li><li>LDAP: Do not clobber return value when multiple controls are returned
+</li><li>TESTS: Add a case-insensitive group search sysdb test
+</li><li>MAN: AD is allowed value of subdomains_provider
+</li><li>tests: Add a test for storing custom attrs with automatic ID
+</li><li>TESTS: Add a unit test for matching the secondary objectclass
+</li><li>IPA: Use GC for group lookups in server mode
+</li><li>AD: Add a missing break statement to the GPO code
+</li><li>LDAP: Do not require a dereference control to be retuned in a reply
+</li><li>MAN: Document the domains option of pam_sss
+</li><li>MONITOR: Make internal functions static
+</li><li>SYSDB: move sysdb_get_real_name() from sysdb.c to sysdb_search.c
+</li><li>BUILD: Use $(MKDIR_P) in Makefile.am
+</li><li>MAN: Build the sss_rpcidmapd man page conditionally
+</li><li>UTIL: Do not depend on monitor code
+</li><li>MONITOR: Remove useless memory contexts
+</li><li>UTIL: Move become_user outside krb5 tree
+</li><li>BUILD: Detect nss_wrapper and uid_wrapper during configure
+</li><li>TESTS: Add a test to change user IDs
+</li><li>UTIL: Always write capaths
+</li><li>Updating the translations for the 1.12.2 release
+</li></ul><p>
+Jan Engelhardt (1):
+</p>
+<ul><li>build: call AC_BUILD_AUX_DIR before anything else
+</li></ul><p>
+Lukas Slebodnik (14):
+</p>
+<ul><li>CI: Add missing debian dependency
+</li><li>CI: Use default config for mock build
+</li><li>GPO: Use argument ndg_flags instead of constant
+</li><li>GPO: remove unused talloc contexts
+</li><li>DP: Print a type as hexadecimal number in debug message.
+</li><li>SDAP: Suppress warning maybe-uninitialized
+</li><li>TOOLS: Fix warning Value stored to is never read
+</li><li>SDAP: Fix warning Value stored to is never read
+</li><li>SDAP: test return value of sysdb_search_services
+</li><li>PAC: Check return value of function hash_entries
+</li><li>IPA: Fix error handling after talloc_ber_flatten
+</li><li>GPO: fail if there is problem with storing gpo into sysdb
+</li><li>GPO: Fail if we cannot retrieve gpo from cache.
+</li><li>GPO: Do not use output argument if function failed
+</li></ul><p>
+Michal Zidek (5):
+</p>
+<ul><li>Add alternative objectClass to group attribute maps
+</li><li>Use the alternative objectclass in group maps.
+</li><li>sssd.api.conf: Declare case_sensitive as string
+</li><li>nss: Preserve case of group members
+</li><li>LDAP: Change defaults for ldap_user/group_objectsid
+</li></ul><p>
+Nikolai Kondrashov (11):
+</p>
+<ul><li>TESTS: Free hbac_info
+</li><li>TESTS: Free compiled regexes in krb5_utils-tests
+</li><li>TESTS: Free link paths in symlink tests
+</li><li>TESTS: Free retrieved sid in test_getsidbyname
+</li><li>CI: Preserve mock config timestamps
+</li><li>CI: Don't run dlopen-tests under Valgrind
+</li><li>CI: Add Valgrind suppression support
+</li><li>CI: Suppress all detected Valgrind issues
+</li><li>CI: Enforce Valgrind check
+</li><li>CI: Remove disabling of Valgrind gdb invocation
+</li><li>CI: Don't say Valgrind is ignored in README.md
+</li></ul><p>
+Pavel Březina (8):
+</p>
+<ul><li>sysdb_get_user_attr: use fqn for subdomain users
+</li><li>tests: add test for sysdb_get_user_attr with subdomain user
+</li><li>sss_get_domain_name: check for fq name first
+</li><li>tests: add test for sss_get_domain_name
+</li><li>Add sysdb_search_[user|group]_override_attrs_by_name
+</li><li>Add sysdb_get_user_attr_with_views
+</li><li>IFP: support views
+</li><li>sudo: support views
+</li></ul><p>
+Pavel Reichl (5):
+</p>
+<ul><li>Fix debug messages - trailing '.'
+</li><li>PAM: new options pam_trusted_users &amp; pam_public_domains
+</li><li>SDAP: move deciding of tls usage into new function
+</li><li>SDAP: check that connection is open before bind
+</li><li>NSS: UPN as a template expansion for homedir mappings
+</li></ul><p>
+Stephen Gallagher (4):
+</p>
+<ul><li>UTIL: Do not change SSSD domains in get_domains_head
+</li><li>krb5: make get_primary() a public call
+</li><li>AD GPO: Fix incorrect sAMAccountName selection
+</li><li>AD GPO: Fix incorrect return of EACCES
+</li></ul><p>
+Sumit Bose (32):
+</p>
+<ul><li>name2sid: Check negative cache for users and groups
+</li><li>sysdb: sysdb_search_group_by_name should work like sysdb_search_user_by_name
+</li><li>IPA: add support for new extdom plugin version
+</li><li>pam: sub-domain authentication fix
+</li><li>add_v1_group_data: fix for empty members list
+</li><li>nss: add SSS_NSS_GETORIGBYNAME request
+</li><li>sss_nss_idmap: add sss_nss_getorigbyname()
+</li><li>sysdb: add sysdb_update_view_name()
+</li><li>Add sdap_deref_search_with_filter_send()
+</li><li>IPA: make IPA ID context available to extdom client code
+</li><li>IPA: add view support and get view name
+</li><li>views: add ipa_get_ad_override_send()
+</li><li>sysdb: add sysdb_store_override
+</li><li>sysdb: add sysdb_attrs_add_val_safe() and sysdb_attrs_add_string_safe()
+</li><li>sysdb: sysdb_apply_default_override
+</li><li>views: get overrides during user and group lookups
+</li><li>views: search overrides for user and group requests
+</li><li>confdb: add has_views and view_name to sss_domain_info
+</li><li>new_subdomain: copy view data from parent
+</li><li>sysdb: add view data to domains
+</li><li>sysdb: add overide lookup calls
+</li><li>sysdb: add sysdb_getpwnam/uid_with_views()
+</li><li>sysdb: add sss_view_ldb_msg_find_element/attr_as_string/uint64
+</li><li>nss: add view support for getpwnam/getpwuid requests
+</li><li>sysdb: add sysdb_initgroups_with_views()
+</li><li>nss: add view support to initgroups request
+</li><li>sysdb: add sysdb_getgrnam_with_views and sysdb_getgrgid_with_views
+</li><li>nss: add view support for getgr* requests
+</li><li>sid2name: return name without views applied
+</li><li>pam: make pam responder aware if views
+</li><li>sysdb: add sysdb_enumpw/grent_with_views()
+</li><li>nss: make enumeration requests aware of views
+</li></ul><p>
+Yassir Elley (1):
+</p>
+<ul><li>AD-GPO resolve conflicting policy settings correctly
+</li></ul></body></html>

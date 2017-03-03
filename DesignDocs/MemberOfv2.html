@@ -1,0 +1,82 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><h2 id="ProposaltoredesignthememberOfplugin">Proposal to redesign the memberOf plugin</h2>
+<p>
+Let us start with the following setup:
+</p>
+<p>
+<a style="padding:0; border:none"><img /></a>
+</p>
+<pre class="wiki">dn: name=Group A, cn=Groups, cn=default, cn=sysdb
+objectClass: group
+member: name=Group D, cn=Groups, cn=default, cn=sysdb
+member: name=User 1, cn=Users, cn=default, cn=sysdb
+member: name=User 2, cn=Users, cn=default, cn=sysdb
+member: name=User 3, cn=Users, cn=default, cn=sysdb
+member: name=User 4, cn=Users, cn=default, cn=sysdb
+member: name=User 5, cn=Users, cn=default, cn=sysdb
+memberOf: name=Group C, cn=Groups, cn=default, cn=sysdb
+
+dn: name=Group B, cn=Groups, cn=default, cn=sysdb
+objectClass: group
+member: name=Group D, cn=Groups, cn=default, cn=sysdb
+member: name=User 1, cn=Users, cn=default, cn=sysdb
+member: name=User 2, cn=Users, cn=default, cn=sysdb
+memberOf: name=Group C, cn=Groups, cn=default, cn=sysdb
+
+dn: name=Group C, cn=Groups, cn=default, cn=sysdb
+objectClass: group
+member: name=Group A, cn=Groups, cn=default, cn=sysdb
+member: name=Group B, cn=Groups, cn=default, cn=sysdb
+member: name=Group F, cn=Groups, cn=default, cn=sysdb
+member: name=User 3, cn=Users, cn=default, cn=sysdb
+
+dn: name=Group D, cn=Groups, cn=default, cn=sysdb
+objectClass: group
+member: name=User 4, cn=Users, cn=default, cn=sysdb
+memberOf: name=Group A, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group B, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group C, cn=Groups, cn=default, cn=sysdb
+
+dn: name=Group E, cn=Groups, cn=default, cn=sysdb
+objectClass: group
+member: name=User 5, cn=Users, cn=default, cn=sysdb
+memberOf: name=Group B, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group C, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group F, cn=Groups, cn=default, cn=sysdb
+
+dn: name=Group F, cn=Groups, cn=default, cn=sysdb
+objectClass: group
+memberOf: name=Group C, cn=Groups, cn=default, cn=sysdb
+
+
+dn: name=User 1, cn=Users, cn=default, cn=sysdb
+objectClass: user
+memberOf: name=Group A, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group B, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group C, cn=Groups, cn=default, cn=sysdb
+
+dn: name=User 2, cn=Users, cn=default, cn=sysdb
+objectClass: user
+memberOf: name=Group A, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group B, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group C, cn=Groups, cn=default, cn=sysdb
+
+dn: name=User 3, cn=Users, cn=default, cn=sysdb
+objectClass: user
+memberOf: name=Group A, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group C, cn=Groups, cn=default, cn=sysdb
+
+dn: name=User 4, cn=Users, cn=default, cn=sysdb
+objectClass: user
+memberOf: name=Group A, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group B, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group C, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group D, cn=Groups, cn=default, cn=sysdb
+
+dn: name=User 5, cn=Users, cn=default, cn=sysdb
+objectClass: user
+memberOf: name=Group A, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group B, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group C, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group E, cn=Groups, cn=default, cn=sysdb
+memberOf: name=Group F, cn=Groups, cn=default, cn=sysdb
+</pre></body></html>

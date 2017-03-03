@@ -1,0 +1,76 @@
+<html><head><link rel="stylesheet" href="/sssd-test2/trac.css" type="text/css" /><link rel="stylesheet" href="/sssd-test2/wiki.css" type="text/css" /></head><body><p>
+</p><div class="wiki-toc">
+<ol>
+  <li>
+    <ol>
+      <li>
+        <a href="#Highlights">Highlights</a>
+      </li>
+      <li>
+        <a href="#Ticketsfixed">Tickets fixed</a>
+      </li>
+      <li>
+        <a href="#DetailedChangelog">Detailed Changelog</a>
+      </li>
+    </ol>
+  </li>
+</ol>
+</div><p>
+</p>
+<h2 id="Highlights">Highlights</h2>
+<ul><li>Several fixes to case-insensitive domain functions
+</li><li>Fix for GSSAPI binds when the keytab contains unrelated principals
+</li><li>Fixed several segfaults
+</li><li>Workarounds added for LDAP servers with unreadable RootDSE
+</li><li>SSH knownhostproxy will no longer enter an infinite loop preventing login
+</li><li>The provided SYSV init script now starts SSSD earlier at startup and stops it later during shutdown
+</li><li>Assorted minor fixes for issues discovered by static analysis tools
+</li></ul><h2 id="Ticketsfixed">Tickets fixed</h2>
+<p>
+</p><div><dl class="wiki compact"><dt><a class="closed" href="/sssd/ticket/1237" title="only free if sure data has been allocated">#1237</a></dt><dd>only free if sure data has been allocated</dd><dt><a class="closed" href="/sssd/ticket/1245" title="&#34;Error looking up public keys&#34; while ssh to replica using IP address.">#1245</a></dt><dd>"Error looking up public keys" while ssh to replica using IP address.</dd><dt><a class="closed" href="/sssd/ticket/1251" title="SSSD memory usage continuously growing">#1251</a></dt><dd>SSSD memory usage continuously growing</dd><dt><a class="closed" href="/sssd/ticket/1253" title="Service lookup shows case sensitive names twice with case_sensitive=false">#1253</a></dt><dd>Service lookup shows case sensitive names twice with case_sensitive=false</dd><dt><a class="closed" href="/sssd/ticket/1257" title="Unable to bind to IPA server when minssf set">#1257</a></dt><dd>Unable to bind to IPA server when minssf set</dd><dt><a class="closed" href="/sssd/ticket/1259" title="Initial service lookups having name with uppercase alphabets doesn't work.">#1259</a></dt><dd>Initial service lookups having name with uppercase alphabets doesn't work.</dd><dt><a class="closed" href="/sssd/ticket/1260" title="RFE: support case-insensitive service lookups by port including protocols">#1260</a></dt><dd>RFE: support case-insensitive service lookups by port including protocols</dd><dt><a class="closed" href="/sssd/ticket/1268" title="sss_ssh_knownhostproxy infinite loop hangs SSH login">#1268</a></dt><dd>sss_ssh_knownhostproxy infinite loop hangs SSH login</dd><dt><a class="closed" href="/sssd/ticket/1269" title="sssd: Uses the wrong key for GSSAPI when there a multiple realms in a ...">#1269</a></dt><dd>sssd: Uses the wrong key for GSSAPI when there a multiple realms in a single keytab.</dd><dt><a class="closed" href="/sssd/ticket/1270" title="sssd_nss crashes on request when no back end is running">#1270</a></dt><dd>sssd_nss crashes on request when no back end is running</dd><dt><a class="closed" href="/sssd/ticket/1272" title="Unable to lookup user, group, netgroup aliases with case_sensitive=false.">#1272</a></dt><dd>Unable to lookup user, group, netgroup aliases with case_sensitive=false.</dd><dt><a class="closed" href="/sssd/ticket/1273" title="SSSD should start before NFS processes">#1273</a></dt><dd>SSSD should start before NFS processes</dd><dt><a class="closed" href="/sssd/ticket/1274" title="Wrong resolv_status might cause crash when name resolution times out">#1274</a></dt><dd>Wrong resolv_status might cause crash when name resolution times out</dd><dt><a class="closed" href="/sssd/ticket/1282" title="Wrong attribute counter causing crash during IPA service lookups">#1282</a></dt><dd>Wrong attribute counter causing crash during IPA service lookups</dd><dt><a class="closed" href="/sssd/ticket/1283" title="accessing an undefined variable in list_missing_attrs might crash SSSD">#1283</a></dt><dd>accessing an undefined variable in list_missing_attrs might crash SSSD</dd><dt><a class="closed" href="/sssd/ticket/1288" title="Invalid keytab path logged when using the default keytab">#1288</a></dt><dd>Invalid keytab path logged when using the default keytab</dd><dt><a class="closed" href="/sssd/ticket/1293" title="Building manpages in a parallel build dir is broken">#1293</a></dt><dd>Building manpages in a parallel build dir is broken</dd><dt><a class="closed" href="/sssd/ticket/1304" title="autofs client: map name length used as key length">#1304</a></dt><dd>autofs client: map name length used as key length</dd></dl></div><p>
+</p>
+<h2 id="DetailedChangelog">Detailed Changelog</h2>
+<p>
+Jakub Hrozek (17):
+</p>
+<ul><li>Fix uninitialized variable
+</li><li>Free entry found in negative cache
+</li><li>Make the string_equal() function public
+</li><li>Save alias of the primary name, too
+</li><li>NSS: Look for services with correct case when cache is updated
+</li><li>AUTOFS: fix copy-and-paste bug in the autofs client
+</li><li>LDAP services: Keep the protocol around
+</li><li>Silence Coverity warning in the autofs test tool
+</li><li>Return correct resolv_status on resolver timeout
+</li><li>Add sss_get_cased_name_list utility function
+</li><li>LDAP services: Save lowercased protocol names in case-insensitive domains
+</li><li>Proxy services: Save lowercased protocol names and aliases in case-insensitive domains
+</li><li>Fix off-by-one error in principal selection
+</li><li>Catch cases where D-Bus connection is NULL
+</li><li>Fix regression in SSSDConfig.py
+</li><li>Use the correct options counter
+</li><li>netlink integration: ensure that interface name is NULL-terminated
+</li></ul><p>
+Jan Cholasta (3):
+</p>
+<ul><li>SSH: Allow clients to explicitly specify host alias
+</li><li>SSH: Canonicalize host name and do reverse DNS lookup in sss_ssh_knownhostsproxy
+</li><li>SSH: Fix infinite loop in sss_ssh_knownhostsproxy
+</li></ul><p>
+Stephen Gallagher (10):
+</p>
+<ul><li>Bumping version to 1.8.2
+</li><li>IPA: Allow service lookups
+</li><li>SYSDB: Save only lowercased aliases in case-insensitive domains
+</li><li>LDAP: Errors retrieving the RootDSE should not be fatal
+</li><li>Start SSSD earlier and stop it later
+</li><li>LDAP: Add better error logging when ldap_result() fails
+</li><li>LDAP: Fix memory leaks in synchronous_tls_setup
+</li><li>Fix building manpages in parallel build dirs
+</li><li>Clean up log messages about keytab_name
+</li><li>Updating translation files for 1.8.2 release
+</li></ul><p>
+Sumit Bose (1):
+</p>
+<ul><li>Always initialize the returned data in sss_krb5_princ_realm()
+</li></ul></body></html>
