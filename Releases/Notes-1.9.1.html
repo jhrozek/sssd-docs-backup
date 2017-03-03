@@ -1,0 +1,235 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>The distribution tarball was fixed to include a missing file, which
+prevented &#8220;make rpms&#8221; from running correctly.</li>
+<li>Handle gracefully the situation where the namingContext is
+zero-length, such as when connected to the Novell eDirectory server.</li>
+<li>A new option default_domain_suffix was added. This option is mainly
+useful for environments whose users come from a trusted domain so
+that the user doesn&#8217;t have to specify that trusted domain with every
+user lookup.</li>
+<li>Many man page fixes that were held from the 1.9.0 release during the
+string freeze</li>
+<li>The entries in the generated known_hosts file are now expired
+preventing the file from growing indefinitely</li>
+<li>The PID file is now created after all the SSSD services start up to
+avoid notifying the user via the init system before SSSD is able to
+handle requests.</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/1303">#1303</a></dt>
+<dd>SSSD is slow at startup</dd>
+<dt><a class="reference external" href="/sssd/ticket/1471">#1471</a></dt>
+<dd>Range Retrieval: Unable to retrieve all members when filter is used
+in search base.</dd>
+<dt><a class="reference external" href="/sssd/ticket/1483">#1483</a></dt>
+<dd>Mention ldap_schema types on newlines or comma separate them.</dd>
+<dt><a class="reference external" href="/sssd/ticket/1494">#1494</a></dt>
+<dd>ldap_chpass_update_last_change is not included in the manual
+page</dd>
+<dt><a class="reference external" href="/sssd/ticket/1525">#1525</a></dt>
+<dd>Explain default re_expression in IPA and AD provider man pages</dd>
+<dt><a class="reference external" href="/sssd/ticket/1529">#1529</a></dt>
+<dd>[RFE] Login with users from a trusted domain always requires a FQ
+name</dd>
+<dt><a class="reference external" href="/sssd/ticket/1533">#1533</a></dt>
+<dd>Improve recreating new ccache file when the old one is not
+accessible any more</dd>
+<dt><a class="reference external" href="/sssd/ticket/1535">#1535</a></dt>
+<dd>Flip the default value of
+ldap_initgroups_use_matching_rule_in_chain</dd>
+<dt><a class="reference external" href="/sssd/ticket/1537">#1537</a></dt>
+<dd>Fix sssd-ad id ranges</dd>
+<dt><a class="reference external" href="/sssd/ticket/1540">#1540</a></dt>
+<dd>[man sssd-ldap] &#8216;ldap_access_filter&#8217; description needs to be
+updated</dd>
+<dt><a class="reference external" href="/sssd/ticket/1541">#1541</a></dt>
+<dd>Manpage has ldap_autofs_search_base as experimental feature</dd>
+<dt><a class="reference external" href="/sssd/ticket/1542">#1542</a></dt>
+<dd>User authentication using LDAP doesn&#8217;t work</dd>
+<dt><a class="reference external" href="/sssd/ticket/1546">#1546</a></dt>
+<dd>sss_seed &#8220;-h&#8221; and &#8220;&#8211;help&#8221; options should output similar results</dd>
+<dt><a class="reference external" href="/sssd/ticket/1548">#1548</a></dt>
+<dd>User authentication fails when password is read from a file using -p
+option of SSS_SEED tool.</dd>
+<dt><a class="reference external" href="/sssd/ticket/1549">#1549</a></dt>
+<dd>Providing invalid UID/GID values, terminates sss_seed tool without
+any error message</dd>
+<dt><a class="reference external" href="/sssd/ticket/1553">#1553</a></dt>
+<dd>Improve error message of sss_seed when the domain does not exist</dd>
+<dt><a class="reference external" href="/sssd/ticket/1554">#1554</a></dt>
+<dd>sss_seed should not allow blank passwords</dd>
+<dt><a class="reference external" href="/sssd/ticket/1562">#1562</a></dt>
+<dd>Domains overlap in range 1 - 4294967295</dd>
+<dt><a class="reference external" href="/sssd/ticket/1563">#1563</a></dt>
+<dd>Document the need to restart autofs service.</dd>
+</dl>
+</div></div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Jakub Hrozek (11):</p>
+<ul class="simple">
+<li>Bumping the version to 1.9.1 release</li>
+<li>Document ldap_chpass_update_last_change</li>
+<li>sudo and autofs search bases should not be marked experimental</li>
+<li>Flip the default value of
+ldap_initgroups_use_matching_rule_in_chain</li>
+<li>Include param_help_py.xml in the list of po4a sources</li>
+<li>Note that Range Retrieval is not supported when filter is used in the
+search base.</li>
+<li>Change the log level of two DEBUG messages in check_domain_ranges</li>
+<li>Remove unused variable</li>
+<li>Check for existing pidfile before starting the providers</li>
+<li>man: Note that automounter must be restarted to re-read the master
+map</li>
+<li>Updating the translations for 1.9.1 release</li>
+</ul>
+<p>Jan Cholasta (2):</p>
+<ul class="simple">
+<li>SSH: Refactor sysdb and related code</li>
+<li>SSH: Expire hosts in known_hosts</li>
+</ul>
+<p>Michal Zidek (7):</p>
+<ul class="simple">
+<li>Change option to display help message in man pages.</li>
+<li>sss_seed: Option &#8211;debug did not work in sss_seed tool.</li>
+<li>sss_seed: Show error message when interactive input fails.</li>
+<li>sss_seed: Make only first line of password file valid.</li>
+<li>sss_seed: Passwords longer then PASS_MAX not allowed.</li>
+<li>sss_seed: Improved error message when the domain does not exist.</li>
+<li>Variable in sdap_sudo_rules_refresh_send could be used,
+uninitialized.</li>
+</ul>
+<p>Ondrej Kos (4):</p>
+<ul class="simple">
+<li>sssd-ldap manpage: ldap_scheme formatting</li>
+<li>Log possibly non-randomizable ccache file template</li>
+<li>Slices calculation is alway wrong for default values</li>
+<li>Fix default upper limit of slices</li>
+</ul>
+<p>Pavel Březina (5):</p>
+<ul class="simple">
+<li>Fix few coding style issues</li>
+<li>monitor: create pid file after all responders are started</li>
+<li>remove left over principal selection</li>
+<li>manpage: ldap_access_filter is not always mandatory</li>
+<li>do not create pid file twice</li>
+</ul>
+<p>Stephen Gallagher (2):</p>
+<ul class="simple">
+<li>LDAP: Handle empty namingContexts values safely</li>
+<li>BUILD: Include the patch file in the tarball</li>
+</ul>
+<p>Sumit Bose (4):</p>
+<ul class="simple">
+<li>Add new option default_domain_suffix</li>
+<li>Use flat name for master domain as well</li>
+<li>sysdb_master_domain_get_info: fix copy-and-paste error</li>
+<li>Add man page section about provider specific re_expression</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.9.1.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.9.1.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

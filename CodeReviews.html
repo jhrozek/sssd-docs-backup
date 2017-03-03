@@ -1,0 +1,269 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Code Reviews &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#CodeReviews">Code Reviews</a><ol class="arabic">
+<li><a class="reference external" href="#Configuringadevelopmenttree">Configuring a development
+tree</a></li>
+<li><a class="reference external" href="#Creatingacode-review:TheAutomatedWay">Creating a code-review: The Automated
+Way</a><ol class="arabic">
+<li><a class="reference external" href="#Troubleshooting">Troubleshooting</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#Creatingacode-review:TheManualWay">Creating a code-review: The Manual
+Way</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#PerformingReviews">Performing Reviews</a><ol class="arabic">
+<li><a class="reference external" href="#FirstSteps">First Steps</a></li>
+<li><a class="reference external" href="#Performingareview">Performing a review</a></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="code-reviews">
+<h1>Code Reviews<a class="headerlink" href="#code-reviews" title="Permalink to this headline">¶</a></h1>
+<p>Code reviews in the SSSD are managed through the Fedora Hosted
+<a class="reference external" href="https://fedorahosted.org/reviewboard">​ReviewBoard</a> instance. To
+submit a code review, you will need a Fedora Account System user
+account. This is the same account that you use for the SSSD wiki and
+ticket tracker. If you do not yet have an account, please sign up for
+one at <a class="reference external" href="https://fedorahosted.org/accounts">​FAS</a>.</p>
+<div class="section" id="configuring-a-development-tree">
+<h2>Configuring a development tree<a class="headerlink" href="#configuring-a-development-tree" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Check out the source repository, if you haven&#8217;t already done so.</li>
+<li>In the SSSD source checkout, run the following command to set the
+location of the ReviewBoard server:</li>
+</ol>
+</div>
+<div class="section" id="creating-a-code-review-the-automated-way">
+<h2>Creating a code-review: The Automated Way<a class="headerlink" href="#creating-a-code-review-the-automated-way" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Create a new git branch, based off of the head of the upstream master
+(or branch). For purposes of illustration, I will assume this branch
+will be named &#8216;review&#8217;, and that the upstream repository is &#8216;origin&#8217;</li>
+<li>On this new branch, use <code class="docutils literal"><span class="pre">git</span> <span class="pre">cherry-pick</span></code> or <code class="docutils literal"><span class="pre">git</span> <span class="pre">am</span></code> to apply
+the series of one or more patches you want to submit for review. Fix
+any merge conflicts.</li>
+<li>Verify with <code class="docutils literal"><span class="pre">git</span> <span class="pre">log</span></code> that you have the correct set of patches
+applied.</li>
+<li>From the root of the SSSD source checkout (or the root $builddir if
+you are building in a parallel tree), run this command:</li>
+<li>You may be prompted for your username and password. This is your
+Fedora Account System name and password, the same as you would use
+for filing bugs in Trac.</li>
+<li>Generating the review may take some time (for large patches or many
+patches, this may even be minutes).</li>
+<li>The tool will output several HTTP links, one per review that has been
+created. You should go to the ReviewBoard server and verify that the
+patches were submitted properly, and then publish the review for all
+to see.<ol class="arabic">
+<li>Log into the ReviewBoard web interface at
+<a class="reference external" href="https://fedorahosted.org/sssd/">​https://fedorahosted.org/sssd/</a></li>
+<li>Click on <code class="docutils literal"><span class="pre">All</span> <span class="pre">My</span> <span class="pre">Requests</span></code></li>
+<li>Review each patch marked &#8220;Draft&#8221; in that list. Make sure to check
+<code class="docutils literal"><span class="pre">View</span> <span class="pre">Diff</span></code>.</li>
+<li>The <code class="docutils literal"><span class="pre">Summary</span></code>, <code class="docutils literal"><span class="pre">Description</span></code> and <code class="docutils literal"><span class="pre">Reviewers</span></code> should be
+automatically set.</li>
+<li>If you would prefer to have a particular reviewer, add them to the
+list.</li>
+<li>If the change is related to one or more tickets in Trac, enter the
+number(s) into the <code class="docutils literal"><span class="pre">Bugs</span></code> field. ReviewBoard will automatically
+convert that to a link.</li>
+<li>If the change is intended for a branch instead of master, specify
+it in the <code class="docutils literal"><span class="pre">Branch</span></code> field.</li>
+<li>Publish the review (or discard it if something went wrong)</li>
+</ol>
+</li>
+</ol>
+<div class="section" id="troubleshooting">
+<h3>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>If you see:</li>
+</ul>
+<p>This means you did not properly create the branch to generate the review
+requests from. This branch must be based off of the upstream master (or
+branch). Chances are, the branch you&#8217;re trying to commit is based off of
+a private git repo branch like Fedora People.</p>
+<ul class="simple">
+<li>If you see:</li>
+</ul>
+<p>This means you have your remote repo configured to use the alias for the
+SSSD repo instead of the proper full path. You will want to do edit your
+.git/config file and edit the URL for this repo to be
+<code class="docutils literal"><span class="pre">https://pagure.io/SSSD/sssd.git</span></code></p>
+</div>
+</div>
+<div class="section" id="creating-a-code-review-the-manual-way">
+<h2>Creating a code-review: The Manual Way<a class="headerlink" href="#creating-a-code-review-the-manual-way" title="Permalink to this headline">¶</a></h2>
+<p><em>Note: These instructions apply only to single-patch changes. For
+multiple patch sets, it is VASTLY easier to follow
+``The Automated Way``. The post-review tool included in the contrib/
+directory handles the necessary magic to produce parent diffs in
+ReviewBoard</em></p>
+<ol class="arabic simple">
+<li>Generate the patch to be submitted using the following command:</li>
+<li>Log into the ReviewBoard web interface at
+<a class="reference external" href="https://fedorahosted.org/reviewboard/">​https://fedorahosted.org/reviewboard/</a></li>
+<li>Click on <code class="docutils literal"><span class="pre">New</span> <span class="pre">Review</span> <span class="pre">Request</span></code> in the navigation bar.</li>
+<li>In the <code class="docutils literal"><span class="pre">Repository</span></code> drop-down menu, select <code class="docutils literal"><span class="pre">sssd</span></code></li>
+<li><code class="docutils literal"><span class="pre">Browse...</span></code> to your patch</li>
+<li>Click <code class="docutils literal"><span class="pre">Create</span> <span class="pre">Review</span> <span class="pre">Request</span></code></li>
+<li>Enter the <code class="docutils literal"><span class="pre">Summary</span></code> and <code class="docutils literal"><span class="pre">Description</span></code> fields and click &#8220;OK&#8221;</li>
+<li>If you would prefer to have a particular reviewer, add them to the
+list.</li>
+<li>If the change is related to one or more tickets in Trac, enter the
+number(s) into the <code class="docutils literal"><span class="pre">Bugs</span></code> field. ReviewBoard will automatically
+convert that to a link.</li>
+<li>If the change is intended for a branch instead of master, specify it
+in the <code class="docutils literal"><span class="pre">Branch</span></code> field.</li>
+<li>Publish the review (or discard it if something went wrong)</li>
+</ol>
+</div>
+</div>
+<div class="section" id="performing-reviews">
+<h1>Performing Reviews<a class="headerlink" href="#performing-reviews" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="first-steps">
+<h2>First Steps<a class="headerlink" href="#first-steps" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Add yourself to the SSSD Review Group.<ol class="arabic">
+<li>Click on <code class="docutils literal"><span class="pre">My</span> <span class="pre">account</span></code> in the upper-right corner.</li>
+<li>Check the box labeled <code class="docutils literal"><span class="pre">SSSD</span> <span class="pre">Review</span> <span class="pre">Group</span></code></li>
+<li>Click <code class="docutils literal"><span class="pre">Save</span> <span class="pre">Preferences</span></code></li>
+</ol>
+</li>
+</ol>
+</div>
+<div class="section" id="performing-a-review">
+<h2>Performing a review<a class="headerlink" href="#performing-a-review" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Log into the ReviewBoard instance at
+<a class="reference external" href="https://fedorahosted.org/reviewboard/">​https://fedorahosted.org/reviewboard/</a></li>
+<li>Click on <code class="docutils literal"><span class="pre">sssd</span></code> under <code class="docutils literal"><span class="pre">Incoming</span> <span class="pre">Reviews</span></code> in the dashboard. This
+will show you the list of pending reviews for the SSSD.</li>
+<li>Click on a pending review to see its details.</li>
+<li>Click on <code class="docutils literal"><span class="pre">View</span> <span class="pre">Diff</span></code> tab to see a side-by-side diff.</li>
+<li>You can click on any line number in the diff to make a comment, or
+drag-select to make a comment on multiple lines at once.</li>
+<li>Comments are not published when you click &#8216;OK&#8217;, they are queued and
+published all at once when you click on <code class="docutils literal"><span class="pre">Publish</span></code></li>
+<li>To make a comment on the patch as a whole, or to approve the chance,
+click on the <code class="docutils literal"><span class="pre">Review</span></code> tab. Making comments here behaves like making
+comments on lines.</li>
+<li>Clicking &#8220;Ship It&#8221; marks your approval for this patch. (Similar to
+sending &#8220;Ack&#8221; to the email list)</li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Code Reviews</a><ul>
+<li><a class="reference internal" href="#configuring-a-development-tree">Configuring a development tree</a></li>
+<li><a class="reference internal" href="#creating-a-code-review-the-automated-way">Creating a code-review: The Automated Way</a><ul>
+<li><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#creating-a-code-review-the-manual-way">Creating a code-review: The Manual Way</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#performing-reviews">Performing Reviews</a><ul>
+<li><a class="reference internal" href="#first-steps">First Steps</a></li>
+<li><a class="reference internal" href="#performing-a-review">Performing a review</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/CodeReviews.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/CodeReviews.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

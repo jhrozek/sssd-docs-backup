@@ -1,0 +1,320 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>This release focuses on backporting bug fixes from the 1.12 and 1.13
+releases. At the moment, the SSSD upstream does not plan on releasing
+1.11.9, barring security issues or regressions in this release. We
+recommend that all users of 1.11 upgrade to 1.12 or 1.13.</li>
+<li>Several bugs related to using <code class="docutils literal"><span class="pre">id_provider=ldap</span></code> together with ID
+mapping enabled were fixed</li>
+<li>Fixed a potential use-after-free error in the nested groups
+resolution code</li>
+<li>The service restart code in the main &#8220;sssd&#8221; process was improved</li>
+<li>The PAC responder can be built with MIT Kerberos versions 1.13 and
+1.14</li>
+<li>A potential segfault in the memberof ldb plugin was fixed</li>
+<li>The LDAP child no longer leaves a stray temporary file behind in case
+acquiring the credentials fails</li>
+<li>The sudo responder works correctly even for users or groups whose
+name contains an LDAP special character such as <code class="docutils literal"><span class="pre">)</span></code></li>
+<li>The <code class="docutils literal"><span class="pre">autofs</span></code> responder now works even with setups that enable the
+<code class="docutils literal"><span class="pre">default_domain_suffix</span></code> option</li>
+<li>A memory leak in the NSS responder when a non-existing netgroup was
+requested is fixed in this release</li>
+<li>The SSSD no longer leaks a file descriptor if service discovery times
+out when discovering an LDAP server</li>
+<li>The sudo responder fixed the logic to sort entries with the sudoOrder
+attribute to match the sudo&#8217;s native LDAP code</li>
+</ul>
+</div>
+<div class="section" id="documentation-changes">
+<h1>Documentation Changes<a class="headerlink" href="#documentation-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>The <code class="docutils literal"><span class="pre">ldap_use_tokengroups</span></code> option defaults to <code class="docutils literal"><span class="pre">false</span></code> in the
+generic LDAP provider. Previously, both the AD and LDAP provider
+(with <code class="docutils literal"><span class="pre">ldap_schema</span></code> set to <code class="docutils literal"><span class="pre">ad</span></code>) attempted to use the
+<code class="docutils literal"><span class="pre">tokenGroups</span></code>, resulting in numerous bugs.</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2412">​https://fedorahosted.org/sssd/ticket/2412</a>
+- Error processing universal groups with cross-domain membership in
+SSSD server mode</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2471">​https://fedorahosted.org/sssd/ticket/2471</a>
+- RHEL6.6 sssd (1.11) fails if IPA permissions and roles have the
+same name</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2484">​https://fedorahosted.org/sssd/ticket/2484</a>
+- Password change over ssh doesn&#8217;t work with OTP and FreeIPA</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2448">​https://fedorahosted.org/sssd/ticket/2448</a>
+- MAN: If ldap_group_base is set, tokengroups might not be able to
+convert all GIDs to names</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2445">​https://fedorahosted.org/sssd/ticket/2445</a>
+- Race condition while invalidating memory cache in client code</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2492">​https://fedorahosted.org/sssd/ticket/2492</a>
+- Group membership gets lost in IPA server mode</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2573">​https://fedorahosted.org/sssd/ticket/2573</a>
+- Use after free in proxy provider.</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2611">​https://fedorahosted.org/sssd/ticket/2611</a>
+- sssd_be dumping core if enumeration times out</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2525">​https://fedorahosted.org/sssd/ticket/2525</a>
+- Monitor SIGKILL timer issue and service restart failure</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2572">​https://fedorahosted.org/sssd/ticket/2572</a>
+- [abrt] sssd-common: talloc_abort(): sssd killed by SIGABRT</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2430">​https://fedorahosted.org/sssd/ticket/2430</a>
+- sssd segfaults repeatedly with error 4 in memberof.so</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1096">​https://fedorahosted.org/sssd/ticket/1096</a>
+- Clock skew in krb5 auth should result in offline operation, not
+failure</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2592">​https://fedorahosted.org/sssd/ticket/2592</a>
+- ccname_file_dummy is not unlinked on error</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2613">​https://fedorahosted.org/sssd/ticket/2613</a>
+- sysdb sudo search doesn&#8217;t escape special characters</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2625">​https://fedorahosted.org/sssd/ticket/2625</a>
+- Sudo responder does not respect filter_users and filter_groups</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2643">​https://fedorahosted.org/sssd/ticket/2643</a>
+- autofs provider fails when default_domain_suffix and
+use_fully_qualified_names set</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2634">​https://fedorahosted.org/sssd/ticket/2634</a>
+- sssd nss responder gets wrong number of secondary groups</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2644">​https://fedorahosted.org/sssd/ticket/2644</a>
+- ignore_group_members doesn&#8217;t work for subdomains</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2659">​https://fedorahosted.org/sssd/ticket/2659</a>
+- IPA enumeration provider crashes</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2663">​https://fedorahosted.org/sssd/ticket/2663</a>
+- id lookup for non-root domain users doesn&#8217;t return all groups on
+first attempt</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2681">​https://fedorahosted.org/sssd/ticket/2681</a>
+- SSSD cache is not updated after user is deleted from ldap server</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2744">​https://fedorahosted.org/sssd/ticket/2744</a>
+- cleanup_groups should sanitize dn of groups</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2800">​https://fedorahosted.org/sssd/ticket/2800</a>
+- Relax POSIX check</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2803">​https://fedorahosted.org/sssd/ticket/2803</a>
+- Memory leak / possible DoS with krb auth.</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2792">​https://fedorahosted.org/sssd/ticket/2792</a>
+- SSSD is not closing sockets properly</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2888">​https://fedorahosted.org/sssd/ticket/2888</a>
+- SRV lookups with id_provider=proxy and auth_provider=krb5</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2865">​https://fedorahosted.org/sssd/ticket/2865</a>
+- sssd_nss memory usage keeps growing on sssd-1.12.4-47.el6.x86_64
+(RHEL6.7) when trying to retrieve non-existing netgroups</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2682">​https://fedorahosted.org/sssd/ticket/2682</a>
+- sudoOrder not honored as expected</li>
+</ul>
+</div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Adam Tkac (1):</p>
+<ul class="simple">
+<li>Option filter_users had no effect for retrieving sudo rules</li>
+</ul>
+<p>Aron Parsons (1):</p>
+<ul class="simple">
+<li>autofs: fix &#8216;Cannot allocate memory&#8217; with FQDNs</li>
+</ul>
+<p>Dan Lavu (1):</p>
+<ul class="simple">
+<li>MAN: page edit for ldap_use_tokengroups</li>
+</ul>
+<p>Daniel Hjorth (1):</p>
+<ul class="simple">
+<li>LDAP: unlink ccname_file_dummy if there is an error</li>
+</ul>
+<p>Jakub Hrozek (8):</p>
+<ul class="simple">
+<li>Updating the version for the 1.11.8 development</li>
+<li>IPA: Use GC for group lookups in server mode</li>
+<li>LDAP: Do not clobber return value when multiple controls are returned</li>
+<li>PAC: krb5_pac_verify failures should not be fatal</li>
+<li>LDAP: return after tevent_req_error</li>
+<li>KRB5: Go offline in case of clock skew</li>
+<li>Download complete groups if ignore_group_members is set with
+tokengroups</li>
+<li>DP: Set extra_value to NULL for enum requests</li>
+</ul>
+<p>Jan Engelhardt (1):</p>
+<ul class="simple">
+<li>build: call AC_BUILD_AUX_DIR before anything else</li>
+</ul>
+<p>Lukas Slebodnik (16):</p>
+<ul class="simple">
+<li>Revert &#8220;LDAP: Change defaults for ldap_user/group_objectsid&#8221;</li>
+<li>LDAP: Disable token groups by default</li>
+<li>sss_client: Extract destroying of mmap cache to function</li>
+<li>sss_client: Fix race condition in memory cache</li>
+<li>PROXY: Fix use after free</li>
+<li>pysss_nss_idmap: Use wrapper for older python</li>
+<li>MONITOR: Fix double free</li>
+<li>TEST: Test empty results from functions sysdb_search_*</li>
+<li>SDAP: Do not set gid 0 twice</li>
+<li>nss: Do not ignore default vaue of SYSDB_INITGR_EXPIRE</li>
+<li>SDAP: Set initgroups expire attribute at the end</li>
+<li>SDAP: Remove user from cache for missing user in LDAP</li>
+<li>LDAP: Sanitize group dn before using in filter</li>
+<li>LDAP: Fix leak of file descriptors</li>
+<li>BUILD: Accept krb5 1.14 for building the PAC plugin</li>
+<li>BUILD: Fix linking issues on debian</li>
+</ul>
+<p>Michal Zidek (1):</p>
+<ul class="simple">
+<li>LDAP: Change defaults for ldap_user/group_objectsid</li>
+</ul>
+<p>Nalin Dahyabhai (1):</p>
+<ul class="simple">
+<li>Accept krb5 1.13 for building the PAC plugin</li>
+</ul>
+<p>Nikolai Kondrashov (1):</p>
+<ul class="simple">
+<li>build: Don&#8217;t install ad and ipa man pages unnecessarily</li>
+</ul>
+<p>Pavel Březina (4):</p>
+<ul class="simple">
+<li>IPA: use ipaUserGroup object class for groups</li>
+<li>enumeration: fix talloc context</li>
+<li>sudo: sanitize filter values</li>
+<li>sudo: use &#8220;higher value wins&#8221; when ordering rules</li>
+</ul>
+<p>Pavel Reichl (14):</p>
+<ul class="simple">
+<li>LDAP: retain external members</li>
+<li>SDAP: return after tevent_req_error</li>
+<li>sudo: return after tevent_req_error</li>
+<li>monitor: use-after-free bugfix</li>
+<li>monitor: monitor_kill_service - refactor</li>
+<li>monitor: memory-leak bug</li>
+<li>SYSDB: sysdb_search_entry fix memory leak</li>
+<li>SYSDB: sysdb_search_custom fix memory leak</li>
+<li>TESTS: sysdb_search_return_ENOENT - check mem leaks</li>
+<li>SDAP: Relax POSIX check</li>
+<li>NSS: sysdb_getnetgr check return value first</li>
+<li>NSS: sysdb_getnetgr refactor</li>
+<li>NSS: fix memory leak in sysdb_getnetgr</li>
+<li>NSS: Fix memory leak netgroup</li>
+</ul>
+<p>Petr Cech (1):</p>
+<ul class="simple">
+<li>KRB5: Adding DNS SRV lookup for krb5 provider</li>
+</ul>
+<p>Simo Sorce (1):</p>
+<ul class="simple">
+<li>Signals: Remove unused functions</li>
+</ul>
+<p>Stephen Gallagher (2):</p>
+<ul class="simple">
+<li>monitor: Service restart fixes</li>
+<li>UTIL: Do not change SSSD domains in get_domains_head</li>
+</ul>
+<p>Sumit Bose (2):</p>
+<ul class="simple">
+<li>memberof: check for empty arrays to avoid segfaults</li>
+<li>ldap: use proper sysdb name in groups_by_user_done()</li>
+</ul>
+<p>Thomas Oulevey (1):</p>
+<ul class="simple">
+<li>Fix memory leak in sssdpac_verify()</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#documentation-changes">Documentation Changes</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.11.8.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.11.8.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Enhanced IPA provider with host-based access control support</li>
+<li>Added server failover feature</li>
+<li>Vast performance enhancements to enumerations</li>
+<li>Performance enhancements to offline user lookups</li>
+<li>Improvements to the SSSDConfig API and configuration upgrade scripts.
+They will now retain comments and ordering.</li>
+<li>Several new translations</li>
+</ul>
+</div>
+<div class="section" id="known-bugs">
+<h1>Known Bugs<a class="headerlink" href="#known-bugs" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Nested groups are known to be broken in 0.99. A fix is basically
+ready, but was too late for inclusion in this release. This will be
+fixed before the 1.0 release.</li>
+</ul>
+</div>
+<div class="section" id="detailed-changes-since-0-7-1">
+<h1>Detailed changes since 0.7.1<a class="headerlink" href="#detailed-changes-since-0-7-1" title="Permalink to this headline">¶</a></h1>
+<p>Bouska (1):</p>
+<ul class="simple">
+<li>Add French translation to sss_client</li>
+</ul>
+<p>Jakub Hrozek (17):</p>
+<ul class="simple">
+<li>Fix migration script for pre-0.5 local domains</li>
+<li>Do not migrate Data Provider</li>
+<li>Free the PCRE regexp with destructor</li>
+<li>Do not delete users, groups outside domain range</li>
+<li>Add missing include</li>
+<li>IPA time rules parsing routines</li>
+<li>Fix regression in error message when deleting groups</li>
+<li>Assorted manpage fixes</li>
+<li>Make the password field configurable in NSS</li>
+<li>Add Simo&#8217;s ipachangeconf</li>
+<li>SSSDChangeConf - a wrapper around ipachangeconf</li>
+<li>Change the upgrade script to use ipachangeconf</li>
+<li>Convert SSSDConfig API to ipachangeconf</li>
+<li>SSSDConfigAPI fixes</li>
+<li>upgrade_config fixes for SSSD 0.6 and later</li>
+<li>Split helpers for child processes</li>
+<li>Get TGT in a child process.</li>
+</ul>
+<p>Martin Nagy (5):</p>
+<ul class="simple">
+<li>Add missing include file to files-tests.c</li>
+<li>Fix a bad free in async_resolv.c</li>
+<li>Add DLIST_FOR_EACH() macro</li>
+<li>Add simple reference counting wrappers for talloc</li>
+<li>Add fail over utility functions</li>
+</ul>
+<p>Piotr Drąg (1):</p>
+<ul class="simple">
+<li>Updating polish translation for 0.7.0</li>
+</ul>
+<p>Simo Sorce (48):</p>
+<ul class="simple">
+<li>Copy option overrides.</li>
+<li>Read the right buffer, avoids potential segfaults</li>
+<li>Add IPA conf template</li>
+<li>Zero pointers on free</li>
+<li>Use standard coding practice to set last login</li>
+<li>Fix segfault</li>
+<li>Add proper support for IPA/AD schemas</li>
+<li>Move responsibility for entry expiration timeout</li>
+<li>Kill the ldap connection when we go offline</li>
+<li>Tidy up ipa options</li>
+<li>Add support to get rootDSE from the LDAP server.</li>
+<li>Fix segfault when SASL is not used at all</li>
+<li>Rename sdap_id_map to sdap_attr_map</li>
+<li>Make available method to quickly retrive string</li>
+<li>Make useful function more broadly available.</li>
+<li>Store the original memberof attributes if any</li>
+<li>Unify parse routines, use maps in generic searches</li>
+<li>Fix and enhance initgroups call</li>
+<li>Unify code to use the generic search interface</li>
+<li>Reorganize ldap id provider files</li>
+<li>Split async helpers in multiple files</li>
+<li>Always set last update and expire time</li>
+<li>Fix build</li>
+<li>Fix ldap driver</li>
+<li>Check return, zero free hostent, adhere to style</li>
+<li>Fix enumerations</li>
+<li>Fix tevent_req error checking.</li>
+<li>Refactor delete functions and add a few</li>
+<li>Add cleanup task</li>
+<li>Try to fix offline logins</li>
+<li>Fix double free case.</li>
+<li>Fix check_cache bug in dealing with the callback</li>
+<li>Change var name to make its use more clear.</li>
+<li>Fix crash due to uninitialized timeout variable</li>
+<li>Change initgroups code to use and check the cache</li>
+<li>Change the pam code to perform an initgroups call</li>
+<li>Store initgr expire time on initgr call</li>
+<li>Failover fixes and additions</li>
+<li>Better behavior on cleanup</li>
+<li>Correctly escape DN value.</li>
+<li>Add reference to sssd-krb5 man page.</li>
+<li>Optimize sysdb_enumgrent</li>
+<li>Filter by id range before actually storing entries.</li>
+<li>Raise some timeouts</li>
+<li>Add initial failover support for ldap and ipa</li>
+<li>Fix ticket <a class="reference external" href="https://fedorahosted.org/sssd/ticket/289">#289</a></li>
+<li>Fix internal options numbers test</li>
+<li>In IPA, the realm is always the domain uppercased.</li>
+</ul>
+<p>Stephen Gallagher (32):</p>
+<ul class="simple">
+<li>Remove DP from example configuration</li>
+<li>Remove [dp] section from example config</li>
+<li>Fix sssd.api.conf with correct entry_cache_timeout</li>
+<li>Clean up warnings in dhash tests</li>
+<li>Make config_file_version a hidden setting in SSSDConfig API</li>
+<li>Remove magic_private_groups from SSSDConfig API schema</li>
+<li>Add support for option descriptions to SSSDConfig API</li>
+<li>Localize SSSDConfig strings</li>
+<li>Add complete pydoc for SSSDConfig API</li>
+<li>Add Requires: cyrus-sasl-gssapi</li>
+<li>Simplify debug_fn()</li>
+<li>Add configure check for sasl.h</li>
+<li>Update midpoint refresh logic to be relative to cache timeout</li>
+<li>Increase the sbus dispatch DEBUG level to 9</li>
+<li>Build files.c only for tools</li>
+<li>Clean up unused dependencies</li>
+<li>Update sssd.spec to use only the required KRB5_LIBS and NSS_LIBS</li>
+<li>Fix segfault on unknown user/domain</li>
+<li>Fix Requires: sssd-client line in specfile</li>
+<li>Make the sysdb user and group names case-sensitive</li>
+<li>Upgrade cache and local databases to case-sensitive names</li>
+<li>Update translatable strings</li>
+<li>Fix sysdb upgrade bug</li>
+<li>Add empty NL translation</li>
+<li>Only display errors in unit tests</li>
+<li>Update PL translation</li>
+<li>Update NL translation</li>
+<li>Make backend request type a bitfield</li>
+<li>Speed up user requests while offline</li>
+<li>Update translation strings for string freeze</li>
+<li>Fix bug with bad ldb pkg-config files</li>
+<li>Update version to 0.99.0</li>
+</ul>
+<p>Sumit Bose (32):</p>
+<ul class="simple">
+<li>store original DN with cached group objects if available</li>
+<li>added a ASQ search API for sysdb</li>
+<li>Allow sysdb_search_entry request to return more than one result</li>
+<li>Add AM_CFLAGS to unit tests</li>
+<li>Fix compiler warnings in krb5_utils-tests.</li>
+<li>remove old sysdb file before starting tests</li>
+<li>set ipa_hostname if not given in config file</li>
+<li>Make debug message less irritating.</li>
+<li>add sysdb_delete_recursive request to sysdb API</li>
+<li>Add sysdb_attrs_replace_name to sysdb API.</li>
+<li>Fix for a seg fault during recursive delete</li>
+<li>add replacements for missing Kerberos calls</li>
+<li>Check is ccache structure is initialized before calling
+krb5_cc_destroy</li>
+<li>added access module of IPA provider</li>
+<li>Simplify krb5 child handler</li>
+<li>Add check for access-time rules to ipa_access.</li>
+<li>Add support for host, source host and user category</li>
+<li>Fix inconsistent use of krb5_ccname_template</li>
+<li>Fixes for proxy provider</li>
+<li>Make &#8216;permit&#8217; the default for the access target</li>
+<li>Fix option name krb5_changepw_principal</li>
+<li>Validate Kerberos credentials with local keytab</li>
+<li>Improve handling of ccache files</li>
+<li>Add ipa_auth</li>
+<li>Enhance check for remote hosts</li>
+<li>Add ldap_pwd_policy option</li>
+<li>Read KDC info from file instead from environment</li>
+<li>Really check return value from pam_set_item</li>
+<li>Use ldb modules from build root for tests</li>
+<li>Make ldb lib dir configurable</li>
+<li>Fix an internal error when cache_credentials=FALSE</li>
+<li>Remove unneeded debugging code</li>
+</ul>
+<p>deneb (1):</p>
+<ul class="simple">
+<li>Add Italian translation for sss_client</li>
+</ul>
+<p>noriko (1):</p>
+<ul class="simple">
+<li>Adding Japanese translation</li>
+</ul>
+<p>raven (1):</p>
+<ul class="simple">
+<li>Update PL translation</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#known-bugs">Known Bugs</a></li>
+<li><a class="reference internal" href="#detailed-changes-since-0-7-1">Detailed changes since 0.7.1</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-0.99.0.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-0.99.0.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>A new option ad_access_filter was added. This option allows the
+administrator to easily configure LDAP search filter that the users
+logging in must match in order to be granted access</li>
+<li>Group resolution now supports resolving group members from different
+trusted AD domains in a single forest</li>
+<li>A bug that prevented a configuration file with trailing spaces to be
+loaded was fixed</li>
+<li>SSSD no longer crashes if the LDAP connection is terminated while
+LDAP requests are still in progress</li>
+<li>Several important bugs related to the Global Catalog support were
+fixed:<ul>
+<li>SSSD now correctly falls back to LDAP lookups in case Global
+Catalog is not reachable</li>
+<li>If the AD servers were specified using the ad_server option and
+not autodiscovered, server fail over did not work correctly with
+1.11.1</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="feature-removal">
+<h1>Feature removal<a class="headerlink" href="#feature-removal" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>The Kerberos provider will no longer try to create public directories
+when evaluating the krb5_ccachedir option. This is a necessary
+backwards-incompatible change, as SSSD has no way to know when a
+directory should be public and when it shouldn&#8217;t without additional
+information. Moreover creating public directories is something the
+system administrator should perform, not the authentication daemon.
+The tmpfiles.d(5) facility can be used for that purpose by admins
+that need dynamic creation of public directories at system boot time.</li>
+</ul>
+</div>
+<div class="section" id="documentation-changes">
+<h1>Documentation Changes<a class="headerlink" href="#documentation-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>The decimal debug levels are now recommended instead of the advanced
+hexadecimal levels which are more suitable for developers</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/1968">#1968</a></dt>
+<dd>Memory grows if subdomain goes away in the AD provider</dd>
+<dt><a class="reference external" href="/sssd/ticket/2030">#2030</a></dt>
+<dd>getent response requires sssd restart after trust add</dd>
+<dt><a class="reference external" href="/sssd/ticket/2064">#2064</a></dt>
+<dd>ad: unable to resolve membership when user is from different domain
+than group</dd>
+<dt><a class="reference external" href="/sssd/ticket/2071">#2071</a></dt>
+<dd>Ccache directory creation leads to unexpected results</dd>
+<dt><a class="reference external" href="/sssd/ticket/2082">#2082</a></dt>
+<dd>[RFE] Add a new option ad_access_filter</dd>
+<dt><a class="reference external" href="/sssd/ticket/2092">#2092</a></dt>
+<dd>Group lookup is not returned immediately after service startup</dd>
+<dt><a class="reference external" href="/sssd/ticket/2100">#2100</a></dt>
+<dd>sudo responder does not support specifying just one of
+sudoNotBefore/sudoNotAfter</dd>
+<dt><a class="reference external" href="/sssd/ticket/2101">#2101</a></dt>
+<dd>Use idrange of forest root if there is none for a member domain and
+type is ipa-ad-trust-posix</dd>
+<dt><a class="reference external" href="/sssd/ticket/2104">#2104</a></dt>
+<dd>AD provider should fall back the LDAP if Global Catalog is not
+reachable</dd>
+<dt><a class="reference external" href="/sssd/ticket/2105">#2105</a></dt>
+<dd>Do not show &#8216;Could not add new domain&#8217; error messages if
+ldap_id_mapping=false</dd>
+<dt><a class="reference external" href="/sssd/ticket/2112">#2112</a></dt>
+<dd>Coverity reported potential NULL dereference</dd>
+<dt><a class="reference external" href="/sssd/ticket/2116">#2116</a></dt>
+<dd>SID looksups are not handled if noexist_delete flag is set</dd>
+<dt><a class="reference external" href="/sssd/ticket/2121">#2121</a></dt>
+<dd>ipa ad trusted user lookups failed with sssd_be crash</dd>
+<dt><a class="reference external" href="/sssd/ticket/2123">#2123</a></dt>
+<dd>Creating system accounts on a IdM client takes up to 10 minutes when
+AD trust is configured in the IdM.</dd>
+<dt><a class="reference external" href="/sssd/ticket/2124">#2124</a></dt>
+<dd>sssd_nss exited abnormally and generated core files.</dd>
+<dt><a class="reference external" href="/sssd/ticket/2126">#2126</a></dt>
+<dd>sssd_be segfault when authenticating against active directory</dd>
+<dt><a class="reference external" href="/sssd/ticket/2131">#2131</a></dt>
+<dd>NSS responder doesn&#8217;t qualify memberuid and ghost users of groups
+that contain members from different domains</dd>
+</dl>
+</div></div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Jakub Hrozek (23):</p>
+<ul class="simple">
+<li>Updating the version for the 1.11.2 release</li>
+<li>krb5: Fix unit tests</li>
+<li>INI: Disable line-wrapping functionality</li>
+<li>KRB5: Return PAM_ACCT_EXPIRED when logging in as expired AD user</li>
+<li>PROXY: Fix memory hierarchy when enumerating services</li>
+<li>Inherit ID limits of parent domains if set</li>
+<li>SYSDB: Add sysdb_delete_by_sid</li>
+<li>LDAP: Delete entry by SID if not found</li>
+<li>LDAP: Amend sdap_access_check to allow any connection</li>
+<li>LDAP: Parse FQDN into name/domain for subdomain users</li>
+<li>AD: Add a new option ad_access_filter</li>
+<li>AD: Use the ad_access_filter if it&#8217;s set</li>
+<li>AD: Search GC by default during access control, fall back to LDAP</li>
+<li>AD: Add extended access filter</li>
+<li>TEST: Test getgrnam with emphasis on members</li>
+<li>NSS: Print FQDN for groups with mixed domain membership</li>
+<li>KRB5: Handle ERR_CHPASS_FAILED</li>
+<li>NSS: Fix service enumeration</li>
+<li>MAN: Document that krb5 directories can only be created as private</li>
+<li>LDAP: Check all search bases during nested group processing</li>
+<li>NSS: Fix parenthesis</li>
+<li>AD: Fix ad_access_filter parsing with empty filter</li>
+<li>Updating translation for the 1.11.2 release</li>
+</ul>
+<p>Lukas Slebodnik (9):</p>
+<ul class="simple">
+<li>LDAP: Set default value for dyndns update to false</li>
+<li>krb5: Remove warning dereference of a null pointer</li>
+<li>krb5: Use right function to free data.</li>
+<li>AD: Prefer GC port from SRV record</li>
+<li>AD: fall back to LDAP if GC is not available.</li>
+<li>tests: Use right format string for type size_t</li>
+<li>Makefile: Add missing libraries</li>
+<li>Makefile: Remove unused variable TEST_MOCK_OBJ</li>
+<li>LDAP: Return correct error code</li>
+</ul>
+<p>Pavel Březina (23):</p>
+<ul class="simple">
+<li>sudo: allow specifying only one time restriction</li>
+<li>sudo: improve time restrictions debug messages</li>
+<li>nss: wait for initial subdomains request to finish</li>
+<li>subdomains: first destroy ptask then remove sdom</li>
+<li>dp: make subdomains refresh interval configurable</li>
+<li>dp: store list of ongoing requests</li>
+<li>utils: add ERR_DOMAIN_NOT_FOUND error code</li>
+<li>dp: set request domain</li>
+<li>dp: add function to terminate request of specific domain</li>
+<li>dp: free sdap domain if subdomain is removed</li>
+<li>be_ptask: add be_ptask_create_sync()</li>
+<li>dp: convert cleanup task to be_ptask</li>
+<li>ipa: destroy cleanup task when subdomain is removed</li>
+<li>ad: destroy ptasks when subdomain is removed</li>
+<li>sdap_save_user: try to determine domain by SID</li>
+<li>sdap_save_group: try to determine domain by SID</li>
+<li>free sid obtained from sss_idmap_unix_to_sid()</li>
+<li>ad: shortcut if possible during get object by ID or SID</li>
+<li>sdap: store base dn in sdap_domain</li>
+<li>sdap: add sdap_domain_get_by_dn()</li>
+<li>ghosts: pick correct domain for every member</li>
+<li>sdap_fill_memberships: pick correct domain for every member</li>
+<li>nested groups: pick correct domain for cache lookups</li>
+</ul>
+<p>Simo Sorce (1):</p>
+<ul class="simple">
+<li>krb5: Remove ability to create public directories</li>
+</ul>
+<p>Stephen Gallagher (4):</p>
+<ul class="simple">
+<li>SYSDB: Fix incorrect DEBUG message</li>
+<li>MAN: Clarify debug level documentation</li>
+<li>MAN: Reflow debug_levels.xml</li>
+<li>BUILD: Update bashrc macros</li>
+</ul>
+<p>Sumit Bose (17):</p>
+<ul class="simple">
+<li>AD: properly intitialize GC from ad_server option</li>
+<li>LDAP: handle SID requests if noexist_delete is set</li>
+<li>IPA server mode: properly initialize ext_groups</li>
+<li>idmap: add internal function to free a domain struct</li>
+<li>idmap: fix a memory leak if a collision is detected</li>
+<li>idmap: allow ranges with external mapping to overlap</li>
+<li>sdap_idmap: add sdap_idmap_get_configured_external_range()</li>
+<li>sdap_idmap: properly handle ranges for external mappings</li>
+<li>Add unconditional online callbacks</li>
+<li>IPA: add callback to reset subdomain timeouts</li>
+<li>sdap_get_generic_ext_send: check if we a re still connected</li>
+<li>find_subdomain_by_sid: skip domains with missing domain_id</li>
+<li>idmap: add sss_idmap_domain_by_name_has_algorithmic_mapping()</li>
+<li>sdap_idmap_domain_has_algorithmic_mapping: add domain name
+argument</li>
+<li>IPA: add trusted domains with missing idrange</li>
+<li>ad_subdom_store: check ID mapping of the domain not of the parent</li>
+<li>be_spy_create: free be_req and not the long living data</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#feature-removal">Feature removal</a></li>
+<li><a class="reference internal" href="#documentation-changes">Documentation Changes</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.11.2.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.11.2.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

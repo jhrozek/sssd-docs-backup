@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#Highlights">Highlights</a></li>
+<li><a class="reference external" href="#Ticketsfixed">Tickets fixed</a></li>
+<li><a class="reference external" href="#DetailedChangelog">Detailed Changelog</a></li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Several fixes to case-insensitive domain functions</li>
+<li>Fix for GSSAPI binds when the keytab contains unrelated principals</li>
+<li>Fixed several segfaults</li>
+<li>Workarounds added for LDAP servers with unreadable RootDSE</li>
+<li>SSH knownhostproxy will no longer enter an infinite loop preventing
+login</li>
+<li>The provided SYSV init script now starts SSSD earlier at startup and
+stops it later during shutdown</li>
+<li>Assorted minor fixes for issues discovered by static analysis tools</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/1237">#1237</a></dt>
+<dd>only free if sure data has been allocated</dd>
+<dt><a class="reference external" href="/sssd/ticket/1245">#1245</a></dt>
+<dd>&#8220;Error looking up public keys&#8221; while ssh to replica using IP
+address.</dd>
+<dt><a class="reference external" href="/sssd/ticket/1251">#1251</a></dt>
+<dd>SSSD memory usage continuously growing</dd>
+<dt><a class="reference external" href="/sssd/ticket/1253">#1253</a></dt>
+<dd>Service lookup shows case sensitive names twice with
+case_sensitive=false</dd>
+<dt><a class="reference external" href="/sssd/ticket/1257">#1257</a></dt>
+<dd>Unable to bind to IPA server when minssf set</dd>
+<dt><a class="reference external" href="/sssd/ticket/1259">#1259</a></dt>
+<dd>Initial service lookups having name with uppercase alphabets doesn&#8217;t
+work.</dd>
+<dt><a class="reference external" href="/sssd/ticket/1260">#1260</a></dt>
+<dd>RFE: support case-insensitive service lookups by port including
+protocols</dd>
+<dt><a class="reference external" href="/sssd/ticket/1268">#1268</a></dt>
+<dd>sss_ssh_knownhostproxy infinite loop hangs SSH login</dd>
+<dt><a class="reference external" href="/sssd/ticket/1269">#1269</a></dt>
+<dd>sssd: Uses the wrong key for GSSAPI when there a multiple realms in
+a single keytab.</dd>
+<dt><a class="reference external" href="/sssd/ticket/1270">#1270</a></dt>
+<dd>sssd_nss crashes on request when no back end is running</dd>
+<dt><a class="reference external" href="/sssd/ticket/1272">#1272</a></dt>
+<dd>Unable to lookup user, group, netgroup aliases with
+case_sensitive=false.</dd>
+<dt><a class="reference external" href="/sssd/ticket/1273">#1273</a></dt>
+<dd>SSSD should start before NFS processes</dd>
+<dt><a class="reference external" href="/sssd/ticket/1274">#1274</a></dt>
+<dd>Wrong resolv_status might cause crash when name resolution times
+out</dd>
+<dt><a class="reference external" href="/sssd/ticket/1282">#1282</a></dt>
+<dd>Wrong attribute counter causing crash during IPA service lookups</dd>
+<dt><a class="reference external" href="/sssd/ticket/1283">#1283</a></dt>
+<dd>accessing an undefined variable in list_missing_attrs might crash
+SSSD</dd>
+<dt><a class="reference external" href="/sssd/ticket/1288">#1288</a></dt>
+<dd>Invalid keytab path logged when using the default keytab</dd>
+<dt><a class="reference external" href="/sssd/ticket/1293">#1293</a></dt>
+<dd>Building manpages in a parallel build dir is broken</dd>
+<dt><a class="reference external" href="/sssd/ticket/1304">#1304</a></dt>
+<dd>autofs client: map name length used as key length</dd>
+</dl>
+</div></div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Jakub Hrozek (17):</p>
+<ul class="simple">
+<li>Fix uninitialized variable</li>
+<li>Free entry found in negative cache</li>
+<li>Make the string_equal() function public</li>
+<li>Save alias of the primary name, too</li>
+<li>NSS: Look for services with correct case when cache is updated</li>
+<li>AUTOFS: fix copy-and-paste bug in the autofs client</li>
+<li>LDAP services: Keep the protocol around</li>
+<li>Silence Coverity warning in the autofs test tool</li>
+<li>Return correct resolv_status on resolver timeout</li>
+<li>Add sss_get_cased_name_list utility function</li>
+<li>LDAP services: Save lowercased protocol names in case-insensitive
+domains</li>
+<li>Proxy services: Save lowercased protocol names and aliases in
+case-insensitive domains</li>
+<li>Fix off-by-one error in principal selection</li>
+<li>Catch cases where D-Bus connection is NULL</li>
+<li>Fix regression in SSSDConfig.py</li>
+<li>Use the correct options counter</li>
+<li>netlink integration: ensure that interface name is NULL-terminated</li>
+</ul>
+<p>Jan Cholasta (3):</p>
+<ul class="simple">
+<li>SSH: Allow clients to explicitly specify host alias</li>
+<li>SSH: Canonicalize host name and do reverse DNS lookup in
+sss_ssh_knownhostsproxy</li>
+<li>SSH: Fix infinite loop in sss_ssh_knownhostsproxy</li>
+</ul>
+<p>Stephen Gallagher (10):</p>
+<ul class="simple">
+<li>Bumping version to 1.8.2</li>
+<li>IPA: Allow service lookups</li>
+<li>SYSDB: Save only lowercased aliases in case-insensitive domains</li>
+<li>LDAP: Errors retrieving the RootDSE should not be fatal</li>
+<li>Start SSSD earlier and stop it later</li>
+<li>LDAP: Add better error logging when ldap_result() fails</li>
+<li>LDAP: Fix memory leaks in synchronous_tls_setup</li>
+<li>Fix building manpages in parallel build dirs</li>
+<li>Clean up log messages about keytab_name</li>
+<li>Updating translation files for 1.8.2 release</li>
+</ul>
+<p>Sumit Bose (1):</p>
+<ul class="simple">
+<li>Always initialize the returned data in sss_krb5_princ_realm()</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.8.2.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.8.2.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

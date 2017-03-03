@@ -1,0 +1,595 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>GPO-Based Access Control &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="gpo-based-access-control">
+<h1>GPO-Based Access Control<a class="headerlink" href="#gpo-based-access-control" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="problem-statement">
+<h2>Problem Statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>A common use case for managing computer-based access control in an AD
+environment is through the use of GPO policy settings related to Windows
+Logon Rights. This design page proposes adding support for this use case
+by enhancing the SSSD AD provider to include the GPO support necessary
+for this access control use case. We are not currently planning on
+supporting other GPO-based use cases.</p>
+</div>
+<div class="section" id="use-cases">
+<h2>Use Cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+<p>Administrator, who maintains a heterogenous AD and RHEL network is able
+to define login policies in one central place &#8211; on the AD DC. The same
+policies will be then honored by his RHEL clients and Windows clients
+alike. Mapping between interactive or remote Windows logon methods and
+RHEL PAM services has sensible defaults and can be customized further.</p>
+</div>
+<div class="section" id="proposed-solution">
+<h2>Proposed Solution<a class="headerlink" href="#proposed-solution" title="Permalink to this headline">¶</a></h2>
+<p>For a general overview of GPO technology, visit <a class="reference external" href="https://docs.pagure.org/sssd-test2/GpoOverview.html">GPO
+Overview</a></p>
+<p>For a general overview of Windows Logon Rights, visit
+<a class="reference external" href="http://technet.microsoft.com/en-us/library/cc976701.aspx">​http://technet.microsoft.com/en-us/library/cc976701.aspx</a></p>
+<p>GPO policy settings can be used to centrally configure several sets of
+Windows Logon Rights, with each set classified by its logon method (e.g.
+interactive, remote interactive) and consisting of a whitelist [and
+blacklist] of users and groups that are allowed [or denied] access to
+the computer using the set&#8217;s logon method. In order to integrate Windows
+Logon Rights into a Linux environment, we allow pam service names to be
+mapped to a specific Logon Right. We provide default mappings for all of
+the commonly used pam service names, but we also allow the admin to
+add/remove mappings as needed (to support custom pam service names, for
+example). The latter is done by using a new set of config options of the
+form &#8220;gpo_map_&lt;logon_right&gt;&#8221; (i.e. gpo_map_interactive,
+gpo_map_network, etc), each of which consists of a comma-separated
+list of entries beginning either with a &#8216;+&#8217; (for adding to default set)
+or a &#8216;-&#8216; (for removing from default set). For example, since the
+RemoteInteractive logon right maps to a single pam service name (&#8220;sshd&#8221;)
+by default, an admin could map their own pam service name
+(&#8220;my_pam_service&#8221;) and remove the &#8220;sshd&#8221; mapping with the following
+sssd.conf line: &#8220;gpo_map_remote_interactive = +my_pam_service,
+-sshd&#8221;</p>
+<p>For this project, the following options can be used to configure the
+corresponding Logon Right (default values are also given):</p>
+<ul class="simple">
+<li>ad_gpo_map_interactive (default: login, su, su-l, gdm-fingerprint,
+gdm-password, gdm-smartcard, kdm)</li>
+<li>ad_gpo_map_remote_interactive (default: sshd)</li>
+<li>ad_gpo_map_network (default: ftp, samba)</li>
+<li>ad_gpo_map_batch (default: crond)</li>
+<li>ad_gpo_map_service (default: &lt;not set&gt;)</li>
+<li>ad_gpo_map_permit (default: sudo, sudo-i)</li>
+<li>ad_gpo_map_deny (default: &lt;not set&gt;)</li>
+<li>ad_gpo_map_default_right (default: deny)</li>
+</ul>
+<p>The first five options are used to associate specific pam service names
+with each logon right. The ad_gpo_map_permit [and ad_gpo_map_deny]
+is used to specify pam service names for which GPO-based access is
+always [or never] granted. Unlike the other options, the
+ad_gpo_map_default_right does not specify pam service names. Rather,
+it allows the admin to specify a default logon right (or the special
+permit/deny values)for pam service names that are not explicitly mapped
+to any of the logon rights. Note that, in many cases, we do not expect
+the admin will need to specify any of these config options, b/c the
+defaults have been chosen carefully to cover the most commonly used pam
+service names (with deny as the default for unmapped service names).</p>
+<p>The semantics of each whitelist and blacklist are as follows:</p>
+<ul class="simple">
+<li>whitelist (&#8220;allow&#8221;): When this policy setting is not defined, any
+user can logon to the computer. When it is defined, only the users
+and groups specified in the whitelist are allowed to logon to the
+computer. In other words, by defining this setting, the semantics go
+from &#8220;everyone allowed access to this computer&#8221; to &#8220;no one allowed
+access to this computer, except principals on the whitelist&#8221;.</li>
+<li>blacklist (&#8220;deny&#8221;): When this policy setting is not defined, it has
+no effect. When it is defined, the users and groups specified in the
+blacklist are blocked from performing logons. For a particular Logon
+Right (e.g. Interactive), if a user/group is specified in both the
+whitelist and the blacklist, then the blacklist takes precedence.</li>
+</ul>
+<p>In summary, if a user is trying to login to a computer (e.g.
+pam_service_name = &#8220;login&#8221;), we first find which Logon Right the
+&#8220;login&#8221; service maps to (i.e. Interactive, by default), and then process
+only the corresponding policy settings found in GptTmpl.inf (which
+contains policy settings for the &#8220;Security Settings&#8221; extension, of which
+Logon Rights are a part). In the case of Interactive Logon Right, those
+policy settings are named <em>SeInteractiveLogonRight</em> and
+<em>SeDenyInteractiveLogonRight</em> in the GptTmpl.inf file.</p>
+<p>A client-side implementation consists of the following components:</p>
+<ul class="simple">
+<li>LDAP Engine: determines which GPOs are applicable for the computer
+account from which the user is attempting to log in, filters those on
+various criteria, and ultimately produces a set of cse_filtered GPOs
+that contain the &#8220;Security Settings&#8221; CSE, which it feeds, one by one,
+to the SMB/CIFS Engine</li>
+<li>SMB/CIFS Engine: makes blocking libsmbclient calls to retrieve each
+GPO&#8217;s GPT.INI and GptTmpl.inf files, and stores the files in the gpo
+cache (/var/lib/sss/gpo_cache), from which the GPO Enforcement
+Engine will retrieve them</li>
+<li>GPO Enforcement Engine: enforces GPO-based access control by
+retrieving each GPO&#8217;s policy file (GptTmpl.inf) from the gpo cache,
+parsing it, and making an access control decision by comparing the
+user/groups against the whitelist/blacklist of the Logon Right of
+interest (which is based on the pam service name)</li>
+</ul>
+<p>For the sake of clarity, the above description ignores some features,
+such as GPO version caching/comparing, and offline support.</p>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation Details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="packaging">
+<h3>Packaging<a class="headerlink" href="#packaging" title="Permalink to this headline">¶</a></h3>
+<p>Since the GPO-based access control feature will only be used by the AD
+provider, it will be included as part of the sssd-ad package. The source
+files for the feature would be included as part of libsss_ad.so. In
+order to ensure that existing configurations do not see changes in
+behavior when upgrading, this feature will not be enabled by default.
+Rather, a new &#8220;ad_gpo_access_control&#8221; config option is provided which
+can be set to &#8220;disabled&#8221; (neither evaluated nor enforced), &#8220;enforcing&#8221;
+(evaluated and enforced), or &#8220;permissive&#8221; (evaluated, but not
+enforced).The &#8220;permissive&#8221; value is the default, primarily to facilitate
+a smooth transition for administrators; it evalutes the gpo-based access
+control rules and outputs a syslog message if access would have been
+denied. By examining the logs, administrators can then make the
+necessary changes before setting the mode to &#8220;enforcing&#8221;.</p>
+<p>In addition to the new ad_gpo_access_control and ad_gpo_map_*
+config options, there is also a new config option named
+ad_gpo_cache_timeout, which can be used to specify the interval
+during which subsequent access control requests can re-use the files
+stored in the gpo_cache (rather than retrieving them from the DC).</p>
+</div>
+<div class="section" id="gpo-retrieval">
+<h3>GPO Retrieval<a class="headerlink" href="#gpo-retrieval" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>LDAP Engine (running in backend): This component runs as part of the
+AD access provider. It does the following:<ul>
+<li>Determines which GPOs are applicable to the computer account from
+which the user is attempting to log in. This is based on:<ul>
+<li>whether the GPO is linked to the site/domain/ou under which the
+computer account is stored</li>
+<li>whether the GPO is enabled or disabled</li>
+<li>whether the GPO is enforced or unenforced</li>
+<li>whether or not the GPO is allowed to be inherited from parent
+containers</li>
+<li>whether the user has the ApplyGroupPolicy permission on the
+GPO&#8217;s DACL</li>
+</ul>
+</li>
+<li>Retrieves relevant attributes of applicable GPOs (e.g. cse-guids,
+file_system_paths, etc)</li>
+<li>Extracts supported GPOs (i.e. those with &#8220;Security Settings&#8221; cse)
+from the applicable GPOs</li>
+<li>For each supported GPO<ul>
+<li>Retrieves the GPO&#8217;s version and timeout from the sysdb cache
+(from a previous transaction, if any)</li>
+<li>If timeout is greater than current time, then skips to GPO
+Enforcement</li>
+<li>Else, sends to the gpo_child the supported GPO, as well as the
+cached GPO version (if any)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>SMB/CIFS Engine (gpo_child): This component is used to make blocking
+SMB/CIFS calls. It does the following:<ul>
+<li>Retrieves the GPO&#8217;s corresponding GPT.INI file (from which it
+extracts the fresh version)</li>
+<li>If the fresh version is greater than the cached version (or if
+there is no cached version)<ul>
+<li>Retrieves the policy file corresponding to the GPO
+(GptTmpl.inf) and saves it to the gpo cache
+(/var/lib/sss/gpo_cache)</li>
+<li>Returns the fresh version to the backend, which stores it in
+the cache</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="gpo-enforcement">
+<h3>GPO Enforcement<a class="headerlink" href="#gpo-enforcement" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>GPO Enforcement Engine: enforces GPO-based access control (note that
+this will take place after existing AD access provider mechanisms,
+such as account lockout, LDAP filter)<ul>
+<li>For each GPO<ul>
+<li>Retrieves GPO&#8217;s corresponding policy file (i.e. GptTmpl.inf)
+file from gpo cache</li>
+<li>Parses policy file, extracting entries corresponding to the
+Logon Right of interest (determined by the pam service name)</li>
+<li>Enforces access control policy settings</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="cache-schema">
+<h3>Cache Schema<a class="headerlink" href="#cache-schema" title="Permalink to this headline">¶</a></h3>
+<p>The Cache stores entries for individual GPOs in a new container
+&#8220;cn=gpos, cn=ad, cn=custom, cn=&lt;domain&gt;, cn=sysdb&#8221;</p>
+</div>
+<div class="section" id="refresh-interval-configuration">
+<h3>Refresh Interval Configuration<a class="headerlink" href="#refresh-interval-configuration" title="Permalink to this headline">¶</a></h3>
+<p>Microsoft specifies that there be separate configurable refresh
+intervals (one for computer-based GPOs and one for user-based GPOs),
+with each having a default of 90 minutes. If 0 minutes are specified,
+Microsoft uses a 7-second refresh interval. Additionally, in order to
+avoid performance degradation that could occur if several computers
+perform a group policy refresh simultaneously, Microsoft also specifies
+that a random offset interval be added to the refresh interval, with the
+maximum offset interval having a default of 30 minutes. As such, there
+are four settings (computer-based refresh interval, computer-based
+maximum offset interval, user-based refresh interval, user-based maximum
+offset interval). Additionally, Microsoft specifies a boolean
+configuration setting that disables refresh altogether (in which case
+none of the previous four configuration settings would be relevant). If
+refresh is completely disabled, then GPOs would only be retrieved at
+computer startup (or user login). One final note: the GPO mechanism
+itself can be used to uniformly set these refresh configuration options
+for a set of computers; namely, Microsoft specifies standard GPO policy
+settings that can used to centrally specify the various refresh
+parameters. Of course, these would not apply until after they had been
+retrieved.</p>
+<p>Although we are only implementing a computer-based GPO in the first
+implementation, we should keep in mind that user-based GPOs could have a
+different refresh interval. As such, we would need to add a new
+configuration option (&#8220;computer_gpo_refresh_interval&#8221;) to the
+existing AD access provider that would specify the gpo retrieval refresh
+interval in seconds. This would specify the period to use in the
+periodic task API to determine how often to call the gpo retrieval code.
+By default, Microsoft sets this value to 90 minutes. It is an open issue
+as to whether we want to support the random offset interval or the
+ability to disable refresh altogether.</p>
+</div>
+</div>
+<div class="section" id="unresolved-issues">
+<h2>Unresolved Issues<a class="headerlink" href="#unresolved-issues" title="Permalink to this headline">¶</a></h2>
+<p>When should GPO retrieval take place? It could happen at one or more of
+the following times:</p>
+<ul class="simple">
+<li>If we follow the Microsoft spec, since &#8220;Allow / Deny Logon Locally&#8221;
+are computer-based policy settings, GPO retrieval should take place
+when the system boots and at regular refresh intervals. If we assume
+system boot effectively coincides with sssd initialization (for our
+purposes), we can retrieve the policy settings during ad_init and
+kick off a periodic task (similar to what we do for enumeration).
+However, this will likely have an adverse performance impact on
+system startup.</li>
+<li>Alternatively, we can perform GPO retrieval in the AD access provider
+itself (just before enforcing the policy settings), meaning that
+retrieval would take place at every user login. This would ensure
+that the freshest policy settings were being applied at every logon.
+If we only performed GPO retrieval at this point, then periodic
+refresh would not be needed (at least for the &#8220;Allow / Deny Logon
+Locally&#8221; policy settings) since we are getting fresh data every time.</li>
+<li>Additionally, we could register an online callback such that GPO
+retrieval takes place when returning to online mode from offline
+mode. This really depends on what we decide about the first two
+retrieval times above. If we aren&#8217;t doing periodic refresh, and are
+only retrieving gpo&#8217;s at login time, then an online callback might
+not be needed. If we are doing periodic refresh, then we can set the
+&#8220;offline&#8221; parameter of be_ptask_create(...) to DISABLE (which means
+the task is disabled immediately when back end goes offline and then
+enabled again when back end goes back online). Or we can play it safe
+and always use DISABLE semantics (regardless of when GPO retrieval
+takes place).</li>
+</ul>
+<p>Should we enforce GPO logon policy settings only at user login, or also
+at periodic intervals?</p>
+<ul class="simple">
+<li>After a user has logged on successfully using GPO-based access
+control, if new policy settings are retrieved during refresh
+indicating that the user is no longer allowed to log in to this host,
+should sssd log out the user (or should we only enforce the access
+control at login time)? What do our other access control mechanisms
+do here? If we wanted to log out the user, do we have an existing
+mechanism to do this?</li>
+</ul>
+<p>If we implement gpo refresh, which of the refresh configuration options
+should we implement and how?</p>
+<ul class="simple">
+<li>sssd configuration options<ul>
+<li>computer_gpo_refresh_interval? If we use sssd configuration, we
+would definitely want this one (although maybe with a shorter
+name).</li>
+<li>computer_gpo_max_offset (default 30 minutes)? Do we think this
+random offset adds enough value to be a configurable option?</li>
+<li>disable_gpo_refresh (default false)? Presumably, this would be
+done so that performance would not be adversely affected during
+the logon session. Alternatively, we could tell admins that wanted
+to disable gpo refresh to set the
+entry_cache_computer_gpo_timeout to zero (0), although this
+would not be how Microsoft interprets a zero value. Does sssd
+interpret &#8216;0&#8217; as &#8220;disable&#8221; elsewhere?</li>
+</ul>
+</li>
+<li>gpo refresh interval GPO<ul>
+<li>if we didn&#8217;t want to clutter sssd&#8217;s configuration namespace, we
+could just use the standard Microsoft GPO that allows an admin to
+specify the aforementioend refresh intervals (and distribute a
+consistent configuration to a set of computers)</li>
+</ul>
+</li>
+</ul>
+<p>Option 1: The straightforward option is to only perform GPO retrieval in
+the AD access provider itself.</p>
+<ul class="simple">
+<li>Pros<ul>
+<li>provides just-in-time retrieval (yielding fresh data)</li>
+<li>does away with need for periodic refresh and refresh configuration</li>
+<li>no performance hit at system startup (and at periodic refresh)</li>
+</ul>
+</li>
+<li>Cons<ul>
+<li>suffers a performance hit on every user login</li>
+<li>doesn&#8217;t allow us to perform user logout (if policy settings no
+longer allow access)</li>
+</ul>
+</li>
+</ul>
+<p>Option 2: The spec-compliant option is to perform GPO retrieval (and
+take the performance hit) at system start and then at periodic
+intervals.</p>
+<ul class="simple">
+<li>Pros<ul>
+<li>complies with spec</li>
+<li>no performance hit at every user login</li>
+<li>allows us to perform user logout (if policy settings no longer
+allow access)</li>
+</ul>
+</li>
+<li>Cons<ul>
+<li>suffers performance hit at initial startup and then periodically</li>
+<li>policy data likely to be stale</li>
+<li>requires implementation of periodic refresh, including refresh
+configuration (for which we should probably use gpo refresh GPO)</li>
+</ul>
+</li>
+</ul>
+<p>In order to avoid premature optimization, the team&#8217;s recommendation is
+to start by implementing the straightforward approach (Option 1), and to
+address potential performance concerns later (when we will be able to
+make actual measurements).</p>
+</div>
+<div class="section" id="configuration-changes">
+<h2>Configuration Changes<a class="headerlink" href="#configuration-changes" title="Permalink to this headline">¶</a></h2>
+<p>The following new options are added to the AD access provider. Kindly
+see the sssd-ad man page for a complete description.</p>
+<ul class="simple">
+<li>ad_gpo_access_control - describes the operation mode of access
+control (enforcing/permissive/disabled)</li>
+<li>ad_gpo_cache_timeout - amount of time between lookups of GPO files
+on the AD server</li>
+<li>ad_gpo_map_interactive - PAM services that map onto
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InteractiveLogonRight.html">InteractiveLogonRight?</a>
+and
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/DenyInteractiveLogonRight.html">DenyInteractiveLogonRight?</a>
+policy settings.</li>
+<li>ad_gpo_map_remote_interactive - PAM services that map onto
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/RemoteInteractiveLogonRight.html">RemoteInteractiveLogonRight?</a>
+and
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/DenyRemoteInteractiveLogonRight.html">DenyRemoteInteractiveLogonRight?</a>
+policy settings.</li>
+<li>ad_gpo_map_network - PAM services that map onto
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/NetworkLogonRight.html">NetworkLogonRight?</a>
+and
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/DenyNetworkLogonRight.html">DenyNetworkLogonRight?</a>
+policy settings.</li>
+<li>ad_gpo_map_batch - PAM services that map onto
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/BatchLogonRight.html">BatchLogonRight?</a>
+and
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/DenyBatchLogonRight.html">DenyBatchLogonRight?</a>
+policy settings.</li>
+<li>ad_gpo_map_service - PAM services that map onto
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/ServiceLogonRight.html">ServiceLogonRight?</a>
+and
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/DenyServiceLogonRight.html">DenyServiceLogonRight?</a>
+policy settings.</li>
+<li>ad_gpo_map_permit - PAM service names for which GPO-based access
+is always granted</li>
+<li>ad_gpo_map_deny - PAM service names for which GPO-based access is
+always denied</li>
+<li>ad_gpo_map_default_right - defines how access control is
+evaluated for PAM service names that are not explicitly listed in one
+of the ad_gpo_map_* options.</li>
+</ul>
+</div>
+<div class="section" id="how-to-test">
+<h2>How to test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Perform the following tests for each set of Logon Rights (not just
+for Interactive, as shown)<ul>
+<li>Setup<ul>
+<li>Create AD users named allowed_user, denied_user,
+regular_user, allowed_group_user, denied_group_user,
+allowed_denied_group_user</li>
+<li>Create AD groups named allowed_group, denied_group</li>
+<li>Set allowed_group_user and allowed_denied_group_user as
+members of allowed_group</li>
+<li>Set denied_group_user and allowed_denied_group_user as
+members of denied_group</li>
+<li>Create GPO with two policy settings (in this case, we are using
+Interactive Logon Right as an example)<ul>
+<li>&#8220;Allow Logon Locally&#8221; is set to &#8220;allowed_user&#8221;,
+&#8220;allowed_group&#8221;</li>
+<li>&#8220;Deny Logon Locally&#8221; is set to &#8220;denied_user&#8221; ,
+&#8220;denied_group&#8221;</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Link GPO to specific site, domain, or OU node (under which the
+host computer resides in AD)</li>
+</ul>
+</li>
+<li>Perform the following &#8220;standard test&#8221; using each logon method
+(corresponding to each Logon Right). For example, we can use &#8220;ssh&#8221; to
+test the RemoteInteractive Logon Right on a single computer
+(localhost)<ul>
+<li>[yelley] $ ssh
+<a class="reference external" href="mailto:allowed_user&#37;&#52;&#48;foo&#46;com">​allowed_user<span>&#64;</span>foo<span>&#46;</span>com</a>&#64;localhost</li>
+<li>Note that &#8220;allowed_user&#8221; and &#8220;allowed_group_user&#8221; should be
+granted access</li>
+<li>Note that &#8220;regular_user&#8221;, &#8220;denied_user&#8221;, &#8220;denied_group_user&#8221;,
+and &#8220;allowed_denied_group_user&#8221; should be denied access</li>
+</ul>
+</li>
+<li>Create a new computer account in a location which should have no
+linked GPOs in the AD hierarchy (site, domain, ou)<ul>
+<li>(Alternatively, use the same computer account, but disable any
+applicable GPOs using GPMC; make sure to re-enable them after this
+step!!)</li>
+<li>Perform standard test and make sure that all users are able to log
+in to host (since no GPOs apply to this host)</li>
+</ul>
+</li>
+<li>Offline Mode<ul>
+<li>take the system offline with no files in the gpo_cache directory;
+perform standard test and make sure it grants access</li>
+<li>perform the standard test while online (download some files); then
+take the system offline and make sure it behaves as expected</li>
+</ul>
+</li>
+<li>Test ad_gpo_access_control config option<ul>
+<li>perform standard tests when this option is &#8220;permissive&#8221; (or
+unspecified), &#8220;enforcing&#8221;, &#8220;disabled&#8221;</li>
+</ul>
+</li>
+<li>Test ad_gpo_cache_timeout config option<ul>
+<li>perform standard test with a sysdb cache with no gpo entries (or a
+clean sysdb cache)</li>
+<li>make a change to a GPO policy setting so that the
+sysvol_gpt_version is incremented<ul>
+<li>perform standard test and make sure that the timestamps on
+GPT.INI and GptTmpl.inf have changed</li>
+</ul>
+</li>
+<li>using a large value for this option (300 seconds), perform
+standard test again within the timeout period; make sure the
+timestamps on GPT.INI and GptTmpl.inf have not changed</li>
+<li>using the default value for this option (5 seconds), perform
+standard test again after the timeout period; make sure the
+timestamp on GPT.INI has changed, but not the timestamp on
+GptTmpl.inf (since no policy change was made in AD)</li>
+</ul>
+</li>
+<li>Test ad_gpo_map_* config options<ul>
+<li>perform standard tests after adding pam service names to default
+set using &#8216;+&#8217;</li>
+<li>perform standard tests after removing pam service names from
+default set using &#8216;-&#8216;</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">GPO-Based Access Control</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem Statement</a></li>
+<li><a class="reference internal" href="#use-cases">Use Cases</a></li>
+<li><a class="reference internal" href="#proposed-solution">Proposed Solution</a></li>
+<li><a class="reference internal" href="#implementation-details">Implementation Details</a><ul>
+<li><a class="reference internal" href="#packaging">Packaging</a></li>
+<li><a class="reference internal" href="#gpo-retrieval">GPO Retrieval</a></li>
+<li><a class="reference internal" href="#gpo-enforcement">GPO Enforcement</a></li>
+<li><a class="reference internal" href="#cache-schema">Cache Schema</a></li>
+<li><a class="reference internal" href="#refresh-interval-configuration">Refresh Interval Configuration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#unresolved-issues">Unresolved Issues</a></li>
+<li><a class="reference internal" href="#configuration-changes">Configuration Changes</a></li>
+<li><a class="reference internal" href="#how-to-test">How to test</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/ActiveDirectoryGPOIntegration.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/ActiveDirectoryGPOIntegration.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

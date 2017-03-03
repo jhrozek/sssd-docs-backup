@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>SSSD 2.0 &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <p><strong>Nothing on this page truly exists. It contains only ramblings on what
+SSSD might become in the future.</strong> These are mostly unordered notes.</p>
+<div class="section" id="sssd-2-0">
+<h1>SSSD 2.0<a class="headerlink" href="#sssd-2-0" title="Permalink to this headline">¶</a></h1>
+<p>Major themes</p>
+<ul class="simple">
+<li>Powered by systemd wherever possible</li>
+<li>Eliminate the monitor process</li>
+<li>Support socket activation and idle termination</li>
+<li>Simplify configuration</li>
+<li>Fast support for local users</li>
+</ul>
+<div class="section" id="systemd">
+<h2>systemd<a class="headerlink" href="#systemd" title="Permalink to this headline">¶</a></h2>
+<p>This init system supports many powerful features that could make large
+parts of SSSD <em>infrastructure</em> irrelevant.</p>
+<ul class="simple">
+<li>Supports process monitoring and automatic restart</li>
+<li>Can support chaining multiple child processes together</li>
+<li>Manages socket-activation for registered processes</li>
+<li>Supports kdbus for secure and fast D-BUS communication between
+processes</li>
+</ul>
+</div>
+<div class="section" id="process-start-up">
+<h2>Process start-up<a class="headerlink" href="#process-start-up" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Use the <code class="docutils literal"><span class="pre">sssd</span></code> process (formerly the monitor) solely to parse
+sssd.conf and convert it to the config LDB, which the other processes
+will be able to read at startup.</li>
+<li>Eliminate the services= line. All supported responders should simply
+be invoked (socket-activated) when their client asks for them and
+then proceed according to the config LDB (which may just tell it to
+terminate again with an appropriate error reply)</li>
+<li>We may want to load different providers as separate processes to make
+it easier to decide when to terminate them. It would be better to
+rethink whether it makes more sense to have one process per domain as
+opposed to one process per configured provider back-end.</li>
+<li>systemd now has a D-BUS method for setting up persistent or
+non-persistent units (such as service units), so we can take
+advantage of this to start up only the processes we really need.</li>
+</ul>
+</div>
+<div class="section" id="idle-termination">
+<h2>idle termination<a class="headerlink" href="#idle-termination" title="Permalink to this headline">¶</a></h2>
+<p>Shutting down any SSSD process that is not actively doing work would be
+advantageous for several reasons (most notably memory and CPU resource
+reduction during idle periods). Designing for this would also force us
+to optimize for making SSSD operations stateless (or at least tracking
+in-progress operations more carefully).</p>
+<p>Some random thoughts on provider implementations:</p>
+<ul class="simple">
+<li>LDAP provider (and derivatives) should auto-terminate once the the
+ldap_connection_expire_timeout is reached, since we can then
+assume that nothing has been happening on the connection for quite
+some time (15 minutes by default).</li>
+<li>Other providers should terminate after a similar reasonable amount of
+time.</li>
+<li>Providers that have computationally-rare periodic tasks (such as
+cache cleanup or kerberos ticket renewal) should be stored in a
+persistent manner between process startups and should automatically
+be invoked if their period has passed. We can take advantage of
+systemd timer units to have the process periodically woken up to
+process these events, rather than simply holding the process alive
+and idle for long periods.</li>
+</ul>
+</div>
+<div class="section" id="local-users">
+<h2>Local users<a class="headerlink" href="#local-users" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>We need to rework the local provider to behave more similarly to the
+other providers (even if this just means a provider backend that
+always returns &#8220;offline&#8221;). This way, the local id_provider can be
+configured with other providers like kerberos.</li>
+<li>We need to optimize the local user behavior such that it is
+acceptable to have <code class="docutils literal"><span class="pre">sss</span></code> first in the nsswitch.conf lines
+everywhere. This will solve the performance problem caused by
+disabling nscd for local users (which results in disk reads for all
+lookups prior to trying sssd)</li>
+<li>We need to work on
+<a class="reference external" href="https://sourceware.org/glibc/wiki/Proposals/GroupMerging">​https://sourceware.org/glibc/wiki/Proposals/GroupMerging</a>
+and finish it.</li>
+</ul>
+</div>
+<div class="section" id="enumeration">
+<h2>Enumeration<a class="headerlink" href="#enumeration" title="Permalink to this headline">¶</a></h2>
+<p>Enumeration mode should be deprecated in SSSD 2.0 with a strong
+recommendation being placed on a D-BUS API for doing enumeration that
+supports paging and filtering. Most uses of enumeration are for
+presenting a user/group list in a UI, so this will be a better fit for
+that anyway.</p>
+</div>
+<div class="section" id="sbus">
+<h2>SBUS<a class="headerlink" href="#sbus" title="Permalink to this headline">¶</a></h2>
+<p>The original point-to-point SBUS should be retired. Now that SSSD
+supports running as non-root, we should instead set up a session bus and
+use that (which will also be advantageous as we get into the
+kdbus-enabled world).</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">SSSD 2.0</a><ul>
+<li><a class="reference internal" href="#systemd">systemd</a></li>
+<li><a class="reference internal" href="#process-start-up">Process start-up</a></li>
+<li><a class="reference internal" href="#idle-termination">idle termination</a></li>
+<li><a class="reference internal" href="#local-users">Local users</a></li>
+<li><a class="reference internal" href="#enumeration">Enumeration</a></li>
+<li><a class="reference internal" href="#sbus">SBUS</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/SSSDTwoPointOh.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/SSSDTwoPointOh.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

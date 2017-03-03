@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>GPO Overview &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="gpo-overview">
+<h1>GPO Overview<a class="headerlink" href="#gpo-overview" title="Permalink to this headline">¶</a></h1>
+<p>Group Policy is a Windows feature that enables administrators to
+centrally manage policies for users and computers in an AD environment.
+A Group Policy Object (GPO) represents a collection of policy settings
+(i.e. name/value pairs) that are stored on a Domain Controller (DC), and
+that can be applied to policy targets (i.e. computers and users). When a
+computer boots up or a user logs in (and at periodic intervals
+thereafter), GPO software on the client computer uses LDAP to identify
+the GPOs that apply to the policy target, uses SMB/CIFS to retrieve each
+GPO&#8217;s policy settings (that it knows how to process), and stores the
+policy settings in a local store. At some later time, an enforcement
+mechanism reads the policy settings from the local store, and enforces
+the policy settings.</p>
+<p>Determining which policy settings are applicable for a given policy
+target depends on the policy target&#8217;s type (i.e. computer or user), and
+the policy target&#8217;s location in the AD hierarchy (i.e. the site, domain,
+and OU(s) under which the policy target resides). By default, GPOs
+applicable to both the computer and the user are applied. However, an
+administrative option can be set on a GPO that results in the GPO&#8217;s
+user-based policy settings being ignored. Additionally, a GPO can never
+be <strong>directly</strong> linked to a policy target (i.e. computer or user).
+Instead, a policy target inherits the policy settings of GPOs linked to
+its enclosing site, domain, and OU. This inheritance sometimes results
+in conflicts, meaning that two policy settings have the same name but
+different values. In case of conflict, the OU has the highest priority,
+followed by domain, followed by site. There is no concept of
+fine-grained merging; a conflicting policy setting with lower priority
+is discarded completely. Note that an administrative option to disable
+inheritance can be set at any site, domain, and/or OU.</p>
+<p>A GPO is identified by a gpo-guid, and it contains a set of Client Side
+Extensions (CSEs), each identified by a cse-guid. A CSE represents a
+class of policy settings (e.g. &#8220;Security Settings&#8221;, &#8220;Registry Settings&#8221;,
+etc) that can be retrieved, parsed, and stored by a specific client-side
+module (corresponding to the cse-guid). Note that both a CSE plugin
+module and its corresponding CSE enforcement mechanism must have
+knowledge of where the policy settings are being stored (and in what
+format).&#8221; Note also that a cse-guid&#8217;s policy settings are ignored if no
+GPO Plugin Module has been registered for that cse-guid. Additionally,
+note that policy settings are not retrieved if the DC&#8217;s policy version
+matches the cached policy version (since nothing has changed on the DC).
+Since policy settings are typically not changed frequently, this means
+that only the GPO version file typically needs to be retrieved (to
+perform the version check) and that policy settings don&#8217;t need to be
+retrieved (unless they have changed).</p>
+<p>A GPO&#8217;s information is stored in two locations. A GPO&#8217;s metadata (e.g.
+version, cse-guids, etc) are stored as attributes in an LDAP
+groupPolicyContainer object on the DC&#8217;s LDAP server. A GPO&#8217;s policy
+settings are stored in a set of CSE-specific files on the DC&#8217;s SMB/CIFS
+file server (in the SYSVOL file share).</p>
+<p>The following diagram provides a simplified summary of how this
+information is stored on the DC. Note that each site/domain/ou may be
+associated with multiple GPOs, with each GPO associated with multiple
+CSEs, with each CSE associated with multiple policy settings.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/GpoOverview.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/GpoOverview.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,339 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>SSSD Devel page &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><a class="reference external" href="#SSSDDevelpage">SSSD Devel page</a><ol class="arabic">
+<li><a class="reference external" href="#Arethereanyintroductorytutorialsavailable">Are there any introductory tutorials
+available?</a><ol class="arabic">
+<li><a class="reference external" href="#Talloc">Talloc</a></li>
+<li><a class="reference external" href="#Teventandtevent_req">Tevent and tevent_req</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#WhenIdebuganSSSDprocessinadebuggeritalwaysgetskilledwithSIGTERMorreceivesSIGRTperiodically">When I debug an SSSD process in a debugger, it always gets killed
+with
+…</a><ol class="arabic">
+<li><a class="reference external" href="#Untilandincludingsssd-1.13">Until and including sssd-1.13</a></li>
+<li><a class="reference external" href="#sssd-1.14orlater">sssd-1.14 or later</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#Usingvalgrindtoidentifymemoryaccessproblems">Using valgrind to identify memory access
+problems</a></li>
+<li><a class="reference external" href="#UsingstracetotracktheSSSDprocesses">Using strace to track the SSSD
+processes</a></li>
+<li><a class="reference external" href="#HowdoItrackwork-in-progressofotherdevelopers">How do I track work-in-progress of other
+developers?</a></li>
+<li><a class="reference external" href="#Whydoesmakechecktakesolong">Why does make check take so
+long?</a></li>
+<li><a class="reference external" href="#Usingclangtoperformstaticanalysisofsourcecode">Using clang to perform static analysis of source
+code</a></li>
+<li><a class="reference external" href="#WhenIcompiletheSSSDfromsourcethereisanerrorthatsaysusrlibldbmemberof.la:invalidELFheader">When I compile the SSSD from source there is an error that says
+…</a></li>
+<li><a class="reference external" href="#WhenItrytodebugtestsusinggdbIgetmessagesimilartohomeusersssd.sysdb-tests:notinexecutableformat:Fileformatnotrecognized">When I try to debug tests using ​gdb I
+…</a></li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="sssd-devel-page">
+<h1>SSSD Devel page<a class="headerlink" href="#sssd-devel-page" title="Permalink to this headline">¶</a></h1>
+<p>This wiki page contains a collection of tips that might be useful for
+SSSD developers and contributors. If you use a trick that is not
+mentioned here, tell us on the <a class="reference external" href="https://fedorahosted.org/mailman/listinfo/sssd-devel">​SSSD development
+list</a> or the
+<a class="reference external" href="irc://irc.freenode.net/sssd">​IRC</a></p>
+<div class="section" id="are-there-any-introductory-tutorials-available">
+<h2>Are there any introductory tutorials available?<a class="headerlink" href="#are-there-any-introductory-tutorials-available" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="talloc">
+<h3>Talloc<a class="headerlink" href="#talloc" title="Permalink to this headline">¶</a></h3>
+<p>SSSD relies on the talloc memory allocator that originated in the Samba
+project.</p>
+<p>SSSD developer Pavel Březina wrote a very detailed tutorial on its
+design, use and best practices. This is a must-read for anyone
+interested in contributing to SSSD.</p>
+<ul class="simple">
+<li><a class="reference external" href="http://talloc.samba.org/talloc/doc/html/libtalloc__tutorial.html">​Talloc
+Tutorial</a></li>
+</ul>
+<p>Other resources:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://sgallagh.wordpress.com/2010/03/17/why-you-should-use-talloc-for-your-next-project/">​Why you should use talloc for your next
+project</a></li>
+</ul>
+</div>
+<div class="section" id="tevent-and-tevent-req">
+<h3>Tevent and tevent_req<a class="headerlink" href="#tevent-and-tevent-req" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference external" href="https://tevent.samba.org/tevent_tutorial.html">​Tevent Tutorial</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="when-i-debug-an-sssd-process-in-a-debugger-it-always-gets-killed-with-sigterm-or-receives-sigrt-periodically">
+<h2>When I debug an SSSD process in a debugger, it always gets killed with <code class="docutils literal"><span class="pre">SIGTERM</span></code> or receives <code class="docutils literal"><span class="pre">SIGRT</span></code> periodically<a class="headerlink" href="#when-i-debug-an-sssd-process-in-a-debugger-it-always-gets-killed-with-sigterm-or-receives-sigrt-periodically" title="Permalink to this headline">¶</a></h2>
+<p>The behaviour here depends a bit on your SSSD version.</p>
+<div class="section" id="until-and-including-sssd-1-13">
+<h3>Until and including sssd-1.13<a class="headerlink" href="#until-and-including-sssd-1-13" title="Permalink to this headline">¶</a></h3>
+<p>The main SSSD process (the monitor) sends &#8220;heartbeat&#8221; checks called
+pings to the other SSSD services, both responders and providers. If the
+service does not respond in a specified time interval, the monitor sends
+the <code class="docutils literal"><span class="pre">SIGTERM</span></code> signal to the service in an attempt to terminate a non
+responding instance and start a new one.</p>
+<p>However, in the case a service is being traced in a debugger, it is
+quite common to examine the process for long enough that the monitor
+would consider the service hung and send SIGTERM. The SSSD has an option
+simply called <code class="docutils literal"><span class="pre">timeout</span></code> that specifies the interval between the pings
+the monitor sends to the services. Currently the monitor sends three
+pings before sending the terminating signals, each ping is sent after 10
+seconds by default.</p>
+<p>To change the monitor settings to send pings after one hour:</p>
+<p>An alternate approach while debugging is to send SIGSTOP to the &#8216;sssd&#8217;
+process, which will halt the monitor process. However, you must remember
+to send SIGCONT when you&#8217;re done debugging, or your monitor will be
+unable to manage the other processes or shut down gracefully.</p>
+</div>
+<div class="section" id="sssd-1-14-or-later">
+<h3>sssd-1.14 or later<a class="headerlink" href="#sssd-1-14-or-later" title="Permalink to this headline">¶</a></h3>
+<p>In order to support socket-activated services better, we removed the
+watchdog ping-pong in 1.14 and replaces it with a &#8220;watchdog&#8221; in the
+services themselves. The services send themselves a <code class="docutils literal"><span class="pre">SIGRT</span></code> signal and
+increase a counter each time <code class="docutils literal"><span class="pre">SIGRT</span></code> is delivered. There is also a
+timer event using the SSSD event loop that periodically re-sets the
+counter to signal the service is still processing event loop events and
+thus can be considered alive. Once the counter reaches a threshold (3 by
+default), the service exits and the monitor restarts the service upon
+receiving a <code class="docutils literal"><span class="pre">SIGCHLD</span></code> signal.</p>
+<p>To change the period of <code class="docutils literal"><span class="pre">SIGRT</span></code> signals and therefore to change how
+often is the counter increased, change the <code class="docutils literal"><span class="pre">timeout</span></code> parameter in the
+service section, for example to be increased only once per hour:</p>
+<p>Alternatively, you can disable the function that stops the watchdog
+completely:</p>
+<p>You can place this command to a <code class="docutils literal"><span class="pre">.gdbinit</span></code> file so that it gets
+executed once you attach gdb to a sssd process.</p>
+</div>
+</div>
+<div class="section" id="using-valgrind-to-identify-memory-access-problems">
+<h2>Using valgrind to identify memory access problems<a class="headerlink" href="#using-valgrind-to-identify-memory-access-problems" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://valgrind.org">​valgrind</a> is an immensely useful tool that is
+able to check a wide range of memory access problems - from memory leaks
+to use-after-free bugs.</p>
+<p>When debugging the main SSSD program, one can just run the program as a
+positional valgrind parameter:</p>
+<p>The situation is somewhat complex when the developer needs to debug one
+of the services that the SSSD monitor spawns. The best solution is to
+use the special (undocumented) parameter called <code class="docutils literal"><span class="pre">command</span></code>. By default,
+the &#8220;command&#8221; defaults to <code class="docutils literal"><span class="pre">${libexec}/sssd_${service</span></code>} which expands
+to absolute path pointing to <code class="docutils literal"><span class="pre">/usr/libexec/sssd/sssd_${service</span></code>} on
+Fedora.</p>
+<p>The general format is <code class="docutils literal"><span class="pre">valgrind</span> <span class="pre">&lt;path-to-service&gt;</span></code>. For example to
+debug the <code class="docutils literal"><span class="pre">sss_nss</span></code> process, you need to specify the following in the
+<code class="docutils literal"><span class="pre">[nss]</span></code> section of the sssd.conf file:</p>
+<p>Some of the SSSD processes, notable the sssd_be processes that
+represent the <code class="docutils literal"><span class="pre">[domain/]</span></code> sections of <code class="docutils literal"><span class="pre">sssd.conf</span></code>, require command
+line parameters in order to function correctly. The easiest way to check
+how exactly the SSSD spawns the worker processes is to simply check with
+the <code class="docutils literal"><span class="pre">ps(1)</span></code> utility:</p>
+<p>The following example illustrates using valgrind to debug an SSSD domain
+called &#8220;default&#8221;, which is the name authconfig uses:</p>
+<p>This will log valgrind findings to a file in /tmp named with the process
+ID.</p>
+</div>
+<div class="section" id="using-strace-to-track-the-sssd-processes">
+<h2>Using strace to track the SSSD processes<a class="headerlink" href="#using-strace-to-track-the-sssd-processes" title="Permalink to this headline">¶</a></h2>
+<p>Sometimes, the DEBUG messages are not enough in telling you what went
+wrong. A typical example, found in the wild was that <code class="docutils literal"><span class="pre">libkrb5</span></code>
+initialization was failing in krb5_child process:</p>
+<p>So krb5_child couldn&#8217;t access a resource, but how do we tell which one?
+It&#8217;s best to start the back end under strace. This has to be done
+similarly to how we start <code class="docutils literal"><span class="pre">sssd_be</span></code> under <code class="docutils literal"><span class="pre">valgrind</span></code>, by adding the
+<code class="docutils literal"><span class="pre">command</span></code> option to the <code class="docutils literal"><span class="pre">[domain]</span></code> section. For SSSD 1.13+ the
+<code class="docutils literal"><span class="pre">command</span></code> can be specified as:</p>
+<p>SSSD version 1.12 and lower require a slightly modified <code class="docutils literal"><span class="pre">command</span></code>
+option:</p>
+<p>The <code class="docutils literal"><span class="pre">-ff</span></code> options are significant for debugging the child processes
+<code class="docutils literal"><span class="pre">sssd_be</span></code> spawns. When the <code class="docutils literal"><span class="pre">sssd_be</span></code> process execs a subprocess,
+strace would also track the child process by creating one file per
+process and appending a numeric PID after the base filename
+<code class="docutils literal"><span class="pre">/tmp/sssd_be_strace</span></code>.</p>
+<p>Then restart SSSD and run the sequence of commands that triggered the
+bug.</p>
+<p>Please make sure SELinux should be set to Permissive, otherwise sssd_be
+might not be able to execute child programs through strace. After that,
+you should see several files under <code class="docutils literal"><span class="pre">/tmp/</span></code> matching the base filename:</p>
+<p>If you&#8217;re looking for a file from a specific subprocess, it&#8217;s best to
+just grep the strace log file for the binary name of the subprocess:</p>
+</div>
+<div class="section" id="how-do-i-track-work-in-progress-of-other-developers">
+<h2>How do I track work-in-progress of other developers?<a class="headerlink" href="#how-do-i-track-work-in-progress-of-other-developers" title="Permalink to this headline">¶</a></h2>
+<p>Most of the core SSSD developers publish their work in progress patches
+in topic branches of git repositories on
+<a class="reference external" href="http://fedorapeople.org">​http://fedorapeople.org</a></p>
+<p>The web interface for the git repositories are available at</p>
+<p>where USERNAME is the FAS user name of the developer and in the
+particular case of REPO_NAME is usually sssd.git</p>
+<p>To add the repository as a git remote, issue the following:</p>
+<p>You can then see all the branches you are tracking with:</p>
+<p>Or for a particular remote:</p>
+<p>If you&#8217;d like to publish your work in the fedorapeople.org repo, follow
+<a class="reference external" href="https://fedoraproject.org/wiki/Infrastructure/fedorapeople.org#BETA_git_hosting_support">​the
+guide</a>
+on the Fedora Project wiki -</p>
+</div>
+<div class="section" id="why-does-make-check-take-so-long">
+<h2>Why does make check take so long?<a class="headerlink" href="#why-does-make-check-take-so-long" title="Permalink to this headline">¶</a></h2>
+<p>By default, the SSSD tests are performed in the build directory. Some of
+the unit tests, in particular the sysdb test generate a lot of disk
+activity and the test runs might take a long time if executed on local
+disk.</p>
+<p>One solution is to use the <code class="docutils literal"><span class="pre">--with-test-dir</span></code> parameter which specifies
+where the tests are creating their temporary files. Configuring the test
+dir to use the in memory tmpfs filesystem located in <code class="docutils literal"><span class="pre">/dev/shm</span></code> will
+mitigate the disk activity and improve the execution time.</p>
+</div>
+<div class="section" id="using-clang-to-perform-static-analysis-of-source-code">
+<h2>Using clang to perform static analysis of source code<a class="headerlink" href="#using-clang-to-perform-static-analysis-of-source-code" title="Permalink to this headline">¶</a></h2>
+<p>The LLVM compiler suite contains a static analyzer that can help you
+find bugs that are otherwise hard to notice. The analysis is run by
+overriding the <code class="docutils literal"><span class="pre">$(CC)</span></code> Makefile variable to point to the
+<code class="docutils literal"><span class="pre">ccc-analyzer</span></code> binary and then compiling the project. The clang suite
+contains a handy Perl script <code class="docutils literal"><span class="pre">scan-build</span></code> that sets all the right
+variables for you. To run the analysis, on Fedora, make sure to have the
+<code class="docutils literal"><span class="pre">clang-analyzer</span></code> package installed. Then reconfigure and rebuild the
+SSSD using the <code class="docutils literal"><span class="pre">scan-build</span></code> script:</p>
+<p>You should see individual functions being analyzed during the build
+process:</p>
+<p>The default output is one HTML page per defect that can be viewed using
+a special <code class="docutils literal"><span class="pre">scan-view</span></code> helper:</p>
+<p>See the <a class="reference external" href="http://clang-analyzer.llvm.org/scan-build.html">​official
+documentation</a> for
+more info.</p>
+</div>
+<div class="section" id="when-i-compile-the-sssd-from-source-there-is-an-error-that-says-usr-lib-ldb-memberof-la-invalid-elf-header">
+<h2>When I compile the SSSD from source there is an error that says <code class="docutils literal"><span class="pre">/usr/lib/ldb/memberof.la:</span> <span class="pre">invalid</span> <span class="pre">ELF</span> <span class="pre">header</span></code><a class="headerlink" href="#when-i-compile-the-sssd-from-source-there-is-an-error-that-says-usr-lib-ldb-memberof-la-invalid-elf-header" title="Permalink to this headline">¶</a></h2>
+<p>You can safely ignore this warning or remove the <code class="docutils literal"><span class="pre">.la</span></code> file
+completely.</p>
+<p>The .la file is a libtool archive and is a relic of how we generate the
+module. They are only necessary for enabling <code class="docutils literal"><span class="pre">make</span> <span class="pre">uninstall</span></code> to work
+properly, but if you are packaging an RPM or DEB file, the removal would
+be handled by the packaging tools.</p>
+</div>
+<div class="section" id="when-i-try-to-debug-tests-using-gdb-i-get-message-similar-to-home-user-sssd-sysdb-tests-not-in-executable-format-file-format-not-recognized">
+<h2>When I try to debug tests using <a class="reference external" href="https://www.gnu.org/software/gdb/">​gdb</a> I get message similar to <code class="docutils literal"><span class="pre">&quot;/home/user/sssd/./sysdb-tests&quot;:</span> <span class="pre">not</span> <span class="pre">in</span> <span class="pre">executable</span> <span class="pre">format:</span> <span class="pre">File</span> <span class="pre">format</span> <span class="pre">not</span> <span class="pre">recognized</span></code><a class="headerlink" href="#when-i-try-to-debug-tests-using-gdb-i-get-message-similar-to-home-user-sssd-sysdb-tests-not-in-executable-format-file-format-not-recognized" title="Permalink to this headline">¶</a></h2>
+<p>The test you are trying to run is actually libtool script. To run for
+example the sysdb-tests, use the following command to run the actual
+binary file with gdb:</p>
+<p>instead of just</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">SSSD Devel page</a><ul>
+<li><a class="reference internal" href="#are-there-any-introductory-tutorials-available">Are there any introductory tutorials available?</a><ul>
+<li><a class="reference internal" href="#talloc">Talloc</a></li>
+<li><a class="reference internal" href="#tevent-and-tevent-req">Tevent and tevent_req</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#when-i-debug-an-sssd-process-in-a-debugger-it-always-gets-killed-with-sigterm-or-receives-sigrt-periodically">When I debug an SSSD process in a debugger, it always gets killed with <code class="docutils literal"><span class="pre">SIGTERM</span></code> or receives <code class="docutils literal"><span class="pre">SIGRT</span></code> periodically</a><ul>
+<li><a class="reference internal" href="#until-and-including-sssd-1-13">Until and including sssd-1.13</a></li>
+<li><a class="reference internal" href="#sssd-1-14-or-later">sssd-1.14 or later</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-valgrind-to-identify-memory-access-problems">Using valgrind to identify memory access problems</a></li>
+<li><a class="reference internal" href="#using-strace-to-track-the-sssd-processes">Using strace to track the SSSD processes</a></li>
+<li><a class="reference internal" href="#how-do-i-track-work-in-progress-of-other-developers">How do I track work-in-progress of other developers?</a></li>
+<li><a class="reference internal" href="#why-does-make-check-take-so-long">Why does make check take so long?</a></li>
+<li><a class="reference internal" href="#using-clang-to-perform-static-analysis-of-source-code">Using clang to perform static analysis of source code</a></li>
+<li><a class="reference internal" href="#when-i-compile-the-sssd-from-source-there-is-an-error-that-says-usr-lib-ldb-memberof-la-invalid-elf-header">When I compile the SSSD from source there is an error that says <code class="docutils literal"><span class="pre">/usr/lib/ldb/memberof.la:</span> <span class="pre">invalid</span> <span class="pre">ELF</span> <span class="pre">header</span></code></a></li>
+<li><a class="reference internal" href="#when-i-try-to-debug-tests-using-gdb-i-get-message-similar-to-home-user-sssd-sysdb-tests-not-in-executable-format-file-format-not-recognized">When I try to debug tests using ​gdb I get message similar to <code class="docutils literal"><span class="pre">&quot;/home/user/sssd/./sysdb-tests&quot;:</span> <span class="pre">not</span> <span class="pre">in</span> <span class="pre">executable</span> <span class="pre">format:</span> <span class="pre">File</span> <span class="pre">format</span> <span class="pre">not</span> <span class="pre">recognized</span></code></a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/DevelTips.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/DevelTips.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>This is mostly a bug fixing release with only minor enhancements
+visible to the end user</li>
+<li>Contains many fixes and enhancements related to the ID views
+functionality of FreeIPA servers</li>
+<li>Several fixes related to retrieving AD group membership in an IPA-AD
+trust scenario</li>
+<li>Fixes a bug where the GPO access control previously didn&#8217;t work at
+all if debugging was enabled in smb.conf.</li>
+<li>SSSD can now be pinned to a particular AD site instead of
+autodiscovering the site</li>
+<li>A regression that caused setting the SELinux context for IPA users to
+fail, was fixed</li>
+<li>Fixed a potential crash caused by a double-free error when an SSSD
+service was killed by the monitor process</li>
+</ul>
+</div>
+<div class="section" id="packaging-changes">
+<h1>Packaging Changes<a class="headerlink" href="#packaging-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Several patches that allow building the Python code in SSSD with
+python3 were merged</li>
+</ul>
+</div>
+<div class="section" id="documentation-changes">
+<h1>Documentation Changes<a class="headerlink" href="#documentation-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>A new option <code class="docutils literal"><span class="pre">ad_site</span></code> was added. When this option is set, SSSD
+will attempt to connect to DCs from this particular AD site instead
+of looking up the site via DNS</li>
+<li>The <code class="docutils literal"><span class="pre">ad_gpo_map_permit</span></code> option now also includes the
+<code class="docutils literal"><span class="pre">systemd-user</span></code> service to avoid errors in processing of the PAM
+session stack</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/1991">#1991</a></dt>
+<dd>Make return codes of basic sysdb operations consistent</dd>
+<dt><a class="reference external" href="/sssd/ticket/2203">#2203</a></dt>
+<dd>Write message to syslog about users with duplicated UID</dd>
+<dt><a class="reference external" href="/sssd/ticket/2376">#2376</a></dt>
+<dd>Investigate Kerberized NFS4 setup with the new NFS plugin</dd>
+<dt><a class="reference external" href="/sssd/ticket/2486">#2486</a></dt>
+<dd>[RFE] ad provider dns_discovery_domain option: kerberos discovery
+is not using this option</dd>
+<dt><a class="reference external" href="/sssd/ticket/2515">#2515</a></dt>
+<dd>sssd-ad: The man page description to enable GPO HBAC Policies are
+unclear</dd>
+<dt><a class="reference external" href="/sssd/ticket/2527">#2527</a></dt>
+<dd>sssd.conf(5) man page gives bad advice about domains parameter</dd>
+<dt><a class="reference external" href="/sssd/ticket/2531">#2531</a></dt>
+<dd>sssd_be crashes in nested LDAP code with a use-after-free error</dd>
+<dt><a class="reference external" href="/sssd/ticket/2542">#2542</a></dt>
+<dd>GPO offline processing rejects access if no applicable GPOs are find
+in the cache</dd>
+<dt><a class="reference external" href="/sssd/ticket/2543">#2543</a></dt>
+<dd>GPO code fails if no LDAP URI can be resolved</dd>
+<dt><a class="reference external" href="/sssd/ticket/2544">#2544</a></dt>
+<dd>GPO: libsmbclient logs to stdout by default, cluttering gpo_child
+output</dd>
+<dt><a class="reference external" href="/sssd/ticket/2547">#2547</a></dt>
+<dd>gzip: stdin: file size changed while zipping when rotating logfile</dd>
+<dt><a class="reference external" href="/sssd/ticket/2548">#2548</a></dt>
+<dd>Document that dyndns_iface only supports a single interface</dd>
+<dt><a class="reference external" href="/sssd/ticket/2550">#2550</a></dt>
+<dd>libsss_simpleifp should pull sssd-dbus</dd>
+<dt><a class="reference external" href="/sssd/ticket/2556">#2556</a></dt>
+<dd>add systemd-user to default gpo list</dd>
+<dt><a class="reference external" href="/sssd/ticket/2557">#2557</a></dt>
+<dd>pam_sss(sshd:auth): authentication failure with user from AD</dd>
+<dt><a class="reference external" href="/sssd/ticket/2559">#2559</a></dt>
+<dd>PAC responder is called after krb5_child switches to the user
+logging in</dd>
+<dt><a class="reference external" href="/sssd/ticket/2560">#2560</a></dt>
+<dd>Users saved throug extop don&#8217;t have the originalMemberOf attribute</dd>
+<dt><a class="reference external" href="/sssd/ticket/2563">#2563</a></dt>
+<dd>Need to set different umask in selinux_child</dd>
+<dt><a class="reference external" href="/sssd/ticket/2564">#2564</a></dt>
+<dd>selinux_child needs to setuid(0) to make libselinux work as
+non-root</dd>
+<dt><a class="reference external" href="/sssd/ticket/2566">#2566</a></dt>
+<dd>Uncached SIDs cannot be resolved</dd>
+<dt><a class="reference external" href="/sssd/ticket/2567">#2567</a></dt>
+<dd>Same member saved as ghost and as member in IPA server mode</dd>
+<dt><a class="reference external" href="/sssd/ticket/2571">#2571</a></dt>
+<dd>IPA initgroups don&#8217;t work correctly in non-default view</dd>
+<dt><a class="reference external" href="/sssd/ticket/2572">#2572</a></dt>
+<dd>[abrt] sssd-common: talloc_abort(): sssd killed by SIGABRT</dd>
+<dt><a class="reference external" href="/sssd/ticket/2586">#2586</a></dt>
+<dd>user_attributes missing from ifp schema</dd>
+</dl>
+</div></div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Bohuslav Kabrda (1):</p>
+<ul class="simple">
+<li>Python3 support in SSSD</li>
+</ul>
+<p>Jakub Hrozek (23):</p>
+<ul class="simple">
+<li>Updating the version to the 1.12.4 release</li>
+<li>GPO: Ignore ENOENT result from
+sysdb_gpo_get_gpo_result_setting()</li>
+<li>TESTS: Cover sysdb_gpo.c with unit tests</li>
+<li>GPO: Set libsmb debugging to stderr</li>
+<li>UTIL: Allow dup-ing child pipe to a different FD</li>
+<li>GPO: Don&#8217;t use stdout for output in gpo_child</li>
+<li>GPO: Extract server hostname after connecting</li>
+<li>krb5_child: Return ERR_NETWORK_IO on KRB5_KDCREP_SKEW</li>
+<li>Open the PAC socket from krb5_child before dropping root</li>
+<li>IPA: Use attr&#8217;s dom for users, too</li>
+<li>SELINUX: Call setuid(0)/setgid(0) to also set the real IDs to root</li>
+<li>SELINUX: Set and reset umask when caling set_seuser from deamon code</li>
+<li>LDAP: Add UUID when saving incomplete groups</li>
+<li>IPA: Resolve IPA user groups&#8217; overrideDN in non-default view</li>
+<li>LDAP: Rename the _res output parameter to avoid clashing with
+libresolv in tests</li>
+<li>RESOLV: Add an internal function to read TTL from a DNS packet</li>
+<li>resolv: Fix a typo</li>
+<li>SELINUX: Check the return value of setuid and setgid</li>
+<li>BUILD: Include python-test.py in the tarball</li>
+<li>GPO: Better debugging for gpo_child&#8217;s mkdir</li>
+<li>LDAP: Add better DEBUG messages to the cleanup task</li>
+<li>LDAP: Handle ENOENT better in the cleanup task</li>
+<li>Updating translations for the 1.12.4 release</li>
+</ul>
+<p>Lukas Slebodnik (11):</p>
+<ul class="simple">
+<li>logrotate: Fix warning file size changed while zipping</li>
+<li>PROXY: Fix use after free</li>
+<li>pysss: Fix double free</li>
+<li>MONITOR: Fix double free</li>
+<li>SSSDConfig: Remove unused exception name</li>
+<li>SSSDConfig: Port missing parts to python3</li>
+<li>Remove strict requirements of python2</li>
+<li>sbus_codegen: Port to python3</li>
+<li>Add missing new lines to debug messages</li>
+<li>CONFIGURE: Do not use macro AC_PROG_MKDIR_P twice</li>
+<li>RESPONDERS: Warn to syslog about colliding objects</li>
+</ul>
+<p>Pavel Březina (1):</p>
+<ul class="simple">
+<li>spec: sifp requires sssd-dbus</li>
+</ul>
+<p>Pavel Reichl (6):</p>
+<ul class="simple">
+<li>GPO: add systemd-user to gpo default permit list</li>
+<li>MAN: dyndns_iface supports only one interface</li>
+<li>MAN: add dots as valid character in domain names</li>
+<li>AD: add new option ad_site</li>
+<li>AD: support for AD site override</li>
+<li>MAN: amend sss_ssh_authorizedkeys</li>
+</ul>
+<p>Rob Crittenden (1):</p>
+<ul class="simple">
+<li>Add user_attributes to ifp section of API schema</li>
+</ul>
+<p>Sumit Bose (24):</p>
+<ul class="simple">
+<li>IPA: add get_be_acct_req_for_user_name()</li>
+<li>IPA: resolve ghost members if a non-default view is applied</li>
+<li>sysdb: fix group members with overridden names</li>
+<li>IPA: ipa_resolve_user_list_send() take care of overrides</li>
+<li>IPA: do not look up overrides on client with default view</li>
+<li>IPA: make version check more precise</li>
+<li>IPA: add missing break</li>
+<li>IPA: process_members() optionally return missing members list</li>
+<li>IPA: rename ipa_s2n_get_groups_send() to
+ipa_s2n_get_fqlist_send()</li>
+<li>IPA: resolve missing members</li>
+<li>IPA: set SYSDB_INITGR_EXPIRE for RESP_USER_GROUPLIST</li>
+<li>krb5: fix entry order in MEMORY keytab</li>
+<li>nss: make fill_orig() multi-value aware</li>
+<li>nss: refactor fill_orig()</li>
+<li>nss: Add original DN and memberOf to origbyname request</li>
+<li>views: fix GID overrride for mpg domains</li>
+<li>IPA: properly handle mixed-case trusted domains</li>
+<li>nss: fix SID lookups</li>
+<li>sysdb: remove ghosts in all sub-domains as well</li>
+<li>IPA: resolve IPA group-memberships for AD users</li>
+<li>IPA: process_members() add ghosts only once</li>
+<li>ipa_s2n_save_objects: properly handle fully-qualified group names</li>
+<li>AD: use GC for SID requests as well</li>
+<li>fill_id() fix LE/BE issue with wrong data type</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#packaging-changes">Packaging Changes</a></li>
+<li><a class="reference internal" href="#documentation-changes">Documentation Changes</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.12.4.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.12.4.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

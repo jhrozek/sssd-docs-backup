@@ -1,0 +1,278 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>IPA sudo schema support &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="ipa-sudo-schema-support">
+<h1>IPA sudo schema support<a class="headerlink" href="#ipa-sudo-schema-support" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1108">​https://fedorahosted.org/sssd/ticket/1108</a></li>
+</ul>
+<p>Related design document(s)</p>
+<ul class="simple">
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/DesignDocs/SUDOCachingRules.html">​https://fedorahosted.org/sssd/wiki/DesignDocs/SUDOCachingRules</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>SSSD supports only standard sudo ldap schema at the moment. This has a
+drawback of having the need to run compat plugin that converts IPA sudo
+schema into the standard one. Once SSSD has support for IPA schema
+administrators administrators can disable sudo compat tree which will
+result in performance improvement on server side.</p>
+</div>
+<div class="section" id="use-cases">
+<h2>Use cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>compat plugin may be disabled when using IPA sudo provider</li>
+</ul>
+</div>
+<div class="section" id="ipa-sudo-schema">
+<h2>IPA sudo schema<a class="headerlink" href="#ipa-sudo-schema" title="Permalink to this headline">¶</a></h2>
+<p>IPA sudo schema is rather different than the standard one. This section
+contains the description of this schema together with ldap containers
+where sudo rules are stored. A relevant standard attribute is noted when
+possible. <strong>RDN is marked in bold</strong>. Attributes that hold dn are marked
+in italic.</p>
+<div class="section" id="cn-sudocmds-cn-sudo-dc">
+<h3>cn=sudocmds,cn=sudo,$dc<a class="headerlink" href="#cn-sudocmds-cn-sudo-dc" title="Permalink to this headline">¶</a></h3>
+<p>This container contains definition of single commands that may be
+present in sudo rules.</p>
+<ul class="simple">
+<li>objectClass = ipasudocmd</li>
+<li><strong>ipaUniqueID</strong></li>
+<li>sudoCmd ~ sudoCommand</li>
+<li><em>memberOf</em> (dn of sudo command group)</li>
+</ul>
+</div>
+<div class="section" id="cn-sudocmdgroups-cn-sudo-dc">
+<h3>cn=sudocmdgroups,cn=sudo,$dc<a class="headerlink" href="#cn-sudocmdgroups-cn-sudo-dc" title="Permalink to this headline">¶</a></h3>
+<p>This container contains definition of command groups that may be present
+in sudo rules.</p>
+<ul class="simple">
+<li>objectClass = ipasudocmdgroup</li>
+<li>ipaUniqueID</li>
+<li><strong>cn</strong></li>
+<li><em>member</em> (dn of sudo command)</li>
+</ul>
+</div>
+<div class="section" id="cn-sudorules-cn-sudo-dc">
+<h3>cn=sudorules,cn=sudo,$dc<a class="headerlink" href="#cn-sudorules-cn-sudo-dc" title="Permalink to this headline">¶</a></h3>
+<p>This container contains definition of sudo rules.</p>
+<ul class="simple">
+<li>objectClass = ipasudorule</li>
+<li><strong>ipaUniqueID</strong></li>
+<li>cn</li>
+<li>ipaEnabledFlag</li>
+<li>ipaSudoOpt ~ sudoOption</li>
+<li><em>ipaSudoRunAs</em> ~ sudoRunAsUser (dn of user or group of users)</li>
+<li><em>ipaSudoRunAsGroup</em> ~ sudoRunAsGroup (dn of group)</li>
+<li><em>memberAllowCmd</em> (dn of sudo command or command group)</li>
+<li><em>memberDenyCmd</em> (dn of sudo command or command group)</li>
+<li><em>memberHost</em> ~ sudoHost (dn of ipa enrolled machine or hostgroup)</li>
+<li><em>memberUser</em> ~ sudoUser (dn of user or group of users)</li>
+<li>hostMask (ip/mask)</li>
+<li><em>sudoNotAfter</em> ~ sudoNotAfter</li>
+<li><em>sudoNotBefore</em> ~ sudoNotBefore</li>
+<li><em>sudoOption</em> ~ sudoOption</li>
+</ul>
+<p>The following attibures have a special meaning and can contain only
+value &#8220;all&#8221;. For example if cmdCategory is present, it is equivalent to
+sudoCommand=ALL.</p>
+<ul class="simple">
+<li>cmdCategory ~ sudoCommand</li>
+<li>hostCategory ~ sudoHost</li>
+<li>ipaSudoRunAsGroupCategory ~ sudoRunAsGroup</li>
+<li>ipaSudoRunAsUserCategory ~ sudoRunAsUser</li>
+<li>userCategory ~ sudoUser</li>
+</ul>
+<p>The following attributes are used to contain external objects not known
+to IPA nor SSSD. Since SSSD by design provides rules only to users and
+groups known to it, we can safely ignore those attributes.</p>
+<ul class="simple">
+<li>externalHost</li>
+<li>externalUser</li>
+<li>ipaSudoRunAsExtGroup</li>
+<li>ipaSudoRunAsExtUser</li>
+</ul>
+</div>
+</div>
+<div class="section" id="overview-of-the-solution">
+<h2>Overview of the solution<a class="headerlink" href="#overview-of-the-solution" title="Permalink to this headline">¶</a></h2>
+<p>We will again use rules, smart and full refresh similar to what we do in
+ldap provider. Since we are working with three containers, it is not
+very simply to translate everything at once into current standard sudo
+schema that we use inside SSSD, because it would make changes in
+commands and command groups hard to propagate. Instead we will keep
+command and command groups stored separately and translate it into
+sudoCommand in responder on the fly.</p>
+<p>We will take advantage of using an IPA server and translate dn into
+names by parsing dn when possible.</p>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="full-refresh">
+<h3>Full refresh<a class="headerlink" href="#full-refresh" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>download everything under cn=sudo,$dc that applies to this host</li>
+<li>store only commands and command groups that are present in at least
+one rule</li>
+<li>convert what possible to sudo schema but leave references to commands
+and command groups for further processing in responder</li>
+</ul>
+</div>
+<div class="section" id="smart-refresh">
+<h3>Smart refresh<a class="headerlink" href="#smart-refresh" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>download everything under cn=sudo,$dc that applies to this host newer
+than last usn value</li>
+<li>if new command or command group is downloaded store it only if it is
+present in changed rule</li>
+<li>if a rule contains command or command group that is not yet present
+in sysdb, fetch it with dereference or single lookup</li>
+</ul>
+</div>
+<div class="section" id="rules-refresh">
+<h3>Rules refresh<a class="headerlink" href="#rules-refresh" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>refresh expired rules and commands and command groups that are
+present in those rules</li>
+</ul>
+<div class="section" id="configuration-changes">
+<h4>Configuration changes<a class="headerlink" href="#configuration-changes" title="Permalink to this headline">¶</a></h4>
+<p>No new options. But we have to provide a way to distinguish between
+usage of IPA and ldap schema. By default we will use IPA schema and if
+ldap_sudo_search_base is set to anything else then cn=sudo,$dc we
+will use the standard sudo ldap schema.</p>
+</div>
+<div class="section" id="how-to-test">
+<h4>How To Test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>existing tests can be used, only switching ldap server for IPA</li>
+</ul>
+</div>
+<div class="section" id="authors">
+<h4>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>Pavel Březina &lt;<a class="reference external" href="mailto:pbrezina&#37;&#52;&#48;redhat&#46;com">​pbrezina<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">IPA sudo schema support</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem statement</a></li>
+<li><a class="reference internal" href="#use-cases">Use cases</a></li>
+<li><a class="reference internal" href="#ipa-sudo-schema">IPA sudo schema</a><ul>
+<li><a class="reference internal" href="#cn-sudocmds-cn-sudo-dc">cn=sudocmds,cn=sudo,$dc</a></li>
+<li><a class="reference internal" href="#cn-sudocmdgroups-cn-sudo-dc">cn=sudocmdgroups,cn=sudo,$dc</a></li>
+<li><a class="reference internal" href="#cn-sudorules-cn-sudo-dc">cn=sudorules,cn=sudo,$dc</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#overview-of-the-solution">Overview of the solution</a></li>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a><ul>
+<li><a class="reference internal" href="#full-refresh">Full refresh</a></li>
+<li><a class="reference internal" href="#smart-refresh">Smart refresh</a></li>
+<li><a class="reference internal" href="#rules-refresh">Rules refresh</a><ul>
+<li><a class="reference internal" href="#configuration-changes">Configuration changes</a></li>
+<li><a class="reference internal" href="#how-to-test">How To Test</a></li>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/SUDOIPASchema.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/SUDOIPASchema.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

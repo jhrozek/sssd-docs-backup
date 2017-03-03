@@ -1,0 +1,873 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ELAPI Interface &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><a class="reference external" href="#ELAPIInterface">ELAPI Interface</a><ol class="arabic">
+<li><a class="reference external" href="#Overview">Overview</a></li>
+<li><a class="reference external" href="#Architecture">Architecture</a></li>
+<li><a class="reference external" href="#ELAPIConcepts">ELAPI Concepts</a><ol class="arabic">
+<li><a class="reference external" href="#Event">Event</a><ol class="arabic">
+<li><a class="reference external" href="#Overview1">Overview</a></li>
+<li><a class="reference external" href="#Messageattribute">Message attribute</a></li>
+<li><a class="reference external" href="#Otherspecialattributes">Other special attributes</a><ol class="arabic">
+<li><code class="docutils literal"><span class="pre">`R_stamp__</span></code> &lt;#R_stamp__&gt;`__</li>
+<li><code class="docutils literal"><span class="pre">`R_time__</span></code> &lt;#R_time__&gt;`__</li>
+<li><code class="docutils literal"><span class="pre">`R_loco__</span></code> &lt;#R_loco__&gt;`__</li>
+</ol>
+</li>
+<li><a class="reference external" href="#Eventcontext">Event context</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#EventTemplate">Event Template</a></li>
+<li><a class="reference external" href="#Target">Target</a><ol class="arabic">
+<li><a class="reference external" href="#Overview2">Overview</a></li>
+<li><a class="reference external" href="#InternalImplementation">Internal Implementation</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#Sink">Sink</a><ol class="arabic">
+<li><a class="reference external" href="#Overview3">Overview</a></li>
+<li><a class="reference external" href="#InternalImplementation1">Internal Implementation</a></li>
+<li><a class="reference external" href="#SinkConfiguration">Sink Configuration</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#Providers">Providers</a><ol class="arabic">
+<li><a class="reference external" href="#Overview4">Overview</a></li>
+<li><a class="reference external" href="#Implementation">Implementation</a><ol class="arabic">
+<li><a class="reference external" href="#FileProvider">File Provider</a></li>
+<li><a class="reference external" href="#Supportedformats">Supported formats</a></li>
+<li><a class="reference external" href="#AppendCreatelogic">Append/Create? logic</a></li>
+<li><a class="reference external" href="#Configurationchanges">Configuration changes</a></li>
+<li><a class="reference external" href="#Specialstderrconfiguration">Special stderr
+configuration</a></li>
+<li><a class="reference external" href="#Notionofsets">Notion of sets</a></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><a class="reference external" href="#ELAPIConfiguration">ELAPI Configuration</a></li>
+<li><a class="reference external" href="#Dispatcher">Dispatcher</a></li>
+<li><a class="reference external" href="#SyncvsAsync">Sync vs Async</a></li>
+<li><a class="reference external" href="#WalkThroughtheDispatcherCreationCall">Walk Through the Dispatcher Creation
+Call</a></li>
+<li><a class="reference external" href="#WalkThroughtheSynchronizedLoggingCall">Walk Through the Synchronized Logging
+Call</a></li>
+<li><a class="reference external" href="#WalkThroughtheAsynchronousLoggingCall">Walk Through the Asynchronous Logging
+Call</a></li>
+<li><a class="reference external" href="#ModuleList">Module List</a></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="elapi-interface">
+<h1>ELAPI Interface<a class="headerlink" href="#elapi-interface" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p><strong>ELAPI</strong> – stands for Event Logging API. There are many ways the
+applications generate and submit the logging information. Historically
+the applications usually write their log information to files, databases
+or syslog. The need to collect and process these logs in one central
+place for compliance and forensic reasons requires a new approach to the
+logging of the information. The syslog is not good for processing due to
+lack of specific format for the messages, there is no filtering at the
+collection point and it is hard to filter unstructured data; the files
+are hard to remote and merge in one central location; files also usually
+do not have a well defined structured format.</p>
+<p>The idea behind the ELAPI is to give the applications a mean to solve
+several problems at the same time.</p>
+<ul class="simple">
+<li>Applications usually lock on some logging interface like syslog, file
+and changing them to log into alternative more advanced log
+destination (log facility) becomes a challenge. The ELAPI solves this
+problem by creating a logging interface that would abstract the
+application from the actual destination of the log, it being a local
+file, syslog, database or something else. The log facilities (or
+sinks) can be plugged into the the ELAPI without any changes to the
+application.</li>
+<li>The data that needs to be logged into the audit logs usually is
+complex and significantly varies from one situation the application
+deals with to another. It is very hard and some times impractical to
+create a fixed structure of the log messages (like in database cases)
+this usually ends up in situations when half of the fields is not
+used while the information has to be jammed into some fields since
+there is not clear definition of where it belongs to. The ELAPI
+solves this issue by providing the application a way to pass
+arbitrarily complex data to the logging facility. The data is
+represented by the collection of the key-value pairs. The collections
+can be easily constructed, modified or nested allowing reuse of the
+data in different events (for example the information about the peer
+host, or socket properties).</li>
+<li>The information in the log should be complete but also human
+readable. In the ELAPI case this is achieved by separating the data
+of the event from the actual presentation (formatting) of the
+message. Thus the event can contain much more data than the message
+in a human readable form. The log facilities that work with human
+readable messages (syslog, file) will receive the event in the
+formatted, user readable form. The more advanced facilities like the
+one being built for IPA will receive the data and formatting
+information separately. Such approach allows much easier processing
+and filtering of the events based on raw data but leaves a
+possibility to convert the event into the human readable form at any
+moment when user wants to inspect the event.</li>
+<li>Usually applications use different interfaces for logging, debugging
+and audit trails. This means that application developer needs to deal
+with three different way of emmiting information from the
+application. ELAPI comes to help providing one interface that can be
+configured to send events into different destinations. The event is a
+collection of key-value pairs. One of the keys is so called &#8220;target&#8221;.
+The configuration can define different logical targets. By default
+ELAPI operates with three predefined targets &#8220;debug&#8221;, &#8220;log&#8221; and
+&#8220;audit&#8221; but application developers can add other targets if they see
+a need to have more. Each target is represented by a number (for
+faster comparison) and mapped to a configuration in the ELAPI
+configuration file. If the event&#8217;s value of the target attribute
+matches the number associated with the target in the configuration
+file (see specific details later), the event will be sent into this
+target.</li>
+<li>The reliability of the target facilities is also very important. The
+audit information on one hand should not be lost but on the other
+logging should not be intrusive and prevent the application from
+doing what it is supposed to do. For that purpose the ELAPI allows
+defining several sinks (actual physical event destinations) per
+target. The sinks are listed in fail over order. If the active sink
+returns error and there is a fail over sink the ELAPI will
+automatically fail over without returning error. If there are no
+available sinks (all sinks returned error) and error will be returned
+to application and it is responsibility of the application to take a
+corresponding action.</li>
+<li>As we started to implement ELAPI it turned out that it can also be
+used as a simple reporting tool. Any data that is read as key value
+pairs (database record for example) can be sent to the output
+destination (specifically file) in different formats (CSV, HTML
+etc.). Thus ELAPI can be used to create simple conversion tools that
+get data in one format and output using other. Though there are many
+other tools that do that it is useful to know that ELAPI is also an
+option.</li>
+</ul>
+</div>
+<div class="section" id="architecture">
+<h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this headline">¶</a></h2>
+<p>The following diagram illustrates the ELAPI architecture:</p>
+<p>So ELAPI is first of all an interface that allows applications to emit
+logging, tracing, audit information. The interface consist of the core
+part and couple different sets of wrappers that can be used by
+application developers when they build threaded or non-threaded
+applications.</p>
+<p>Under the hood the ELAPI has a dispatcher. Dispatcher is the entity that
+holds the targets, and sends the events to them evaluating which event
+needs to go into which target. Targets consist of sink fail-over chains.
+Same sink can be mentioned in chains belonging to different targets.
+This capability should be used with cation so that events destined for
+different targets might end up in one place. Sometimes this is desired
+but some times not.</p>
+<p>One of the main values of ELAPI is that targets and sinks can be
+reconfigured at will without changing the application. New providers
+(code that formats and writes events) can also be dropped in.</p>
+<p>The original implementation includes following providers:</p>
+<ul class="simple">
+<li>file provider - code that writes events to a file</li>
+<li>syslog provider - code that writes events to the syslog</li>
+</ul>
+<p>These providers (SUBJECT TO CHANGE) will be embedded directly into the
+ELAPI itself. Other providers can be dropped in later.</p>
+<p>One of such providers would be a so called IPA remote provider. This
+provider will have a connection with the local collection daemon. This
+daemon will get events from different ELAPI enabled applications that
+send events through this &#8220;remote&#8221; provider, filter them and then deliver
+to the central auditing server for storing and processing.</p>
+</div>
+<div class="section" id="elapi-concepts">
+<h2>ELAPI Concepts<a class="headerlink" href="#elapi-concepts" title="Permalink to this headline">¶</a></h2>
+<p>This section covers main concepts related to ELAPI.</p>
+<div class="section" id="event">
+<h3>Event<a class="headerlink" href="#event" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id1">
+<h4>Overview<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<div class="line-block">
+<div class="line"><strong>Event</strong> - event is a collection of the key-value pairs. Application
+creates a collection and sends it to log dispatcher (see below). There
+are convenience APIs that allow doing it in one step
+(creating-submitting-destroying).</div>
+<div class="line">There are several special keys that have predefined meaning and use.
+They are prefixed and suffixed with &#8220;<code class="docutils literal"><span class="pre">__</span></code>&#8221; or with &#8220;<code class="docutils literal"><span class="pre">R_</span></code>&#8221;. The
+attributes denoted by theses keys are common to many events. They are
+defined in the
+<a class="reference external" href="https://fedorahosted.org/sssd/browser/common/elapi/elapi_event.h">common/elapi/elapi_event.h</a>.
+See comments there.</div>
+<div class="line">The attributes with &#8220;<code class="docutils literal"><span class="pre">__</span></code>&#8221; are just special &#8220;reserved&#8221; attributes.
+They have prefix and suffix so that they are differentiated from the
+attributes supplied by the application. The attributes with &#8220;<code class="docutils literal"><span class="pre">R_</span></code>&#8221;
+are not only reserved attributes but also resolvable when the event is
+submitted into dispatcher. This means that the value of the attribute
+is set by ELAPI based on specific rules on per attribute basis.</div>
+</div>
+</div>
+<div class="section" id="message-attribute">
+<h4>Message attribute<a class="headerlink" href="#message-attribute" title="Permalink to this headline">¶</a></h4>
+<p>There is a special attribute named &#8220;<code class="docutils literal"><span class="pre">R_message__</span></code>&#8221; that can be a part
+of any event. This attribute is processed differently than other
+attributes. The message attribute can have place holders to reference
+other attributes from the same event at the run time. For example the
+message can be something like this:</p>
+<p>The tokens &#8220;<code class="docutils literal"><span class="pre">%(__host__)</span></code>&#8221;, &#8220;%(<code class="docutils literal"><span class="pre">R_stamp__</span></code>)&#8221; and &#8220;%(<code class="docutils literal"><span class="pre">__pid__</span></code>)&#8221;
+are references to other fields in the same event.</p>
+</div>
+<div class="section" id="other-special-attributes">
+<h4>Other special attributes<a class="headerlink" href="#other-special-attributes" title="Permalink to this headline">¶</a></h4>
+<p>There are couple other special attributes that ELAPI handles internally.</p>
+<div class="section" id="r-stamp">
+<h5><code class="docutils literal"><span class="pre">R_stamp__</span></code><a class="headerlink" href="#r-stamp" title="Permalink to this headline">¶</a></h5>
+<p>The value of this attribute is expected to be a format rather than a
+value itself. The ELAPI will resolve the time stamp automatically and
+insert it into the output without affecting the original event so that
+it can be copied around and used as a base for another event.</p>
+</div>
+<div class="section" id="r-time">
+<h5><code class="docutils literal"><span class="pre">R_time__</span></code><a class="headerlink" href="#r-time" title="Permalink to this headline">¶</a></h5>
+<p>The value of this attribute is ignored. It is automatically resolved
+with the current UTC time (number of seconds since 1970).</p>
+</div>
+<div class="section" id="r-loco">
+<h5><code class="docutils literal"><span class="pre">R_loco__</span></code><a class="headerlink" href="#r-loco" title="Permalink to this headline">¶</a></h5>
+<p>The value of this attribute is ignored. It is automatically resolved
+with the current offset between the local time UTC time (number of
+seconds).</p>
+</div>
+</div>
+<div class="section" id="event-context">
+<h4>Event context<a class="headerlink" href="#event-context" title="Permalink to this headline">¶</a></h4>
+<p>Attributes that need special handling should be resolved once per event
+submission but since event can be sent to different targets and sinks it
+makes sense to resolve these attributes once and then carry them around
+in a resolved event. Events are based on collection interface
+(<a class="reference external" href="https://fedorahosted.org/sssd/browser/common/collection/collection.h">common/collection/collection.h</a>)
+and support reference counts. thus one copy of immutable data (already
+resolved event) can be used by different targets. When the event writing
+is complete the destructor will be called against the event reference
+and the count will be decreased. This way it does not matter which
+target finishes logging first in the async case, the data will be around
+for other targets to finish logging. The event will be completely
+deleted when last target completes the task. There are other elements of
+the event context that are important. They are discussed later.</p>
+</div>
+</div>
+<div class="section" id="event-template">
+<h3>Event Template<a class="headerlink" href="#event-template" title="Permalink to this headline">¶</a></h3>
+<p>Sometimes it makes sense to create a common collection of attributes and
+reuse then with different events. This is what the templates are for. A
+template is a collection of the event attributes that are frequently or
+always used. The &#8220;time stamp&#8221;, &#8220;PID&#8221;, &#8220;hostname&#8221; and some others are
+good examples of such attributes. Combining them together once in a set
+and reusing simplifies coding and optimizes performance since resolving
+names and IP addresses might be costly. The developer can create,
+destroy, modify and copy templates. It advised to create a set of the
+templates at the initialization of the application and them just reuse
+them. API allows creating events based on the templates or even logging
+events right away by implicitly constructing event using template and
+submitting it into the log dispatcher.</p>
+</div>
+<div class="section" id="target">
+<h3>Target<a class="headerlink" href="#target" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h4>Overview<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<p>The concept of a &#8220;target&#8221; is introduced to separate logging destinations
+logically and to allow one event be sent to different destinations at
+the same time. ELAPI supports three default targets: &#8220;debug&#8221;, &#8220;audit&#8221;
+and &#8220;log&#8221;. Other destinations can be added/defined by the developer of
+the application that utilizes ELAPI. In this case a new section should
+be added to the ELAPI configuration file. The target is a bit mask
+argument specified by caller of the interface. The configuration file
+shall contain targets with corresponding bit mask values. At run time
+the bit masks provided by caller and bit mask provided in the
+configuration file are compared. If logical AND of those is positive the
+event will be sent to the specific target.</p>
+<p>ELAPI defines three default targets using the following values:</p>
+<ul class="simple">
+<li>debug is 1</li>
+<li>audit is 2</li>
+<li>log is 4</li>
+</ul>
+<p>This mapping is really just a convention. The configuration file (see
+details below) allows defining different targets (just names of the
+sections in the file) and assigning them a number. It is really does no
+matter how they are named but for convenience ELAPI provides three pre
+configured targets mentioned above.</p>
+<p>The log dispatcher tries all the targets listed in the configuration and
+makes decision based on the result of the bit mask evaluation. As it was
+said above target is a logical destination. Targets must be unique.
+Specifying target twice will not rise error but only one target object
+will be created by ELAPI. Each target has its own section in the
+configuration file. This section specifies sinks (physical destinations)
+that constitute the target and the bit mask &#8220;value&#8221; needed for
+evaluation.</p>
+<p>For more details see comments and examples in the
+<a class="reference external" href="https://fedorahosted.org/sssd/browser/common/elapi/elapi_test/elapi_ut.conf">common/elapi/elapi_test/elapi_ut.conf</a>.</p>
+</div>
+<div class="section" id="internal-implementation">
+<h4>Internal Implementation<a class="headerlink" href="#internal-implementation" title="Permalink to this headline">¶</a></h4>
+<p>Internally target is treated as an object. This means that memory for it
+is allocated and the main reference to a target object is a pointer to a
+memory. The target has functions to create and destroy. Creating target
+means allocating memory for its context and filling it. Destroying means
+freeing the allocated memory that different parts of context use and
+freeing the context itself. List of targets is implemented using
+pointers to allocated context not the context data itself. So the data
+stored in collection is a pointer. To simplify an explanation here is
+the example. For simplicity let us assume that out context consists of
+two integer variables.</p>
+<p>The collection of targets could have been implemented in different ways.
+It could save a copy of the context or a pointer to it. In first case it
+will store a block of data with the contents of the context structure
+(variables a and b), in the second case it will store just a pointer.
+The collection of targets keeps pointers. This approach is preferable
+since it reduces the number of memory allocation operations and data
+duplication.</p>
+</div>
+</div>
+<div class="section" id="sink">
+<h3>Sink<a class="headerlink" href="#sink" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h4>Overview<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<div class="line-block">
+<div class="line">The sink describes a physical destination. Each target might consist
+from more than one physical destination i.e. more than one sinks. Each
+sink is associated with a specific logging facility (provider, see
+below) like file, syslog, database, remote logging server etc. The
+sinks specified for a target constitute a fail over chain. This means
+that when the ELAPI tries to log into the &#8220;target&#8221; it will use first
+sink from the list. If this sink fails to log the event then next sink
+will be tried until all sinks are tried and logging either successes
+or fails. The fail over and retry logic is a bit more complex than
+that. One must also keep in mind that sinks usually (if implemented
+properly) allow asynchronous operations so the failure might be
+resolved internally. The error will be returned to caller only if all
+best efforts (within given configured fail over and retry rules)
+failed.</div>
+<div class="line">Each sink has its own section in the configuration file. This section
+specifies settings related to a specific sink.</div>
+</div>
+<p>For more details see comments and examples in the
+<a class="reference external" href="https://fedorahosted.org/sssd/browser/common/elapi/elapi_test/elapi_ut.conf">common/elapi/elapi_test/elapi_ut.conf</a>.
+Same sink can be used for different targets in different places in the
+fail over chain.</p>
+</div>
+<div class="section" id="id4">
+<h4>Internal Implementation<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<p>Sinks, similarly to the targets, are implemented as objects and list of
+sinks keeps references to the sink memory rather than a copy of the
+sink&#8217;s data. Internally dispatcher has list of sinks and list of
+targets. Each target has an array of sinks it deals with. The data in
+this array (implemented as dynamic array with reference count) is an
+index of the sink in the global array of sinks constructed at the
+creation of the dispatcher.</p>
+</div>
+<div class="section" id="sink-configuration">
+<h4>Sink Configuration<a class="headerlink" href="#sink-configuration" title="Permalink to this headline">¶</a></h4>
+<p>There is a set of common parameters that are applicable to each sink.
+For details see
+<a class="reference external" href="https://fedorahosted.org/sssd/browser/common/elapi/elapi_test/elapi_ut.conf">common/elapi/elapi_test/elapi_ut.conf</a>.</p>
+</div>
+</div>
+<div class="section" id="providers">
+<h3>Providers<a class="headerlink" href="#providers" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id5">
+<h4>Overview<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<p>Provider is the implementation of a &#8220;writer&#8221; functionality. Each sink is
+logging via a provider. Two sinks can write via same provider. For
+example there is a &#8220;file&#8221; provider. It is capable of taking and event,
+serializing it and writing it into a file. There can be several sinks in
+the configuration that take advantage of the same provider. For example
+assume that there is a &#8220;log&#8221; target that consists of two sinks in the
+fail over chain: &#8220;nfsfile&#8221; and &#8220;localfile&#8221;. Both these sinks will write
+to a file but these would be two different files. So in this case the
+provider will be same for two different sinks. The sinks will differ in
+configuration, they will use different file name, might have different
+format or set of fields. There are a lot of parameters that can be
+defined around each provider. All the provider specific configuration
+parameters shall be listed in the same sink definition section of the
+configuration file.</p>
+</div>
+<div class="section" id="implementation">
+<h4>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h4>
+<p>There are two embedded providers that ELAPI will provide out of box:
+file and syslog.</p>
+<div class="section" id="file-provider">
+<h5>File Provider<a class="headerlink" href="#file-provider" title="Permalink to this headline">¶</a></h5>
+<p>File provider configuration consists of two sets of parameters. First
+set denotes parameters that are common for all formats supported by this
+provider. The second set is the collection of groups of parameters where
+each group is associated with a specific format. Internally a provider
+is represented by a context object (a structure). This structure
+contains information that provider needs to keep about itself during run
+time. On of the parts of the context is the configuration structure.
+This configuration structure holds the parameters common for all the
+formats supported by provider. The format specific configuration is
+stored in a separate structure pointer to which is stored in the
+configuration structure. It is done this way to not have a huge
+structure with all possible configuration parameters for all formats.
+This would have been a waste of memory since only one format can be
+configured at a time (well... actually two see below). Another reason to
+keep format specific information separately from common parameters is
+that there are two main very loosely coupled functions that a provider
+(especially a &#8220;file&#8221; provider) should perform: serialize and write. The
+code to serialize should not and does not care what happens with
+serialized data while the part of code that actually writes the data
+should not care about format. This situation creates a good argument for
+separation of duties between two functions: serialize and write. As a
+result the file provider reads common part of the configuration,
+identifies the format and then calls a special format handler that would
+read the format specific configuration. The file provider sees the
+format specific data as opaque pointer and does not have a clue what
+parameter the format handler cares about. When the event is submitted
+into the sink and passed from sink to provider a special serialization
+function is invoked by the provider. The opaque pointer with the format
+specific configuration is passed into this function. The serialized data
+is stored in a specific common for all providers structure and ready to
+be sent into a file or socket.</p>
+</div>
+<div class="section" id="supported-formats">
+<h5>Supported formats<a class="headerlink" href="#supported-formats" title="Permalink to this headline">¶</a></h5>
+<p>There is a plan to support the following formats:</p>
+<ol class="arabic simple">
+<li>CSV</li>
+<li>HTML</li>
+<li>XML</li>
+<li>JSON</li>
+<li>Key value pairs</li>
+<li>Free format (might be extracted into a special provider)</li>
+</ol>
+<p>The first implementation might not have all the formats supported. So
+far CSV format is implemented.</p>
+</div>
+<div class="section" id="append-create-logic">
+<h5><a class="reference external" href="https://docs.pagure.org/sssd-test2/Append/Create.html">Append/Create?</a> logic<a class="headerlink" href="#append-create-logic" title="Permalink to this headline">¶</a></h5>
+<p>(To be implemented)</p>
+<p>The configuration is read once when ELAPI is initialized. At that moment
+all the sinks and provers are loaded and initialized. At the same time
+the file specified as a destination for output is checked. If the file
+is not present it is created. If the file is present the file will be
+just opened. In both cases the launch marker will be added. The marker
+is a configurable string that is used to identify the beginning of the
+application run. After the marker format specific headers if any will be
+inserted. Then if the file is configured to be kept open it will be kept
+open. In this case the parameter that defines how frequently the
+buffered data should be flushed to a file is respected. If the provider
+is configured to open and close the file on each event it will do so and
+then the flushing parameter is ignored since closing the file forces a
+flush operation.</p>
+</div>
+<div class="section" id="configuration-changes">
+<h5>Configuration changes<a class="headerlink" href="#configuration-changes" title="Permalink to this headline">¶</a></h5>
+<p>(To be implemented)</p>
+<p>One of the important things that one needs to keep in mind is that the
+output file is treated as a continuous stream of data. It is never
+rotated by the ELAPI. Use logrotate to rotate such files. However ELAPI
+needs to deal with the cases when the configuration changes. For example
+someone stopped application, set format to CSV, ran application, stopped
+it, changed format again to HTML and started it again keeping the file
+name same. The data will be sent to that file but in different formats.
+The launch marker mentioned above becomes important. Also some formats
+(like XML, HTML) require opening and closing tags at the beginning and
+at the end so those tags will be inserted at the initialization and
+finalization times respectfully.</p>
+</div>
+<div class="section" id="special-stderr-configuration">
+<h5>Special stderr configuration<a class="headerlink" href="#special-stderr-configuration" title="Permalink to this headline">¶</a></h5>
+<p>(To be implemented)</p>
+<p>The &#8220;stderr&#8221; can be used as a special value for the name of the file. In
+this case the file sink will use file descriptor 2 for its output. If
+file descriptor 2 is not opened (for example it was closed during the
+application initialization if application is a daemon) the provider will
+return unrecoverable failure so such sink should not be configured as
+required otherwise the ELAPI dispatcher will fail to start. There will
+be no attempt at least in first implementation to reopen file descriptor
+2 and connect back to terminal if descriptor 2 was deliberately closed
+by the application.</p>
+</div>
+<div class="section" id="notion-of-sets">
+<h5>Notion of sets<a class="headerlink" href="#notion-of-sets" title="Permalink to this headline">¶</a></h5>
+<p>Let us look at the following use case: my ELAPI application emits all
+sorts of events that are created using different templates, but there is
+really a common set of fields that I mostly care about, so I want the
+output to have a predefined set of columns. If the key is missing in the
+event I want the output to contain an empty value. To accomplish this I
+can define a set of fields in the configuration file and this set of
+fields will always constitute my output. But what about other fields
+that are not a part of the set but may be a part of the event? I might
+want to have them in the output too but only as additional fields after
+the predefined set. For some formats having &#8220;leftovers&#8221; be presented as
+separate columns or fields in the output might be preferable but there
+are formats for which it makes sense to jam the leftovers together in
+one field. When one defines a set in the configuration file for a sink a
+special string &#8220;&#64;&#8221; can be put at the end of the set. It would denote
+that all the leftovers need to be added to the end of the output as
+separate fields. The string &#8220;&#64;n&#8221; will specify that the leftovers need to
+be jammed into one format and this format number is specified by &#8220;n&#8221;.
+The internal implementation parses the event and splits it in two parts:
+the fields predefined by the set and leftovers. Then depending upon the
+configuration the fields are serialized and the output is constructed.</p>
+</div>
+</div>
+</div>
+<div class="section" id="elapi-configuration">
+<h3>ELAPI Configuration<a class="headerlink" href="#elapi-configuration" title="Permalink to this headline">¶</a></h3>
+<p>The example of the ELAPI configuration file with comments can be found
+here
+<a class="reference external" href="https://fedorahosted.org/sssd/browser/common/elapi/elapi_test/elapi_ut.conf">common/elapi/elapi_test/elapi_ut.conf</a>.
+The application initializing ELAPI needs to call initialization
+function. There are couple different initialization functions that can
+be used depending upon the type of the application see details below and
+in the
+<a class="reference external" href="https://fedorahosted.org/sssd/browser/common/elapi/elapi_log.h">common/elapi/elapi_log.h</a>.
+One of the arguments to those functions is the name of the application
+(appname) and another is a path to configuration file or directory
+(config_path). The following logic is used to determine where and how
+to read the ELAPI configuration for the application:</p>
+</div>
+<div class="section" id="dispatcher">
+<h3>Dispatcher<a class="headerlink" href="#dispatcher" title="Permalink to this headline">¶</a></h3>
+<p>Dispatcher is the core of the ELAPI logic. It is the collection of
+targets and sinks. It keeps track of sink statuses and checks where the
+event should be sent. Application can instantiate multiple dispatchers
+with different configurations. This is useful for the thread
+applications. In such cases it is important to use only re-entrant
+sinks. Syslog sink is not re-entrant sink so it should be used with
+caution. It is recommended to phase out use of the syslog sink as soon
+as possible to avoid issues with its inability to act properly in
+re-entrant environments.</p>
+</div>
+<div class="section" id="sync-vs-async">
+<h3>Sync vs Async<a class="headerlink" href="#sync-vs-async" title="Permalink to this headline">¶</a></h3>
+<p>Internally the ELAPI is written as the asynchronous interface. However
+the use of the synchronous or asynchronous interface should be
+correlated to the way the dispatcher is initialized. The low level
+dispatcher initialization call looks like this (see
+<a class="reference external" href="https://fedorahosted.org/sssd/browser/common/elapi/elapi_test/elapi_dispatcher.h">common/elapi/elapi_test/elapi_dispatcher.h</a>
+for more details):</p>
+<div class="line-block">
+<div class="line">The use of the async or synch API with a dispatcher depends upon what
+is specified in the last parameter of the call. If the application is
+using its own async loop it can construct the async context object
+using provided API and pass it to the elapi_create_dispatcher()
+function. The async context object is a set of the callbacks and
+pointers to data that application wants to pass to those callbacks.
+The callbacks are used by ELAPI when ELAPI wants to request read or
+write operation on a file descriptor or wants to create a timer. If
+the application provides its callbacks the ELAPI will be fully
+integrated into the main event loop of the application. It will
+process submitted log events asynchronously and will call application
+provided callback at different points of processing (depending upon
+passed in flags). If application calls synch API it will wrap the
+internal async calls and will not return until the events are logged.
+This is accomplished by internally looping using loop_once() callback
+provided by application as part of the async context object.</div>
+<div class="line">If the application calls dispatcher and does not provide the async
+context the dispatcher will be initialized internally using internal
+loop. So if the synch API is called the ELAPI will use the internal
+loop to process the event. If the async API is called the caller would
+have to provide a callback that will be invoked at the special moments
+of the event processing. The async call will return right away and the
+caller would have to get back to checking the results of the
+invocation when all necessary callbacks are executed. The synch API
+does exactly that so there is no sense to use async API with a
+dispatcher that is not integrated with the application loop.</div>
+</div>
+</div>
+<div class="section" id="walk-through-the-dispatcher-creation-call">
+<h3>Walk Through the Dispatcher Creation Call<a class="headerlink" href="#walk-through-the-dispatcher-creation-call" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Validate input</li>
+<li>Allocate memory for dispatcher data</li>
+<li>Read configuration file</li>
+<li>Initialize global internal objects like hash table and list of
+resolvers</li>
+<li>Build target lists and sink chains. As a part of this operation:
+<strong>The list of targets is created</strong> Then the list of sinks is created.
+<strong>The sink arrays are constructed for each target denoting the fail
+over chains. The sink array contains the index of the sink in the
+global list of sink stored in dispatcher.</strong> The providers are loaded
+and initialized for each sink</li>
+<li>Initialize internal loop if the external loop data is not provided</li>
+</ul>
+</div>
+<div class="section" id="walk-through-the-synchronized-logging-call">
+<h3>Walk Through the Synchronized Logging Call<a class="headerlink" href="#walk-through-the-synchronized-logging-call" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Create an error object. The error object contains an aggregated error
+state and collection of statutes related to each target the event was
+sent to.</li>
+<li>Call async logging call. The call schedules the logging operation and
+returns. The details of what happens inside the async call are
+described below.</li>
+<li>The loop_once() callback is executed until the error object gets
+into the &#8220;done&#8221; state. After this the call returns to the caller.</li>
+</ul>
+</div>
+<div class="section" id="walk-through-the-asynchronous-logging-call">
+<h3>Walk Through the Asynchronous Logging Call<a class="headerlink" href="#walk-through-the-asynchronous-logging-call" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>The event is resolved. As a result a new &#8220;resolved&#8221; event where the
+values for all special keys are resolved.</li>
+<li>The tracker object is created. The tracker object is the internal
+ELAPI object that tracks how many instances of the event are being
+loged into different targets at the same time.</li>
+<li>The event is sent into the target list. This is when the target list
+is traversed and for each matched target the event context object is
+created. The event context object attaches to the tracker. The
+tracker records how many event contexts are expected and how many
+event context are actually created. When the processing of the event
+failed early and the event context was not created there will be less
+event contexts tracked than tracker expects. The whole point of ELAPI
+is to try to log as much as possible even if logging into some of the
+targets failed. Tracker object helps with this goal. It compares
+number of expected event contexts to the actual number of event
+context and makes sure that the caller does not wait for the
+completion of the logging of the event when the event context
+creation already failed. The event context object keeps reference to
+the resolved event, target&#8217;s sink array and other target related
+properties. At this stage the event starts its journey through the
+callback chain.</li>
+<li>The callback chain for each event context object consist of the
+sequence of operations executed by one high level processing callback
+function. This is the function that looks at the event context,
+determines its state and does an operation it is supposed to do in
+this state. Then it schedules execution of the itself again passing
+in the event context. When time comes the function is called again
+but now the event is in a different state so different operation is
+performed. The list of operations includes doing a logging operation
+via interrogating with the sink object or calling a user provided
+callback in a specific state. Think about this function being a
+rocket in the table tennis when someone just juggles the ball (event
+context) on the rocket. Just imagine that every time the ball hits
+the rocket the internal reaction happens and the ball changes its
+color. Same here, the ball i.e. the event context goes through the
+chain of states and finally gets destroyed when the event is
+successfully logged, operation failed or was canceled by application
+via callback return code. One of the states is interrogating with
+sink. What is done in this state depends upon the state of the sink.
+The sink can be active so the event will be scheduled for logging. As
+soon as the file descriptor is ready for writing the event will be
+written into the file descriptor. The sink can be suspended, then
+depending upon the configuration the sink might be skipped or the
+ELAPI might decide that it is time to revive the sink. If the logging
+into the sink fails the event context will be scheduled to start over
+with next sink in the chain.</li>
+<li>When the async logging call is executed the caller needs to provide
+the callback and a &#8220;flags&#8221; argument. The flags argument determines in
+which state(s) the application provided callback needs to be
+executed. By default the callback will be executed when the
+processing of the sink chain ends due to error or success and when
+all the copies of the same event destined for different targets
+complete their journey.</li>
+</ul>
+</div>
+<div class="section" id="module-list">
+<h3>Module List<a class="headerlink" href="#module-list" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><strong>elapi_dispatcher.c</strong> - code to create and destroy dispatcher</li>
+<li><strong>elapi_dispatcher.h</strong> - interface definition for dispatcher related
+operations. This interface is external.</li>
+<li><strong>elapi_log.c</strong> - code to log the event synchronously or
+asynchronously</li>
+<li><strong>elapi_log.h</strong> - interface to log the event synchronously or
+asynchronously. This interface is external.</li>
+<li><strong>elapi_event.c</strong> - code to construct events and templates from
+key-value pairs and collections</li>
+<li><strong>elapi_event.h</strong> - interface to the event creation functions. This
+interface is external.</li>
+<li><strong>elapi_ioctl.c</strong> - specific code to populate the network related
+attributes</li>
+<li><strong>elapi_ioctl.h</strong> - header for specific code to populate the network
+related attributes</li>
+<li><strong>elapi_net.h</strong> - header for specific code to populate the network
+related attributes</li>
+<li><strong>elapi_resolve.c</strong> - code to resolve the elements of the event</li>
+<li><strong>elapi_subst.c</strong> - code to perform substitution used in resolution
+code</li>
+<li><strong>elapi_error.c</strong> - code to implement error and status object. Used
+by synch code to keep track of the aggregated result.</li>
+<li><strong>elapi_error.h</strong> - interface to the event object. This interface is
+external. It consists of two parts. One for processing results after
+the synch call returns to caller and another for building of the
+synch wrappers.</li>
+<li><strong>elapi_loop.c</strong> - code to implement internal event loop.</li>
+<li><strong>elapi_loop.h</strong> - intern event loop callbacks. This interface is
+external.</li>
+<li><strong>elapi_async.c</strong> - code to create the object that has all the async
+callbacks</li>
+<li><strong>elapi_async.h</strong> - interface to the async object. This interface is
+external.</li>
+<li><strong>elapi_target.c</strong> - code to implement target object.</li>
+<li><strong>elapi_target.h</strong> - interface to the target object. This interface
+is internal.</li>
+<li><strong>elapi_sink.c</strong> - code to implement sink object.</li>
+<li><strong>elapi_sink.h</strong> - interface to the sink object. This interface is
+internal.</li>
+<li><strong>elapi_evctx.c</strong> - code to implement event context object</li>
+<li><strong>elapi_evctx.h</strong> - interface to the event context object. This
+interface is internal.</li>
+<li><strong>elapi_tracker.c</strong> - code to implement tracker object</li>
+<li><strong>elapi_tracker.h</strong> - interface to the tracker object. This
+interface is internal.</li>
+<li><strong>elapi_priv.h</strong> - the main internal ELAPI header file that defines
+all the internal data</li>
+<li><strong>elapi_plugin.h</strong> - the internal ELAPI header file that defines the
+provider interface</li>
+<li><strong>elapi_defines.h</strong> - some of the ELAPI constants</li>
+<li><strong>elapi.h</strong> - high level header that includes all public interfaces
+exposed by ELAPI</li>
+<li><strong>elapi_basic.c</strong> - the basic object for data serialization</li>
+<li><strong>elapi_basic.h</strong> - interface to the basic data serialization
+object. This interface is internal but supposed to be used by the
+providers.</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ELAPI Interface</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#architecture">Architecture</a></li>
+<li><a class="reference internal" href="#elapi-concepts">ELAPI Concepts</a><ul>
+<li><a class="reference internal" href="#event">Event</a><ul>
+<li><a class="reference internal" href="#id1">Overview</a></li>
+<li><a class="reference internal" href="#message-attribute">Message attribute</a></li>
+<li><a class="reference internal" href="#other-special-attributes">Other special attributes</a><ul>
+<li><a class="reference internal" href="#r-stamp"><code class="docutils literal"><span class="pre">R_stamp__</span></code></a></li>
+<li><a class="reference internal" href="#r-time"><code class="docutils literal"><span class="pre">R_time__</span></code></a></li>
+<li><a class="reference internal" href="#r-loco"><code class="docutils literal"><span class="pre">R_loco__</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#event-context">Event context</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#event-template">Event Template</a></li>
+<li><a class="reference internal" href="#target">Target</a><ul>
+<li><a class="reference internal" href="#id2">Overview</a></li>
+<li><a class="reference internal" href="#internal-implementation">Internal Implementation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sink">Sink</a><ul>
+<li><a class="reference internal" href="#id3">Overview</a></li>
+<li><a class="reference internal" href="#id4">Internal Implementation</a></li>
+<li><a class="reference internal" href="#sink-configuration">Sink Configuration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#providers">Providers</a><ul>
+<li><a class="reference internal" href="#id5">Overview</a></li>
+<li><a class="reference internal" href="#implementation">Implementation</a><ul>
+<li><a class="reference internal" href="#file-provider">File Provider</a></li>
+<li><a class="reference internal" href="#supported-formats">Supported formats</a></li>
+<li><a class="reference internal" href="#append-create-logic">Append/Create? logic</a></li>
+<li><a class="reference internal" href="#configuration-changes">Configuration changes</a></li>
+<li><a class="reference internal" href="#special-stderr-configuration">Special stderr configuration</a></li>
+<li><a class="reference internal" href="#notion-of-sets">Notion of sets</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#elapi-configuration">ELAPI Configuration</a></li>
+<li><a class="reference internal" href="#dispatcher">Dispatcher</a></li>
+<li><a class="reference internal" href="#sync-vs-async">Sync vs Async</a></li>
+<li><a class="reference internal" href="#walk-through-the-dispatcher-creation-call">Walk Through the Dispatcher Creation Call</a></li>
+<li><a class="reference internal" href="#walk-through-the-synchronized-logging-call">Walk Through the Synchronized Logging Call</a></li>
+<li><a class="reference internal" href="#walk-through-the-asynchronous-logging-call">Walk Through the Asynchronous Logging Call</a></li>
+<li><a class="reference internal" href="#module-list">Module List</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/WikiPage/ELAPIInterface.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/WikiPage/ELAPIInterface.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

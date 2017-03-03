@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>&lt;no title&gt; &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <ol class="arabic">
+<li><p class="first">Follow the steps in <a class="reference external" href="https://docs.pagure.org/sssd-test2/Fedora_11_Test_Day/Installation.html">Installing the
+SSSD</a>.</p>
+</li>
+<li><p class="first">As root, open the file <code class="docutils literal"><span class="pre">/etc/sssd/sssd.conf</span></code>. In the
+<code class="docutils literal"><span class="pre">[domains/LDAP]</span></code> section, change:</p>
+<p>to</p>
+<p>and save the file</p>
+</li>
+<li><p class="first">Test enumeration of LDAP users</p>
+<p>You should see 100 users named sssdtestNNNNN, as well as a few
+others:</p>
+</li>
+<li><p class="first">Test retrieval of individual users, specifying the domain</p>
+<p>This should return:</p>
+</li>
+<li><p class="first">Repeat the above test with the users listed in
+step<a class="reference external" href="https://fedorahosted.org/sssd/ticket/3">#3</a>. It is expected
+that <code class="docutils literal"><span class="pre">sssd&#64;test</span></code> will fail.</p>
+</li>
+<li><p class="first">Test retrieval of individual users, without specifying the domain</p>
+<p>This should return:</p>
+</li>
+<li><p class="first">Repeat the above test with the users listed in step2. It is expected
+that <code class="docutils literal"><span class="pre">sssd&#64;test</span></code> will fail.</p>
+</li>
+<li><p class="first">Test enumeration of LDAP groups</p>
+<p>This should return a large number of groups of varying membership</p>
+</li>
+<li><p class="first">Test retrieval of a specific group, specifying the domain</p>
+<p>This should return one group with ten members (sssdtest10001 through
+sssdtest10010)</p>
+</li>
+<li><p class="first">Test retrieval of a specific group, without specifying the domain</p>
+<p>This should return one group with eleven members (sssdtest10001
+through sssdtest10011)</p>
+</li>
+<li><p class="first">Test that we do not truncate NSS data</p>
+<p>There will be a lot of output. Verify that it ends with
+<code class="docutils literal"><span class="pre">sssdtest10100</span></code></p>
+</li>
+<li><p class="first">Test offline support by terminating your network connection (e.g.
+unplugging your network cable or turning off your WiFI card), then
+rerun the above tests and verify that they return the same results.
+To minimize delays while offline, consider the following settings for
+your /etc/ldap.conf:</p>
+</li>
+</ol>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Fedora_11_Test_Day/NSS_LDAP_Legacy.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Fedora_11_Test_Day/NSS_LDAP_Legacy.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

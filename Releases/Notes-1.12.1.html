@@ -1,0 +1,428 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>The GPO access control was further enhanced to allow the access
+control decisions while offline and map the Windows logon rights onto
+Linux PAM services</li>
+<li>The SSSD now ships a plugin for the rpc.idmapd daemon. Please refer
+to the
+<a class="reference external" href="https://jhrozek.fedorapeople.org/sssd/1.12.1/man/sss_rpcidmapd.5.html">​sss_rpcidmapd(5)</a>
+man page for more details on the plugin.</li>
+<li>A MIT Kerberos localauth plugin was added to SSSD. This plugin helps
+translating principals to user names in IPA-AD trust scenarios,
+allowing the krb5.conf configuration to be less complex.</li>
+<li>A libwbclient plugin implementation is now part of the SSSD. The main
+purpose is to map Active Directory users and groups identified by
+their SID to POSIX users and groups for the file-server use-case.</li>
+<li>Active Directory users ca nnow use their User Logon Name to log in</li>
+<li>The sss_cache tool was enhanced to allow invalidating the SSH host
+keys.</li>
+<li>Groups without full POSIX information can now be used to enroll group
+membership (fixes
+<a class="reference external" href="http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2014-0249">​CVE-2014-0249</a>)</li>
+<li>Detection of transition from offline to online state was improved,
+resulting in fewer timeouts when SSSD is offline.</li>
+<li>The Active Directory provider now correctly detects Windows Server
+2012 R2. Previous versions would fall back to the slower non-AD path
+with 2012 R2.</li>
+<li>Several other bugs related to deployments where SSSD is acting as an
+AD client were fixed. Please refer to the detailed changelog for more
+information.</li>
+</ul>
+</div>
+<div class="section" id="packaging-changes">
+<h1>Packaging Changes<a class="headerlink" href="#packaging-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>The upstream spec file dropped support for RHEL-5</li>
+<li>The libwbclient plugin implementation is packaged in its own
+subpackage</li>
+<li>GPO files are stored in a new subdirectory, by default
+<code class="docutils literal"><span class="pre">/var/lib/sss/gpo_cache</span></code></li>
+</ul>
+</div>
+<div class="section" id="documentation-changes">
+<h1>Documentation Changes<a class="headerlink" href="#documentation-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>The case_sensitive option was changed to be a tri-state and accepts
+a new value &#8220;preserving&#8221;. When this option is used, the sssd would
+match case-insensitive, but return the original case.</li>
+<li>A new option override_space was added. When this option is set, a
+space character in user or group names is replaced by the character
+specified in this option</li>
+<li>The NFS plugin has a new man page
+<a class="reference external" href="https://jhrozek.fedorapeople.org/sssd/1.12.1/man/sss_rpcidmapd.5.html">​sss_rpcidmapd(5)</a></li>
+<li>A small random value is now added to the offline_timeout parameter
+value to avoid flooding servers with periodical online checks</li>
+<li>Several new GPO-related options were added. Please refer to the
+<a class="reference external" href="https://jhrozek.fedorapeople.org/sssd/1.12.1/man/sssd-ad.5.html">​sssd-ad</a>
+man page for more details. The options are prefixed with <code class="docutils literal"><span class="pre">ad_gpo_*</span></code></li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/1560">#1560</a></dt>
+<dd>Enable OpenSSH-LPK support by default</dd>
+<dt><a class="reference external" href="/sssd/ticket/1588">#1588</a></dt>
+<dd>[RFE] Allow SSSD to be used with smbd shares</dd>
+<dt><a class="reference external" href="/sssd/ticket/1749">#1749</a></dt>
+<dd>[RFE] Allow email-address in ldap_user_principal</dd>
+<dt><a class="reference external" href="/sssd/ticket/1835">#1835</a></dt>
+<dd>[RFE] Implement localauth plugin for MIT krb5 1.12</dd>
+<dt><a class="reference external" href="/sssd/ticket/1974">#1974</a></dt>
+<dd>Remove the references to RHEL5 from upstream spec file</dd>
+<dt><a class="reference external" href="/sssd/ticket/2281">#2281</a></dt>
+<dd>[GSS 7.0] if access_provider is not set sssd fails with no good
+error</dd>
+<dt><a class="reference external" href="/sssd/ticket/2344">#2344</a></dt>
+<dd>a bug in codegen causes diffs in generated code when switching
+branches</dd>
+<dt><a class="reference external" href="/sssd/ticket/2357">#2357</a></dt>
+<dd>Failover SRV discovery not honouring priority/weight</dd>
+<dt><a class="reference external" href="/sssd/ticket/2358">#2358</a></dt>
+<dd>[PATCH] sss_cache flush ssh host keys.</dd>
+<dt><a class="reference external" href="/sssd/ticket/2359">#2359</a></dt>
+<dd>&#8220;local&#8221; auth_provider is not documented in sssd.conf</dd>
+<dt><a class="reference external" href="/sssd/ticket/2367">#2367</a></dt>
+<dd>RFE: SSSD should preserve case for user uid field.</dd>
+<dt><a class="reference external" href="/sssd/ticket/2382">#2382</a></dt>
+<dd>Push patches to bump the version info of sss_sifp</dd>
+<dt><a class="reference external" href="/sssd/ticket/2403">#2403</a></dt>
+<dd>&#8220;Mapping ID [4294967295] to SID failed&#8221; messages clutter the sssd
+domain log</dd>
+<dt><a class="reference external" href="/sssd/ticket/2423">#2423</a></dt>
+<dd>Man sssd-ldap shows parameter ldap_purge_cache_timeout with
+&#8220;Default: 10800 (12 hours)&#8221;</dd>
+<dt><a class="reference external" href="/sssd/ticket/2431">#2431</a></dt>
+<dd>offline gpo processing yields incorrect results if &#8220;tattooing&#8221;
+occurs</dd>
+<dt><a class="reference external" href="/sssd/ticket/2523">#2523</a></dt>
+<dd>PAC: krb5_pac_verify failures should not be fatal (backport fix
+from upstream)</dd>
+</dl>
+</div></div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Ian Lee (1):</p>
+<ul class="simple">
+<li>Add user lookup and session dependencies to systemd service file.</li>
+</ul>
+<p>Jakub Hrozek (45):</p>
+<ul class="simple">
+<li>Updating the version for the 1.12.1 development</li>
+<li>MAN: local auth_provider is not documented in sssd.conf</li>
+<li>MAN: Document that each provider type uses its own set of options</li>
+<li>No point in searching for gid if we already know the group should be
+filtered</li>
+<li>Only check GID if ID-mapping</li>
+<li>AD: Check return value of ad_gpo_evaluate_dacl</li>
+<li>AD: Increment som_index when advancing to the next GPO</li>
+<li>LDAP: Print referrals for debugging purposes</li>
+<li>LDAP: Dump LDAP server IP address with a high DEBUG level</li>
+<li>LDAP: Avoid undefined ret value</li>
+<li>UTIL: remove get_username_from_uid</li>
+<li>PAC: krb5_pac_verify failures should not be fatal</li>
+<li>IFP: Fix lookups with fully-qualified names</li>
+<li>RPM: Restart service in %posttrans, not %post</li>
+<li>TESTS: Check if option maps have the right number of members</li>
+<li>NSS: Ignore default_domain for netgroups</li>
+<li>Only replace space with the specified substitution</li>
+<li>Make the space override responder-agnostic</li>
+<li>PAM: Use the override_space option</li>
+<li>IFP: Use the override_space option</li>
+<li>SUDO: Use the override_space option</li>
+<li>TESTS: Add unit tests for the replace-space functionality</li>
+<li>BE: Handle SIGUSR2</li>
+<li>IPA: handle searches by SID in apply_subdomain_homedir</li>
+<li>SYSDB: Clarify sss_ldb_modify_permissive returns ldb error code</li>
+<li>Revert &#8220;IPA: new attribute map for non-posix groups&#8221;</li>
+<li>Revert &#8220;IPA: process non-posix nested groups&#8221;</li>
+<li>Revert &#8220;IPA: try to resolve nested groups as poxix group&#8221;</li>
+<li>LDAP: Do not shortcut on ret != EOK during password expiry check</li>
+<li>LDAP: Split out linking primary group members into a separate
+function</li>
+<li>LDAP: Don&#8217;t add a user member twice when adding a primary group</li>
+<li>LDAP: Use tmp_ctx in ldap_child for temporary data</li>
+<li>LDAP: Use randomized ccname for storing credentials</li>
+<li>LDAP: Add Windows Server 2012 R2 functional level</li>
+<li>LDAP: Fall back to functional level of Windows Server 2003</li>
+<li>LDAP: Enable tokenGroups with Windows Server 2003</li>
+<li>TESTS: Add unit tests for the GPO interface</li>
+<li>LDAP: Set umask before calling mkstemp</li>
+<li>LDAP: Ignore returned referrals if referral support is disabled</li>
+<li>LDAP: Don&#8217;t reuse a single tevent callback for multiple requests</li>
+<li>LDAP: Skip dereferenced entries that we are not permitted to read</li>
+<li>TESTS: Add a unit test for dereference parsing</li>
+<li>MAN: Add sss_rpcidmapd.5.xml to the list of translatable man pages</li>
+<li>LDAP: Check return value</li>
+<li>Updating translations for the 1.12.1 release</li>
+</ul>
+<p>Jan Cholasta (1):</p>
+<ul class="simple">
+<li>SDAP: Set default value of ldap_user_ssh_public_key to
+&#8220;sshPublicKey&#8221;</li>
+</ul>
+<p>Lukas Slebodnik (31):</p>
+<ul class="simple">
+<li>sss_client: thread safe initialisation of sss_cli_mc_ctx</li>
+<li>sss_client: Fix memory leak in nss_mc_{group,passwd}</li>
+<li>LDAP: Remove unused option ldap_netgroup_uuid</li>
+<li>LDAP: Remove unused option ldap_group_uuid</li>
+<li>LDAP: Remove unused option ldap_user_uuid</li>
+<li>test_utils: Use common header file for libsss_util tests.</li>
+<li>UTIL: Add functions for replacing whitespaces.</li>
+<li>NSS: Replace spaces with specified string in names.</li>
+<li>SDAP: Deref needn&#8217;t be treated as critical</li>
+<li>Revert &#8220;SDAP: Deref needn&#8217;t be treated as critical&#8221;</li>
+<li>dyndns_test: Use right socket length of for IPv4 address.</li>
+<li>responder-get-domains-tests: fix checking of leaks</li>
+<li>test_dyndns: Use different talloc context in wrapped functions.</li>
+<li>TESTS: leak_check functions shouldn&#8217;t be called with NULL context</li>
+<li>dyndns: Fix talloc hierarchy of &#8220;struct sss_iface_addr&#8221;</li>
+<li>test_dyndns: sss_iface_addr_list_get can return more values</li>
+<li>SDAP: free subrequest in sdap_dyndns_update_addrs_done</li>
+<li>SDAP: Immediately finish request for empty array</li>
+<li>SDAP: Use different talloc_context for array of names</li>
+<li>SDAP: Update groups for user just once.</li>
+<li>SDAP: Fix using of uninitialized variable</li>
+<li>strtonum-tests: Add unit test for strtouint16.</li>
+<li>responder_socket_access-tests: Fix condition in loop</li>
+<li>MAN: Fix a conversion of seconds to hours</li>
+<li>AD: Ignore all errors if gpo is in permissive mode.</li>
+<li>AUTOCONF: Update detection of libnfsidmap</li>
+<li>SPEC: Use netlink library version 3 for rhel7</li>
+<li>SPEC: Drop old OS conditions from spec file.</li>
+<li>refcount-tests: Do not force to run test in CK_FORK mode</li>
+<li>NSS: Use right domain for group members with fq names</li>
+<li>pysss: test return value of realloc.</li>
+</ul>
+<p>Michal Zidek (10):</p>
+<ul class="simple">
+<li>Add function confdb_set_string.</li>
+<li>case_sensitivity = preserving</li>
+<li>MAN: case_sensitivity man page update</li>
+<li>Remove unused function confdb_set_bool</li>
+<li>ptask: Allow adding random_offset to scheduled execution time</li>
+<li>ptask: Add backoff feature to the ptask api.</li>
+<li>Exit offline mode only if server is available.</li>
+<li>MAN: offline_timeout</li>
+<li>be_get_account_info change level of debug message</li>
+<li>IFP: Suppress &#8216;git diff&#8217; noise</li>
+</ul>
+<p>Michal Šrubař (1):</p>
+<ul class="simple">
+<li>LDAP SUDO: sudo provider doesn&#8217;t fetch &#8216;EntryUSN&#8217;</li>
+</ul>
+<p>Nalin Dahyabhai (2):</p>
+<ul class="simple">
+<li>sss_client: Fix &#8220;struct sss_cli_mc_ctx&#8221; reinitialize-on-errors</li>
+<li>Accept krb5 1.13 for building the PAC plugin</li>
+</ul>
+<p>Nikolai Kondrashov (10):</p>
+<ul class="simple">
+<li>build: Remove substitution of *_OBJ variables</li>
+<li>build: Mention required libini_config version</li>
+<li>build: Distinguish libini_config version checks</li>
+<li>build: Distinguish libnl version checks</li>
+<li>build: Reverse order of libini_config checks</li>
+<li>build: Move libini_config 1.1.0 check to libini_config.m4</li>
+<li>build: Don&#8217;t install ad and ipa man pages unnecessarily</li>
+<li>Add basic support for CI test execution</li>
+<li>CI: Add libnfsidmap-dev Debian dependency</li>
+<li>CI: Consider libcmocka-devel always present</li>
+</ul>
+<p>Noam Meltzer (5):</p>
+<ul class="simple">
+<li>NEW CLIENT: plugin for NFSv4 rpc.idmapd</li>
+<li>NFSv4 client: (private) headers from libnfsidmap</li>
+<li>NFSv4 client: add to build system</li>
+<li>NFSv4 client: add to RPM spec</li>
+<li>NFSv4 client: man page</li>
+</ul>
+<p>Pavel Březina (15):</p>
+<ul class="simple">
+<li>resolv tests: remove ununused variable from for cyclus</li>
+<li>resolv tests: add test for multiple servers with zero weights</li>
+<li>resolv: fix server sort by weight</li>
+<li>sudo: fetch sudoRunAs attribute</li>
+<li>sss_sifp test: fix object path array test</li>
+<li>sss_sifp: set output parameters if attribute is NULL</li>
+<li>ad_handle_acct_info_step: fix typo</li>
+<li>ad: comment ENOENT when id mapping is disabled</li>
+<li>ad: update membership after SIDs are resolved</li>
+<li>sudo: use dbus array for rules refresh</li>
+<li>sudo: replace asterisk with escape sequence in host filter</li>
+<li>failover: set port status to not working if previous srv lookup
+failed</li>
+<li>ad initgroups: continue if resolved SID is still missing</li>
+<li>sudo: work with correct D-Bus iterator</li>
+<li>sss_sifp: bump version to 0:1:0</li>
+</ul>
+<p>Pavel Reichl (25):</p>
+<ul class="simple">
+<li>SYSDB: augmented logging when adding new group</li>
+<li>LDAP: tokengroups do not work with id_provider=ldap</li>
+<li>SDAP: Continue resolving SID even if some fail</li>
+<li>UTIL: rename find_subdomain_by_sid</li>
+<li>UTIL: rename find_subdomain_by_name</li>
+<li>UTIL: rename find_subdomain_by_object_name</li>
+<li>SDAP: remove duplicated code</li>
+<li>SDAP: reduce code duplicity-rfc2307bis nested groups</li>
+<li>SDAP: fix use after free in async_initgroups</li>
+<li>SDAP: split sdap_access_filter_get_access_done</li>
+<li>SDAP: refactor sdap_access_filter_send</li>
+<li>SDAP: nitpicks in sdap_access_filter_get_access_done</li>
+<li>SDAP: refactor sdap_access_filter_done</li>
+<li>SDAP: don&#8217;t log error on access denied</li>
+<li>IPA: new attribute map for non-posix groups</li>
+<li>IPA: process non-posix nested groups</li>
+<li>IPA: try to resolve nested groups as poxix group</li>
+<li>SDAP: refactor AC offline checks</li>
+<li>SDAP: new option - DN to ppolicy on LDAP</li>
+<li>SDAP: account lockout to restrict access via ssh key</li>
+<li>MAN: options &#8216;lockout&#8217; and &#8216;ldap_pwdlockout_dn&#8217;</li>
+<li>SYSDB: SSS_LDB_SEARCH - macro around ldb_search</li>
+<li>IPA: process non-posix nested groups</li>
+<li>AD: process non-posix nested groups w/o tokenGroups</li>
+<li>AD: process non-posix nested groups using tokenGroups</li>
+</ul>
+<p>Sumit Bose (17):</p>
+<ul class="simple">
+<li>KRB5: add missing debug-to-stderr option to krb5_child</li>
+<li>AD: add missing debug-to-stderr option to gpo_child</li>
+<li>libwbclient: SSSD implementation</li>
+<li>sss_log: fix handling of variable argument lists</li>
+<li>sysdb_get_real_name: allow UPN as input</li>
+<li>LDAP: If extra_value is &#8216;U&#8217; do a UPN search</li>
+<li>PAM: extract checks from parsing routines</li>
+<li>PAM: remove ldb_result member from pam_auth_req context</li>
+<li>NSS: check_cache() add extra option</li>
+<li>PAM, NSS: allow UPN login names</li>
+<li>Replace space: add some checks</li>
+<li>Add conditional build for MIT Kerberos localauth plugin</li>
+<li>Implement MIT Kerberos localauth plugin</li>
+<li>Doxygen: replace &lt;pre&gt; with markdown table</li>
+<li>libwbclient: make build optional</li>
+<li>dlopen test: only test libwbclient when it is build</li>
+<li>libwbclient: avoid collision with Samba version</li>
+</ul>
+<p>William B (1):</p>
+<ul class="simple">
+<li>SSS_CACHE: Allow sss_cache tool to flush SSH hosts cache</li>
+</ul>
+<p>Yassir Elley (9):</p>
+<ul class="simple">
+<li>AD-GPO: Store policy settings in local files</li>
+<li>AD-GPO: add sysdb_gpo support for caching gpo version</li>
+<li>AD-GPO: only download policy files if gpo version changes</li>
+<li>AD-GPO: add ad_gpo_cache_timeout option</li>
+<li>AD-GPO: sysdb_gpo changes for offline gpo support</li>
+<li>AD-GPO: ad_gpo changes for offline gpo support</li>
+<li>AD-GPO: config changes for gpo_map_* options</li>
+<li>AD-GPO: processing changes for gpo_map_* options</li>
+<li>AD-GPO: delete stale GPOs</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#packaging-changes">Packaging Changes</a></li>
+<li><a class="reference internal" href="#documentation-changes">Documentation Changes</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.12.1.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.12.1.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

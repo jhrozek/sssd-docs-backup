@@ -1,0 +1,293 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>SSSD&#8217;s cache performance was improved. SSSD now stores operational
+attributes of cache entries to a separate database with asynchronous
+writes mode, which results in substantially faster cache update times
+in most cases. Note that the performance of the initial cache write
+with an empty cache does not improve, only subsequent updates.</li>
+<li>SSSD is able to merge configuration file snippets from an include
+directory. This functionality requires the latest libini release
+1.3.0.</li>
+<li>The GPO evaluator is able to skip malformed INI files. This feature
+is also only available with libini release 1.3.0 or newer.</li>
+<li>A new command line tool, called <code class="docutils literal"><span class="pre">sssctl</span></code> was added. This tool
+allows the administrator to observe the status of SSSD. In this
+version, the tool is able to:<ul>
+<li>list SSSD domains and subdomains, including their online and
+offline status</li>
+<li>print information about objects stored in the cache</li>
+<li>backup or remove the local databases</li>
+<li>help truncate SSSD logs</li>
+</ul>
+</li>
+<li>SSSD is able to validate configuration files against a built-in
+schema. To retain backwards-compatibility with configuration files
+that would otherwise not validate, the validator only warns about
+errors in the config file in this version.</li>
+<li>An ID-mapping plugin for the winbind deamon was added. With this
+plugin, it&#8217;s possible for winbind to use the same ID-mapping scheme
+as SSSD uses, producing consistent ID values</li>
+<li>A new &#8220;secrets&#8221; responder was added. This responder allows an
+application to communicate with SSSD over a UNIX socket using the
+<a class="reference external" href="https://github.com/simo5/custodia/blob/master/API.md">​Custodia
+API</a>. SSSD
+then stores the secrets either in its local database or proxies them
+to a remote Custodia server.</li>
+</ul>
+</div>
+<div class="section" id="packaging-changes">
+<h1>Packaging Changes<a class="headerlink" href="#packaging-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>SSSD stores ephemeral attributes in a new ldb database called
+<code class="docutils literal"><span class="pre">timestamps_$domain.ldb</span></code> stored in the same directory as the
+regular caches.</li>
+<li>The winbind ID-mapping plugin is packages in its own subpackage
+called <code class="docutils literal"><span class="pre">winbind-idmap</span></code></li>
+<li>The SSSD configuration snippets are being read from a newly-owned
+directory <code class="docutils literal"><span class="pre">/etc/sssd/conf.d</span></code>.</li>
+<li>SSSD ships a file with rules for the configuration validator. In
+Fedora, this file is located at <code class="docutils literal"><span class="pre">/var/lib/sss/cfg_rules.ini</span></code></li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/385">#385</a></dt>
+<dd>[RFE] Provide a Method to Display SSSD Status Information</dd>
+<dt><a class="reference external" href="/sssd/ticket/1662">#1662</a></dt>
+<dd>[RFE] Provide a force reload utility</dd>
+<dt><a class="reference external" href="/sssd/ticket/1800">#1800</a></dt>
+<dd>[RFE] create a generic sssdctl utility</dd>
+<dt><a class="reference external" href="/sssd/ticket/1937">#1937</a></dt>
+<dd>[RFE] Improve LDAP error logging</dd>
+<dt><a class="reference external" href="/sssd/ticket/2028">#2028</a></dt>
+<dd>sssd does not detail which line in configuration is invalid</dd>
+<dt><a class="reference external" href="/sssd/ticket/2166">#2166</a></dt>
+<dd>[RFE] SSSD cache database reporting</dd>
+<dt><a class="reference external" href="/sssd/ticket/2247">#2247</a></dt>
+<dd>[RFE] SSSD should be able to merge configuration from multiple files</dd>
+<dt><a class="reference external" href="/sssd/ticket/2466">#2466</a></dt>
+<dd>[RFE] Method for setting custom shells without Unix Attributes in AD
+account</dd>
+<dt><a class="reference external" href="/sssd/ticket/2602">#2602</a></dt>
+<dd>Optimize cache writes to sysdb</dd>
+<dt><a class="reference external" href="/sssd/ticket/2671">#2671</a></dt>
+<dd>RFE: sss_cache: Add an option to rm the database files</dd>
+<dt><a class="reference external" href="/sssd/ticket/2735">#2735</a></dt>
+<dd>Document best practices from security standpoint for OpenScap team</dd>
+<dt><a class="reference external" href="/sssd/ticket/2751">#2751</a></dt>
+<dd>SSSD can&#8217;t process GPO from Active Directory when it contains lines
+with no equal sign</dd>
+<dt><a class="reference external" href="/sssd/ticket/2913">#2913</a></dt>
+<dd>Add a Secrets as a Service component</dd>
+<dt><a class="reference external" href="/sssd/ticket/2918">#2918</a></dt>
+<dd>Make cli_ctx more generic</dd>
+<dt><a class="reference external" href="/sssd/ticket/2921">#2921</a></dt>
+<dd>Replace the monitor ping with an in-process heartbeat</dd>
+<dt><a class="reference external" href="/sssd/ticket/2957">#2957</a></dt>
+<dd>Extend interface between DP and IFP</dd>
+<dt><a class="reference external" href="/sssd/ticket/3070">#3070</a></dt>
+<dd>Add infrastructure for socket-activated responders</dd>
+</dl>
+</div></div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Christian Heimes (1):</p>
+<ul class="simple">
+<li>Secrets: m4 macros for jansson and http-parser</li>
+</ul>
+<p>Jakub Hrozek (19):</p>
+<ul class="simple">
+<li>Updating the version for the 1.14 beta release</li>
+<li>SYSDB: Move sysdb initialization into a new module sysdb_init.c</li>
+<li>UTIL: Add error codes for sysdb too old or too new</li>
+<li>SYSDB: Refactor database connection</li>
+<li>SYSDB: Add a second, timestamp-only ldb cache</li>
+<li>SYSDB: Open a timestamps cache for caching domains</li>
+<li>SYSDB: Wrap sysdb_store_group in a transaction and split it into
+smaller functions</li>
+<li>SYSDB: Search the timestamp caches in addition to the sysdb cache</li>
+<li>SYSDB: If modifyTimestamp is the same, only update the TS cache</li>
+<li>SYSDB: Check if group attributes differ before saving a group</li>
+<li>SYSDB: Refactor sysdb_store_user</li>
+<li>SYSDB: Only update user attributes if needed</li>
+<li>TESTS: Add a unit test for timestamps caches</li>
+<li>TESTS: Add an integration test for the timestamps cache</li>
+<li>LDAP: Shortcut looking up for group members sooner</li>
+<li>Contrib: Add a gdbinit file</li>
+<li>BUILD: Fall back to non-strict http parser, if strict is not
+available</li>
+<li>MAN: Include idmap_sss.8.xml in the manpage sources</li>
+<li>Updating the translations for the 1.14 beta release</li>
+</ul>
+<p>Lukas Slebodnik (6):</p>
+<ul class="simple">
+<li>Prepare ini schema with rules for validation</li>
+<li>UTIL: Fix debug message in sssd_async_connect_done</li>
+<li>UTIL: Revent connection handling in sssd_async_connect_send</li>
+<li>Downcast to errno_t after tevent_req_is_error</li>
+<li>BUILD: Fix detection of systemd</li>
+<li>BUILD: Detect libsystemd-daemon or libsystemd</li>
+</ul>
+<p>Michal Židek (3):</p>
+<ul class="simple">
+<li>GPO: ignore non-KVP lines if possible</li>
+<li>confdb: Make it possible to use config snippets</li>
+<li>confdb: Check for config file errors on sssd startup</li>
+</ul>
+<p>Pavel Březina (25):</p>
+<ul class="simple">
+<li>IFP: Add domain nodes</li>
+<li>IFP: new header file that contains interface definitions</li>
+<li>sss_sifp: make it compatible with latest version of the infopipe</li>
+<li>sss_sifp: return context even on IO error</li>
+<li>sss_sifp: bump version to 1:0:1</li>
+<li>sss_tools: add command description</li>
+<li>sss_tools: add help commands to usage message</li>
+<li>sss_tools: unify description of &#8211;debug</li>
+<li>sss_tools: tell whether an option was provided</li>
+<li>sss_tools: add commands delimiter</li>
+<li>sss_tools: pad help message properly</li>
+<li>sss_tools: return errno_t instead of system code</li>
+<li>sss_tools: add test if sssd is running</li>
+<li>sss_tools: create confdb if not exist</li>
+<li>sss_override: return EXIT_SUCCESS even when no overrides are found</li>
+<li>sss_override: return EXIT_FAILURE if file does not exist during
+import</li>
+<li>ERRORS: Add errors to indicated whether SSSD is running or not</li>
+<li>SBUS ERRORS: Add unknown domain</li>
+<li>SBUS: Fix typo in comment</li>
+<li>SBUS: Add string helper macros</li>
+<li>DP: Add function to get be_ctx directly from dp_client</li>
+<li>DP: Add
+org.freedesktop.sssd.<a class="reference external" href="https://docs.pagure.org/sssd-test2/DataProvider.html">DataProvider?</a>.Backend</li>
+<li>DP: Add
+org.freedesktop.sssd.<a class="reference external" href="https://docs.pagure.org/sssd-test2/DataProvider.html">DataProvider?</a>.Failover</li>
+<li>IFP: Provide domain and failover status</li>
+<li>sssctl: new tool</li>
+</ul>
+<p>Simo Sorce (14):</p>
+<ul class="simple">
+<li>Util: Add watchdog helper</li>
+<li>Server: Enable Watchdog in all daemons</li>
+<li>Monitor: Remove ping infrastructure</li>
+<li>Responders: Make the client context more generic</li>
+<li>Responders: Add support for socket activation</li>
+<li>ConfDB: Add helper function to get &#8220;subsections&#8221;</li>
+<li>Secrets: Add autoconf macros to build with secrets</li>
+<li>Secrets: Add initial responder code for secrets service</li>
+<li>Add initial providers infrastructure.</li>
+<li>Secrets: Add encryption at rest</li>
+<li>Secrets: Add Proxy backend</li>
+<li>Local secrets provider Content-Type handling</li>
+<li>Secrets: Add local container entries support</li>
+<li>Monitor: Add mode to generate confdb only</li>
+</ul>
+<p>Sumit Bose (1):</p>
+<ul class="simple">
+<li>Add winbind idmap plugin</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#packaging-changes">Packaging Changes</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.14.0beta.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.14.0beta.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

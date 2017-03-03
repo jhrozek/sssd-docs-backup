@@ -1,0 +1,202 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Subdomain configuration &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="subdomain-configuration">
+<h1>Subdomain configuration<a class="headerlink" href="#subdomain-configuration" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2599">​https://fedorahosted.org/sssd/ticket/2599</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>When SSSD is joined to a FreeIPA/Active Directory domain, Administrator
+can easily configure/tweak the domain settings in <code class="docutils literal"><span class="pre">sssd.conf</span></code>.
+However, when SSSD is joined to a FreeIPA domain that is in a trust
+relationship with other domain (Active Directory), Administrator can
+only tweak the main (FreeIPA) domain, but cannot tweak the trusted
+(Active Directory) domain as it does not have a proper domain section in
+<code class="docutils literal"><span class="pre">sssd.conf</span></code>. While we introduced <code class="docutils literal"><span class="pre">subdomain_inherit</span></code> option which
+worked for some use cases, it does not help if the subdomain needs
+parameters different from the main domain.</p>
+<p>This design page describes new feature that allows admins to configure
+subdomain parameters in standard SSSD configuration files in similar way
+as the main domain&#8217;s parameters.</p>
+</div>
+<div class="section" id="use-cases">
+<h2>Use cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="use-case-1-filtering-inactive-users-in-trusted-ad-domain">
+<h3>Use Case 1: filtering inactive users in trusted AD domain<a class="headerlink" href="#use-case-1-filtering-inactive-users-in-trusted-ad-domain" title="Permalink to this headline">¶</a></h3>
+<p>As an Administrator, I want to set a different search base for users and
+groups in the trusted AD domain, to filter out users from inactive
+organizational units, so that only active users and groups are visible
+to the system.</p>
+</div>
+<div class="section" id="use-case-2-restricting-freeipa-sssd-only-to-selected-ad-servers-and-or-sites">
+<h3>Use Case 2: restricting FreeIPA/SSSD only to selected AD servers and/or sites<a class="headerlink" href="#use-case-2-restricting-freeipa-sssd-only-to-selected-ad-servers-and-or-sites" title="Permalink to this headline">¶</a></h3>
+<p>As an Administrator, I want to disable autodiscovery of AD servers and
+sites in the trusted AD domain and instead list servers and/or sites
+manually, so that I can limit the list of Active Directories SSSD
+communicates with and for example avoid reaching out to sites that are
+not accessible.</p>
+</div>
+</div>
+<div class="section" id="overview-of-the-solution">
+<h2>Overview of the solution<a class="headerlink" href="#overview-of-the-solution" title="Permalink to this headline">¶</a></h2>
+<p>A new section in SSSD configuration will be added where the subdomain
+options can be set.</p>
+<p>This section name will be the same as the main domain section with
+&#8220;/&lt;subdomain name&gt;&#8221; suffix, where the <code class="docutils literal"><span class="pre">&lt;subdomain</span> <span class="pre">name&gt;</span></code> is the
+trusted domain&#8217;s name. For example if the main domain&#8217;s (FreeIPA) name
+is <code class="docutils literal"><span class="pre">ipadomain.test</span></code> and the trusted (Active Directory) domain&#8217;s name
+is <code class="docutils literal"><span class="pre">addomain.test</span></code>, then the configuration sections will look like
+this</p>
+<p>Note that <strong>not all options available for the main domain will also be
+available in the new subdomain section</strong>. Here are some options that
+will be supported (the list is not exhaustive):</p>
+<ul class="simple">
+<li>ldap_search_base</li>
+<li>ldap_user_search_base</li>
+<li>ldap_group_search_base</li>
+<li>ad_server</li>
+<li>ad_backup_server</li>
+<li>ad_site</li>
+</ul>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<p>TBD</p>
+</div>
+<div class="section" id="how-to-test">
+<h2>How To Test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Configure FreeIPA server and set it in a Trust relationship with
+respective Active Directory domain</li>
+<li>In <code class="docutils literal"><span class="pre">sssd.conf</span></code> on the FreeIPA server, add trusted domain section
+and redefine some of the supported options for this section (for
+example <code class="docutils literal"><span class="pre">ldap_user_search_base</span></code> for <a class="reference external" href="https://fedorahosted.org/sssd#Use%20Case%201:%20filtering%20inactive%20users%20in%20trusted%20AD%20domain">Use Case
+1</a>
+or <code class="docutils literal"><span class="pre">ad_server</span></code>/<code class="docutils literal"><span class="pre">ad_site</span></code> for <a class="reference external" href="https://fedorahosted.org/sssd#Use%20Case%202:%20restricting%20FreeIPA/SSSD%20only%20to%20selected%20AD%20servers%20and/or%20sites">Use Case
+2</a>)</li>
+<li>Restart SSSD</li>
+<li>Join FreeIPA domain with another client (with <code class="docutils literal"><span class="pre">ipa-client-install</span></code>
+for example), see if the set option is used correctly</li>
+</ul>
+</div>
+<div class="section" id="how-to-debug">
+<h2>How To Debug<a class="headerlink" href="#how-to-debug" title="Permalink to this headline">¶</a></h2>
+<p>TBD</p>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<p>Michal Židek <a class="reference external" href="mailto:mzidek&#37;&#52;&#48;redhat&#46;com">​mzidek<span>&#64;</span>redhat<span>&#46;</span>com</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Subdomain configuration</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem statement</a></li>
+<li><a class="reference internal" href="#use-cases">Use cases</a><ul>
+<li><a class="reference internal" href="#use-case-1-filtering-inactive-users-in-trusted-ad-domain">Use Case 1: filtering inactive users in trusted AD domain</a></li>
+<li><a class="reference internal" href="#use-case-2-restricting-freeipa-sssd-only-to-selected-ad-servers-and-or-sites">Use Case 2: restricting FreeIPA/SSSD only to selected AD servers and/or sites</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#overview-of-the-solution">Overview of the solution</a></li>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a></li>
+<li><a class="reference internal" href="#how-to-test">How To Test</a></li>
+<li><a class="reference internal" href="#how-to-debug">How To Debug</a></li>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/SubdomConf.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/SubdomConf.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>The Active Directory provider now includes support for Site-based
+discovery. This feature allows the Active Directory clients to find
+the most suitable Domain Controller to connect to.</li>
+<li>Support for dynamic DNS updates in the Active Directory provider.
+This feature enables the clients to automatically update or refresh
+their DNS records stored in the AD server.</li>
+<li>A new library, called <code class="docutils literal"><span class="pre">libsss_nss_idmap</span></code> was introduced. This
+library allows the user to convert Windows Security Identifiers
+(SIDs) to names and vice versa. The library also includes Python
+bindings.</li>
+<li>Setting the SELinux context on the IPA server now also works for
+users coming from a trusted Active Directory domain</li>
+<li>Fixed a serious performance issue when enumerating large number of
+users</li>
+<li>The <code class="docutils literal"><span class="pre">subdomain_homedir</span></code> configuration option gained a new template
+expansion <code class="docutils literal"><span class="pre">%F</span></code> that expands to the flat name (NetBIOS name) of the
+trusted AD domain</li>
+</ul>
+</div>
+<div class="section" id="packaging-changes">
+<h1>Packaging Changes<a class="headerlink" href="#packaging-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>The SSSD python ConfigAPI was moved to its own noarch subpackage to
+make the SSSD packaging more compliant with the Fedora packaging
+guidelines</li>
+<li>The <code class="docutils literal"><span class="pre">libsss_nss_idmap</span></code> library and its Python bindings are packaged
+in separate subpackages</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/1625">#1625</a></dt>
+<dd>Confusing error messages for invalid sssd.conf</dd>
+<dt><a class="reference external" href="/sssd/ticket/1741">#1741</a></dt>
+<dd>sss_cache doesn&#8217;t support subdomains</dd>
+<dt><a class="reference external" href="/sssd/ticket/1767">#1767</a></dt>
+<dd>unify sss_mc_set_recycled</dd>
+<dt><a class="reference external" href="/sssd/ticket/1774">#1774</a></dt>
+<dd>move processing of password expiration back to PAM provider only</dd>
+<dt><a class="reference external" href="/sssd/ticket/1784">#1784</a></dt>
+<dd>rewrite nested group processing to follow the tevent_req coding
+style</dd>
+<dt><a class="reference external" href="/sssd/ticket/1786">#1786</a></dt>
+<dd>Use new interface from ding-libs ini interface</dd>
+<dt><a class="reference external" href="/sssd/ticket/1830">#1830</a></dt>
+<dd>make the authtok structure really opaque</dd>
+<dt><a class="reference external" href="/sssd/ticket/1839">#1839</a></dt>
+<dd>Incorrect *.py[co] files placement</dd>
+<dt><a class="reference external" href="/sssd/ticket/1844">#1844</a></dt>
+<dd>add a call to calculated the range for a given domain SID to
+libsss_idmap</dd>
+<dt><a class="reference external" href="/sssd/ticket/1848">#1848</a></dt>
+<dd>unused parameter in ipa_selinux handler</dd>
+<dt><a class="reference external" href="/sssd/ticket/1860">#1860</a></dt>
+<dd>pidfile() may leak memory on error</dd>
+<dt><a class="reference external" href="/sssd/ticket/1861">#1861</a></dt>
+<dd>potential out-of-bounds-write in sss_idmap_sid_to_dom_sid</dd>
+<dt><a class="reference external" href="/sssd/ticket/1862">#1862</a></dt>
+<dd>negative return in files.c</dd>
+<dt><a class="reference external" href="/sssd/ticket/1864">#1864</a></dt>
+<dd>Bad comparisons in checks found by new Coverity instance</dd>
+<dt><a class="reference external" href="/sssd/ticket/1865">#1865</a></dt>
+<dd>Logically dead code in tools_util.c</dd>
+<dt><a class="reference external" href="/sssd/ticket/1867">#1867</a></dt>
+<dd>document that AD provider is always case insensitive</dd>
+<dt><a class="reference external" href="/sssd/ticket/1877">#1877</a></dt>
+<dd>ding-libs.dhash: uninitialized pointer read</dd>
+<dt><a class="reference external" href="/sssd/ticket/1888">#1888</a></dt>
+<dd>freeipa 3.2 trusted ad user not listed in external group</dd>
+<dt><a class="reference external" href="/sssd/ticket/1889">#1889</a></dt>
+<dd>coverity: dead code in sudo client</dd>
+</dl>
+</div></div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Abhishek Singh (3):</p>
+<ul class="simple">
+<li>cmocka unittest for find_uid added</li>
+<li>cmocka unittest for io added</li>
+<li>Fix segmentation fault in test_io.</li>
+</ul>
+<p>Ariel Barria (2):</p>
+<ul class="simple">
+<li>Allow setting krb5_renew_interval with a delimiter</li>
+<li>Confusing error messages for invalid sssd.conf</li>
+</ul>
+<p>Jakub Hrozek (38):</p>
+<ul class="simple">
+<li>Updating the version for the 1.10 beta1 release</li>
+<li>krb5 child: Use the correct type when processing OTP</li>
+<li>pidfile(): Do not leak fd on error</li>
+<li>Fix potential out-of-bounds write in sss_idmap_sid_to_dom_sid</li>
+<li>Return errno, not -1 on failure in files.c</li>
+<li>Check for correct variable name</li>
+<li>Init failover with be_res options</li>
+<li>Centralize resolv_init, remove resolv context list</li>
+<li>dyndns: Fix initializing sdap_id_ctx</li>
+<li>Check for the correct variables</li>
+<li>Allocate PAM DP request data on responder context</li>
+<li>LDAP: Always fail if a map can&#8217;t be found</li>
+<li>Put the override_homedir into an included xml file</li>
+<li>Allow using flatname for subdomain home dir template</li>
+<li>Fix simple access group control in case-insensitive domains</li>
+<li>Make leak checks usable in tests that do not utilize check</li>
+<li>tests: Fix the order of key/values</li>
+<li>LDAP: do not invalidate pointer with realloc while processing ghost
+users</li>
+<li>Convert the simple access check to new error codes</li>
+<li>tests: Link the simple access tests with -ldl</li>
+<li>Do not keep growing event context</li>
+<li>Document the naming convention for SSSD domains</li>
+<li>Document that the AD provider is case-insensitive</li>
+<li>selinux: if no domain matches, make the debug message louder</li>
+<li>Only try to relink ghost users if we&#8217;re not enumerating</li>
+<li>Display the last grace warning, too</li>
+<li>Refactor dynamic DNS updates</li>
+<li>Convert IPA-specific options to be back-end agnostic</li>
+<li>dyndns: new option dyndns_refresh_interval</li>
+<li>resolver: Return PTR record as string</li>
+<li>dyndns: New option dyndns_update_ptr</li>
+<li>dyndns: new option dyndns_force_tcp</li>
+<li>dyndns: new option dyndns_auth</li>
+<li>Split out the common code from timed DNS updates</li>
+<li>Active Directory dynamic DNS updates</li>
+<li>AD: Always initialize ID mapping</li>
+<li>Only check UPN if enterprise principals are not used</li>
+<li>Updating the translations for the 1.10 beta1 release</li>
+</ul>
+<p>Jan Cholasta (1):</p>
+<ul class="simple">
+<li>Add exit status section to sss_ssh_* man pages</li>
+</ul>
+<p>Lukas Slebodnik (5):</p>
+<ul class="simple">
+<li>LDAP: Fix value initialization warnings</li>
+<li>Incorrect *.py[co] files placement</li>
+<li>Fix krbcc dir creation issue with MIT krb5 1.11</li>
+<li>Default TEST_DIR to cwd, not empty string if not set explicitly</li>
+<li>SUDO: IPA provider</li>
+</ul>
+<p>Michal Zidek (6):</p>
+<ul class="simple">
+<li>Check for waitpid failure at wrong place.</li>
+<li>Wrong condition after waitpid.</li>
+<li>sss_cache: support for subdomains</li>
+<li>sss_cache: Remove annoying messages</li>
+<li>Inform about function duplication.</li>
+<li>libsss_idmap: function to calculate range</li>
+</ul>
+<p>Ondrej Kos (3):</p>
+<ul class="simple">
+<li>DB: Switch to new libini_config API</li>
+<li>CONFDB: prevent double free</li>
+<li>IDMAP: Fix variable initialization</li>
+</ul>
+<p>Pavel Březina (18):</p>
+<ul class="simple">
+<li>resolv: add resolv_get_domain request to resolv utils</li>
+<li>resolv: add resolv_discover_srv request to resolv utils</li>
+<li>DNS sites support - SRV lookup plugin interface</li>
+<li>DNS sites support - SRV DNS lookup plugin</li>
+<li>fail over - add function to insert multiple servers to the list</li>
+<li>DNS sites support - replace SRV lookup code with a plugin call</li>
+<li>DNS sites support - use SRV DNS lookup plugin in all providers</li>
+<li>DNS sites support - add IPA SRV plugin</li>
+<li>sudo client: remove dead code</li>
+<li>add fo_discover_servers request</li>
+<li>IPA SRV plugin: use fo_discover_servers request</li>
+<li>IPA SRV plugin: improve debugging</li>
+<li>sdap: add sdap_connect_host request</li>
+<li>add sss_ldap_encode_ndr_uint32</li>
+<li>DNS sites support - add AD SRV plugin</li>
+<li>dns srv plugin: compare domain names case insensitive</li>
+<li>AD SRV plugin: check if site name is empty</li>
+<li>fo_discover_servers_send: don&#8217;t crash when backup_domain is NULL</li>
+</ul>
+<p>Simo Sorce (1):</p>
+<ul class="simple">
+<li>Further restrict become_user drop of privileges.</li>
+</ul>
+<p>Sumit Bose (21):</p>
+<ul class="simple">
+<li>Fix and rename get_my_domain_data()</li>
+<li>Refactoring: remove duplicated code in nss responder</li>
+<li>Allow usage of enterprise principals</li>
+<li>Make IPA SELinux provider aware of subdomain users</li>
+<li>Add override_homedir.xml to po4a.cfg</li>
+<li>Remove unused TALLOC_CTX from responder_get_domain()</li>
+<li>responder_get_domain: do not return disabled domains</li>
+<li>responder_get_domain(): remove timeout calculation</li>
+<li>LDAP: always store SID if available</li>
+<li>Add secid filter to responder-dp protocol</li>
+<li>Add two new request types to the data-provider interface</li>
+<li>Add idmap context to nss context</li>
+<li>Add responder_get_domain_by_id()</li>
+<li>sysdb: add sysdb_search_object_by_sid()</li>
+<li>Add sss_ncache_set_sid() and sss_ncache_check_sid()</li>
+<li>Remove unused attribute list</li>
+<li>Use struct to hold different types of request parameters</li>
+<li>Add SID related lookups to IPA subdomains</li>
+<li>Add SID related calls to the NSS responder</li>
+<li>Add client library for SID related lookups</li>
+<li>Add python interface to libsss_nss_idmap</li>
+</ul>
+<p>Yuri Chornoivan (1):</p>
+<ul class="simple">
+<li>Fix typos in man pages</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#packaging-changes">Packaging Changes</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.10.0beta1.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.10.0beta1.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#Highlights">Highlights</a></li>
+<li><a class="reference external" href="#TicketsFixed">Tickets Fixed</a></li>
+<li><a class="reference external" href="#DetailedChangelog">Detailed Changelog</a></li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>A security bug assigned CVE-2013-0219 was fixed - TOCTOU race
+conditions when creating or removing home directories for users in
+local domain</li>
+<li>A security bug assigned CVE-2013-0220 was fixed - out-of-bounds reads
+in autofs and ssh responder</li>
+<li>Handle servers that return an empty string as the value of
+namingContext, in particular Novell eDirectory</li>
+<li>The netgroup midpoint cache refresh works as documented in the manual
+page</li>
+<li>The sssd_pam responder processes pending requests after reconnect</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1542">​https://fedorahosted.org/sssd/ticket/1542</a>
+User authentication using LDAP doesn&#8217;t work</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1581">​https://fedorahosted.org/sssd/ticket/1581</a>
+sssd_be crashes while looking up users</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1717">​https://fedorahosted.org/sssd/ticket/1717</a>
+Limit requests coalescing in time</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1683">​https://fedorahosted.org/sssd/ticket/1683</a>
+arithmetic bug in the SSSD causes netgroup midpoint refresh to be
+always set to 10 seconds</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1655">​https://fedorahosted.org/sssd/ticket/1655</a>
+Login fails - sssd_be module polling fd indefinitely and gets killed</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1781">​https://fedorahosted.org/sssd/ticket/1781</a>
+sssd: Out-of-bounds read flaws in autofs and ssh services responders</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1528">​https://fedorahosted.org/sssd/ticket/1528</a>
+SSSD_NSS failure to gracefully restart after sbus failure</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1783">​https://fedorahosted.org/sssd/ticket/1783</a>
+Group lookup fails and takes ~60s to return to shell if member dn is
+incorrect</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1782">​https://fedorahosted.org/sssd/ticket/1782</a>
+TOCTOU race conditions by copying and removing directory trees</li>
+</ul>
+</div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Jakub Hrozek (9):</p>
+<ul class="simple">
+<li>Updating the version for the 1.8.6 release</li>
+<li>Initialize Kerberos ticket renewal in the IPA provider</li>
+<li>LDAP: Check validity of naming_context</li>
+<li>Free the internal DP request</li>
+<li>Do not always return PAM_SYSTEM_ERR when offline krb5
+authentication fails</li>
+<li>NSS: Fix netgroup midpoint cache refresh</li>
+<li>TOOLS: Use openat/unlinkat when removing the homedir</li>
+<li>TOOLS: Compile on old platforms such as RHEL5</li>
+<li>Include the auth_utils.h header in the distribution</li>
+</ul>
+<p>Jan Cholasta (1):</p>
+<ul class="simple">
+<li>Check that strings do not go beyond the end of the packet body in
+autofs and SSH requests.</li>
+</ul>
+<p>Ondrej Kos (2):</p>
+<ul class="simple">
+<li>Restart services with a delay in case they are restarted too often</li>
+<li>TOOLS: Use file descriptor to avoid races when creating a home
+directory</li>
+</ul>
+<p>Pavel Březina (1):</p>
+<ul class="simple">
+<li>nested groups: fix group lookup hangs if member dn is incorrect</li>
+</ul>
+<p>Simo Sorce (2):</p>
+<ul class="simple">
+<li>responder_dp: Add timeout to side requets</li>
+<li>sssd_pam: Cleanup requests cache on sbus reconect</li>
+</ul>
+<p>Stephen Gallagher (1):</p>
+<ul class="simple">
+<li>LDAP: Handle empty namingContexts values safely</li>
+</ul>
+<p>Timo Aaltonen (1):</p>
+<ul class="simple">
+<li>link sss_ssh_authorizedkeys and sss_ssh_knownhostsproxy with
+-lpthread</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.8.6.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.8.6.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

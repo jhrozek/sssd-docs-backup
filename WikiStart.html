@@ -1,0 +1,246 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>SSSD - System Security Services Daemon &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#SSSD-SystemSecurityServicesDaemon">SSSD - System Security Services
+Daemon</a><ol class="arabic">
+<li><a class="reference external" href="#Resources">Resources</a></li>
+<li><a class="reference external" href="#Releases">Releases</a></li>
+<li><a class="reference external" href="#SocialNetworking">Social Networking</a></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="sssd-system-security-services-daemon">
+<h1>SSSD - System Security Services Daemon<a class="headerlink" href="#sssd-system-security-services-daemon" title="Permalink to this headline">¶</a></h1>
+<p>SSSD is a system daemon. Its primary function is to provide access to
+identity and authentication remote resource through a common framework
+that can provide caching and offline support to the system. It provides
+PAM and NSS modules, and in the future will D-BUS based interfaces for
+extended user information. It provides also a better database to store
+local users as well as extended user data.</p>
+<p>Documentation on configuring SSSD in Fedora or Red Hat Enterprise Linux
+is available from <a class="reference external" href="https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html-single/Deployment_Guide/index.html#SSSD-Introduction">​the RHEL deployment
+guide</a>.
+We also have a dedicated <a class="reference external" href="https://docs.pagure.org/sssd-test2/Documentation.html">Documentation
+section</a></p>
+<p>Having problems? Check out our <a class="reference external" href="https://docs.pagure.org/sssd-test2/Troubleshooting.html">troubleshooting
+page</a> or the
+&#8220;<a class="reference external" href="https://docs.pagure.org/sssd-test2/FAQ.html">Frequently Asked
+Questions</a>&#8221; page for
+answers to common issues.</p>
+<p>If you would like to contribute to the SSSD, a good place to start would
+be our
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Contribute.html">Contributions</a>
+page.</p>
+<p>If you want to file a bug or enhancement request, please log in with
+your Fedora Account System credentials. If you do not have a Fedora
+Account, you can register for one at
+<a class="reference external" href="https://admin.fedoraproject.org/accounts/">​https://admin.fedoraproject.org/accounts/</a></p>
+<div class="section" id="resources">
+<h2>Resources<a class="headerlink" href="#resources" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/DesignDocs.html">Design
+Documents</a></li>
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/Documentation.html">Documentation and
+HOWTOs</a></li>
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/DevRes.html">Developer
+Information</a></li>
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/Configuring_sssd_with_ad_server.html">Configuring sssd to authenticate with a Windows
+Server</a></li>
+</ul>
+</div>
+<div class="section" id="releases">
+<h2>Releases<a class="headerlink" href="#releases" title="Permalink to this headline">¶</a></h2>
+<p>Latest Stable Release:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="24%" />
+<col width="15%" />
+<col width="22%" />
+<col width="17%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.15.0.tar.gz">​sssd-1.15.0.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.15.0.tar.gz.asc">​sssd-1.15.0.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">0c9fc62c1b9bcdca649223d9f673b9a73f273e56</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">0c151a045e5292fece1e991b665d525c</span></code></td>
+<td>Date: 2017-01-25
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.15.0.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.15.0/man/">​Manpages</a></td>
+</tr>
+</tbody>
+</table>
+<p>Latest LTM Release:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="24%" />
+<col width="15%" />
+<col width="22%" />
+<col width="17%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.13.4.tar.gz">​sssd-1.13.4.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.13.4.tar.gz.asc">​sssd-1.13.4.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">8332501d752ab82f994170d11d31d5d15912b2e9</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">d147e0a4f4719d993693c6a99370b350</span></code></td>
+<td>Date: 2016-04-13
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.13.4.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.13.4/man/">​Manpages</a></td>
+</tr>
+</tbody>
+</table>
+<p>Previous LTM Release:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="24%" />
+<col width="15%" />
+<col width="22%" />
+<col width="17%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.7.tar.gz">​sssd-1.9.7.tar.gz</a></td>
+<td><a class="reference external" href="https://releases.pagure.org/sssd-test2/sssd-1.9.7.tar.gz.asc">​sssd-1.9.7.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">941c5f479664a50a8611a4d1bcec7226f25f7add</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">d35149f567a7c158715b55c93c8d91cb</span></code></td>
+<td>Date: 2014-12-05
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/Notes-1.9.7.html">Release Notes</a></td>
+<td><a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.9.7/man/">​Manpages</a></td>
+</tr>
+</tbody>
+</table>
+<p>Latest Stable Release of DING-LIBS</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="28%" />
+<col width="31%" />
+<col width="16%" />
+<col width="25%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference external" href="https://fedorahosted.org/released/ding-libs/ding-libs-0.6.0.tar.gz">​ding-libs-0.6.0.tar.gz</a></td>
+<td><a class="reference external" href="https://fedorahosted.org/released/ding-libs/ding-libs-0.6.0.tar.gz.asc">​ding-libs-0.6.0.tar.gz.asc</a></td>
+<td>SHA1SUM: <code class="docutils literal"><span class="pre">c8ec86cb93a26e013a13b12a7b0b3fbc1bca16c1</span></code>
+MD5SUM: <code class="docutils literal"><span class="pre">0dd0a95f2f8d65b84d3cb9568494109a</span></code></td>
+<td>Date: 2016-06-22
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases/DingNotes-0.6.0.html">Release Notes</a></td>
+</tr>
+</tbody>
+</table>
+<p>Older releases are available on our
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases.html">Releases</a> page.</p>
+</div>
+<div class="section" id="social-networking">
+<h2>Social Networking<a class="headerlink" href="#social-networking" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://twitter.com/SysSecSvcDaemon">Follow &#64;SysSecSvcDaemon on
+Twitter!</a></p>
+<p>Join the <a class="reference external" href="https://plus.google.com/114204339376082660377">​SSSD
+Google+</a> page</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">SSSD - System Security Services Daemon</a><ul>
+<li><a class="reference internal" href="#resources">Resources</a></li>
+<li><a class="reference internal" href="#releases">Releases</a></li>
+<li><a class="reference internal" href="#social-networking">Social Networking</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/WikiStart.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/WikiStart.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

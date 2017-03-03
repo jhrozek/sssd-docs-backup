@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Periodic task API &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="periodic-task-api">
+<h1>Periodic task API<a class="headerlink" href="#periodic-task-api" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1891">​unite periodic refresh
+API</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem Statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>SSSD contains several periodic tasks that implements custom periodic
+API. These APIs are more or less sophisticated but it does the same
+thing.</p>
+<p>Current periodic tasks are:</p>
+<ul class="simple">
+<li>Enumeration</li>
+<li>Dynamic DNS updates</li>
+<li>SUDO - full and smart refresh</li>
+<li>Refresh of expired NSS entries</li>
+</ul>
+<p>We want to replace these individual implementation with one back end
+wise API.</p>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="terminology">
+<h3>Terminology<a class="headerlink" href="#terminology" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>task: object of type be_ptask</li>
+<li>request: tevent request that is fired periodically and is managed by
+task</li>
+</ul>
+</div>
+<div class="section" id="api">
+<h3>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><em>struct be_ptask_task</em> is encapsulated.</li>
+<li><em>be_ptask_create()</em> creates and starts new periodic task</li>
+<li><em>be_ptask_enable(task)</em> enable <em>task</em> and schedule next execution
+<em>enabled_delay</em> from now</li>
+<li><em>be_ptask_disable(task)</em> disable <em>task</em>, cancel current timer and
+wait until it is enabled again</li>
+<li><em>be_ptask_destroy(task)</em> destroys <em>task</em> and sets it to <em>NULL</em></li>
+</ul>
+</div>
+<div class="section" id="schedule-rules">
+<h3>Schedule rules<a class="headerlink" href="#schedule-rules" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>the first execution is scheduled <em>first_delay</em> seconds after the
+task is created</li>
+<li>if request returns EOK, it will be scheduled again to
+&#8216;last_execution_time + period&#8217;</li>
+<li>if request returns ERR_STOP_PERIODIC_TASK, the task will be
+terminated</li>
+<li>if request returns other error code (i.e. non fatal failure), it will
+be rescheduled to &#8216;now + period&#8217;</li>
+<li>if request does not complete in <em>timeout</em> seconds, it will be
+cancelled and rescheduled to &#8216;now + period&#8217;</li>
+<li>if the task is reenabled, it will be scheduled again to &#8216;now +
+enabled_delay&#8217;</li>
+</ul>
+</div>
+<div class="section" id="when-offline">
+<h3>When offline<a class="headerlink" href="#when-offline" title="Permalink to this headline">¶</a></h3>
+<p>Offline behaviour is controlled by <em>offline</em> parameter.</p>
+<ul class="simple">
+<li>If <em>offline</em> is <em>BE_PTASK_OFFLINE_EXECUTE</em> and back end is
+offline, current request will be executed as planned.</li>
+<li>If <em>offline</em> is <em>BE_PTASK_OFFLINE_SKIP</em> and back end is offline,
+current request will be skipped and rescheduled to &#8216;now + period&#8217;.</li>
+<li>If <em>offline</em> is <em>BE_PTASK_OFFLINE_DISABLE</em>, an offline and online
+callback is registered. The task is disabled immediately when back
+end goes offline and then enabled again when back end goes back
+online.</li>
+</ul>
+</div>
+<div class="section" id="debugging">
+<h3>Debugging<a class="headerlink" href="#debugging" title="Permalink to this headline">¶</a></h3>
+<p>Task will provide enough debugging information so we can know exactly
+when a task is created and destroy, when it is executed and finished and
+when it will be executed in the future.</p>
+</div>
+</div>
+<div class="section" id="author-s">
+<h2>Author(s)<a class="headerlink" href="#author-s" title="Permalink to this headline">¶</a></h2>
+<p>Pavel Březina &lt;<a class="reference external" href="mailto:pbrezina&#37;&#52;&#48;redhat&#46;com">​pbrezina<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Periodic task API</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem Statement</a></li>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a><ul>
+<li><a class="reference internal" href="#terminology">Terminology</a></li>
+<li><a class="reference internal" href="#api">API</a></li>
+<li><a class="reference internal" href="#schedule-rules">Schedule rules</a></li>
+<li><a class="reference internal" href="#when-offline">When offline</a></li>
+<li><a class="reference internal" href="#debugging">Debugging</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#author-s">Author(s)</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/PeriodicTasks.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/PeriodicTasks.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

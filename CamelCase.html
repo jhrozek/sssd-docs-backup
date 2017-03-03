@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>CamelCase &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="camelcase">
+<h1>CamelCase<a class="headerlink" href="#camelcase" title="Permalink to this headline">¶</a></h1>
+<p>New words created by smashing together capitalized words.</p>
+<p><a class="reference external" href="https://docs.pagure.org/sssd-test2/CamelCase.html">CamelCase</a> is the
+original wiki convention for creating hyperlinks, with the additional
+requirement that the capitals are followed by a lower-case letter; hence
+“AlabamA” and “ABc” will not be links.</p>
+<div class="section" id="customizing-the-wiki-behavior">
+<h2>Customizing the Wiki behavior<a class="headerlink" href="#customizing-the-wiki-behavior" title="Permalink to this headline">¶</a></h2>
+<p>Some people dislike linking by
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/CamelCase.html">CamelCase</a>. While
+Trac remains faithful to the original Wiki style, it provides a number
+of ways to accomodate users with different preferences:</p>
+<ul class="simple">
+<li>There&#8217;s an option (<code class="docutils literal"><span class="pre">ignore_missing_pages</span></code> in the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#wiki-section">[wiki]</a>
+section of
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">TracIni</a>) to
+simply ignore links to missing pages when the link is written using
+the <a class="reference external" href="https://docs.pagure.org/sssd-test2/CamelCase.html">CamelCase</a>
+style, instead of that word being replaced by a gray link followed by
+a question mark.
+That can be useful when
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/CamelCase.html">CamelCase</a>
+style is used to name code artifacts like class names and there&#8217;s no
+corresponding page for them.</li>
+<li>There&#8217;s an option (<code class="docutils literal"><span class="pre">split_page_names</span></code> in the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#wiki-section">[wiki]</a>
+section of
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">TracIni</a>) to
+automatically insert space characters between the words of a
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/CamelCase.html">CamelCase</a>
+link when rendering the link.</li>
+<li>Creation of explicit Wiki links is also easy, see
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiPageNames.html">WikiPageNames</a>
+for details.</li>
+<li>In addition, Wiki formatting can be disabled completely in some
+places (e.g. when rendering commit log messages). See
+<code class="docutils literal"><span class="pre">wiki_format_messages</span></code> in the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#changeset-section">[changeset]</a>
+section of
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">TracIni</a>.</li>
+</ul>
+<p>See <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">TracIni</a> for
+more information on the available options.</p>
+</div>
+<div class="section" id="more-information-on-camelcase">
+<h2>More information on CamelCase<a class="headerlink" href="#more-information-on-camelcase" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://c2.com/cgi/wiki?WikiCase">​http://c2.com/cgi/wiki?WikiCase</a></li>
+<li><a class="reference external" href="http://en.wikipedia.org/wiki/CamelCase">​http://en.wikipedia.org/wiki/CamelCase</a></li>
+</ul>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiPageNames.html">WikiPageNames</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiNewPage.html">WikiNewPage</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html">WikiFormatting</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracWiki.html">TracWiki</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">CamelCase</a><ul>
+<li><a class="reference internal" href="#customizing-the-wiki-behavior">Customizing the Wiki behavior</a></li>
+<li><a class="reference internal" href="#more-information-on-camelcase">More information on CamelCase</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/CamelCase.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/CamelCase.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

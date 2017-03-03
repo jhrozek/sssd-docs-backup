@@ -1,0 +1,390 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Active Directory client access control &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="active-directory-client-access-control">
+<h1>Active Directory client access control<a class="headerlink" href="#active-directory-client-access-control" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2082">​RFE:Add a new option
+ad_access_filter</a></li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1975">​RFE:Change the default of
+ldap_access_order</a></li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1977">​issues when combining the AD provider and
+ldap_access_filter</a></li>
+</ul>
+<p>Somewhat related:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2083">​Document the best practices for AD access
+control</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem Statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>The recommended way of connecting a Linux client to an Active Directory
+domain is using the <a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.11.0/man/sssd-ad.5.html">​AD
+provider</a>.
+However, in the default configuration of the Active Directory provider,
+only account expiration is checked. Very often, the administrator needs
+to restrict the access to the client machine further, limiting the
+access to a certain user, group of users, or using some other custom
+filtering mechanism. In order to do so, the administrator is required to
+use an alternative access control provider. However, none of the
+alternatives provide the full required functionality for all users
+resolvable by the AD provider, moreover they are hard to configure. This
+design page proposes extension of the AD access provider to address
+these concerns.</p>
+</div>
+<div class="section" id="current-access-control-options">
+<h2>Current access control options<a class="headerlink" href="#current-access-control-options" title="Permalink to this headline">¶</a></h2>
+<p>With the existing SSSD, the administrator has two basic means to
+restrict access control to the Linux client - using the <a class="reference external" href="http://jhrozek.fedorapeople.org/sssd/1.11.0/man/sssd-simple.5.html">​simple access
+control
+provider</a>
+or configuring the LDAP access control provider. Each approach has its
+pros and cons.</p>
+<div class="section" id="using-the-simple-access-provider">
+<h3>Using the simple access provider<a class="headerlink" href="#using-the-simple-access-provider" title="Permalink to this headline">¶</a></h3>
+<p>The simple access provider grants or denies access based on the contents
+of allow and deny lists. There are separate lists for user and group
+names as well as allowed and denied objects.</p>
+<p>The following example shows configuration that grants access to user
+named <code class="docutils literal"><span class="pre">tux</span></code> and group called <code class="docutils literal"><span class="pre">linuxadmins</span></code>.</p>
+<ul class="simple">
+<li>Pros:<ul>
+<li>Easy to configure</li>
+<li>Realmd provides an interface to configure the simple access
+provider using its CLI</li>
+</ul>
+</li>
+<li>Cons:<ul>
+<li>Account expiration is not checked</li>
+<li>Limited expresiveness. No way to combine several clauses</li>
+<li>Does not align with the LDAP structure the Active Directory uses</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="using-the-ldap-access-provider">
+<h3>Using the LDAP access provider<a class="headerlink" href="#using-the-ldap-access-provider" title="Permalink to this headline">¶</a></h3>
+<p>The LDAP access provider offers a way to configure the access control
+decision based on whether the user matches a preconfigured filter.
+Moreover, the LDAP access provider also offers chaining other LDAP based
+checks. For the vanilla AD environment, only account expiration check
+applies.</p>
+<p>The following example illustrates configuration that allows access to
+those users, who are members of group named <code class="docutils literal"><span class="pre">linuxadmins</span></code> AND have a
+valid home directory set using the <code class="docutils literal"><span class="pre">ldap_access_filter</span></code> directive. The
+users who match the configured filter are also checked whether they are
+expired (<code class="docutils literal"><span class="pre">ldap_access_order</span></code> contains <code class="docutils literal"><span class="pre">expire</span></code>).</p>
+<ul class="simple">
+<li>Pros:<ul>
+<li>Allows the administrator to base access control on a custom LDAP
+filter, making it possible to combine several conditions</li>
+<li>Conditions are not limited to user names or group membership</li>
+</ul>
+</li>
+<li>Cons:<ul>
+<li>Nontrivial and clumsy configuration that must include several low
+level LDAP settings, otherwise set automatically by the AD
+provider. Defeats the whole purpose of the AD provider</li>
+<li>The admin needs to combine AD and LDAP providers. Judging by
+experience from triaging support cases with Red Hat support, this
+is a problem for many admins.</li>
+<li>Account expiration check must be configured separately, which is
+not obvious</li>
+<li>No support for users from trusted AD domains</li>
+<li>No realmd integration</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="proposed-solution">
+<h2>Proposed solution<a class="headerlink" href="#proposed-solution" title="Permalink to this headline">¶</a></h2>
+<p>The proposal is to add a new access filter configuration option to the
+existing AD access provider. Adding the option to the AD provider would
+greatly simplify the configuration when compared to the LDAP access
+control, while maintaining the full expresiveness of
+<code class="docutils literal"><span class="pre">ldap_access_filter</span></code>. The new option would be called
+<code class="docutils literal"><span class="pre">ad_access_filter</span></code>. If the new option was set, then the AD access
+provider would first match the entry against the filter in that option.
+If the entry matched, then the account would be checked for expiration.</p>
+<p>The following exapmple illustrates an example similar to the one above,
+using the proposed AD options:</p>
+<p>The main advantage is simplified configuration. The admin doesn&#8217;t have
+to know or understand what &#8220;SASL ID&#8221; is.</p>
+<p>In comparison with the two legacy solutions explained above:</p>
+<ul class="simple">
+<li>Pros<ul>
+<li>Easy and intuitive configuration. Only one provider type is
+configured</li>
+<li>Sane defaults - always checks for expiration, also checks access
+filter if configured that way</li>
+<li>Would support users and groups from trusted domains by leveraging
+the existing AD provider infrastructure</li>
+</ul>
+</li>
+<li>Cons<ul>
+<li>No realmd integration</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="realmd-integration">
+<h2>Realmd integration<a class="headerlink" href="#realmd-integration" title="Permalink to this headline">¶</a></h2>
+<p>After a short discussion with the realmd upstream maintainer, it was
+decided that these options do not fit the realmd use-cases well. If the
+user needs to use such advanced techniques as LDAP filters, chances are
+that he doesn&#8217;t need a tool like realmd to set them up in the config
+file.</p>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>The default value of what AD access_provider is set to should be
+changed<ul>
+<li>Currently, if <code class="docutils literal"><span class="pre">access_provider</span></code> is not set explicitly, the
+default is <code class="docutils literal"><span class="pre">permit</span></code>, thus allowing even expired accounts</li>
+<li>The new default would be <code class="docutils literal"><span class="pre">ad</span></code>, checking account expiration even
+with a minimal configuration</li>
+</ul>
+</li>
+<li>A new option would be added. The new option would be called
+<code class="docutils literal"><span class="pre">ad_access_filter</span></code></li>
+<li>The LDAP access provider must be extended to allow connecting to a GC
+and support subdomains in general<ul>
+<li>Pass in <code class="docutils literal"><span class="pre">struct</span> <span class="pre">sdap_domain</span></code> and <code class="docutils literal"><span class="pre">id_conn</span></code> instead of using
+the connection from <code class="docutils literal"><span class="pre">sdap_id_ctx</span></code> directly</li>
+<li>The code must not read the <code class="docutils literal"><span class="pre">sss_domain_info</span></code> from <code class="docutils literal"><span class="pre">be_ctx</span></code> but
+only from <code class="docutils literal"><span class="pre">sdap_domain</span></code> in order to support subdomain users</li>
+</ul>
+</li>
+<li>The AD access provider must call the improved LDAP access provider
+internally with the right connection<ul>
+<li>The default should be GC</li>
+<li>If POSIX attributes are in use and GC lookup wouldn&#8217;t match,
+optionally fall back to LDAP. This fallback could be tried just
+once to speed up subsequent access control</li>
+</ul>
+</li>
+<li>The default chain of LDAP access filter the AD provider sets
+internally must be changed.<ul>
+<li>Currently AD provider sets <code class="docutils literal"><span class="pre">ldap_access_order=expire</span></code>. If (and
+only if) <code class="docutils literal"><span class="pre">ad_access_filter</span></code> was set, the LDAP chain would become
+<code class="docutils literal"><span class="pre">ldap_access_order=filter,expire</span></code></li>
+</ul>
+</li>
+</ol>
+<div class="section" id="parsing-the-ad-access-filter-option">
+<h3>Parsing the <code class="docutils literal"><span class="pre">ad_access_filter</span></code> option<a class="headerlink" href="#parsing-the-ad-access-filter-option" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li>The <code class="docutils literal"><span class="pre">ad_access_filter</span></code> option is a comma-separated list of filters
+that apply globally, per-domain or per-forest. The most specific
+match is used</li>
+<li>If the <code class="docutils literal"><span class="pre">ad_access_filter</span></code> value starts with an opening bracket
+<code class="docutils literal"><span class="pre">(</span></code>, it is used as a filter for all entries from all domains and
+forests<ul>
+<li>example:
+<code class="docutils literal"><span class="pre">(&amp;(memberOf=cn=admins,ou=groups,dc=example,dc=com)(unixHomeDirectory=*))</span></code></li>
+</ul>
+</li>
+<li>More advanced format can be used to restrict the filter to a specific
+domain or a specific forest. This format is <code class="docutils literal"><span class="pre">KEYWORD:NAME:FILTER</span></code><ul>
+<li>KEYWORD can be one of <code class="docutils literal"><span class="pre">DOM</span></code> or <code class="docutils literal"><span class="pre">FOREST</span></code><ul>
+<li>KEYWORD can be missing</li>
+</ul>
+</li>
+<li>NAME is a label.<ul>
+<li>if KEYWORD equals <code class="docutils literal"><span class="pre">DOM</span></code> or missing completely, the filter is
+applied for users from domain named NAME only</li>
+<li>if KEYWORD equals <code class="docutils literal"><span class="pre">FOREST</span></code>, the filter is applied on users
+from forest named NAME only</li>
+</ul>
+</li>
+<li>examples of valid filters are:<ul>
+<li>apply filter on domain called dom1 only:<ul>
+<li><code class="docutils literal"><span class="pre">dom1:(memberOf=cn=admins,ou=groups,dc=dom1,dc=com)</span></code></li>
+</ul>
+</li>
+<li>apply filter on domain called dom2 only:<ul>
+<li><code class="docutils literal"><span class="pre">DOM:dom2:(memberOf=cn=admins,ou=groups,dc=dom2,dc=com)</span></code></li>
+</ul>
+</li>
+<li>apply filter on forest called EXAMPLE.COM only:<ul>
+<li><code class="docutils literal"><span class="pre">FOREST:EXAMPLE.COM:(memberOf=cn=admins,ou=groups,dc=example,dc=com)</span></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>If no filter matches the user&#8217;s domain, access is denied<ul>
+<li>example
+<code class="docutils literal"><span class="pre">ad_access_filter</span> <span class="pre">=</span> <span class="pre">dom1:(memberOf=cn=admins,ou=groups,dc=dom1,dc=com),</span> <span class="pre">dom2:(memberOf=cn=admins,ou=groups,dc=dom2,dc=com)</span></code>,
+user logs in from dom3</li>
+</ul>
+</li>
+</ol>
+</div>
+</div>
+<div class="section" id="contingency-plan">
+<h2>Contingency plan<a class="headerlink" href="#contingency-plan" title="Permalink to this headline">¶</a></h2>
+<p>None needed. The existing options would still exist and function as they
+do now.</p>
+</div>
+<div class="section" id="how-to-test">
+<h2>How to test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Check that <code class="docutils literal"><span class="pre">access_provider=ad</span></code> without any other options allows
+non-expired users</li>
+<li>Check that <code class="docutils literal"><span class="pre">access_provider=ad</span></code> without any other options denies
+expired users</li>
+<li>Test that setting <code class="docutils literal"><span class="pre">ad_access_filter</span></code> restricts access to users who
+match the filter<ul>
+<li>test that an expired user, even though he matches the filter, is
+denied access</li>
+<li>this test must include users from the primary domain as well as a
+sub domain</li>
+<li>Different filters should be tested to make sure the most speficic
+filter applies<ul>
+<li>example: add a restrictive filter for dom1 and permissive
+filter without specifying the domain. A user from dom1 must be
+denied access, while a user from other domain must be allowed
+access</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>When access is denied, the SSSD PAM responder must return a
+reasonable return code (6)</li>
+</ol>
+</div>
+<div class="section" id="future-and-optional-enhancements">
+<h2>Future and optional enhancements<a class="headerlink" href="#future-and-optional-enhancements" title="Permalink to this headline">¶</a></h2>
+<p>In the future, we should extend the <code class="docutils literal"><span class="pre">access_provider</span></code> option itself
+and allow chaining access providers. This enhancement would allow even
+more flexibility and would allow the administrator to combine different
+access providers, but is outside the scope of the change described by
+this design page.</p>
+</div>
+<div class="section" id="author-s">
+<h2>Author(s)<a class="headerlink" href="#author-s" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Jakub Hrozek &lt;<a class="reference external" href="mailto:jhrozek&#37;&#52;&#48;redhat&#46;com">​jhrozek<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+<li>Sumit Bose &lt;<a class="reference external" href="mailto:sbose&#37;&#52;&#48;redhat&#46;com">​sbose<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Active Directory client access control</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem Statement</a></li>
+<li><a class="reference internal" href="#current-access-control-options">Current access control options</a><ul>
+<li><a class="reference internal" href="#using-the-simple-access-provider">Using the simple access provider</a></li>
+<li><a class="reference internal" href="#using-the-ldap-access-provider">Using the LDAP access provider</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#proposed-solution">Proposed solution</a></li>
+<li><a class="reference internal" href="#realmd-integration">Realmd integration</a></li>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a><ul>
+<li><a class="reference internal" href="#parsing-the-ad-access-filter-option">Parsing the <code class="docutils literal"><span class="pre">ad_access_filter</span></code> option</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#contingency-plan">Contingency plan</a></li>
+<li><a class="reference internal" href="#how-to-test">How to test</a></li>
+<li><a class="reference internal" href="#future-and-optional-enhancements">Future and optional enhancements</a></li>
+<li><a class="reference internal" href="#author-s">Author(s)</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/ActiveDirectoryAccessControl.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/ActiveDirectoryAccessControl.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

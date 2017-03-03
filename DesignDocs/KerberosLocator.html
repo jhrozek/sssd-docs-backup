@@ -1,0 +1,327 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Kerberos Locator Plugin &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><a class="reference external" href="#KerberosLocatorPlugin">Kerberos Locator Plugin</a><ol class="arabic">
+<li><a class="reference external" href="#OldDesign">Old Design</a><ol class="arabic">
+<li><a class="reference external" href="#Limitations">Limitations</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#NewDesign">New Design</a><ol class="arabic">
+<li><a class="reference external" href="#LocatorPlugin">Locator Plugin</a></li>
+<li><a class="reference external" href="#LocatorResponder">Locator Responder</a><ol class="arabic">
+<li><a class="reference external" href="#LocatorResponder-ClientWireProtocol">Locator Responder-Client Wire
+Protocol</a><ol class="arabic">
+<li><a class="reference external" href="#Request">Request</a></li>
+<li><a class="reference external" href="#Replies">Replies</a><ol class="arabic">
+<li><a class="reference external" href="#ReplyAddressData">Reply Address Data</a></li>
+<li><a class="reference external" href="#ReplyAddressDataStringrepresentation">Reply Address Data String
+representation</a></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><a class="reference external" href="#ResponderBehavior">Responder Behavior</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#KerberosProviderExtensions">Kerberos Provider Extensions</a><ol class="arabic">
+<li><a class="reference external" href="#SBUSProtocol">SBUS Protocol</a></li>
+<li><a class="reference external" href="#AddressResolution">Address Resolution</a></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="kerberos-locator-plugin">
+<h1>Kerberos Locator Plugin<a class="headerlink" href="#kerberos-locator-plugin" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="old-design">
+<h2>Old Design<a class="headerlink" href="#old-design" title="Permalink to this headline">¶</a></h2>
+<p>The current Kerberos locator plugin functions as follows:</p>
+<ol class="arabic simple">
+<li>The krb5 provider would write a file,
+<code class="docutils literal"><span class="pre">/var/lib/sss/pubconf/kdcinfo.REALM</span></code> consisting of a single line,
+the IP address and port of the KDC being used.</li>
+<li>The kerberos locator plugin would read in this file and return the IP
+address and port to the requesting application.</li>
+</ol>
+<div class="section" id="limitations">
+<h3>Limitations<a class="headerlink" href="#limitations" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>The locator provides only a single address and is only updated when
+the krb5 provider in the SSSD service connects to a new KDC.</li>
+<li>If the KDC we last authenticated against becomes unreachable, but
+other KDCs in a failover configuration remain up, applications
+relying on libkrb5 will fail to access those failover servers.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="new-design">
+<h2>New Design<a class="headerlink" href="#new-design" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="locator-plugin">
+<h3>Locator Plugin<a class="headerlink" href="#locator-plugin" title="Permalink to this headline">¶</a></h3>
+<p>The Kerberos locator plugin will be reinvented as an sss_client object.
+It will retain minimal logic in itself except as follows:</p>
+<ol class="arabic simple">
+<li>It will communicate across a socket to the Locator Responder
+(sssd_locator).</li>
+<li>We will optionally implement an in-memory cache similar to that of
+the NSS clients.</li>
+<li>This communication and caching will support retrieving multiple
+address/port pairs in a single transaction.</li>
+</ol>
+</div>
+<div class="section" id="locator-responder">
+<h3>Locator Responder<a class="headerlink" href="#locator-responder" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="locator-responder-client-wire-protocol">
+<h4>Locator Responder-Client Wire Protocol<a class="headerlink" href="#locator-responder-client-wire-protocol" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="request">
+<h5>Request<a class="headerlink" href="#request" title="Permalink to this headline">¶</a></h5>
+<table border="1" class="docutils">
+<colgroup>
+<col width="28%" />
+<col width="72%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Bytes</td>
+<td>Function</td>
+</tr>
+<tr class="row-even"><td>0-4</td>
+<td>Message Length</td>
+</tr>
+<tr class="row-odd"><td>4-7</td>
+<td>Locate Service Type</td>
+</tr>
+<tr class="row-even"><td>9-11</td>
+<td>Socket Type</td>
+</tr>
+<tr class="row-odd"><td>12-15</td>
+<td>Protocol Family</td>
+</tr>
+<tr class="row-even"><td>16-19</td>
+<td>Length of realm</td>
+</tr>
+<tr class="row-odd"><td>20-XX</td>
+<td>Realm</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="replies">
+<h5>Replies<a class="headerlink" href="#replies" title="Permalink to this headline">¶</a></h5>
+<table border="1" class="docutils">
+<colgroup>
+<col width="26%" />
+<col width="74%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Bytes</td>
+<td>Function</td>
+</tr>
+<tr class="row-even"><td>0-3</td>
+<td>Length of the message</td>
+</tr>
+<tr class="row-odd"><td>4-7</td>
+<td>Number of addresses</td>
+</tr>
+<tr class="row-even"><td>8-X</td>
+<td>Address Data</td>
+</tr>
+</tbody>
+</table>
+<p>A reply with zero addresses should be interpreted by the client as SSSD
+not being aware of the requested realm. This should be treated as
+KRB5_PLUGIN_NO_HANDLE.</p>
+<p>Reply Address Data</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="80%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Bytes</td>
+<td>Function</td>
+</tr>
+<tr class="row-even"><td>0-3</td>
+<td>Port</td>
+</tr>
+<tr class="row-odd"><td>4-7</td>
+<td>Size of address</td>
+</tr>
+<tr class="row-even"><td>8-X</td>
+<td>String representation of address</td>
+</tr>
+</tbody>
+</table>
+<p>Reply Address Data String representation</p>
+<ul class="simple">
+<li>IPv4: numbers-and-dots notation as supported by inet_aton(3)</li>
+<li>IPv6: hexadecimal string format as supported by inet_pton(3)</li>
+<li>This is done so the string can be passed directly to getaddrinfo() in
+the locator plugin.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="responder-behavior">
+<h4>Responder Behavior<a class="headerlink" href="#responder-behavior" title="Permalink to this headline">¶</a></h4>
+<p>The responder will receive requests from the locator plugin. It will
+parse the realm from the wire protocol and use that to determine which
+(if any) KRB5 auth or chpass provider is available for that realm. It
+will then query that provider via the SBUS to get an appropriate list of
+addresses. Once this reply is made, the responder will answer the
+locator plugin client.</p>
+<p>The responder MUST enqueue multiple requests for the same realm
+together, so that fewer trips to the provider will be required.</p>
+<p>Once the responder returns, the results SHOULD be added to an in-memory
+cache similar to that offered by the NSS responder.</p>
+<p>For compatibility with applications that have older versions of the
+locator still loaded, the responder MUST write out a
+<code class="docutils literal"><span class="pre">/var/lib/sss/pubconf/kdcinfo.REALM</span></code> file containing the first address
+in the set returned from the provider.</p>
+</div>
+</div>
+<div class="section" id="kerberos-provider-extensions">
+<h3>Kerberos Provider Extensions<a class="headerlink" href="#kerberos-provider-extensions" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="sbus-protocol">
+<h4>SBUS Protocol<a class="headerlink" href="#sbus-protocol" title="Permalink to this headline">¶</a></h4>
+<p>TBD</p>
+</div>
+<div class="section" id="address-resolution">
+<h4>Address Resolution<a class="headerlink" href="#address-resolution" title="Permalink to this headline">¶</a></h4>
+<p>The provider SHOULD reply with potential addresses even if the provider
+is in offline mode. This is to ensure that the locator plugin can
+accurately return data if the KDCs become available again before the
+SSSD notices (by performing an online authentication or password-change)</p>
+<p>If the provider is online, it MUST return the KDC it last communicated
+with as the first address in the response list. The provider MUST return
+up to N-1 (configurable) total addresses from its available pool. For
+example, if the configuration specifies</p>
+<p>and the KDC is online, it MUST return the KDC it is connected to,
+followed by the next two servers in the failover list, or fewer if only
+one or two exist in total.</p>
+<p>TBD</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Kerberos Locator Plugin</a><ul>
+<li><a class="reference internal" href="#old-design">Old Design</a><ul>
+<li><a class="reference internal" href="#limitations">Limitations</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#new-design">New Design</a><ul>
+<li><a class="reference internal" href="#locator-plugin">Locator Plugin</a></li>
+<li><a class="reference internal" href="#locator-responder">Locator Responder</a><ul>
+<li><a class="reference internal" href="#locator-responder-client-wire-protocol">Locator Responder-Client Wire Protocol</a><ul>
+<li><a class="reference internal" href="#request">Request</a></li>
+<li><a class="reference internal" href="#replies">Replies</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#responder-behavior">Responder Behavior</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#kerberos-provider-extensions">Kerberos Provider Extensions</a><ul>
+<li><a class="reference internal" href="#sbus-protocol">SBUS Protocol</a></li>
+<li><a class="reference internal" href="#address-resolution">Address Resolution</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/KerberosLocator.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/KerberosLocator.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

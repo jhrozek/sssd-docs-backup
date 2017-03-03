@@ -1,0 +1,483 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Upgrade Instructions &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="upgrade-instructions">
+<h1>Upgrade Instructions<a class="headerlink" href="#upgrade-instructions" title="Permalink to this headline">¶</a></h1>
+<div class="system-message"><p><strong>Error: Macro TracGuideToc(None) failed</strong></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;NoneType&#39;</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span> <span class="s1">&#39;find&#39;</span>
+</pre></div>
+</div>
+</div><ol class="arabic simple">
+<li><a class="reference external" href="#Instructions">Instructions</a><ol class="arabic">
+<li><a class="reference external" href="#a1.Bringyourserveroff-line">1. Bring your server off-line</a></li>
+<li><a class="reference external" href="#UpdatetheTracCode">2. Update the Trac Code</a></li>
+<li><a class="reference external" href="#UpgradetheTracEnvironment">3. Upgrade the Trac Environment</a></li>
+<li><a class="reference external" href="#UpdatetheTracDocumentation">4. Update the Trac Documentation</a></li>
+<li><a class="reference external" href="#a5.Refreshstaticresources">5. Refresh static resources</a></li>
+<li><a class="reference external" href="#a6.StepsspecifictoagivenTracversion">6. Steps specific to a given Trac
+version</a></li>
+<li><a class="reference external" href="#RestarttheWebServer">7. Restart the Web Server</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#KnownIssues">Known Issues</a><ol class="arabic">
+<li><a class="reference external" href="#CustomizedTemplates">Customized Templates</a></li>
+<li><a class="reference external" href="#ZipImportError">ZipImportError</a></li>
+<li><a class="reference external" href="#WikiUpgrade">Wiki Upgrade</a></li>
+<li><a class="reference external" href="#Tracdatabaseupgrade">Trac database upgrade</a></li>
+<li><a class="reference external" href="#parentdir">parent dir</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#Relatedtopics">Related topics</a><ol class="arabic">
+<li><a class="reference external" href="#UpgradingPython">Upgrading Python</a></li>
+<li><a class="reference external" href="#ChangingDatabaseBackend">Changing Database Backend</a></li>
+<li><a class="reference external" href="#OlderVersions">Upgrading from older versions of Trac</a></li>
+</ol>
+</li>
+</ol>
+<div class="section" id="instructions">
+<h2>Instructions<a class="headerlink" href="#instructions" title="Permalink to this headline">¶</a></h2>
+<p>Typically, there are seven steps involved in upgrading to a newer
+version of Trac:</p>
+<div class="section" id="bring-your-server-off-line">
+<h3>1. Bring your server off-line<a class="headerlink" href="#bring-your-server-off-line" title="Permalink to this headline">¶</a></h3>
+<p>It is not a good idea to update a running server: the server processes
+may have parts of the current packages cached in memory, and updating
+the code will likely trigger <a class="reference external" href="https://fedorahosted.org/sssd#ZipImportError">internal
+errors</a>.</p>
+</div>
+<div class="section" id="update-the-trac-code">
+<h3>2. Update the Trac Code<a class="headerlink" href="#update-the-trac-code" title="Permalink to this headline">¶</a></h3>
+<p>Get the new version as described in
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracInstall.html">TracInstall</a>,
+or your operating system specific procedure.</p>
+<p>If you already have a 0.11 version of Trac installed via
+<code class="docutils literal"><span class="pre">easy_install</span></code>, it might be easiest to also use <code class="docutils literal"><span class="pre">easy_install</span></code> to
+upgrade your Trac installation:</p>
+<p>If you do a manual (not operating system-specific) upgrade, you should
+also stop any running Trac servers before the installation. Doing &#8220;hot&#8221;
+upgrades is not advised, especially on Windows
+(<a class="reference external" href="http://trac.edgewall.org/intertrac/%237265">​#7265</a>).</p>
+<p>You may also want to remove the pre-existing Trac code by deleting the
+<code class="docutils literal"><span class="pre">trac</span></code> directory from the Python <code class="docutils literal"><span class="pre">lib/site-packages</span></code> directory, or
+remove Trac <code class="docutils literal"><span class="pre">.egg</span></code> files from former versions. The location of the
+site-packages directory depends on the operating system and the location
+in which Python was installed. However, the following locations are
+typical:</p>
+<ul class="simple">
+<li>on Linux: <code class="docutils literal"><span class="pre">/usr/lib/python2.X/site-packages</span></code></li>
+<li>on Windows: <code class="docutils literal"><span class="pre">C:\Python2.X\lib\site-packages</span></code></li>
+<li>on MacOSX: <code class="docutils literal"><span class="pre">/Library/Python/2.X/site-packages</span></code></li>
+</ul>
+<p>You may also want to remove the Trac <code class="docutils literal"><span class="pre">cgi-bin</span></code>, <code class="docutils literal"><span class="pre">htdocs</span></code>,
+<code class="docutils literal"><span class="pre">templates</span></code> and <code class="docutils literal"><span class="pre">wiki-default</span></code> directories that are commonly found
+in a directory called <code class="docutils literal"><span class="pre">share/trac</span></code>. (The exact location depends on
+your platform.)</p>
+<p>This cleanup is not mandatory, but makes it easier to troubleshoot
+issues later on, as you won&#8217;t waste your time looking at code or
+templates from a previous release that are not being used anymore... As
+usual, make a backup before actually deleting things.</p>
+</div>
+<div class="section" id="upgrade-the-trac-environment">
+<h3>3. Upgrade the Trac Environment<a class="headerlink" href="#upgrade-the-trac-environment" title="Permalink to this headline">¶</a></h3>
+<p>Environment upgrades are not necessary for minor version releases unless
+otherwise noted.</p>
+<p>After restarting, Trac should show the instances which need a manual
+upgrade via the automated upgrade scripts to ease the pain. These
+scripts are run via
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracAdmin.html">trac-admin</a>:</p>
+<p>This command will do nothing if the environment is already up-to-date.</p>
+<p>Note that a backup of your database will be performed automatically
+prior to the upgrade. This feature is relatively new for the PostgreSQL
+or MySQL database backends, so if it fails, you will have to backup the
+database manually. Then, to perform the actual upgrade, run:</p>
+</div>
+<div class="section" id="update-the-trac-documentation">
+<h3>4. Update the Trac Documentation<a class="headerlink" href="#update-the-trac-documentation" title="Permalink to this headline">¶</a></h3>
+<p>Every <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracEnvironment.html">Trac
+environment</a>
+includes a copy of the Trac documentation for the installed version. As
+you probably want to keep the included documentation in sync with the
+installed version of Trac,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracAdmin.html">trac-admin</a>
+provides a command to upgrade the documentation:</p>
+<p>Note that this procedure will leave your <code class="docutils literal"><span class="pre">WikiStart</span></code> page intact.</p>
+</div>
+<div class="section" id="refresh-static-resources">
+<h3>5. Refresh static resources<a class="headerlink" href="#refresh-static-resources" title="Permalink to this headline">¶</a></h3>
+<p>If you have set up a web server to give out static resources directly
+(accessed using the <code class="docutils literal"><span class="pre">/chrome/</span></code> URL) then you will need to refresh them
+using the same command:</p>
+<p>this will extract static resources and CGI scripts (<code class="docutils literal"><span class="pre">trac.wsgi</span></code>, etc)
+from new Trac version and its plugins into <code class="docutils literal"><span class="pre">/deploy/path</span></code>.</p>
+<p>Some web browsers (IE, Opera) cache CSS and Javascript files
+aggressively, so you may need to instruct your users to manually erase
+the contents of their browser&#8217;s cache, a forced refreshed (<code class="docutils literal"><span class="pre">&lt;F5&gt;</span></code>)
+should be enough.</p>
+</div>
+<div class="section" id="steps-specific-to-a-given-trac-version">
+<h3>6. Steps specific to a given Trac version<a class="headerlink" href="#steps-specific-to-a-given-trac-version" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="upgrading-from-trac-0-11-to-trac-0-12">
+<h4>Upgrading from Trac 0.11 to Trac 0.12<a class="headerlink" href="#upgrading-from-trac-0-11-to-trac-0-12" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="python-2-3-no-longer-supported">
+<h5>Python 2.3 no longer supported<a class="headerlink" href="#python-2-3-no-longer-supported" title="Permalink to this headline">¶</a></h5>
+<p>The minimum supported version of python is now 2.4</p>
+</div>
+<div class="section" id="sqlite-v3-x-required">
+<h5>SQLite v3.x required<a class="headerlink" href="#sqlite-v3-x-required" title="Permalink to this headline">¶</a></h5>
+<p>SQLite v2.x is no longer supported. If you still use a Trac database of
+this format, you&#8217;ll need to convert it to SQLite v3.x first. See
+<a class="reference external" href="http://trac.edgewall.org/intertrac/PySqlite%23UpgradingSQLitefrom2.xto3.x">​PySqlite#UpgradingSQLitefrom2.xto3.x</a>
+for details.</p>
+</div>
+<div class="section" id="pysqlite-2-required">
+<h5><a class="reference external" href="https://docs.pagure.org/sssd-test2/PySqlite.html">PySqlite?</a> 2 required<a class="headerlink" href="#pysqlite-2-required" title="Permalink to this headline">¶</a></h5>
+<p><a class="reference external" href="https://docs.pagure.org/sssd-test2/PySqlite.html">PySqlite?</a> 1.1.x
+is no longer supported. Please install 2.5.5 or later if possible (see
+<a class="reference external" href="https://fedorahosted.org/sssd#Tracdatabaseupgrade">Trac database
+upgrade</a> below).</p>
+</div>
+<div class="section" id="multiple-repository-support">
+<h5>Multiple Repository Support<a class="headerlink" href="#multiple-repository-support" title="Permalink to this headline">¶</a></h5>
+<p>The latest version includes support for multiple repositories. If you
+plan to add more repositories to your Trac instance, please refer to
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracRepositoryAdmin.html#Migration">TracRepositoryAdmin#Migration</a>.</p>
+<p>This may be of interest to users with only one repository, since there&#8217;s
+now a way to avoid the potentially costly resync check at every request.</p>
+</div>
+<div class="section" id="resynchronize-the-trac-environment-against-the-source-code-repository">
+<h5>Resynchronize the Trac Environment Against the Source Code Repository<a class="headerlink" href="#resynchronize-the-trac-environment-against-the-source-code-repository" title="Permalink to this headline">¶</a></h5>
+<p>Each <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracEnvironment.html">Trac
+environment</a>
+must be resynchronized against the source code repository in order to
+avoid errors such as &#8220;<a class="reference external" href="http://trac.edgewall.org/ticket/6120">​No changeset ??? in the
+repository</a>&#8221; while browsing the
+source through the Trac interface:</p>
+</div>
+<div class="section" id="improved-repository-synchronization">
+<h5>Improved repository synchronization<a class="headerlink" href="#improved-repository-synchronization" title="Permalink to this headline">¶</a></h5>
+<p>In addition to supporting multiple repositories, there is now a more
+efficient method for synchronizing Trac and your repositories.</p>
+<p>While you can keep the same synchronization as in 0.11 adding the
+post-commit hook as outlined in
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracRepositoryAdmin.html#Synchronization">TracRepositoryAdmin#Synchronization</a>
+and
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracRepositoryAdmin.html#ExplicitSync">TracRepositoryAdmin#ExplicitSync</a>
+will allow more efficient synchronization and is more or less required
+for multiple repositories.</p>
+<p>Note that if you were using the <code class="docutils literal"><span class="pre">trac-post-commit-hook</span></code>, <em>you&#8217;re
+strongly advised to upgrade it</em> to the new hook documented in the above
+references, as the old hook will not work with anything else than the
+default repository and even for this case, it won&#8217;t trigger the
+appropriate notifications.</p>
+</div>
+<div class="section" id="authz-permission-checking">
+<h5>Authz permission checking<a class="headerlink" href="#authz-permission-checking" title="Permalink to this headline">¶</a></h5>
+<p>The authz permission checking has been migrated to a fine-grained
+permission policy. If you use authz permissions (aka
+<code class="docutils literal"><span class="pre">[trac]</span> <span class="pre">authz_file</span></code> and <code class="docutils literal"><span class="pre">authz_module_name</span></code>), you must add
+<code class="docutils literal"><span class="pre">AuthzSourcePolicy</span></code> in front of your permission policies in
+<code class="docutils literal"><span class="pre">[trac]</span> <span class="pre">permission_policies</span></code>. You must also remove <code class="docutils literal"><span class="pre">BROWSER_VIEW</span></code>,
+<code class="docutils literal"><span class="pre">CHANGESET_VIEW</span></code>, <code class="docutils literal"><span class="pre">FILE_VIEW</span></code> and <code class="docutils literal"><span class="pre">LOG_VIEW</span></code> from your global
+permissions (with <code class="docutils literal"><span class="pre">trac-admin</span> <span class="pre">$ENV</span> <span class="pre">permission</span> <span class="pre">remove</span></code> or the
+&#8220;Permissions&#8221; admin panel).</p>
+</div>
+<div class="section" id="microsecond-timestamps">
+<h5>Microsecond timestamps<a class="headerlink" href="#microsecond-timestamps" title="Permalink to this headline">¶</a></h5>
+<p>All timestamps in database tables (except the <code class="docutils literal"><span class="pre">session</span></code> table) have
+been changed from &#8220;seconds since epoch&#8221; to &#8220;microseconds since epoch&#8221;
+values. This change should be transparent to most users, except for
+custom reports. If any of your reports use date/time columns in
+calculations (e.g. to pass them to <code class="docutils literal"><span class="pre">datetime()</span></code>), you must divide the
+values retrieved from the database by 1&#8216;000&#8216;000. Similarly, if a report
+provides a calculated value to be displayed as a date/time (i.e. with a
+column named &#8220;time&#8221;, &#8220;datetime&#8221;, &#8220;changetime&#8221;, &#8220;date&#8221;, &#8220;created&#8221; or
+&#8220;modified&#8221;), you must provide a microsecond timestamp, that is, multiply
+your previous calculation with 1&#8216;000&#8216;000.</p>
+</div>
+</div>
+<div class="section" id="upgrading-from-trac-0-10-to-trac-0-11">
+<h4>Upgrading from Trac 0.10 to Trac 0.11<a class="headerlink" href="#upgrading-from-trac-0-10-to-trac-0-11" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="site-templates-and-styles">
+<h5>Site Templates and Styles<a class="headerlink" href="#site-templates-and-styles" title="Permalink to this headline">¶</a></h5>
+<p>The templating engine has changed in 0.11 to Genshi, please look at
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracInterfaceCustomization.html">TracInterfaceCustomization</a>
+for more information.</p>
+<p>If you are using custom CSS styles or modified templates in the
+<code class="docutils literal"><span class="pre">templates</span></code> directory of the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracEnvironment.html">TracEnvironment</a>,
+you will need to convert them to the Genshi way of doing things. To
+continue to use your style sheet, follow the instructions at
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracInterfaceCustomization.html#SiteAppearance">TracInterfaceCustomization#SiteAppearance</a>.</p>
+</div>
+<div class="section" id="trac-macros-plugins">
+<h5>Trac Macros, Plugins<a class="headerlink" href="#trac-macros-plugins" title="Permalink to this headline">¶</a></h5>
+<p>The Trac macros will need to be adapted, as the old-style wiki-macros
+are not supported anymore (due to the drop of
+<a class="reference external" href="http://trac.edgewall.org/intertrac/ClearSilver">​ClearSilver</a> and
+the HDF); they need to be converted to the new-style macros, see
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiMacros.html">WikiMacros</a>.
+When they are converted to the new style, they need to be placed into
+the plugins directory instead and not wiki-macros, which is no longer
+scanned for macros or plugins.</p>
+</div>
+<div class="section" id="for-fcgi-wsgi-cgi-users">
+<h5>For FCGI/WSGI/CGI users<a class="headerlink" href="#for-fcgi-wsgi-cgi-users" title="Permalink to this headline">¶</a></h5>
+<p>For those who run Trac under the CGI environment, run this command in
+order to obtain the trac.*gi file:</p>
+<p>This will create a deploy directory with the following two
+subdirectories: <code class="docutils literal"><span class="pre">cgi-bin</span></code> and <code class="docutils literal"><span class="pre">htdocs</span></code>. Then update your Apache
+configuration file <code class="docutils literal"><span class="pre">httpd.conf</span></code> with this new <code class="docutils literal"><span class="pre">trac.cgi</span></code> location
+and <code class="docutils literal"><span class="pre">htdocs</span></code> location.</p>
+</div>
+<div class="section" id="web-admin-plugin-integrated">
+<h5>Web Admin plugin integrated<a class="headerlink" href="#web-admin-plugin-integrated" title="Permalink to this headline">¶</a></h5>
+<p>If you had the webadmin plugin installed, you can uninstall it as it is
+part of the Trac code base since 0.11.</p>
+</div>
+</div>
+</div>
+<div class="section" id="restart-the-web-server">
+<h3>7. Restart the Web Server<a class="headerlink" href="#restart-the-web-server" title="Permalink to this headline">¶</a></h3>
+<p>If you are not running
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracCgi.html">CGI</a>, reload the
+new Trac code by restarting your web server.</p>
+</div>
+</div>
+<div class="section" id="known-issues">
+<h2>Known Issues<a class="headerlink" href="#known-issues" title="Permalink to this headline">¶</a></h2>
+<p>Things you should pay attention to, while upgrading.</p>
+<div class="section" id="customized-templates">
+<h3>Customized Templates<a class="headerlink" href="#customized-templates" title="Permalink to this headline">¶</a></h3>
+<p>Trac supports customization of its Genshi templates by placing copies of
+the templates in the <code class="docutils literal"><span class="pre">&lt;env&gt;/templates</span></code> folder of your
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracEnvironment.html">environment</a>
+or in a common location specified in the <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#GlobalConfiguration">[inherit]
+templates_dir</a>
+configuration setting. If you choose to do so, be wary that you will
+need to repeat your changes manually on a copy of the new templates when
+you upgrade to a new release of Trac (even a minor one), as the
+templates will likely evolve. So keep a diff around ;-)</p>
+<p>The preferred way to perform
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracInterfaceCustomization.html">TracInterfaceCustomization</a>
+is to write a custom plugin doing an appropriate
+<code class="docutils literal"><span class="pre">ITemplateStreamFilter</span></code> transformation, as this is more robust in case
+of changes: we usually won&#8217;t modify element <code class="docutils literal"><span class="pre">id</span></code>s or change CSS
+<code class="docutils literal"><span class="pre">class</span></code>es, and if we have to do so, this will be documented in the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracDev/ApiChanges.html">TracDev/ApiChanges?</a>
+pages.</p>
+</div>
+<div class="section" id="zipimporterror">
+<h3>ZipImportError<a class="headerlink" href="#zipimporterror" title="Permalink to this headline">¶</a></h3>
+<p>Due to internal caching of zipped packages, whenever the content of the
+packages change on disk, the in-memory zip index will no longer match
+and you&#8217;ll get irrecoverable ZipImportError errors. Better anticipate
+and bring your server down for maintenance before upgrading. See
+<a class="reference external" href="http://trac.edgewall.org/intertrac/%237014">​#7014</a> for details.</p>
+</div>
+<div class="section" id="wiki-upgrade">
+<h3>Wiki Upgrade<a class="headerlink" href="#wiki-upgrade" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">trac-admin</span></code> will not delete or remove default wiki pages that were
+present in a previous version but are no longer in the new version.</p>
+</div>
+<div class="section" id="trac-database-upgrade">
+<h3>Trac database upgrade<a class="headerlink" href="#trac-database-upgrade" title="Permalink to this headline">¶</a></h3>
+<p>A known issue in some versions of
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/PySqlite.html">PySqlite?</a>
+(2.5.2-2.5.4) prevents the trac-admin upgrade script from successfully
+upgrading the database format. It is advised to use either a newer or
+older version of the sqlite python bindings to avoid this error. For
+more details see ticket
+<a class="reference external" href="http://trac.edgewall.org/intertrac/%239434">​#9434</a>.</p>
+</div>
+<div class="section" id="parent-dir">
+<h3>parent dir<a class="headerlink" href="#parent-dir" title="Permalink to this headline">¶</a></h3>
+<p>If you use a trac parent env configuration and one of the plugins in one
+child does not work, none of the children work.</p>
+</div>
+</div>
+<div class="section" id="related-topics">
+<h2>Related topics<a class="headerlink" href="#related-topics" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="upgrading-python">
+<h3>Upgrading Python<a class="headerlink" href="#upgrading-python" title="Permalink to this headline">¶</a></h3>
+<p>Upgrading Python to a newer version will require reinstallation of
+Python packages: Trac of course; also
+<a class="reference external" href="http://pypi.python.org/pypi/setuptools">​easy_install</a>, if you&#8217;ve
+been using that. Assuming you&#8217;re using Subversion, you&#8217;ll also need to
+upgrade the Python bindings for svn.</p>
+<div class="section" id="windows-and-python-2-6">
+<h4>Windows and Python 2.6<a class="headerlink" href="#windows-and-python-2-6" title="Permalink to this headline">¶</a></h4>
+<p>If you&#8217;ve been using CollabNet&#8217;s Subversion package, you may need to
+uninstall that in favor of <a class="reference external" href="http://alagazam.net/">​Alagazam</a>, which
+has the Python bindings readily available (see
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracSubversion.html">TracSubversion?</a>).
+The good news is, that works with no tweaking.</p>
+</div>
+</div>
+<div class="section" id="changing-database-backend">
+<h3>Changing Database Backend<a class="headerlink" href="#changing-database-backend" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="sqlite-to-postgresql">
+<h4>SQLite to PostgreSQL<a class="headerlink" href="#sqlite-to-postgresql" title="Permalink to this headline">¶</a></h4>
+<p>The <a class="reference external" href="http://trac-hacks.org/wiki/SqliteToPgScript">​sqlite2pg</a> script
+on <a class="reference external" href="http://trac-hacks.org">​trac-hacks.org</a> has been written to
+assist in migrating a SQLite database to a PostgreSQL database</p>
+</div>
+</div>
+<div class="section" id="upgrading-from-older-versions-of-trac">
+<h3>Upgrading from older versions of Trac<a class="headerlink" href="#upgrading-from-older-versions-of-trac" title="Permalink to this headline">¶</a></h3>
+<p>For upgrades from versions older than Trac 0.10, refer first to
+<a class="reference external" href="http://trac.edgewall.org/intertrac/wiki%3A0.10/TracUpgrade%23SpecificVersions">​wiki:0.10/TracUpgrade#SpecificVersions</a>.</p>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracGuide.html">TracGuide</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracInstall.html">TracInstall</a></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Upgrade Instructions</a><ul>
+<li><a class="reference internal" href="#instructions">Instructions</a><ul>
+<li><a class="reference internal" href="#bring-your-server-off-line">1. Bring your server off-line</a></li>
+<li><a class="reference internal" href="#update-the-trac-code">2. Update the Trac Code</a></li>
+<li><a class="reference internal" href="#upgrade-the-trac-environment">3. Upgrade the Trac Environment</a></li>
+<li><a class="reference internal" href="#update-the-trac-documentation">4. Update the Trac Documentation</a></li>
+<li><a class="reference internal" href="#refresh-static-resources">5. Refresh static resources</a></li>
+<li><a class="reference internal" href="#steps-specific-to-a-given-trac-version">6. Steps specific to a given Trac version</a><ul>
+<li><a class="reference internal" href="#upgrading-from-trac-0-11-to-trac-0-12">Upgrading from Trac 0.11 to Trac 0.12</a><ul>
+<li><a class="reference internal" href="#python-2-3-no-longer-supported">Python 2.3 no longer supported</a></li>
+<li><a class="reference internal" href="#sqlite-v3-x-required">SQLite v3.x required</a></li>
+<li><a class="reference internal" href="#pysqlite-2-required">PySqlite? 2 required</a></li>
+<li><a class="reference internal" href="#multiple-repository-support">Multiple Repository Support</a></li>
+<li><a class="reference internal" href="#resynchronize-the-trac-environment-against-the-source-code-repository">Resynchronize the Trac Environment Against the Source Code Repository</a></li>
+<li><a class="reference internal" href="#improved-repository-synchronization">Improved repository synchronization</a></li>
+<li><a class="reference internal" href="#authz-permission-checking">Authz permission checking</a></li>
+<li><a class="reference internal" href="#microsecond-timestamps">Microsecond timestamps</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#upgrading-from-trac-0-10-to-trac-0-11">Upgrading from Trac 0.10 to Trac 0.11</a><ul>
+<li><a class="reference internal" href="#site-templates-and-styles">Site Templates and Styles</a></li>
+<li><a class="reference internal" href="#trac-macros-plugins">Trac Macros, Plugins</a></li>
+<li><a class="reference internal" href="#for-fcgi-wsgi-cgi-users">For FCGI/WSGI/CGI users</a></li>
+<li><a class="reference internal" href="#web-admin-plugin-integrated">Web Admin plugin integrated</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#restart-the-web-server">7. Restart the Web Server</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#known-issues">Known Issues</a><ul>
+<li><a class="reference internal" href="#customized-templates">Customized Templates</a></li>
+<li><a class="reference internal" href="#zipimporterror">ZipImportError</a></li>
+<li><a class="reference internal" href="#wiki-upgrade">Wiki Upgrade</a></li>
+<li><a class="reference internal" href="#trac-database-upgrade">Trac database upgrade</a></li>
+<li><a class="reference internal" href="#parent-dir">parent dir</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#related-topics">Related topics</a><ul>
+<li><a class="reference internal" href="#upgrading-python">Upgrading Python</a><ul>
+<li><a class="reference internal" href="#windows-and-python-2-6">Windows and Python 2.6</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changing-database-backend">Changing Database Backend</a><ul>
+<li><a class="reference internal" href="#sqlite-to-postgresql">SQLite to PostgreSQL</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#upgrading-from-older-versions-of-trac">Upgrading from older versions of Trac</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracUpgrade.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracUpgrade.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

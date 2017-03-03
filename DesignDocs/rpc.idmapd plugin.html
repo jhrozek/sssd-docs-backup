@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rpc.idmapd plugin &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#rpc.idmapdplugin">rpc.idmapd plugin</a></li>
+<li><a class="reference external" href="#SSSNFSClientrpc.idmapdplugin-Design">SSS NFS Client (rpc.idmapd plugin) -
+Design</a><ol class="arabic">
+<li><a class="reference external" href="#rpc.idmapd-background">rpc.idmapd - background</a></li>
+<li><a class="reference external" href="#SSSD-Responder">SSSD - Responder</a></li>
+<li><a class="reference external" href="#SSSD-NFSClient">SSSD - NFS Client</a></li>
+<li><a class="reference external" href="#OptimisationTechniques">Optimisation Techniques</a></li>
+<li><a class="reference external" href="#ConfigurationFile">Configuration File</a></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="rpc-idmapd-plugin">
+<h1>rpc.idmapd plugin<a class="headerlink" href="#rpc-idmapd-plugin" title="Permalink to this headline">¶</a></h1>
+<hr class="docutils" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="section" id="sss-nfs-client-rpc-idmapd-plugin-design">
+<h1>SSS NFS Client (rpc.idmapd plugin) - Design<a class="headerlink" href="#sss-nfs-client-rpc-idmapd-plugin-design" title="Permalink to this headline">¶</a></h1>
+<p>The client is named &#8220;<strong>sss_nfs</strong>&#8221; (althogh &#8220;sss_idmap&#8221; or &#8220;idmap&#8221;
+might have been better names, the term &#8220;idmap&#8221; is already occupied in
+the SSSD world).</p>
+<div class="section" id="rpc-idmapd-background">
+<h2>rpc.idmapd - background<a class="headerlink" href="#rpc-idmapd-background" title="Permalink to this headline">¶</a></h2>
+<p>rpc.idmapd runs on NFSv4 servers as a userspace daemon (part of
+nfs-utils). Its role is to assist knfsd by providing the following 6
+mapping functions:</p>
+<ol class="arabic simple">
+<li>(user) name to uid</li>
+<li>(group) name to gid</li>
+<li>uid to (user) name</li>
+<li>gid to (group) name</li>
+<li>principal (user) name to ids (uid + gid)
+<a href="#id1"><span class="problematic" id="id2">:sup:`(`(1) &lt;https://fedorahosted.org/sssd#krbnote&gt;`__</span></a>)`</li>
+<li>principal (user) name to grouplist (groups which user are member of)
+<a href="#id3"><span class="problematic" id="id4">:sup:`(`(1) &lt;https://fedorahosted.org/sssd#krbnote&gt;`__</span></a>)`</li>
+</ol>
+<p>rpc.idmapd provides API for developing plugins (loaded by <code class="docutils literal"><span class="pre">dlopen(3)</span></code>)
+which implements the actual mapping process.</p>
+<p>On the kernel level, there&#8217;s a caching mechanism for the responses from
+the userspace daemon.</p>
+<p><sup>(1)</sup> Items 5 + 6 are only relevant for kerberised NFSv4 servers.
+At the first stage only there won&#8217;t be kerberos support.</p>
+</div>
+<div class="section" id="sssd-responder">
+<h2>SSSD - Responder<a class="headerlink" href="#sssd-responder" title="Permalink to this headline">¶</a></h2>
+<p>The functionality required from the Responder side is a subset of the
+functionality provided by existing NSS Responder&#8217;s commands.</p>
+<p>As you can see below (on the client part of the design) - no changes are
+needed in the NSS Responder.</p>
+</div>
+<div class="section" id="sssd-nfs-client">
+<h2>SSSD - NFS Client<a class="headerlink" href="#sssd-nfs-client" title="Permalink to this headline">¶</a></h2>
+<p>Responder-Facing Interactions (existing NSS Responder commands)</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">SSS_NSS_GETPWNAM</span></code> - map (user) name to uid requests</li>
+<li><code class="docutils literal"><span class="pre">SSS_NSS_GETGRNAM</span></code> - map (group) name to gid requests</li>
+<li><code class="docutils literal"><span class="pre">SSS_NSS_GETPWUID</span></code> - map uid to (user) name requests</li>
+<li><code class="docutils literal"><span class="pre">SSS_NSS_GETGRGID</span></code> - map gid to (group) name requests</li>
+</ul>
+<p>The request &amp; reply sent to &amp; from the responder is &#8220;standard&#8221; in terms
+of the NSS Responder.</p>
+<p>The client only needs a portion of the reply. Only this portion will be
+extracted from the packet (i.e. uid/gid/user name/group name).</p>
+</div>
+<div class="section" id="optimisation-techniques">
+<h2>Optimisation Techniques<a class="headerlink" href="#optimisation-techniques" title="Permalink to this headline">¶</a></h2>
+<p>The optimisation techniques used for the NSS client will be used here as
+well. i.e. Fast Cache (memcache) &amp; negative-cache.</p>
+<p>It will be possible for the user to disable Fast Cache from the
+configuration file. (see below)</p>
+</div>
+<div class="section" id="configuration-file">
+<h2>Configuration File<a class="headerlink" href="#configuration-file" title="Permalink to this headline">¶</a></h2>
+<p>The configuration of the client will be part of rpc.idmap config file
+(<code class="docutils literal"><span class="pre">/etc/idmapd.conf</span></code>).</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">rpc.idmapd plugin</a></li>
+<li><a class="reference internal" href="#sss-nfs-client-rpc-idmapd-plugin-design">SSS NFS Client (rpc.idmapd plugin) - Design</a><ul>
+<li><a class="reference internal" href="#rpc-idmapd-background">rpc.idmapd - background</a></li>
+<li><a class="reference internal" href="#sssd-responder">SSSD - Responder</a></li>
+<li><a class="reference internal" href="#sssd-nfs-client">SSSD - NFS Client</a></li>
+<li><a class="reference internal" href="#optimisation-techniques">Optimisation Techniques</a></li>
+<li><a class="reference internal" href="#configuration-file">Configuration File</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/rpc.idmapd plugin.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/rpc.idmapd plugin.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

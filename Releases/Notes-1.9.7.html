@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>This release is the last supported upstream release in the 1.9.x
+series. Users of sssd-1.9 are advised to upgrade to sssd-1.11</li>
+<li>A memory leak in the netgroup code of the NSS responder was fixed</li>
+<li>Subdomains inherit min_id/max_id limits of parent domains. The
+user-visible effect of this bug was that adding system users or
+groups with shadow-utils took too long.</li>
+<li>The default_domain_suffix is ignored in the autofs responder,
+making it possible to use default_domain_suffix along with autofs
+integration</li>
+<li>Several fixes related to Kerberos DIR cache support were backported
+from later releases</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1936">​https://fedorahosted.org/sssd/ticket/1936</a>
+- GSSAPI working only on first login</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2153">​https://fedorahosted.org/sssd/ticket/2153</a>
+- If both IPA and LDAP are set up with enumeration on, two enum tasks
+are running</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2170">​https://fedorahosted.org/sssd/ticket/2170</a>
+- sssd_nss grows memory footprint when netgroups are requested</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2157">​https://fedorahosted.org/sssd/ticket/2157</a>
+- sssd_be segfaults if empty grop is resolved using
+ad_matching_rule</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2077">​https://fedorahosted.org/sssd/ticket/2077</a>
+- [RFE] If originalDN is not available during LDAP auth, the SSSD
+should look it up</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2051">​https://fedorahosted.org/sssd/ticket/2051</a>
+- Do not fail if initgroups returns NOT_FOUND</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2123">​https://fedorahosted.org/sssd/ticket/2123</a>
+- Creating system accounts on a IdM client takes up to 10 minutes
+when AD trust is configured in the IdM.</li>
+</ul>
+</div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Aron Parsons (1):</p>
+<ul class="simple">
+<li>do not use default_domain_suffix with autofs</li>
+</ul>
+<p>Jakub Hrozek (7):</p>
+<ul class="simple">
+<li>Bumping the version for 1.9.7</li>
+<li>Inherit ID limits of parent domains if set</li>
+<li>PROXY: Handle empty GECOS</li>
+<li>LDAP: Split out a request to search for a user w/o saving</li>
+<li>LDAP: Search for original DN during auth if it&#8217;s missing</li>
+<li>LDAP: Initialize user count for AD matching rule</li>
+<li>Updating translations for the 1.9.7 release</li>
+</ul>
+<p>Lukas Slebodnik (6):</p>
+<ul class="simple">
+<li>NSS: Fix memory leak in sss_setnetgrent</li>
+<li>AUTOTOOLS: krb5 1.12 is also supported krb5 libs</li>
+<li>LDAP: Setup periodic task only once.</li>
+<li>Fix wrong detection of krb5 ccname</li>
+<li>Every time return directory for krb5 cache collection.</li>
+<li>Do not switch to credentials everytime.</li>
+</ul>
+<p>Simo Sorce (1):</p>
+<ul class="simple">
+<li>proxy: Allow initgroup to return NOTFOUND</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.9.7.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.9.7.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

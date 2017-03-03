@@ -1,0 +1,417 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Support for case-insensitive domains</li>
+<li>Support for multiple search bases in the LDAP provider</li>
+<li>Support for the native FreeIPA netgroup implementation</li>
+<li>Reliability improvements to the process monitor</li>
+<li>New DEBUG facility with more consistent log levels</li>
+<li>New tool to change debug log levels without restarting SSSD</li>
+<li>SSSD will now disconnect from LDAP server when idle</li>
+<li>FreeIPA HBAC rules can choose to ignore srchost options for
+significant performance gains</li>
+<li>Assorted performance improvements in the LDAP provider (reducing
+disk-writes to the cache)</li>
+<li><strong>Experimental</strong> support for looking up SUDO rules in ldap<ul>
+<li>Not built by default</li>
+<li>Requires unreleased sudo binary. Very preliminary functionality.</li>
+</ul>
+</li>
+<li><strong>Experimental</strong> support for Heimdal Kerberos implementation (buggy)</li>
+</ul>
+</div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Jakub Hrozek (89):</p>
+<ul class="simple">
+<li>pyhbac: Do not convert int to bool</li>
+<li>Fix returning groups when gidNumber attribute is not ordered</li>
+<li>Prevent segfault if vetoed_shells are specified without
+allowed_shells</li>
+<li>Remove unused temporary context</li>
+<li>Handle errno properly in set_debug_file_from_fd()</li>
+<li>Do not delete requests inside hash_iterate loop</li>
+<li>Handle timeout during sss_ldap_init_send</li>
+<li>IPA dyndns: do not segfault if the server cannot be resolved</li>
+<li>Return the first value of name if the multivalued name attribute does
+not match RDN</li>
+<li>Add LDAP provider option to set LDAP_OPT_X_SASL_NOCANON</li>
+<li>Use the default Kerberos realm for LDAP with GSSAPI auth</li>
+<li>Fix moving to next entry in deref code</li>
+<li>Allow turning dereference off by setting the threshold to 0</li>
+<li>Change libnl monitor callback to only signal going online</li>
+<li>Discard carrier messages from non-ethernet devices</li>
+<li>Subscribe to netlink route and addr messages</li>
+<li>Improve error message for LDAP password constraint violation</li>
+<li>Keep deref controls until the whole request is finished</li>
+<li>Fix uninitialized pointer read in sdap_gssapi_get_default_realm()</li>
+<li>Fix wrong buffer size in has_phy_80211_subdir()</li>
+<li>Multiline macro cleanup</li>
+<li>IPA access: hostname comparison should be case-insensitive</li>
+<li>Add sysdb interface to get name aliases</li>
+<li>Add a sysdb_get_direct_parents function</li>
+<li>Store name aliases for users, groups</li>
+<li>Return users and groups based on alias</li>
+<li>Use explicit base 10 for converting strings to integers</li>
+<li>Fix typo in sysdb_get_direct_parents</li>
+<li>Add option to follow symlinks to check_file()</li>
+<li>Append PID to sbus server socket name, let clients use a symlink</li>
+<li>Streamline the example config</li>
+<li>Check if dp_requests hash table exists before using it</li>
+<li>Fix off-by-one error in remove_socket_symlink()</li>
+<li>Report on errno, not return code in create_socket_symlink</li>
+<li>Add a missing break</li>
+<li>Sanitize DN in sysdb_get_direct_parents</li>
+<li>gitignore additions</li>
+<li>Utility functions for LDAP nested schema initgroups</li>
+<li>Use fewer transactions during RFC2307bis initgroups</li>
+<li>Use fewer transactions during IPA initgroups</li>
+<li>Cancel transactions correctly during initgroups</li>
+<li>Plug memory leaks in LDAP provider</li>
+<li>Plug memory leaks in sysdb_ops</li>
+<li>Do not leak hash table iterator during proxy auth</li>
+<li>resolver: Free the whole hostent structure</li>
+<li>RFC2307bis initgroups: fix nested groups processing</li>
+<li>Steal result onto mem_ctx in
+sdap_initgr_nested_get_direct_parents</li>
+<li>Use LDAPDerefSpec properly</li>
+<li>Remove confusing do-while loop</li>
+<li>Fix segfault in sdap_get_initgr_user</li>
+<li>Use correct state struct in sdap_initgr_rfc2307bis_next_base</li>
+<li>configAPI: Fix removing in old domain when saving a new domain</li>
+<li>Squash transactions in sdap_initgr_common_store</li>
+<li>Use one transaction instead of two during RFC2307bis group processing</li>
+<li>Prevent printing NULL in several places of LDAP provider</li>
+<li>Cleanup: Remove unused parameters</li>
+<li>Fix sdap_id_ctx/ipa_id_ctx mismatch in IPA provider</li>
+<li>Provide means of forcing TLS and GSSAPI enabled/disabled for sdap
+connections</li>
+<li>IPA migration fixes</li>
+<li>Fix two small bugs in group dereferencing</li>
+<li>Use dereference during IPA provider initgroups</li>
+<li>Pass the correct private data into Data Provider callback</li>
+<li>Always attempt to connect in sdap_async_sys_connect_done</li>
+<li>LDAP provider: Error while setting the nocanon option should not be
+fatal</li>
+<li>Cancel ping_check if service goes away</li>
+<li>sss_utf8_tolower utility function+unit tests</li>
+<li>Responders: Split getting domain by name into separate function</li>
+<li>Canonicalize username in PAM provider</li>
+<li>Use the case sensitivity flag in responders</li>
+<li>Refactor saving sdap entities</li>
+<li>sysdb_get_real_name helper function</li>
+<li>Use the case sensitivity flag in the LDAP provider</li>
+<li>Use the case sensitivity flag in the simple access provider</li>
+<li>Use the case sensitivity flag in the proxy provider</li>
+<li>Export the function to convert ldb_result to sysdb_attrs</li>
+<li>SUDO Integration - sysdb interface</li>
+<li>SUDO Integration - LDAP provider - save sudo rules functions</li>
+<li>SUDO Integration - responder - get sudo rules logic</li>
+<li>DP: Remove processed callbacks</li>
+<li>Pass client context to sss_dp_get_account_send</li>
+<li>Pass sdap_id_ctx to online check from IPA provider</li>
+<li>Error out if local domain is case insensitive</li>
+<li>Resolver: Introduce a per-request timeout</li>
+<li>Do not touch resolve_service_state in fo_resolve_service_done</li>
+<li>Failover: Introduce a per-service timeout</li>
+<li>Save original memberof, not memberof</li>
+<li>sss_get_cased_name utility function</li>
+<li>Return user and group names lowercased in case insensitive domains</li>
+<li>Honor case sensitive flag when creating the ccname template</li>
+</ul>
+<p>Jan Zeleny (37):</p>
+<ul class="simple">
+<li>sysdb refactoring: renamed ctx variable to sysdb</li>
+<li>Added sysdb_ctx_get_domain function</li>
+<li>sysdb refactoring: deleted domain variables in sysdb API</li>
+<li>sysdb refactoring: memory context deleted</li>
+<li>Remaining memory context variables renamed</li>
+<li>sdap_async_accounts.c split</li>
+<li>Confusing part of code cleared out</li>
+<li>Moved some functions in sdap_async_groups</li>
+<li>Moved some functions in sdap_async_initgroups</li>
+<li>Fixed bad logic in processing netgroups in LDAP provider</li>
+<li>man page fix (lists are comma-separated)</li>
+<li>Fixed timeout handling in responders</li>
+<li>Added krb5_fast_principal to SSSDConfig API</li>
+<li>Cleanup of unused function in ldap access provider</li>
+<li>Add wrapper for krb5_get_init_creds_opt_set_canonicalize</li>
+<li>Add support to request canonicalization on krb AS requests</li>
+<li>Support to request canonicalization in LDAP/IPA provider</li>
+<li>Handle group renaming correctly</li>
+<li>Fixed possible resource leak in get_uid_from_pid()</li>
+<li>Fixed possible resource leak in create_mail_spool()</li>
+<li>Fixed empty loginShell in proxy provider</li>
+<li>Fixed unchecked value of setenv() in check_and_export_options()</li>
+<li>Renamed some LDAP routines</li>
+<li>Modified sdap_parse_search_base()</li>
+<li>Added and modified options for IPA netgroups</li>
+<li>New IPA ID context</li>
+<li>Added support for fetching netgroups in IPA provider</li>
+<li>Added IPA account info handler</li>
+<li>Fixed a typo in sysdb_upgrade_07() declaration</li>
+<li>Fixed uninitialized pointer read in netgroups processing</li>
+<li>Fixed logically dead code in netgroup processing</li>
+<li>Add ipa_hbac_support_srchost option to IPA provider</li>
+<li>Fixed an error in macro for merging double linked lists</li>
+<li>Fixed incorrect return code in PAM client</li>
+<li>Add ldap_sasl_minssf option</li>
+<li>Fixed IPA netgroup processing</li>
+<li>Deleted declaration of nss_get_dom()</li>
+</ul>
+<p>Krzysztof Klimonda (1):</p>
+<ul class="simple">
+<li>Fix FTBFS related to -Werror=format-security</li>
+</ul>
+<p>Marko Myllynen (4):</p>
+<ul class="simple">
+<li>Add missing options to sssd.api.conf</li>
+<li>Unbreak ./configure</li>
+<li>Update sssd-example.conf</li>
+<li>Typo fixes</li>
+</ul>
+<p>Pavel Březina (35):</p>
+<ul class="simple">
+<li>debug_timestamps fixes</li>
+<li>Fixed implicit declaration of function &#8216;time&#8217; in
+src/sss_client/common.c.</li>
+<li>New DEBUG facility - new levels</li>
+<li>New DEBUG facility - modified DEBUG</li>
+<li>New DEBUG facility - conversion</li>
+<li>New DEBUG facility - man pages</li>
+<li>New DEBUG facility - unit tests</li>
+<li>New DEBUG facility - SSSDBG_UNRESOLVED changed from -1 to 0</li>
+<li>&#8211;debug-timestamps=1 is not passed to providers</li>
+<li>sss_ldap_err2string() - function created</li>
+<li>sss_ldap_err2string() - ldap_err2string() to
+sss_ldap_err2string()</li>
+<li>sss_debuglevel - change the debug levels on the fly</li>
+<li>DEBUG timestamps offer higher precision</li>
+<li>DEBUG timestamps offer higher precision - man page updated</li>
+<li>DEBUG timestamps offer higher precision - unit tests updated</li>
+<li>DEBUG timestamps offer higher precision - SSSDConfig updated</li>
+<li>Added quiet option to pam_sss</li>
+<li>SysDB commands that save lastUpdate allows this value to be passed in</li>
+<li>Fixes debug-tests.c coverity issues: NEGATIVE_RETURNS, FORWARD_NULL</li>
+<li>sss_cli.h - fix: function declaration after the header guard</li>
+<li>Added sssd &#8211;version option</li>
+<li>Added sss_ldap_dn_in_search_bases()</li>
+<li>Support search bases in RFC2307bis enumeration</li>
+<li>Support search bases in netgroup members translation</li>
+<li>SUDO integration - client common interface</li>
+<li>SUDO integration - data provider backend handler</li>
+<li>SUDO Integration - LDAP configuration options</li>
+<li>SUDO integration - LDAP provider</li>
+<li>SUDO Integration - responder</li>
+<li>SUDO Integration - API for sudo</li>
+<li>SUDO Integration - pseudo client for testing</li>
+<li>Logically dead code in sdap_nested_group_lookup_group</li>
+<li>Use of uninitialized value in sss_ldap_dn_in_search_bases</li>
+<li>SUDO Integration - be_sudo_req removed from sudo_ctx</li>
+<li>SUDO Integration - fixed memory leak in sdap_sudo_handler()</li>
+</ul>
+<p>Pavel Zuna (2):</p>
+<ul class="simple">
+<li>Fix small bug where TALLOC_CTX could end up unfreed.</li>
+<li>Add common SIGCHLD handling for providers.</li>
+</ul>
+<p>Ralf Haferkamp (1):</p>
+<ul class="simple">
+<li>Allow the O_NONBLOCK flag to be reset correctly</li>
+</ul>
+<p>Simo Sorce (1):</p>
+<ul class="simple">
+<li>Set more strict permissions on keyring</li>
+</ul>
+<p>Stephen Gallagher (74):</p>
+<ul class="simple">
+<li>Bumping version to 1.7.0</li>
+<li>Revert &#8220;Allow LDAP to decide when an expiration warning is warranted&#8221;</li>
+<li>Rename sssd.conf to sssd-example.conf</li>
+<li>Include the configuration file as a %ghost entry</li>
+<li>Remove private shared object Provides: for pysss.so and pyhbac.so</li>
+<li>Cancel sysdb upgrade transaction if commit fails</li>
+<li>Fix potential double-free issue</li>
+<li>Fix broken RHEL5 build</li>
+<li>Use sysdb attribute name for GID, not LDAP attribute</li>
+<li>HBAC: Handle saving groups that have no members</li>
+<li>HBAC: Use of hostgroups for targethost or sourcehost was broken</li>
+<li>HBAC: Properly skip all non-group memberOf entries</li>
+<li>Add option to specify the kerberos replay cache dir</li>
+<li>Fix typo in %configure</li>
+<li>Remove all libtool .la files from RPM</li>
+<li>Improve documentation of libipa_hbac</li>
+<li>Add libipa_hbac documentation to the -devel package</li>
+<li>MONITOR: Correctly detect lack of response from services</li>
+<li>Do not build documentation on RHEL 5</li>
+<li>Fix typo in specfile</li>
+<li>MAN: Add more information about internal credential storage</li>
+<li>Enable the midpoint cache update by default</li>
+<li>HBAC: fix typos preventing proper hostgroup evaluation</li>
+<li>SYSDB: New source file for sysdb upgrade routines</li>
+<li>HBAC: Do not save member/memberOf links</li>
+<li>HBAC: Use originalMember for identifying servicegroups</li>
+<li>HBAC: Use originalMember for identifying hostgroups</li>
+<li>BUILDSYS: Fix &#8211;without-manpages</li>
+<li>TOOLS: Do not leak pid_file handle on error</li>
+<li>MONITOR: fix timeout conversion</li>
+<li>Updating translation files</li>
+<li>SSSDConfig: Handle integer parsing more leniently</li>
+<li>Remove unused sdap_options attributes</li>
+<li>Fix size return for split_on_separator()</li>
+<li>Make sdap_get_id_specific_filter() more strict</li>
+<li>LDAP: Add parser for multiple search bases</li>
+<li>LDAP: Support multiple user search bases (non-enumeration)</li>
+<li>LDAP: Support multiple netgroup search bases</li>
+<li>LDAP: Support multiple group search bases (non-enumeration, RFC2307)</li>
+<li>LDAP: Add multiple search bases for initgroups (users)</li>
+<li>LDAP: Add multiple search bases for initgroups (RFC2307 groups)</li>
+<li>LDAP: Add multiple search bases for initgroups (RFC2307bis groups)</li>
+<li>LDAP: Update manpages with multiple search base information</li>
+<li>LDAP: Convert ldap_*_search_filter</li>
+<li>LDAP: Add support for multiple search bases for user enumeration</li>
+<li>LDAP: Add support for multiple search bases for group enumeration</li>
+<li>RESPONDER: Fix segfault in sss_packet_send()</li>
+<li>SYSDB: add index for nameAlias</li>
+<li>Periodic translation file update</li>
+<li>LDAP: Remove redundant groups from the lookup list</li>
+<li>SBUS: Fix DEBUG log matching</li>
+<li>RESPONDER: Ensure that all input strings are valid UTF-8</li>
+<li>SYSDB: Make ENOENT log messages less threatening</li>
+<li>Fix broken build due to commit of IPA netgroup support</li>
+<li>Add -fno-strict-aliasing</li>
+<li>LDAP: Try next failover server on any error</li>
+<li>RESPONDER: Refactor DP requests into tevent_req style</li>
+<li>Allow using Glib for UTF8 support</li>
+<li>Ignore NULL-terminator when checking UTF8-validity</li>
+<li>LDAP: Fix missing break statements in force_tls</li>
+<li>Ignore NULL-terminator when checking UTF8-validity for netgroups</li>
+<li>Fix potential resource leak in backup_file.c</li>
+<li>Fix uninitialized value error in ipa_netgroups.c</li>
+<li>Add sdap_connection_expire_timeout option</li>
+<li>Update spec file to build with Glib on RHEL 5</li>
+<li>Fix typo in IPA SSSDConfig file</li>
+<li>Move child_common routines to util</li>
+<li>Reorder pidfile() function to guarantee NULL-termination</li>
+<li>Securely set umask when using mkstemp</li>
+<li>Update translations for string freeze</li>
+<li>MONITOR: use sigchld handler for monitoring SSSD services</li>
+<li>PAM: make initgroups timeout work across multiple clients</li>
+<li>Add compatibility layer for Heimdal Kerberos implementation</li>
+<li>Importing new translations for 1.7.0 release</li>
+</ul>
+<p>Sumit Bose (2):</p>
+<ul class="simple">
+<li>Improve password policy error code and message</li>
+<li>Do not access memory out of bounds</li>
+</ul>
+<p>Thorsten Scherf (1):</p>
+<ul class="simple">
+<li>Fixed translation bug</li>
+</ul>
+<p>Yuri Chornoivan (2):</p>
+<ul class="simple">
+<li>Fix two man page typos</li>
+<li>Fix typos in manual pages</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.7.0.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.7.0.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,478 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Trac and mod_wsgi &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="trac-and-mod-wsgi">
+<h1>Trac and mod_wsgi<a class="headerlink" href="#trac-and-mod-wsgi" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="http://code.google.com/p/modwsgi/">​mod_wsgi</a> is an Apache module
+for running WSGI-compatible Python applications directly on top of the
+Apache webserver. The mod_wsgi adapter is written completely in C and
+provides very good performances.</p>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><cite>The ``trac.wsgi`</cite> script &lt;#Thetrac.wsgiscript&gt;`__<ol class="arabic">
+<li><a class="reference external" href="#Averybasicscript">A very basic script</a></li>
+<li><a class="reference external" href="#Amoreelaboratescript">A more elaborate script</a></li>
+<li><cite>Recommended ``trac.wsgi`</cite> script &lt;#Recommendedtrac.wsgiscript&gt;`__</li>
+</ol>
+</li>
+<li><a class="reference external" href="#Mappingrequeststothescript">Mapping requests to the script</a></li>
+<li><a class="reference external" href="#ConfiguringAuthentication">Configuring Authentication</a><ol class="arabic">
+<li><a class="reference external" href="#UsingBasicAuthentication">Using Basic Authentication</a></li>
+<li><a class="reference external" href="#UsingDigestAuthentication">Using Digest Authentication</a></li>
+<li><a class="reference external" href="#UsingLDAPAuthentication">Using LDAP Authentication</a></li>
+<li><a class="reference external" href="#UsingSSPIAuthentication">Using SSPI Authentication</a></li>
+<li><a class="reference external" href="#UsingApacheauthenticationwiththeAccountManagerpluginsLoginform">Using Apache authentication with the Account Manager plugin&#8217;s
+Login
+form</a></li>
+<li><a class="reference external" href="#Example:Apachemod_wsgiwithBasicAuthenticationTracbeingattherootofavirtualhost">Example: Apache/mod_wsgi with Basic Authentication, Trac being
+at the root of a virtual
+host</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#Troubleshooting">Troubleshooting</a><ol class="arabic">
+<li><a class="reference external" href="#Usearecentversion">Use a recent version</a></li>
+<li><a class="reference external" href="#GettingTractoworknicelywithSSPIandRequireGroup">Getting Trac to work nicely with SSPI and &#8216;Require
+Group&#8217;</a></li>
+<li><a class="reference external" href="#TracwithPostgreSQL">Trac with PostgreSQL</a></li>
+<li><a class="reference external" href="#Otherresources">Other resources</a></li>
+</ol>
+</li>
+</ol>
+<div class="section" id="the-trac-wsgi-script">
+<h3>The <code class="docutils literal"><span class="pre">trac.wsgi</span></code> script<a class="headerlink" href="#the-trac-wsgi-script" title="Permalink to this headline">¶</a></h3>
+<p>Trac can be run on top of mod_wsgi with the help of the following
+application script, which is just a Python file, though usually saved
+with a <code class="docutils literal"><span class="pre">.wsgi</span></code> extension).</p>
+<div class="section" id="a-very-basic-script">
+<h4>A very basic script<a class="headerlink" href="#a-very-basic-script" title="Permalink to this headline">¶</a></h4>
+<p>In its simplest form, the script could be:</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;TRAC_ENV&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;/usr/local/trac/mysite&#39;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;PYTHON_EGG_CACHE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;/usr/local/trac/mysite/eggs&#39;</span>
+
+<span class="kn">import</span> <span class="nn">trac.web.main</span>
+<span class="n">application</span> <span class="o">=</span> <span class="n">trac</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">main</span><span class="o">.</span><span class="n">dispatch_request</span>
+</pre></div>
+</div>
+</div><p>The <code class="docutils literal"><span class="pre">TRAC_ENV</span></code> variable should naturally be the directory for your
+Trac environment (if you have several Trac environments in a directory,
+you can also use <code class="docutils literal"><span class="pre">TRAC_ENV_PARENT_DIR</span></code> instead), while the
+<code class="docutils literal"><span class="pre">PYTHON_EGG_CACHE</span></code> should be a directory where Python can temporarily
+extract Python eggs.</p>
+</div>
+<div class="section" id="a-more-elaborate-script">
+<h4>A more elaborate script<a class="headerlink" href="#a-more-elaborate-script" title="Permalink to this headline">¶</a></h4>
+<p>If you&#8217;re using multiple <code class="docutils literal"><span class="pre">.wsgi</span></code> files (for example one per Trac
+environment) you must <em>not</em> use <code class="docutils literal"><span class="pre">os.environ['TRAC_ENV']</span></code> to set the
+path to the Trac environment. Using this method may lead to Trac
+delivering the content of another Trac environment, as the variable may
+be filled with the path of a previously viewed Trac environment.</p>
+<p>To solve this problem, use the following <code class="docutils literal"><span class="pre">.wsgi</span></code> file instead:</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;PYTHON_EGG_CACHE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;/usr/local/trac/mysite/eggs&#39;</span>
+
+<span class="kn">import</span> <span class="nn">trac.web.main</span>
+<span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">):</span>
+  <span class="n">environ</span><span class="p">[</span><span class="s1">&#39;trac.env_path&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;/usr/local/trac/mysite&#39;</span>
+  <span class="k">return</span> <span class="n">trac</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">main</span><span class="o">.</span><span class="n">dispatch_request</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">)</span>
+</pre></div>
+</div>
+</div><p>For clarity, you should give this file a <code class="docutils literal"><span class="pre">.wsgi</span></code> extension. You should
+probably put the file in its own directory, since you will expose it to
+Apache.</p>
+<p>If you have installed Trac and eggs in a path different from the
+standard one you should add that path by adding the following code at
+the top of the wsgi script:</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">site</span>
+<span class="n">site</span><span class="o">.</span><span class="n">addsitedir</span><span class="p">(</span><span class="s1">&#39;/usr/local/trac/lib/python2.4/site-packages&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div><p>Change it according to the path you installed the Trac libs at.</p>
+</div>
+<div class="section" id="recommended-trac-wsgi-script">
+<h4>Recommended <code class="docutils literal"><span class="pre">trac.wsgi</span></code> script<a class="headerlink" href="#recommended-trac-wsgi-script" title="Permalink to this headline">¶</a></h4>
+<p>A somewhat robust and generic version of this file can be created using
+the <code class="docutils literal"><span class="pre">trac-admin</span> <span class="pre">&lt;env&gt;</span> <span class="pre">deploy</span> <span class="pre">&lt;dir&gt;</span></code> command which automatically
+substitutes the required paths (see
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracInstall.html#cgi-bin">TracInstall#cgi-bin</a>).</p>
+</div>
+</div>
+<div class="section" id="mapping-requests-to-the-script">
+<h3>Mapping requests to the script<a class="headerlink" href="#mapping-requests-to-the-script" title="Permalink to this headline">¶</a></h3>
+<p>After you&#8217;ve done preparing your .wsgi script, add the following to your
+Apache configuration file (<code class="docutils literal"><span class="pre">httpd.conf</span></code> for example).</p>
+<p>Here, the script is in a subdirectory of the Trac environment.</p>
+<p>If you followed the directions <a class="reference external" href="http://trac.edgewall.org/wiki/TracInstall#cgi-bin">​Generating the Trac cgi-bin
+directory</a>, your
+Apache configuration file should look like following:</p>
+<p>In order to let Apache run the script, access to the directory in which
+the script resides is opened up to all of Apache. Additionally, the
+<code class="docutils literal"><span class="pre">WSGIApplicationGroup</span></code> directive ensures that Trac is always run in
+the first Python interpreter created by mod_wsgi; this is necessary
+because the Subversion Python bindings, which are used by Trac, don&#8217;t
+always work in other sub-interpreters and may cause requests to hang or
+cause Apache to crash as a result. After adding this configuration,
+restart Apache, and then it should work.</p>
+<p>To test the setup of Apache, mod_wsgi and Python itself (ie. without
+involving Trac and dependencies), this simple wsgi application can be
+used to make sure that requests gets served (use as only content in your
+<code class="docutils literal"><span class="pre">.wsgi</span></code> script):</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">):</span>
+        <span class="n">start_response</span><span class="p">(</span><span class="s1">&#39;200 OK&#39;</span><span class="p">,[(</span><span class="s1">&#39;Content-type&#39;</span><span class="p">,</span><span class="s1">&#39;text/html&#39;</span><span class="p">)])</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;&lt;html&gt;&lt;body&gt;Hello World!&lt;/body&gt;&lt;/html&gt;&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div><p>For more information about using the mod_wsgi specific directives, see
+the <a class="reference external" href="http://code.google.com/p/modwsgi/wiki/">​mod_wsgi&#8217;s wiki</a> and
+more specifically the
+<a class="reference external" href="http://code.google.com/p/modwsgi/wiki/IntegrationWithTrac">​IntegrationWithTrac</a>
+page.</p>
+</div>
+<div class="section" id="configuring-authentication">
+<h3>Configuring Authentication<a class="headerlink" href="#configuring-authentication" title="Permalink to this headline">¶</a></h3>
+<p>We describe in the the following sections different methods for setting
+up authentication.</p>
+<p>See also <a class="reference external" href="http://httpd.apache.org/docs/2.2/howto/auth.html">​Authentication, Authorization and Access
+Control</a> in the
+Apache guide.</p>
+<div class="section" id="using-basic-authentication">
+<h4>Using Basic Authentication<a class="headerlink" href="#using-basic-authentication" title="Permalink to this headline">¶</a></h4>
+<p>The simplest way to enable authentication with Apache is to create a
+password file. Use the <code class="docutils literal"><span class="pre">htpasswd</span></code> program to create the password file:</p>
+<p>After the first user, you dont need the &#8220;-c&#8221; option anymore:</p>
+<p>After you&#8217;ve created the users, you can set their permissions using
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracPermissions.html">TracPermissions</a>.</p>
+<p>Now, you&#8217;ll need to enable authentication against the password file in
+the Apache configuration:</p>
+<p>If you&#8217;re hosting multiple projects you can use the same password file
+for all of them:</p>
+<div class="line-block">
+<div class="line">Note that neither a file nor a directory named &#8216;login&#8217; needs to exist.</div>
+<div class="line">See also the
+<a class="reference external" href="http://httpd.apache.org/docs/2.2/mod/mod_auth_basic.html">​mod_auth_basic</a>
+documentation.</div>
+</div>
+</div>
+<div class="section" id="using-digest-authentication">
+<h4>Using Digest Authentication<a class="headerlink" href="#using-digest-authentication" title="Permalink to this headline">¶</a></h4>
+<p>For better security, it is recommended that you either enable SSL or at
+least use the “digest” authentication scheme instead of “Basic”.</p>
+<p>You&#8217;ll have to create your <code class="docutils literal"><span class="pre">.htpasswd</span></code> file with the <code class="docutils literal"><span class="pre">htdigest</span></code>
+command instead of <code class="docutils literal"><span class="pre">htpasswd</span></code>, as follows:</p>
+<p>The &#8220;trac&#8221; parameter above is the &#8220;realm&#8221;, and will have to be reused in
+the Apache configuration in the AuthName directive:</p>
+<p>For multiple environments, you can use the same <code class="docutils literal"><span class="pre">LocationMatch</span></code> as
+described with the previous method.</p>
+<p>Don&#8217;t forget to activate the mod_auth_digest. For example, on a Debian
+4.0r1 (etch) system:</p>
+<p>See also the
+<a class="reference external" href="http://httpd.apache.org/docs/2.2/mod/mod_auth_digest.html">​mod_auth_digest</a>
+documentation.</p>
+</div>
+<div class="section" id="using-ldap-authentication">
+<h4>Using LDAP Authentication<a class="headerlink" href="#using-ldap-authentication" title="Permalink to this headline">¶</a></h4>
+<p>Configuration for
+<a class="reference external" href="http://httpd.apache.org/docs/2.2/mod/mod_ldap.html">​mod_ldap</a>
+authentication in Apache is a bit tricky (httpd 2.2.x and OpenLDAP:
+slapd 2.3.19)</p>
+<ol class="arabic simple">
+<li>You need to load the following modules in Apache httpd.conf</li>
+</ol>
+<ol class="arabic simple" start="2">
+<li>Your httpd.conf also needs to look something like:</li>
+</ol>
+<ol class="arabic simple" start="3">
+<li>You can use the LDAP interface as a way to authenticate to a
+Microsoft Active Directory:</li>
+</ol>
+<p>Use the following as your LDAP URL:</p>
+<p>You will also need to provide an account for Apache to use when checking
+credentials. As this password will be listed in plaintext in the config,
+you should be sure to use an account specifically for this task:</p>
+<p>The whole section looks like:</p>
+<p>Note 1: This is the case where the LDAP search will get around the
+multiple OUs, conecting to Global Catalog Server portion of AD (Notice
+the port is 3268, not the normal LDAP 389). The GCS is basically a
+&#8220;flattened&#8221; tree which allows searching for a user without knowing to
+which OU they belong.</p>
+<p>Note 2: You can also require the user be a member of a certain LDAP
+group, instead of just having a valid login:</p>
+<p>See also:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://httpd.apache.org/docs/2.2/mod/mod_authnz_ldap.html">​mod_authnz_ldap</a>,
+documentation for mod_authnz_ldap</li>
+<li><a class="reference external" href="http://httpd.apache.org/docs/2.2/mod/mod_ldap.html">​mod_ldap</a>,
+documentation for mod_ldap, which provides connection pooling and a
+shared cache.</li>
+<li><a class="reference external" href="http://trac-hacks.org/wiki/LdapPlugin">​TracHacks:LdapPlugin</a> for
+storing
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracPermissions.html">TracPermissions</a>
+in LDAP.</li>
+</ul>
+</div>
+<div class="section" id="using-sspi-authentication">
+<h4>Using SSPI Authentication<a class="headerlink" href="#using-sspi-authentication" title="Permalink to this headline">¶</a></h4>
+<p>If you are using Apache on Windows, you can use mod_auth_sspi to
+provide single-sign-on. Download the module from the SourceForge
+<a class="reference external" href="http://sourceforge.net/projects/mod-auth-sspi/">​mod-auth-sspi
+project</a> and then add
+the following to your VirtualHost:</p>
+<p>Using the above, usernames in Trac will be of the form
+<code class="docutils literal"><span class="pre">DOMAIN\username</span></code>, so you may have to re-add permissions and such. If
+you do not want the domain to be part of the username, set
+<code class="docutils literal"><span class="pre">SSPIOmitDomain</span> <span class="pre">On</span></code> instead.</p>
+<p>Some common problems with SSPI authentication:
+<a class="reference external" href="http://trac.edgewall.org/intertrac/%231055">​#1055</a>,
+<a class="reference external" href="http://trac.edgewall.org/intertrac/%231168">​#1168</a> and
+<a class="reference external" href="http://trac.edgewall.org/intertrac/%233338">​#3338</a>.</p>
+<p>See also
+<a class="reference external" href="http://trac.edgewall.org/intertrac/TracOnWindows/Advanced">​TracOnWindows/Advanced</a>.</p>
+</div>
+<div class="section" id="using-apache-authentication-with-the-account-manager-plugin-s-login-form">
+<h4>Using Apache authentication with the Account Manager plugin&#8217;s Login form<a class="headerlink" href="#using-apache-authentication-with-the-account-manager-plugin-s-login-form" title="Permalink to this headline">¶</a></h4>
+<p>To begin with, see the basic instructions for using the Account Manager
+plugin&#8217;s <a class="reference external" href="http://trac-hacks.org/wiki/AccountManagerPlugin/Modules#LoginModule">​Login
+module</a>
+and its <a class="reference external" href="http://trac-hacks.org/wiki/AccountManagerPlugin/AuthStores#HttpAuthStore">​HttpAuthStore authentication
+module</a>.</p>
+<p><strong>Note:</strong> If is difficult to get HttpAuthStore to work with WSGI when
+using any Account Manager version prior to acct_mgr-0.4. Upgrading is
+recommended.</p>
+<p>Here is an example (from the HttpAuthStore link) using acct_mgr-0.4 for
+hosting a single project:</p>
+<p>This will generally be matched with an Apache config like:</p>
+<p>Note that <strong>authFile</strong> need not exist. See the HttpAuthStore link above
+for examples where multiple Trac projects are hosted on a server.</p>
+</div>
+<div class="section" id="example-apache-mod-wsgi-with-basic-authentication-trac-being-at-the-root-of-a-virtual-host">
+<h4>Example: Apache/mod_wsgi with Basic Authentication, Trac being at the root of a virtual host<a class="headerlink" href="#example-apache-mod-wsgi-with-basic-authentication-trac-being-at-the-root-of-a-virtual-host" title="Permalink to this headline">¶</a></h4>
+<p>Per the mod_wsgi documentation linked to above, here is an example
+Apache configuration that a) serves the Trac instance from a virtualhost
+subdomain and b) uses Apache basic authentication for Trac
+authentication.</p>
+<p>If you want your Trac to be served from e.g.
+<a class="reference external" href="http://trac.my-proj.my-site.org">http://trac.my-proj.my-site.org</a>, then from the folder e.g.
+<code class="docutils literal"><span class="pre">/home/trac-for-my-proj</span></code>, if you used the command
+<code class="docutils literal"><span class="pre">trac-admin</span> <span class="pre">the-env</span> <span class="pre">initenv</span></code> to create a folder <code class="docutils literal"><span class="pre">the-env</span></code>, and you
+used <code class="docutils literal"><span class="pre">trac-admin</span> <span class="pre">the-env</span> <span class="pre">deploy</span> <span class="pre">the-deploy</span></code> to create a folder
+<code class="docutils literal"><span class="pre">the-deploy</span></code>, then first:</p>
+<p>Create the htpasswd file:</p>
+<p>(keep the file above your document root for security reasons)</p>
+<p>Create this file e.g. (ubuntu)
+<code class="docutils literal"><span class="pre">/etc/apache2/sites-enabled/trac.my-proj.my-site.org.conf</span></code> with the
+following contents:</p>
+<p>Note: for subdomains to work you would probably also need to alter
+<code class="docutils literal"><span class="pre">/etc/hosts</span></code> and add A-Records to your host&#8217;s DNS.</p>
+</div>
+</div>
+<div class="section" id="troubleshooting">
+<h3>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="use-a-recent-version">
+<h4>Use a recent version<a class="headerlink" href="#use-a-recent-version" title="Permalink to this headline">¶</a></h4>
+<p>Please use either version 1.6, 2.4 or later of <code class="docutils literal"><span class="pre">mod_wsgi</span></code>. Versions
+prior to 2.4 in the 2.X branch have problems with some Apache
+configurations that use WSGI file wrapper extension. This extension is
+used in Trac to serve up attachments and static media files such as
+style sheets. If you are affected by this problem attachments will
+appear to be empty and formatting of HTML pages will appear not to work
+due to style sheet files not loading properly. Another frequent symptom
+is that binary attachment downloads are truncated. See mod_wsgi tickets
+<a class="reference external" href="http://code.google.com/p/modwsgi/issues/detail?id=100">​#100</a> and
+<a class="reference external" href="http://code.google.com/p/modwsgi/issues/detail?id=132">​#132</a>.</p>
+<p><em>Note: using mod_wsgi 2.5 and Python 2.6.1 gave an Internal Server
+Error on my system (Apache 2.2.11 and Trac 0.11.2.1). Upgrading to
+Python 2.6.2 (as suggested
+`​here &lt;http://www.mail-archive.com/modwsgi&#64;googlegroups.com/msg01917.html&gt;`__)
+solved this for me
+&#8211; Graham Shanks</em></p>
+<p>If you plan to use <code class="docutils literal"><span class="pre">mod_wsgi</span></code> in embedded mode on Windows or with the
+MPM worker on Linux, then you&#8217;ll even need version 0.3.4 or greater (see
+<a class="reference external" href="http://trac.edgewall.org/intertrac/%2310675">​#10675</a> for details).</p>
+</div>
+<div class="section" id="getting-trac-to-work-nicely-with-sspi-and-require-group">
+<h4>Getting Trac to work nicely with SSPI and &#8216;Require Group&#8217;<a class="headerlink" href="#getting-trac-to-work-nicely-with-sspi-and-require-group" title="Permalink to this headline">¶</a></h4>
+<p>If like me you&#8217;ve set Trac up on Apache, Win32 and configured SSPI, but
+added a &#8216;Require group&#8217; option to your apache configuration, then the
+SSPIOmitDomain option is probably not working. If its not working your
+usernames in trac are probably looking like &#8216;DOMAIN\user&#8217; rather than
+&#8216;user&#8217;.</p>
+<p>This WSGI script &#8216;fixes&#8217; things, hope it helps:</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">trac.web.main</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;TRAC_ENV&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;/usr/local/trac/mysite&#39;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;PYTHON_EGG_CACHE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;/usr/local/trac/mysite/eggs&#39;</span>
+
+<span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">):</span>
+    <span class="k">if</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span> <span class="ow">in</span> <span class="n">environ</span><span class="p">[</span><span class="s1">&#39;REMOTE_USER&#39;</span><span class="p">]:</span>
+        <span class="n">environ</span><span class="p">[</span><span class="s1">&#39;REMOTE_USER&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">environ</span><span class="p">[</span><span class="s1">&#39;REMOTE_USER&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">trac</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">main</span><span class="o">.</span><span class="n">dispatch_request</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></div>
+<div class="section" id="trac-with-postgresql">
+<h4>Trac with PostgreSQL<a class="headerlink" href="#trac-with-postgresql" title="Permalink to this headline">¶</a></h4>
+<p>When using the mod_wsgi adapter with multiple Trac instances and
+PostgreSQL (or MySQL?) as a database back-end, the server <em>may</em> create a
+lot of open database connections and thus PostgreSQL processes.</p>
+<p>A somewhat brutal workaround is to disabled connection pooling in Trac.
+This is done by setting <code class="docutils literal"><span class="pre">poolable</span> <span class="pre">=</span> <span class="pre">False</span></code> in
+<code class="docutils literal"><span class="pre">trac.db.postgres_backend</span></code> on the <code class="docutils literal"><span class="pre">PostgreSQLConnection</span></code> class.</p>
+<p>But it&#8217;s not necessary to edit the source of Trac, the following lines
+in <code class="docutils literal"><span class="pre">trac.wsgi</span></code> will also work:</p>
+<p>or</p>
+<p>Now Trac drops the connection after serving a page and the connection
+count on the database will be kept minimal.</p>
+<p><em>This is not a recommended approach though. See also the notes at the
+bottom of the `​mod_wsgi&#8217;s
+IntegrationWithTrac &lt;http://code.google.com/p/modwsgi/wiki/IntegrationWithTrac&gt;`__
+wiki page.</em></p>
+</div>
+<div class="section" id="other-resources">
+<h4>Other resources<a class="headerlink" href="#other-resources" title="Permalink to this headline">¶</a></h4>
+<p>For more troubleshooting tips, see also the <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracModPython.html#Troubleshooting">mod_python
+troubleshooting</a>
+section, as most Apache-related issues are quite similar, plus
+discussion of potential <a class="reference external" href="http://code.google.com/p/modwsgi/wiki/ApplicationIssues">​application
+issues</a> when
+using mod_wsgi. The wsgi page also has a <a class="reference external" href="http://code.google.com/p/modwsgi/wiki/IntegrationWithTrac">​Integration With
+Trac</a>
+document.</p>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracGuide.html">TracGuide</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracInstall.html">TracInstall</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracFastCgi.html">FastCGI</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracModPython.html">ModPython</a>,
+<a class="reference external" href="http://trac.edgewall.org/intertrac/TracNginxRecipe">​TracNginxRecipe</a></p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Trac and mod_wsgi</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a><ul>
+<li><a class="reference internal" href="#the-trac-wsgi-script">The <code class="docutils literal"><span class="pre">trac.wsgi</span></code> script</a><ul>
+<li><a class="reference internal" href="#a-very-basic-script">A very basic script</a></li>
+<li><a class="reference internal" href="#a-more-elaborate-script">A more elaborate script</a></li>
+<li><a class="reference internal" href="#recommended-trac-wsgi-script">Recommended <code class="docutils literal"><span class="pre">trac.wsgi</span></code> script</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#mapping-requests-to-the-script">Mapping requests to the script</a></li>
+<li><a class="reference internal" href="#configuring-authentication">Configuring Authentication</a><ul>
+<li><a class="reference internal" href="#using-basic-authentication">Using Basic Authentication</a></li>
+<li><a class="reference internal" href="#using-digest-authentication">Using Digest Authentication</a></li>
+<li><a class="reference internal" href="#using-ldap-authentication">Using LDAP Authentication</a></li>
+<li><a class="reference internal" href="#using-sspi-authentication">Using SSPI Authentication</a></li>
+<li><a class="reference internal" href="#using-apache-authentication-with-the-account-manager-plugin-s-login-form">Using Apache authentication with the Account Manager plugin&#8217;s Login form</a></li>
+<li><a class="reference internal" href="#example-apache-mod-wsgi-with-basic-authentication-trac-being-at-the-root-of-a-virtual-host">Example: Apache/mod_wsgi with Basic Authentication, Trac being at the root of a virtual host</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#troubleshooting">Troubleshooting</a><ul>
+<li><a class="reference internal" href="#use-a-recent-version">Use a recent version</a></li>
+<li><a class="reference internal" href="#getting-trac-to-work-nicely-with-sspi-and-require-group">Getting Trac to work nicely with SSPI and &#8216;Require Group&#8217;</a></li>
+<li><a class="reference internal" href="#trac-with-postgresql">Trac with PostgreSQL</a></li>
+<li><a class="reference internal" href="#other-resources">Other resources</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracModWSGI.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracModWSGI.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

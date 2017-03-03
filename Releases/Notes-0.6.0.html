@@ -1,0 +1,262 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>New, more consistent config file format</li>
+<li>Improvements to SSL/TLS setup in the LDAP provider</li>
+<li>Support for configuring the location of the credential cache in
+Kerberos</li>
+<li>Better handling of bad configuration files</li>
+<li>Support for asynchronous cache refreshes</li>
+<li>New, faster enumeration logic</li>
+<li>SSS tools made more reliable</li>
+<li>New Python API for managing native SSSD users</li>
+<li>Improvements for building on older platforms</li>
+<li>Many other bugfixes and stability improvements</li>
+</ul>
+</div>
+<div class="section" id="detailed-changes-since-0-5-0">
+<h1>Detailed Changes Since 0.5.0<a class="headerlink" href="#detailed-changes-since-0-5-0" title="Permalink to this headline">¶</a></h1>
+<p>Dmitri Pal (8):</p>
+<ul class="simple">
+<li>ELAPI sinks and providers</li>
+<li>ELAPI Adding file provider and CSV format</li>
+<li>ELAPI Laying foundation for the async processing</li>
+<li>COLLECTION Copy collection flat with concatenated names</li>
+<li>COLLECTION Improvements to copy functions</li>
+<li>COLLECTION Functions to deal with hash</li>
+<li>ELAPI Better separation from collection internals.</li>
+<li>INI Error handling and interface cleanup</li>
+</ul>
+<p>Jakub Hrozek (17):</p>
+<ul class="simple">
+<li>Remove shadow-utils support from tools</li>
+<li>Small changes to the example config and manpage</li>
+<li>Add copyright notices</li>
+<li>ELAPI: Fix dispatcher structure initialization</li>
+<li>Add binaries and backup files to .gitignore</li>
+<li>Refactor tools code</li>
+<li>Decouple synchronous sysdb interface from tools</li>
+<li>Provide python bindings for sysdb</li>
+<li>Use syslog for logging error conditions in SSSD</li>
+<li>ELAPI: fix varargs call, update unit tests</li>
+<li>ELAPI: Ticket 161: Initialize structures with calloc instead of
+enumerating members</li>
+<li>Allow entering parent groups as FQDN</li>
+<li>Remove provider=files</li>
+<li>Manpages update</li>
+<li>script to upgrade config to v2</li>
+<li>Send debug messages to logfile</li>
+<li>Convert the example config to v2 format, upgrade config on update
+only</li>
+</ul>
+<p>Jeff Schroeder (1):</p>
+<ul class="simple">
+<li>Add documentation for installing build dependencies</li>
+</ul>
+<p>Piotr Drąg (1):</p>
+<ul class="simple">
+<li>Add pl translation</li>
+</ul>
+<p>Ralf Haferkamp (2):</p>
+<ul class="simple">
+<li>Fix initgroups search filter when using rfc2307bis</li>
+<li>Avoid crash when timestamp is NULL</li>
+</ul>
+<p>Simo Sorce (30):</p>
+<ul class="simple">
+<li>Use the correct structure.</li>
+<li>Initial support for multiple schema types</li>
+<li>Always save using member/memberOf</li>
+<li>Fix group replies when using member/memberof</li>
+<li>Upgrade database to 0.2</li>
+<li>Remove redunant function and always pass attrs.</li>
+<li>Make enumeration an independent task</li>
+<li>Speed-up enumerations.</li>
+<li>Correctly handle DbusWatch behavior.</li>
+<li>Turn enumeration into a boolean value</li>
+<li>Honor enumerate option in ldap_id</li>
+<li>Fix proxy enumeration</li>
+<li>Fix two possible uninitialized values</li>
+<li>Split database in multiple files</li>
+<li>Tools are allowed to touch only the &#8216;local&#8217; domain</li>
+<li>Fix Ldap id backend offline code</li>
+<li>Fix memory mishandling.</li>
+<li>Fix ldap enumeration async task</li>
+<li>Fix getgrnam and getgrgid calls</li>
+<li>Complete the removal of &#8220;legacy&#8221; option.</li>
+<li>Update documentation and examples</li>
+<li>Make the offline status backend-global</li>
+<li>Turn ldap driver options into multitype</li>
+<li>Fix copy&amp;paste error.</li>
+<li>Better handle groups w/o members</li>
+<li>Fix copy&amp;paste of wrong structure</li>
+<li>Don&#8217;t try to use initgroups_dyn if not available</li>
+<li>Handle suspend cases</li>
+<li>Split out an sssd-clients package</li>
+<li>Let backend respond while fetching large results</li>
+</ul>
+<p>Stephen Gallagher (26):</p>
+<ul class="simple">
+<li>Move RPM specfiles into contrib/</li>
+<li>Consolidate cache lookups in the NSS</li>
+<li>Add support for the EntryCacheNoWaitRefreshTimeout</li>
+<li>Check for valid min and max IDs in confdb_get_domains</li>
+<li>Update manpage to reflect new syntax for enumerate</li>
+<li>Add strtoint32 and strtouint32 convenience functions</li>
+<li>Properly detect negative/invalid values for the minId and maxId</li>
+<li>Remove unused event context argument from confdb_init</li>
+<li>Read the configuration parsing before daemonization</li>
+<li>Fix first-time confdb generation</li>
+<li>Add &#8216;make tests&#8217; target</li>
+<li>Add strtoint32 and strtouint32 tests</li>
+<li>Print error message when connection to the config db fails</li>
+<li>Exit if the sssd is launched as a user other than root</li>
+<li>Include m4 directories in tarball</li>
+<li>Allow rerunning autoreconf from the tarball</li>
+<li>Add PRERELEASE_VERSION variable for use in sssd.spec.in</li>
+<li>Add missing updates to LINGUAS for pl translation</li>
+<li>Add missing reference to sssd-ldap(5) in sssd.conf(5) manpage</li>
+<li>Include groupSearchBase in sssd-ldap(5) manpage</li>
+<li>Several fixes and enhancements for config file processing</li>
+<li>Make configure script compatible with older python versions</li>
+<li>Revert &#8220;Use syslog for logging error conditions in SSSD&#8221;</li>
+<li>Temporarily disable automatic config file reread</li>
+<li>Upgrade confdb to version 2</li>
+<li>Update version to 0.6.0</li>
+</ul>
+<p>Sumit Bose (31):</p>
+<ul class="simple">
+<li>removed unused header file</li>
+<li>do not show server messages to user</li>
+<li>fix internal order of ldap user mapping options</li>
+<li>add configure check for errno_t</li>
+<li>send SSSD_REALM and SSSD_KDCIP environment to the client</li>
+<li>check if gid attribute is empty</li>
+<li>stop processing a domain if no provider is given</li>
+<li>check if libpcre version is above or below 7</li>
+<li>remove the concept of a backend name</li>
+<li>configure cleanups</li>
+<li>fix libdbus configure check</li>
+<li>initialize sockaddr_in structure</li>
+<li>add change password target to krb5 backend</li>
+<li>use fork+exec for kerberos helper</li>
+<li>Let the PAM client send its PID</li>
+<li>remove unused client locale from PAM protocol</li>
+<li>make cli_pid mandatory and increase version number of pam protocol</li>
+<li>add krb5ccache_dir and krb5ccname_template option</li>
+<li>fix the wrong usage of an offset</li>
+<li>added child timeout handler</li>
+<li>Check if SSL/TLS handler is already in place</li>
+<li>use getaddrinfo to resolve IP address of KDC</li>
+<li>add a man page for pam_sss</li>
+<li>toggle debug output of sssd_krb5_locator_plugin with an
+environment variable</li>
+<li>add new config options ldap_tls_cacert and ldap_tls_cacertdir</li>
+<li>fix possible short reads in kerberos provider</li>
+<li>remove krb5_try_simple_upn option and make it a default fallback</li>
+<li>add defines for large file support to standard CFLAGS</li>
+<li>more fixes for older libpcre versions</li>
+<li>Cleanups for library linking</li>
+<li>added support for older MIT kerberos versions</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#detailed-changes-since-0-5-0">Detailed Changes Since 0.5.0</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-0.6.0.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-0.6.0.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,430 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Support for IPv6<ul>
+<li>IPv6 operation is not yet supported for chpass operations on
+Kerberos, due to a libkrb5 bug.</li>
+</ul>
+</li>
+<li>Support for LDAP referrals<ul>
+<li>This is only supported on platforms running openldap libraries &gt;=
+2.4.13</li>
+</ul>
+</li>
+<li>Offline failed login counter</li>
+<li>Fix for the long-standing cache cleanup performance issues<ul>
+<li>Running with &#8216;enumerate=false&#8217; (the default) will now be much
+faster</li>
+</ul>
+</li>
+<li>libini_config, libcollection, libdhash, libref_array and
+libpath_utils are now built as shared libraries for general
+consumption</li>
+<li>Users get feedback from PAM if they authenticated offline</li>
+<li>Native local backend now has a utility to show nested memberships
+(<code class="docutils literal"><span class="pre">sss_groupshow</span></code>)</li>
+</ul>
+</div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>David O&#8217;Brien (2):</p>
+<ul class="simple">
+<li>Copy-edit sssd-ipa man page</li>
+<li>Copy-edit, mainly fixing typos and English</li>
+</ul>
+<p>Dmitri Pal (8):</p>
+<ul class="simple">
+<li>COMMON Improvements to the trace macro</li>
+<li>COLLECTION Create reference to the top level collection</li>
+<li>COLLECTION: Cleaning FIXME comments</li>
+<li>INI: Cleaning FIXME comments.</li>
+<li>INI Correcting build warnings.</li>
+<li>INI: Added method to get string list with empty values</li>
+<li>REFARRAY: New referenced array object</li>
+<li>COLLECTION: Fixing queue collection and unit tests.</li>
+</ul>
+<p>Domingo Becker (1):</p>
+<ul class="simple">
+<li>Updating ES translation</li>
+</ul>
+<p>Fabian Affolter (1):</p>
+<ul class="simple">
+<li>Add German translation</li>
+</ul>
+<p>George
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/McCollister.html">McCollister?</a>
+(2):</p>
+<ul class="simple">
+<li>Pointers to non 32 bit aligned data were being cast to uint32_t *</li>
+<li>Added option to use libcrypto instead of NSS.</li>
+</ul>
+<p>Göran Uddeborg (5):</p>
+<ul class="simple">
+<li>Add Swedish translation for sss_client</li>
+<li>Add Swedish translation for SSSD server</li>
+<li>Update SV translation</li>
+<li>Update SV translation</li>
+<li>Update SV translation</li>
+</ul>
+<p>Jakub Hrozek (32):</p>
+<ul class="simple">
+<li>Setup ldap child logging from IPA backend</li>
+<li>Check the services started against a list of known services</li>
+<li>Handle spaces in config parser</li>
+<li>Fail on nonexistent input file</li>
+<li>Do not start with provider=files</li>
+<li>Reduce code duplication between LDAP child and Kerberos child</li>
+<li>Change ares usage to be c-ares 1.7.0 compatible</li>
+<li>Import ares 1.7.0 helpers</li>
+<li>Don&#8217;t build the SRV and TXT parsing code except for tests</li>
+<li>Document the failover feature in manpages</li>
+<li>Consolidate code for splitting strings by separator</li>
+<li>sss_groupshow - a utility to print properties of a local group</li>
+<li>document debug_timestamps</li>
+<li>Deleting nonexistent users or groups is not a noop</li>
+<li>Add missing include</li>
+<li>Few misc minor man page bugs</li>
+<li>Fix other memory alignment issues</li>
+<li>sss_groupshow improvements</li>
+<li>gitignore additions</li>
+<li>sss_groupshow: separate member lists by comma</li>
+<li>Synchronize IPA and LDAP options</li>
+<li>Add test for number of options in IPA and LDAP backends</li>
+<li>Supress warnings with -O2</li>
+<li>Use macros to hide memcpy calls</li>
+<li>Remove Kerberos options from confdb.h</li>
+<li>Restrict family lookups</li>
+<li>Do not schedule enumeration after a cleanup</li>
+<li>Do not check entries during cleanup task</li>
+<li>Store lastLogin attribute when authenticating online</li>
+<li>Better cleanup task handling</li>
+<li>Remove a check that was left behind</li>
+<li>Fix check for values of expiration limits</li>
+</ul>
+<p>Marina Latini (1):</p>
+<ul class="simple">
+<li>Update IT translation</li>
+</ul>
+<p>Martin Nagy (10):</p>
+<ul class="simple">
+<li>Fix egg-info file generation in the spec file</li>
+<li>Add some debugging statements to fail_over and resolver</li>
+<li>Correctly restart server status after the timeout</li>
+<li>Don&#8217;t consider one address with different port numbers as the same</li>
+<li>fail over: Change the first server pick logic</li>
+<li>Re-create c-ares channels if /etc/resolv.conf is modified</li>
+<li>Make periodic checks for DNS timeouts</li>
+<li>Don&#8217;t recursively call ares_process_fd() from fd_event()</li>
+<li>Make sure callbacks never retry when ares channel is destroyed</li>
+<li>Don&#8217;t pass a variable as format to talloc_asprintf()</li>
+</ul>
+<p>Piotr Drąg (3):</p>
+<ul class="simple">
+<li>Update SV translation</li>
+<li>Updating PL translation</li>
+<li>Update PL translation</li>
+</ul>
+<p>Sergei V. Kovylov (1):</p>
+<ul class="simple">
+<li>sssd.spec for SLES</li>
+</ul>
+<p>Sergey V. Kovylov (1):</p>
+<ul class="simple">
+<li>Update suse sssd.spec</li>
+</ul>
+<p>Simo Sorce (20):</p>
+<ul class="simple">
+<li>Fix memberof plugin</li>
+<li>Compute and save memberuid in cache as well</li>
+<li>Use memberuid and not member in group enumerations</li>
+<li>Use the custom password field in groups too.</li>
+<li>Resolve nested groups also when rfc2307bis is used</li>
+<li>Make strdn build functions more available</li>
+<li>Fix nested group memberships</li>
+<li>Allow nesting to fix
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/310">#310</a></li>
+<li>Fix bug <a class="reference external" href="https://fedorahosted.org/sssd/ticket/311">#311</a>, properly
+set callback attribute</li>
+<li>Change dhash API to be talloc-friendly</li>
+<li>dhash: Add private pointer for delete callback</li>
+<li>Add comments to document latest changes</li>
+<li>Add rebuild task to memberof plugin</li>
+<li>Handle the special 02 upgrade case for 04-&gt;05</li>
+<li>Fix for <a class="reference external" href="https://fedorahosted.org/sssd/ticket/316">#316</a></li>
+<li>Fix for <a class="reference external" href="https://fedorahosted.org/sssd/ticket/322">#322</a>, update
+from old database versions.</li>
+<li>Fix upgrade bug <a class="reference external" href="https://fedorahosted.org/sssd/ticket/323">#323</a></li>
+<li>Fix ldap child memory hierarchy and other issues</li>
+<li>Don&#8217;t free timer events within the handler.</li>
+<li>Fix <a class="reference external" href="https://fedorahosted.org/sssd/ticket/382">#382</a>, a segfault
+bug in the memberof plugin.</li>
+</ul>
+<p>Stephen Gallagher (103):</p>
+<ul class="simple">
+<li>Revert &#8220;Stop configuring ELAPI&#8221;</li>
+<li>Revert &#8220;Remove ELAPI from build and tarball&#8221;</li>
+<li>Make debug log timestamps human-readable</li>
+<li>Raise debug log level for LDB_DEBUG_WARNING</li>
+<li>Add allocation error check</li>
+<li>Avoid returning uninitialized result.</li>
+<li>Fix potential uninitialized value errors in nsssrv_cmd.c</li>
+<li>Fix potential uninitialized value error in responder_dp.c</li>
+<li>SSSDDomain.remove_provider() requires only the provider type</li>
+<li>Make SSSDDomain.remove_provider() remove configured options</li>
+<li>Run dhash tests</li>
+<li>Add SSSDDomain.set_name() function to SSSDConfig API</li>
+<li>Reduce the verbosity of the SSSDConfigTest</li>
+<li>Fix broken SSSDChangeConf.set() function</li>
+<li>Fix SSSDConfig API bugs around [de-]activation of domains</li>
+<li>Fix RPM spec for RHEL6</li>
+<li>SSSDConfig API: fix deactivate_domain()</li>
+<li>SSSDConfig.get_domain() should properly detect active state</li>
+<li>Ensure that list_active_domains returns the real value</li>
+<li>Properly deny id_provider=files</li>
+<li>Add missing options to sssd-ipa configuraion</li>
+<li>Add missing SSSDConfig file for IPA for make install</li>
+<li>Fix processing of Boolean values in SSSDConfig</li>
+<li>Add &#8216;permit&#8217; and &#8216;deny&#8217; access providers to SSSDConfig API</li>
+<li>Remove default for ldap_use_start_tls in IPA providers</li>
+<li>Run SSSDConfig tests during &#8216;make check&#8217;</li>
+<li>Fix stupid copy-paste error</li>
+<li>Updating version to 0.99.1</li>
+<li>Properly close STDERR when daemonizing</li>
+<li>Fix tight loop in monitor</li>
+<li>Don&#8217;t set explicit default for &#8220;timeout&#8221; in domains</li>
+<li>Fix warning in server.c</li>
+<li>Raise DEBUG level of sdap_get_generic_done()</li>
+<li>Change default for enumeration to TRUE</li>
+<li>Fix tight-loop in monitor part 2</li>
+<li>Properly handle EINTR from poll()</li>
+<li>Updating ES translation</li>
+<li>Add DEBUG messages to getpwnam_callback and getpwuid_callback</li>
+<li>Clarify access_provider manpage entry</li>
+<li>Do not blindly accept zero-length passwords</li>
+<li>Fix broken password changes for local users</li>
+<li>Release SSSD 1.0</li>
+<li>Allow debug_timestamps setting on a per-domain basis</li>
+<li>Update translations for master</li>
+<li>Releasing version 1.0.1</li>
+<li>Remove local and kerberos providers from the access_provider list</li>
+<li>Explicitly set async DNS timeout</li>
+<li>Update version to 1.0.2</li>
+<li>Updating version to 1.1</li>
+<li>Resetting VERSION to 1.0.99</li>
+<li>Fix timeout memory heirarchy</li>
+<li>License libdhash under the LGPL</li>
+<li>Split off libdhash into a shared library</li>
+<li>Use version.m4 for setting the SSSD version</li>
+<li>Add &#8216;prerelease-srpms&#8217; target to Makefile</li>
+<li>Add &#8216;prerelease-rpms&#8217; target to Makefile</li>
+<li>Add missing link for Kerberos</li>
+<li>Fix async resolver integration with tevent</li>
+<li>Fix release script to use version.m4</li>
+<li>Handle IPv6 addresses with the async resolver</li>
+<li>Fix size error on 64-bit systems</li>
+<li>Force offline operation with SIGUSR1</li>
+<li>License libpath_utils under LGPL</li>
+<li>Split off libpath_utils into a shared library</li>
+<li>Package libpath_utils and libpath_utils-devel</li>
+<li>Add license files for collection</li>
+<li>Remove private header requirements from collection_tools.h</li>
+<li>Split off libcollection into a shared library</li>
+<li>Package libcollection and libcollection-devel</li>
+<li>Add license files for ini_config</li>
+<li>Fix array index error</li>
+<li>Split off libini_config into a shared library</li>
+<li>Package libini_config and libini_config-devel</li>
+<li>Add license files for refarray</li>
+<li>Split refarray off into a shared library</li>
+<li>Package libref_array and libref_array-devel</li>
+<li>Enable debug_timestamps by default</li>
+<li>Internationalize the command-line help message</li>
+<li>Remove unnecessary explicit defaults from SSSDConfig API</li>
+<li>Add mandatory flag to SSSD config schema</li>
+<li>Add a few additional extensions to .gitignore</li>
+<li>Update translatable strings</li>
+<li>Make collection_queue.h and collection_stack.h into public headers</li>
+<li>Remove ELAPI from the SSSD repository</li>
+<li>Add doxygen docs for ConfDB</li>
+<li>Make attr_type an integer</li>
+<li>Make PAM responses more compatible with D-BUS spec</li>
+<li>Eliminate separate build tree for sss_client</li>
+<li>Merge sss_client and sss_daemon translations together</li>
+<li>Remove unneeded files from sss_client</li>
+<li>Rename server/ directory to src/</li>
+<li>Build all manpages from a single location</li>
+<li>License libpath_utils under LGPL</li>
+<li>Fix licensing issues in SSSD</li>
+<li>Properly license libdhash</li>
+<li>Fix licensing issues for sss_client</li>
+<li>Fix bad merge</li>
+<li>Disable rpath support in the linker</li>
+<li>Remove unnecessary &#8220;domain&#8221; parameter from DP registration</li>
+<li>Remove unnecessary domain parameter from PAM requests</li>
+<li>Include hour in &#8216;make prerelease-rpms&#8217;</li>
+<li>Revert &#8220;Change default for enumeration to TRUE&#8221;</li>
+<li>Update translations for release</li>
+</ul>
+<p>Sumit Bose (51):</p>
+<ul class="simple">
+<li>Check LDAP structure before calling ldap_unbind_ext()</li>
+<li>Add sysdb_search_custom request</li>
+<li>Do not treat missing proc files as errors.</li>
+<li>Add basic OS detection</li>
+<li>Make packaging of *.egg-info files more flexible</li>
+<li>Try to renew Kerberos credentials</li>
+<li>Add checks to test the memberuid handling</li>
+<li>Add offline support for ipa_access</li>
+<li>Add dummy credentials to an empty ccache file</li>
+<li>Always update sysdb to the latest version</li>
+<li>Fix DEBUG message for sysdb_init</li>
+<li>Use sys.exit instead of exit</li>
+<li>Add elapi_ut.conf to the list of dist files</li>
+<li>Check for minimal version of check</li>
+<li>Build python modules in builddir</li>
+<li>Use &#8211;with-ldb-lib-dir while running make distcheck</li>
+<li>Cleanup db files after test run</li>
+<li>disable password migration code</li>
+<li>Handle chauthtok with PAM_PRELIM_CHECK separately</li>
+<li>Do not overwrite valid TGTs when offline</li>
+<li>Fix for <a class="reference external" href="https://fedorahosted.org/sssd/ticket/344">#344</a></li>
+<li>Return an error for an unknown PAM request</li>
+<li>Fix return value when offline and TGT is valid</li>
+<li>Add sysdb request to authenticate against a cached password</li>
+<li>Fix a double free bug</li>
+<li>Update the url in the spec files</li>
+<li>Rename PAM_USER_INFO to PAM_SYSTEM_INFO</li>
+<li>Avoid &#8216;PAM&#8217; at the beginning of define and enum names</li>
+<li>Improve logging of pam_sss</li>
+<li>Check cache_credentials in sysdb_cache_auth_send()</li>
+<li>Use ldap connection callbacks to get file descriptors</li>
+<li>Add new option ldap_referrals</li>
+<li>Add offline failed login counter</li>
+<li>Warn the user if authentication happens offline</li>
+<li>Make resolve and failover test work with CK_FORK=no</li>
+<li>Make krb5 and open checks work if forking is disabled</li>
+<li>Reactivate old fd handling conditionally</li>
+<li>Document when LDAP referral chasing is available</li>
+<li>Send a message to the user if the login is delayed</li>
+<li>Fix handling of the global context in the leak detector</li>
+<li>Make return values more specific during password change</li>
+<li>Make change password errors more transparent</li>
+<li>Add check for broken LDAP connection callbacks</li>
+<li>Remove replace</li>
+<li>Fix two typos</li>
+<li>Send Kerberos environment after password change</li>
+<li>Remove unneeded items from struct pam_data</li>
+<li>Add documentation for PAM response messages</li>
+<li>Check and set permissions on SBUS sockets</li>
+<li>Fix file permissions of config.ldb</li>
+<li>Handle expired passwords like other PAM modules</li>
+</ul>
+<p>beckerde (1):</p>
+<ul class="simple">
+<li>Add Spanish translation</li>
+</ul>
+<p>ruigo (1):</p>
+<ul class="simple">
+<li>Add Portuguese translation</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.0.99.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.0.99.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

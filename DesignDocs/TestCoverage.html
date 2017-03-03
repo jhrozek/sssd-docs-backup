@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>SSSD Test Suite Coverage &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="sssd-test-suite-coverage">
+<h1>SSSD Test Suite Coverage<a class="headerlink" href="#sssd-test-suite-coverage" title="Permalink to this headline">¶</a></h1>
+<p>This document describes the plan on improving the test coverage of the
+SSSD using the cmocka unit test library. The plan might be implemented
+through Fedora&#8217;s participation in Gnome outreach for women.</p>
+<div class="section" id="high-level-strategy">
+<h2>High Level Strategy<a class="headerlink" href="#high-level-strategy" title="Permalink to this headline">¶</a></h2>
+<p>The contributor should, on a high level, follow these steps:</p>
+<ol class="arabic simple">
+<li>familiarize herself with SSSD from user point of view<ul>
+<li>what is it good for?</li>
+<li>how do I install it?</li>
+<li>how do I configure it?</li>
+<li>Useful links:<ul>
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/Documentation.html">docs on this wiki, includes
+presentations</a></li>
+<li><a class="reference external" href="http://lwn.net/Articles/457415/">​lwn.net article on SSSD</a></li>
+<li><a class="reference external" href="https://access.redhat.com/knowledge/docs/en-US/Red_Hat_Enterprise_Linux/6/html/Deployment_Guide/SSSD-Introduction.html">​RHEL documentation on
+SSSD</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>investigate how the SSSD can be built from source<ul>
+<li>clone the git repository</li>
+<li>configure and make the sources</li>
+<li>make check</li>
+</ul>
+</li>
+<li>learn about the current unit tests being used in the SSSD project<ul>
+<li>currently used tests are stored in <code class="docutils literal"><span class="pre">src/tests</span></code> subdirectory and
+mostly use the check unit test suite</li>
+<li>newer tests have started to use the cmocka library to leverage the
+mocking framework</li>
+</ul>
+</li>
+<li>get familiar with the cmocka unit test library<ul>
+<li><a class="reference external" href="http://cmocka.cryptomilk.org/">​http://cmocka.cryptomilk.org/</a></li>
+</ul>
+</li>
+<li>implement a new unit test for the SSSD as a proof-of-concept<ul>
+<li>this first unit test would make the contributor familiar with how
+a unit test can be written</li>
+<li>does not have to cover any important piece of the SSSD, but rather
+one that is self-contained</li>
+</ul>
+</li>
+<li>gradually start learning about the architecture of the SSSD<ul>
+<li>this step requires coordination with the SSSD developers</li>
+<li>work with the SSSD developers on understanding the architecture</li>
+<li>blog posts on the SSSD are mostly welcome!</li>
+</ul>
+</li>
+<li>propose a couple of unit tests to the SSSD upstream<ul>
+<li>the most important tier would contain tests such as &#8220;does identity
+work&#8221; or &#8220;does authentication work&#8221;</li>
+</ul>
+</li>
+<li>cover the most important parts of the SSSD with unit tests<ul>
+<li>as some of the unit tests might share the same boilerplate code,
+the contributor might also need to implement convenient functions
+reusable by different tests</li>
+</ul>
+</li>
+</ol>
+</div>
+<div class="section" id="schedule">
+<h2>Schedule<a class="headerlink" href="#schedule" title="Permalink to this headline">¶</a></h2>
+<p>The complete OPFW schedule is
+<a class="reference external" href="https://wiki.gnome.org/OutreachProgramForWomen/2013/DecemberMarch">​here</a>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">SSSD Test Suite Coverage</a><ul>
+<li><a class="reference internal" href="#high-level-strategy">High Level Strategy</a></li>
+<li><a class="reference internal" href="#schedule">Schedule</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/TestCoverage.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/TestCoverage.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

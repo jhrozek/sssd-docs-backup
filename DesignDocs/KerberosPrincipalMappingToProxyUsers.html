@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Mapping ID provider names to Kerberos principals &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="mapping-id-provider-names-to-kerberos-principals">
+<h1>Mapping ID provider names to Kerberos principals<a class="headerlink" href="#mapping-id-provider-names-to-kerberos-principals" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2509">​https://fedorahosted.org/sssd/ticket/2509</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>Some users are migrating to SSSD from a legacy configuration that
+consisted of a traditional UNIX user stored in <code class="docutils literal"><span class="pre">/etc/passwd</span></code> and
+managing their Kerberos tickets either with the use of some GUI tool or
+just command-line <code class="docutils literal"><span class="pre">kinit</span></code>. While these users can use SSSD by
+configuring the <code class="docutils literal"><span class="pre">id_provider</span></code> proxy, very often the name of their UNIX
+user is different from the name of their company-wide Kerberos
+credentials.</p>
+<p>This feature helps the above use-case by mapping their UNIX user name to
+the Kerberos principal name.</p>
+</div>
+<div class="section" id="use-cases">
+<h2>Use cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+<p>Joe User has a company laptop where his UNIX user has been traditionally
+named <code class="docutils literal"><span class="pre">joe</span></code>. At the same time, his company Kerberos principal is
+called <code class="docutils literal"><span class="pre">juser&#64;EXAMPLE.COM</span></code>. Joe would like to start using SSSD to
+leverage features like offline kinit without having to rename his UNIX
+user and chown all his local files to the corporate user ID.</p>
+<p>While most of this design page describes setup using the proxy provider,
+which would be the typical case, this option can be used along with any
+<code class="docutils literal"><span class="pre">id_provider</span></code>.</p>
+</div>
+<div class="section" id="overview-of-the-solution">
+<h2>Overview of the solution<a class="headerlink" href="#overview-of-the-solution" title="Permalink to this headline">¶</a></h2>
+<p>The Kerberos provider will acquire a new option that describes how are
+the user names from the ID provider mapped onto the user part of the
+Kerberos principal. The user would then add the appropriate mapping to
+the <code class="docutils literal"><span class="pre">domain</span></code> section of <code class="docutils literal"><span class="pre">sssd.conf</span></code>.</p>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<p>A new option <code class="docutils literal"><span class="pre">krb5_map_user</span></code> would be added to the Kerberos auth code.
+This option would have form similar to how we map the LDAP extra
+attributes, that is <code class="docutils literal"><span class="pre">local_name:krb5_name</span></code>. When mapping exists for
+the user who is authenticating, the krb5_auth module would use that
+user name for calls like <code class="docutils literal"><span class="pre">find_or_guess_upn</span></code> instead of <code class="docutils literal"><span class="pre">pd-&gt;name</span></code>.
+We should consider whether to keep using <code class="docutils literal"><span class="pre">pd-&gt;name</span></code> or introduce
+another attribute to the <code class="docutils literal"><span class="pre">krb5_child_req</span></code> structure.</p>
+</div>
+<div class="section" id="configuration-changes">
+<h2>Configuration changes<a class="headerlink" href="#configuration-changes" title="Permalink to this headline">¶</a></h2>
+<p>A new configuration option tentatively called <code class="docutils literal"><span class="pre">krb5_map_user</span></code> would be
+added. This option is unset by default, which means whatever user name
+the ID provider stores will be used.</p>
+</div>
+<div class="section" id="how-to-test">
+<h2>How To Test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Prepare a Kerberos KDC, add a user principal (<code class="docutils literal"><span class="pre">juser&#64;EXAMPLE.COM</span></code>)</li>
+<li>Add a local user using <code class="docutils literal"><span class="pre">useradd</span></code> with name that differs from
+Kerberos principal in the name portion. (<code class="docutils literal"><span class="pre">joe</span></code>)</li>
+<li>Configure SSSD with <code class="docutils literal"><span class="pre">id_provider=proxy</span></code> with
+<code class="docutils literal"><span class="pre">proxy_lib_name=files</span></code> and <code class="docutils literal"><span class="pre">auth_provider=krb5</span></code> pointing to our
+test KDC</li>
+<li>Attempt to authenticate using a PAM service. The authentication
+should fail and the logs would show authentication as
+<code class="docutils literal"><span class="pre">joe&#64;EXAMPLE.COM</span></code></li>
+<li>Set <code class="docutils literal"><span class="pre">krb5_map_user</span></code> to <code class="docutils literal"><span class="pre">joe:juser</span></code> and restart SSSD.</li>
+<li>Authenticate again. This time, authentication should succeed and the
+user&#8217;s klist output should list <code class="docutils literal"><span class="pre">juser&#64;EXAMPLE.COM</span></code>. The <code class="docutils literal"><span class="pre">id(1)</span></code>
+output should still list <code class="docutils literal"><span class="pre">joe</span></code>, though.</li>
+<li>Test that Kerberos ticket renewals still work</li>
+<li>Test that delayed kinit still works.</li>
+</ol>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Jakub Hrozek &lt;<a class="reference external" href="mailto:jhrozek&#37;&#52;&#48;redhat&#46;com">​jhrozek<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Mapping ID provider names to Kerberos principals</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem statement</a></li>
+<li><a class="reference internal" href="#use-cases">Use cases</a></li>
+<li><a class="reference internal" href="#overview-of-the-solution">Overview of the solution</a></li>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a></li>
+<li><a class="reference internal" href="#configuration-changes">Configuration changes</a></li>
+<li><a class="reference internal" href="#how-to-test">How To Test</a></li>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/KerberosPrincipalMappingToProxyUsers.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/KerberosPrincipalMappingToProxyUsers.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>FastNSSCache &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><a class="reference external" href="#FastNSSCache">FastNSSCache</a><ol class="arabic">
+<li><a class="reference external" href="#ProblemStatement">Problem Statement</a></li>
+<li><a class="reference external" href="#OverviewofFastNSSCachesolution">Overview of FastNSSCache
+solution</a></li>
+<li><a class="reference external" href="#Implementationdetails">Implementation details</a></li>
+<li><a class="reference external" href="#Configuration">Configuration</a></li>
+<li><a class="reference external" href="#FutureImprovements">Future Improvements</a></li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="fastnsscache">
+<h1>FastNSSCache<a class="headerlink" href="#fastnsscache" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="problem-statement">
+<h2>Problem Statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>Currently in SSSD user and group lookups are performed by using a
+connection to a named socket. This means each client has to talk to the
+sssd_nss daemon for every lookup it needs to perform.</p>
+<p>Although this behaviour works well for normal machines, it has
+scalability limits on busy machines with many processes that need to
+query the user/group database frequently.</p>
+<p>There are 2 factors that cause scalability issues:</p>
+<ol class="arabic simple">
+<li>context switches</li>
+<li>the responder process is single-threaded (although asynchronous) so
+the amount of processing it can do is limited by the speed of 1 cpu</li>
+</ol>
+<p>Each request suffers from at least 2 context switches (and a few copies
+of the data in memory) to write() the request in, wait until it is
+processed by sssd_nss, read() the reply back. Because sssd_nss may be
+busy answering many requests a queue may build up and replies be
+delayed.</p>
+<p>Allowing the clinets to direcly access SSSD caches is not possible for
+various reasons including:</p>
+<ul class="simple">
+<li>sssd uses LDB as caching backend and LDB depends on byte range locks.
+Letting a client read access to the cache would allow DoS if the
+client lcoks a record and never unlock it.</li>
+<li>sssd stores data not all clients are allowed to get access to
+(password hashes for example) and partitioning access to this data
+within the LDB cache is not feasible.</li>
+</ul>
+<p>A method to avoid context switches and the sssd_nss bottleneck without
+compromising th security of the system is therefore desirable.</p>
+</div>
+<div class="section" id="overview-of-fastnsscache-solution">
+<h2>Overview of FastNSSCache solution<a class="headerlink" href="#overview-of-fastnsscache-solution" title="Permalink to this headline">¶</a></h2>
+<p>The FastNSSCache feature addresses both issues.</p>
+<p>This is done by creating a specialized cache that have a few properties</p>
+<ul class="simple">
+<li>Contains only public data (the same data available in a public passwd
+or group files)</li>
+<li>Read only for clients</li>
+<li>Does not use locking and yet prevents access to inconsistent data</li>
+<li>Cache has a fixed size and uses a FIFO (for now) method to know which
+entries to purge</li>
+<li>Fallback to named sockets if entry is not found in the Fast Cache</li>
+</ul>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<p>The cache files are opened on the client at the first query and mmaped
+in the process memory, all accesses to data are therefore direct access
+to memory and do not suffer from any context switch. They also happen in
+parallel within each process with synchronization (in order to allow
+updates) performed by using memory barriers.</p>
+<p>Cache files can only be used for direct lookups (by name or by uid/gid),
+enumerations are _never_ handled via fast cache lookups by design,
+they always fallback to socket communication.</p>
+<p>The &#8220;maps&#8221; currently available are the _passwd_ and _group_ maps,
+each map has a file associated in the /var/lib/sss/mc directory which is
+accessible read-only by clients.</p>
+</div>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>At the moement we plan to provide 3 parameters per map that can control
+the caches.</p>
+<ul class="simple">
+<li>Per map enablement parameter that allows to activate/deactiveate maps
+invidiually.</li>
+<li>Per map cache size to fine tune the cache sizes in case space is at a
+premium or the dataset does not fit the default cache.</li>
+<li>Expiration time for entries.</li>
+</ul>
+<p>Cache entries warrant a shorter expiration time than current LDB caches
+because access to these entries is undetectable by sssd_nss which
+cannot decide how much an entry is required and whether a midway refresh
+is needed. By shortening the FastNSSCache entries life time we incur in
+the penalty of using the pipe from time to time but in turn we allow
+ssd_nss to decide whether it is required to refresh the entry or not.</p>
+</div>
+<div class="section" id="future-improvements">
+<h2>Future Improvements<a class="headerlink" href="#future-improvements" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Better garbage collection on the server side, at the moment a FIFO is
+used.</li>
+<li>Handle caching other nsswitch.conf database plugins in order to avoid
+slow access to the files db</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">FastNSSCache</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem Statement</a></li>
+<li><a class="reference internal" href="#overview-of-fastnsscache-solution">Overview of FastNSSCache solution</a></li>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a></li>
+<li><a class="reference internal" href="#configuration">Configuration</a></li>
+<li><a class="reference internal" href="#future-improvements">Future Improvements</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/FastNSSCache.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/FastNSSCache.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

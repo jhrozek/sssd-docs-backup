@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Sudo Responder/Cache? Behavior &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="sudo-responder-cache-behavior">
+<h1>Sudo <a class="reference external" href="https://docs.pagure.org/sssd-test2/Responder/Cache.html">Responder/Cache?</a> Behavior<a class="headerlink" href="#sudo-responder-cache-behavior" title="Permalink to this headline">¶</a></h1>
+<blockquote>
+<div><p>Before we go into the caching its better to know some useful
+information about sudo schema.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">1) As the document at
+<a class="reference external" href="http://www.gratisoft.us/sudo/man/1.8.1/sudoers.ldap.man.html">​http://www.gratisoft.us/sudo/man/1.8.1/sudoers.ldap.man.html</a>
+indicates the sudo rules are contained in a ldap server inside
+the SUDOers container.</div>
+</div>
+<div class="line-block">
+<div class="line">2) The SUDOers container contains the sudoRole objects. Where
+each object indicates a a sudorule.</div>
+</div>
+<div class="line-block">
+<div class="line">3) Each sudoRole object supports following attributes.</div>
+</div>
+</div></blockquote>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><strong>sudoUser</strong> - A user name, uid (prefixed with &#8216;#&#8217;), Unix group
+(prefixed with a &#8216;%&#8217;) or user netgroup (prefixed with a &#8216;+&#8217;).</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>sudoHost</strong> - A host name, IP address, IP network, or host
+netgroup (prefixed with a &#8216;+&#8217;). The special value ALL will match
+any host.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>sudoCommand</strong> - A Unix command with optional command line
+arguments and wild chars.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>sudoOption</strong> – Specifies options to be enabled or disabled as in
+the sudoers file.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>sudoRunAsUser</strong> - A user name or uid (prefixed with &#8216;#&#8217;) that
+commands may be run as or a Unix group (prefixed with a &#8216;%&#8217;) or
+user netgroup (prefixed with a &#8216;+&#8217;) that contains a list of users
+that commands may be run as. The special value ALL will match any
+user.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>sudoRunAsGroup</strong> - A Unix group or gid (prefixed with &#8216;#&#8217;) that
+commands may be run as. The special value ALL will match any
+group.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>sudoNotBefore</strong> - A time-stamp in the form yyyymmddHHMMZ that
+can be used to provide a start date/time for when the sudoRole
+will be valid. If multiplesudoNotBefore entries are present, the
+earliest is used. Note that timestamps must be in Coordinated
+Universal Time (UTC), not the local timezone.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>sudoNotAfter</strong> - A time stamp in the form yyyymmddHHMMZ that
+indicates an expiration date/time,after which the sudoRole will no
+longer be valid. If multiplesudoNotBefore entries are present, the
+last one is used. Note that time-stamps must be in Coordinated
+Universal Time (UTC), not the local timezone</div>
+</div>
+<p><strong>*To use
+`SudoNotBefore? &lt;https://docs.pagure.org/sssd-test2/SudoNotBefore.html&gt;`__
+and
+`SudoNotAfter? &lt;https://docs.pagure.org/sssd-test2/SudoNotAfter.html&gt;`__,
+the user should enable the SUDOERS_TIMED option in the config
+file.</strong>*</p>
+<blockquote>
+<div><strong>sudoOrder</strong> - The sudoRole entries retrieved from the LDAP
+directory have no inherent order. The sudoOrder attribute is an
+integer (or floating point value for LDAP servers that support
+it) that is used to sort the matching entries. This allows
+LDAP-based sudoers entries to more closely mimic the behaviour
+of the sudoers file, where the of the entries influences the
+result. If multiple entries match, the entry with the highest
+sudoOrder attribute is chosen.</div></blockquote>
+<div class="line-block">
+<div class="line"><strong>*A sudoRole must contain at least one sudoUser, sudoHost and
+sudoCommand.</strong>*</div>
+</div>
+<blockquote>
+<div>4)The sudoRole that have <code class="docutils literal"><span class="pre">'''cn=Defaults'''</span></code> will be applied
+(if specified) over all the rules before applying any other
+rules. This mimics the default statements in the sudoers file.</div></blockquote>
+</div></blockquote>
+<p>Now we have the necessary information to move on.</p>
+<p>Q1). <strong>What should we cache for offline sudo authentication???</strong></p>
+<p>The anatomy of sudo is as follows.</p>
+<blockquote>
+<div><p>when you type &#8216;sudo cmd&#8217; sudo is going to lookup in ldap to try and
+find the user posix groups and the user/host Nisnetgroup where the
+user is a member. Then it is going to do an ldap search in the
+ou=SUDOers container looking for any rule that matches that user or
+his usergroups. when it matches some rules, it goes down that list
+to see if the hostname OR a netgroup that the host is a member of is
+in that same rule, then finally it determines if the command &#8216;less&#8217;
+is allowed.</p>
+<p>This is how it works in a ldap server client. But in order to
+incorporate the netgroups we have to do some hack in the order of
+this anatomy.</p>
+<p>For the successful validation we need to know the nisnetgroups and
+posix groups that a user/host is a member of. So that we need to
+cache the host/user-&gt; nisgroup and user-&gt;posixgroups along with all
+sudoRole objects inside the SUDOers container that references to the
+specified command.</p>
+<p>The simple solution for this problem is to enumerate all groups and
+netgroup information and check it with sudorules. But this approach
+less efficient and costly. Instead of enumerating all the rules, the
+procedure goes like this.</p>
+<p>1) First we need to find the groups and user/host netgroups in which
+the user is a member of. That is the first step. We can do the
+search in DN: cn=accounts,dc=example,dc=com. Here we can use
+memberof plugin to resolve the user groups and the host groups. This
+step is already implemented inside the sssd. In order to include the
+support for nis net groups we can add one more filter to the query
+that searches for the user groups. The query is</p>
+</div></blockquote>
+<p>The skeleton of the filter will be:</p>
+<p>Q2) How to store cached data??? The cached data is in the LDAP format.
+So that the simple option available is to store it in the ldb file.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/DesignDocs/SudoSupport/SudoResponderCacheBehavior.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../../_sources/DesignDocs/SudoSupport/SudoResponderCacheBehavior.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

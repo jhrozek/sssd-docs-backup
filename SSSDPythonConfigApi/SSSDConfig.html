@@ -1,0 +1,731 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>class SSSDConfig &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><a class="reference external" href="#classSSSDConfig">class SSSDConfig</a><ol class="arabic">
+<li><code class="docutils literal"><span class="pre">`__init__([schemafile,</span> <span class="pre">schemaplugindir])</span></code> &lt;#__init__schemafileschemaplugindir&gt;`__<ol class="arabic">
+<li><a class="reference external" href="#InternalImplementationNotes">Internal Implementation
+Notes</a></li>
+<li><a class="reference external" href="#Returns">Returns</a></li>
+<li><a class="reference external" href="#Errors">Errors</a></li>
+</ol>
+</li>
+<li><code class="docutils literal"><span class="pre">`import_config([configfile])</span></code> &lt;#import_configconfigfile&gt;`__<ol class="arabic">
+<li><a class="reference external" href="#Returns1">Returns</a></li>
+<li><a class="reference external" href="#Errors1">Errors</a></li>
+</ol>
+</li>
+<li><code class="docutils literal"><span class="pre">`new_config()</span></code> &lt;#new_config&gt;`__<ol class="arabic">
+<li><a class="reference external" href="#Returns2">Returns</a></li>
+<li><a class="reference external" href="#Errors2">Errors</a></li>
+</ol>
+</li>
+<li><code class="docutils literal"><span class="pre">`write([outputfile]</span></code> &lt;#writeoutputfile&gt;`__<ol class="arabic">
+<li><a class="reference external" href="#Returns3">Returns</a></li>
+<li><a class="reference external" href="#Errors3">Errors</a></li>
+</ol>
+</li>
+<li><code class="docutils literal"><span class="pre">`list_services()</span></code> &lt;#list_services&gt;`__<ol class="arabic">
+<li><a class="reference external" href="#Returns4">Returns</a></li>
+<li><a class="reference external" href="#Errors4">Errors</a></li>
+</ol>
+</li>
+<li><code class="docutils literal"><span class="pre">`get_service(name)</span></code> &lt;#get_servicename&gt;`__<ol class="arabic">
+<li><a class="reference external" href="#Returns5">Returns</a></li>
+<li><a class="reference external" href="#Errors5">Errors</a></li>
+</ol>
+</li>
+<li><code class="docutils literal"><span class="pre">`new_service(name)</span></code> &lt;#new_servicename&gt;`__<ol class="arabic">
+<li><a class="reference external" href="#Returns6">Returns</a></li>
+<li><a class="reference external" href="#Errors6">Errors</a></li>
+</ol>
+</li>
+<li><code class="docutils literal"><span class="pre">`delete_service(name)</span></code> &lt;#delete_servicename&gt;`__<ol class="arabic">
+<li><a class="reference external" href="#Returns7">Returns</a></li>
+<li><a class="reference external" href="#Errors7">Errors</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#save_serviceSSSDServiceservice_object">save_service(SSSDService
+…</a><ol class="arabic">
+<li><a class="reference external" href="#Returns8">Returns</a></li>
+<li><a class="reference external" href="#Errors8">Errors</a></li>
+</ol>
+</li>
+<li><code class="docutils literal"><span class="pre">`list_active_domains()</span></code> &lt;#list_active_domains&gt;`__<ol class="arabic">
+<li><a class="reference external" href="#Returns9">Returns</a></li>
+<li><a class="reference external" href="#Errors9">Errors</a></li>
+</ol>
+</li>
+<li><code class="docutils literal"><span class="pre">`list_inactive_domains()</span></code> &lt;#list_inactive_domains&gt;`__<ol class="arabic">
+<li><a class="reference external" href="#Returns10">Returns</a></li>
+<li><a class="reference external" href="#Errors10">Errors</a></li>
+</ol>
+</li>
+<li><code class="docutils literal"><span class="pre">`list_domains()</span></code> &lt;#list_domains&gt;`__<ol class="arabic">
+<li><a class="reference external" href="#Returns11">Returns</a></li>
+<li><a class="reference external" href="#Errors11">Errors</a></li>
+</ol>
+</li>
+<li><code class="docutils literal"><span class="pre">`get_domain(name)</span></code> &lt;#get_domainname&gt;`__<ol class="arabic">
+<li><a class="reference external" href="#Returns12">Returns</a></li>
+<li><a class="reference external" href="#Errors12">Errors</a></li>
+</ol>
+</li>
+<li><code class="docutils literal"><span class="pre">`new_domain(name)</span></code> &lt;#new_domainname&gt;`__<ol class="arabic">
+<li><a class="reference external" href="#Returns13">Returns</a></li>
+<li><a class="reference external" href="#Errors13">Errors</a></li>
+</ol>
+</li>
+<li><code class="docutils literal"><span class="pre">`delete_domain(name)</span></code> &lt;#delete_domainname&gt;`__<ol class="arabic">
+<li><a class="reference external" href="#Returns14">Returns</a></li>
+<li><a class="reference external" href="#Errors14">Errors</a></li>
+</ol>
+</li>
+<li><code class="docutils literal"><span class="pre">`save_domain(SSSDDomain</span> <span class="pre">domain_object)</span></code> &lt;#save_domainSSSDDomaindomain_object&gt;`__<ol class="arabic">
+<li><a class="reference external" href="#Returns15">Returns</a></li>
+<li><a class="reference external" href="#Errors15">Errors</a></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="class-sssdconfig">
+<h1>class SSSDConfig<a class="headerlink" href="#class-sssdconfig" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="init-schemafile-schemaplugindir">
+<h2><code class="docutils literal"><span class="pre">__init__([schemafile,</span> <span class="pre">schemaplugindir])</span></code><a class="headerlink" href="#init-schemafile-schemaplugindir" title="Permalink to this headline">¶</a></h2>
+<p><em>Initialize the SSSD config parser/editor. This constructor does not
+open or create a config file. If the schemafile and schemaplugindir are
+not passed, it will use the system defaults.</em></p>
+<dl class="docutils">
+<dt><strong>schemafile</strong></dt>
+<dd>The path to the api schema config file. Usually
+/etc/sssd/sssd.api.conf</dd>
+<dt><strong>schemaplugindir</strong></dt>
+<dd>The path the directory containing the provider schema config files.
+Usually /etc/sssd/sssd.api.d</dd>
+</dl>
+<div class="section" id="internal-implementation-notes">
+<h3>Internal Implementation Notes<a class="headerlink" href="#internal-implementation-notes" title="Permalink to this headline">¶</a></h3>
+<p>This function will create a
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfigSchema.html">SSSDConfigSchema?</a>
+object internally that will be passed to
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDService.html">SSSDService</a>
+and
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDDomain.html">SSSDDomain</a>
+objects when they are created or requested.</p>
+</div>
+<div class="section" id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Permalink to this headline">¶</a></h3>
+<p>The newly-created SSSDConfig object.</p>
+</div>
+<div class="section" id="errors">
+<h3>Errors<a class="headerlink" href="#errors" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>IOError</strong></dt>
+<dd>Exception raised when the schema file could not be opened for
+reading. Note: provider schema files in the schemaplugindir that
+cannot be read will be ignored.</dd>
+<dt><strong>ParsingError</strong></dt>
+<dd>The main schema file or one of those in the plugin directory could
+not be parsed.</dd>
+</dl>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="import-config-configfile">
+<h2><code class="docutils literal"><span class="pre">import_config([configfile])</span></code><a class="headerlink" href="#import-config-configfile" title="Permalink to this headline">¶</a></h2>
+<p><em>Read in a config file, populating all of the service and domain objects
+with the read values.</em></p>
+<dl class="docutils">
+<dt><strong>configfile</strong></dt>
+<dd>The path to the SSSD config file. If not specified, use the system
+default, usually /etc/sssd/sssd.conf</dd>
+</dl>
+<div class="section" id="id1">
+<h3>Returns<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>No return value</p>
+</div>
+<div class="section" id="id2">
+<h3>Errors<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>IOError</strong></dt>
+<dd>Exception raised when the file could not be opened for reading</dd>
+<dt><strong>ParsingError</strong></dt>
+<dd>Exception raised when errors occur attempting to parse a file.</dd>
+<dt><strong>AlreadyInitializedError</strong></dt>
+<dd>This SSSDConfig object was already initialized by a call to
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#import_configconfigfile">import_config()</a>
+or
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#new_config">new_config()</a></dd>
+</dl>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="new-config">
+<h2><code class="docutils literal"><span class="pre">new_config()</span></code><a class="headerlink" href="#new-config" title="Permalink to this headline">¶</a></h2>
+<p><em>Initialize the SSSDConfig object with the defaults from the schema.</em></p>
+<div class="section" id="id3">
+<h3>Returns<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>No return value</p>
+</div>
+<div class="section" id="id4">
+<h3>Errors<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>AlreadyInitializedError</strong></dt>
+<dd>This SSSDConfig object was already initialized by a call to
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#import_configconfigfile">import_config()</a>
+or
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#new_config">new_config()</a></dd>
+</dl>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="write-outputfile">
+<h2><code class="docutils literal"><span class="pre">write([outputfile]</span></code><a class="headerlink" href="#write-outputfile" title="Permalink to this headline">¶</a></h2>
+<p><em>Write out the configuration to a file.</em></p>
+<dl class="docutils">
+<dt><strong>outputfile</strong></dt>
+<dd>The path to write the new config file. If it is not specified, it
+will use the path specified by the import() call.</dd>
+</dl>
+<div class="section" id="id5">
+<h3>Returns<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>No return value</p>
+</div>
+<div class="section" id="id6">
+<h3>Errors<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>IOError</strong></dt>
+<dd>Exception raised when the file could not be opened for writing</dd>
+<dt><strong>NotInitializedError</strong></dt>
+<dd>This SSSDConfig object has not had
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#import_configconfigfile">import_config()</a>
+or
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#new_config">new_config()</a>
+run on it yet.</dd>
+<dt><strong>NoOutputFileError</strong></dt>
+<dd>No outputfile was specified and this SSSDConfig object was not
+initialized by import()</dd>
+</dl>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="list-services">
+<h2><code class="docutils literal"><span class="pre">list_services()</span></code><a class="headerlink" href="#list-services" title="Permalink to this headline">¶</a></h2>
+<p><em>Retrieve a list of known services.</em></p>
+<div class="section" id="id7">
+<h3>Returns<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<p>The list of known services.</p>
+</div>
+<div class="section" id="id8">
+<h3>Errors<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>NotInitializedError</strong></dt>
+<dd>This SSSDConfig object has not had
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#import_configconfigfile">import_config()</a>
+or
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#new_config">new_config()</a>
+run on it yet.</dd>
+</dl>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="get-service-name">
+<h2><code class="docutils literal"><span class="pre">get_service(name)</span></code><a class="headerlink" href="#get-service-name" title="Permalink to this headline">¶</a></h2>
+<p><em>Get an
+`SSSDService &lt;https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDService.html&gt;`__
+object to edit a service.</em></p>
+<dl class="docutils">
+<dt><strong>name</strong></dt>
+<dd>The name of the service to return.</dd>
+</dl>
+<div class="section" id="id9">
+<h3>Returns<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<p>An
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDService.html">SSSDService</a>
+instance containing the current state of a service in the SSSDConfig</p>
+</div>
+<div class="section" id="id10">
+<h3>Errors<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>NoServiceError**</strong></dt>
+<dd>There is no such service with the specified name in the SSSDConfig.</dd>
+<dt><strong>NotInitializedError</strong></dt>
+<dd>This SSSDConfig object has not had
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#import_configconfigfile">import_config()</a>
+or
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#new_config">new_config()</a>
+run on it yet.</dd>
+</dl>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="new-service-name">
+<h2><code class="docutils literal"><span class="pre">new_service(name)</span></code><a class="headerlink" href="#new-service-name" title="Permalink to this headline">¶</a></h2>
+<p><em>Create a new service from the defaults and return the
+`SSSDService &lt;https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDService.html&gt;`__
+object for it. This function will also add this service to the list of
+active services in the [SSSD] section.</em></p>
+<dl class="docutils">
+<dt><strong>name</strong></dt>
+<dd>The name of the service to create and return.</dd>
+</dl>
+<div class="section" id="id11">
+<h3>Returns<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<p>The newly-created
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDService.html">SSSDService</a>
+object</p>
+</div>
+<div class="section" id="id12">
+<h3>Errors<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>ServiceNotRecognizedError</strong></dt>
+<dd>There is no such service in the schema.</dd>
+<dt><strong>ServiceAlreadyExistsError</strong></dt>
+<dd>The service being created already exists in the SSSDConfig object.</dd>
+<dt><strong>NotInitializedError</strong></dt>
+<dd>This SSSDConfig object has not had
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#import_configconfigfile">import_config()</a>
+or
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#new_config">new_config()</a>
+run on it yet.</dd>
+</dl>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="delete-service-name">
+<h2><code class="docutils literal"><span class="pre">delete_service(name)</span></code><a class="headerlink" href="#delete-service-name" title="Permalink to this headline">¶</a></h2>
+<p><em>Remove a service from the SSSDConfig object. This function will also
+remove this service from the list of active services in the [SSSD]
+section. Has no effect if the service does not exist.</em></p>
+<div class="section" id="id13">
+<h3>Returns<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<p>No return value</p>
+</div>
+<div class="section" id="id14">
+<h3>Errors<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>NotInitializedError</strong></dt>
+<dd>This SSSDConfig object has not had
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#import_configconfigfile">import_config()</a>
+or
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#new_config">new_config()</a>
+run on it yet.</dd>
+</dl>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="save-service-sssdservice-service-object">
+<h2>save_service(<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDService.html">SSSDService</a> service_object)<a class="headerlink" href="#save-service-sssdservice-service-object" title="Permalink to this headline">¶</a></h2>
+<p><em>Save the changes made to the service object back to the SSSDConfig
+object.</em></p>
+<dl class="docutils">
+<dt><strong>service_object</strong></dt>
+<dd>The
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDService.html">SSSDService</a>
+object to save to the configuration.</dd>
+</dl>
+<div class="section" id="id15">
+<h3>Returns<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<p>No return value</p>
+</div>
+<div class="section" id="id16">
+<h3>Errors<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>NotInitializedError</strong></dt>
+<dd>This SSSDConfig object has not had
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#import_configconfigfile">import_config()</a>
+or
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#new_config">new_config()</a>
+run on it yet.</dd>
+<dt><strong>TypeError</strong></dt>
+<dd><code class="docutils literal"><span class="pre">service_object</span></code> was not of the type SSSDService</dd>
+</dl>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="list-active-domains">
+<h2><code class="docutils literal"><span class="pre">list_active_domains()</span></code><a class="headerlink" href="#list-active-domains" title="Permalink to this headline">¶</a></h2>
+<p><em>Return a list of all active domains.</em></p>
+<div class="section" id="id17">
+<h3>Returns<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
+<p>The list of configured, active domains.</p>
+</div>
+<div class="section" id="id18">
+<h3>Errors<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>NotInitializedError</strong></dt>
+<dd>This SSSDConfig object has not had
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#import_configconfigfile">import_config()</a>
+or
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#new_config">new_config()</a>
+run on it yet.</dd>
+</dl>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="list-inactive-domains">
+<h2><code class="docutils literal"><span class="pre">list_inactive_domains()</span></code><a class="headerlink" href="#list-inactive-domains" title="Permalink to this headline">¶</a></h2>
+<p><em>Return a list of all configured, but disabled domains.</em></p>
+<div class="section" id="id19">
+<h3>Returns<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
+<p>The list of configured, inactive domains.</p>
+</div>
+<div class="section" id="id20">
+<h3>Errors<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>NotInitializedError</strong></dt>
+<dd>This SSSDConfig object has not had
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#import_configconfigfile">import_config()</a>
+or
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#new_config">new_config()</a>
+run on it yet.</dd>
+</dl>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="list-domains">
+<h2><code class="docutils literal"><span class="pre">list_domains()</span></code><a class="headerlink" href="#list-domains" title="Permalink to this headline">¶</a></h2>
+<p><em>Return a list of all configured domains, including inactive domains.</em></p>
+<div class="section" id="id21">
+<h3>Returns<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h3>
+<p>The list of configured domains, both active and inactive.</p>
+</div>
+<div class="section" id="id22">
+<h3>Errors<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>NotInitializedError</strong></dt>
+<dd>This SSSDConfig object has not had
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#import_configconfigfile">import_config()</a>
+or
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#new_config">new_config()</a>
+run on it yet.</dd>
+</dl>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="get-domain-name">
+<h2><code class="docutils literal"><span class="pre">get_domain(name)</span></code><a class="headerlink" href="#get-domain-name" title="Permalink to this headline">¶</a></h2>
+<p><em>Get an
+`SSSDDomain &lt;https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDDomain.html&gt;`__
+object to edit a domain.</em></p>
+<dl class="docutils">
+<dt><strong>name</strong></dt>
+<dd>The name of the domain to return.</dd>
+</dl>
+<div class="section" id="id23">
+<h3>Returns<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h3>
+<p>An
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDDomain.html">SSSDDomain</a>
+instance containing the current state of a domain in the SSSDConfig</p>
+</div>
+<div class="section" id="id24">
+<h3>Errors<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>NoDomainError**</strong></dt>
+<dd>There is no such domain with the specified name in the SSSDConfig.</dd>
+<dt><strong>NotInitializedError</strong></dt>
+<dd>This SSSDConfig object has not had
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#import_configconfigfile">import_config()</a>
+or
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#new_config">new_config()</a>
+run on it yet.</dd>
+</dl>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="new-domain-name">
+<h2><code class="docutils literal"><span class="pre">new_domain(name)</span></code><a class="headerlink" href="#new-domain-name" title="Permalink to this headline">¶</a></h2>
+<p><em>Create a new, empty domain and return the
+`SSSDDomain &lt;https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDDomain.html&gt;`__
+object for it.</em></p>
+<dl class="docutils">
+<dt><strong>name</strong></dt>
+<dd>The name of the domain to create and return.</dd>
+</dl>
+<div class="section" id="id25">
+<h3>Returns<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h3>
+<p>The newly-created
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDDomain.html">SSSDDomain</a>
+object</p>
+</div>
+<div class="section" id="id26">
+<h3>Errors<a class="headerlink" href="#id26" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>DomainAlreadyExistsError</strong></dt>
+<dd>The service being created already exists in the SSSDConfig object.</dd>
+<dt><strong>NotInitializedError</strong></dt>
+<dd>This SSSDConfig object has not had
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#import_configconfigfile">import_config()</a>
+or
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#new_config">new_config()</a>
+run on it yet.</dd>
+</dl>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="delete-domain-name">
+<h2><code class="docutils literal"><span class="pre">delete_domain(name)</span></code><a class="headerlink" href="#delete-domain-name" title="Permalink to this headline">¶</a></h2>
+<p><em>Remove a domain from the SSSDConfig object. This function will also
+remove this domain from the list of active domains in the [SSSD]
+section, if it is there.</em></p>
+<div class="section" id="id27">
+<h3>Returns<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h3>
+<p>No return value</p>
+</div>
+<div class="section" id="id28">
+<h3>Errors<a class="headerlink" href="#id28" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>NotInitializedError</strong></dt>
+<dd>This SSSDConfig object has not had
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#import_configconfigfile">import_config()</a>
+or
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#new_config">new_config()</a>
+run on it yet.</dd>
+</dl>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="save-domain-sssddomain-domain-object">
+<h2><code class="docutils literal"><span class="pre">save_domain(SSSDDomain</span> <span class="pre">domain_object)</span></code><a class="headerlink" href="#save-domain-sssddomain-domain-object" title="Permalink to this headline">¶</a></h2>
+<p><em>Save the changes made to the domain object back to the SSSDConfig
+object. If this domain is marked active, ensure it is present in the
+active domain list in the [SSSD] section</em></p>
+<dl class="docutils">
+<dt><strong>domain_object</strong></dt>
+<dd>The
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDDomain.html">SSSDDomain</a>
+object to save to the configuration.</dd>
+</dl>
+<div class="section" id="id29">
+<h3>Returns<a class="headerlink" href="#id29" title="Permalink to this headline">¶</a></h3>
+<p>No return value</p>
+</div>
+<div class="section" id="id30">
+<h3>Errors<a class="headerlink" href="#id30" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>NotInitializedError</strong></dt>
+<dd>This SSSDConfig object has not had
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#import_configconfigfile">import_config()</a>
+or
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDConfig.html#new_config">new_config()</a>
+run on it yet.</dd>
+<dt><strong>TypeError</strong></dt>
+<dd><code class="docutils literal"><span class="pre">domain_object</span></code> was not of type
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SSSDPythonConfigApi/SSSDDomain.html">SSSDDomain</a></dd>
+</dl>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">class SSSDConfig</a><ul>
+<li><a class="reference internal" href="#init-schemafile-schemaplugindir"><code class="docutils literal"><span class="pre">__init__([schemafile,</span> <span class="pre">schemaplugindir])</span></code></a><ul>
+<li><a class="reference internal" href="#internal-implementation-notes">Internal Implementation Notes</a></li>
+<li><a class="reference internal" href="#returns">Returns</a></li>
+<li><a class="reference internal" href="#errors">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#import-config-configfile"><code class="docutils literal"><span class="pre">import_config([configfile])</span></code></a><ul>
+<li><a class="reference internal" href="#id1">Returns</a></li>
+<li><a class="reference internal" href="#id2">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#new-config"><code class="docutils literal"><span class="pre">new_config()</span></code></a><ul>
+<li><a class="reference internal" href="#id3">Returns</a></li>
+<li><a class="reference internal" href="#id4">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#write-outputfile"><code class="docutils literal"><span class="pre">write([outputfile]</span></code></a><ul>
+<li><a class="reference internal" href="#id5">Returns</a></li>
+<li><a class="reference internal" href="#id6">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#list-services"><code class="docutils literal"><span class="pre">list_services()</span></code></a><ul>
+<li><a class="reference internal" href="#id7">Returns</a></li>
+<li><a class="reference internal" href="#id8">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#get-service-name"><code class="docutils literal"><span class="pre">get_service(name)</span></code></a><ul>
+<li><a class="reference internal" href="#id9">Returns</a></li>
+<li><a class="reference internal" href="#id10">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#new-service-name"><code class="docutils literal"><span class="pre">new_service(name)</span></code></a><ul>
+<li><a class="reference internal" href="#id11">Returns</a></li>
+<li><a class="reference internal" href="#id12">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#delete-service-name"><code class="docutils literal"><span class="pre">delete_service(name)</span></code></a><ul>
+<li><a class="reference internal" href="#id13">Returns</a></li>
+<li><a class="reference internal" href="#id14">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#save-service-sssdservice-service-object">save_service(SSSDService service_object)</a><ul>
+<li><a class="reference internal" href="#id15">Returns</a></li>
+<li><a class="reference internal" href="#id16">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#list-active-domains"><code class="docutils literal"><span class="pre">list_active_domains()</span></code></a><ul>
+<li><a class="reference internal" href="#id17">Returns</a></li>
+<li><a class="reference internal" href="#id18">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#list-inactive-domains"><code class="docutils literal"><span class="pre">list_inactive_domains()</span></code></a><ul>
+<li><a class="reference internal" href="#id19">Returns</a></li>
+<li><a class="reference internal" href="#id20">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#list-domains"><code class="docutils literal"><span class="pre">list_domains()</span></code></a><ul>
+<li><a class="reference internal" href="#id21">Returns</a></li>
+<li><a class="reference internal" href="#id22">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#get-domain-name"><code class="docutils literal"><span class="pre">get_domain(name)</span></code></a><ul>
+<li><a class="reference internal" href="#id23">Returns</a></li>
+<li><a class="reference internal" href="#id24">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#new-domain-name"><code class="docutils literal"><span class="pre">new_domain(name)</span></code></a><ul>
+<li><a class="reference internal" href="#id25">Returns</a></li>
+<li><a class="reference internal" href="#id26">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#delete-domain-name"><code class="docutils literal"><span class="pre">delete_domain(name)</span></code></a><ul>
+<li><a class="reference internal" href="#id27">Returns</a></li>
+<li><a class="reference internal" href="#id28">Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#save-domain-sssddomain-domain-object"><code class="docutils literal"><span class="pre">save_domain(SSSDDomain</span> <span class="pre">domain_object)</span></code></a><ul>
+<li><a class="reference internal" href="#id29">Returns</a></li>
+<li><a class="reference internal" href="#id30">Errors</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/SSSDPythonConfigApi/SSSDConfig.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/SSSDPythonConfigApi/SSSDConfig.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

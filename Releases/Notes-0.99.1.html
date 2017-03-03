@@ -1,0 +1,230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>This release contains bugfixes since the 0.99.0 release.</li>
+</ul>
+</div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>David O&#8217;Brien (1):</p>
+<ul class="simple">
+<li>Copy-edit sssd-ipa man page</li>
+</ul>
+<p>Dmitri Pal (5):</p>
+<ul class="simple">
+<li>COMMON Improvements to the trace macro</li>
+<li>COLLECTION Create reference to the top level collection</li>
+<li>COLLECTION: Cleaning FIXME comments</li>
+<li>INI: Cleaning FIXME comments.</li>
+<li>INI Correcting build warnings.</li>
+</ul>
+<p>Fabian Affolter (1):</p>
+<ul class="simple">
+<li>Add German translation</li>
+</ul>
+<p>Göran Uddeborg (2):</p>
+<ul class="simple">
+<li>Add Swedish translation for sss_client</li>
+<li>Add Swedish translation for SSSD server</li>
+</ul>
+<p>Jakub Hrozek (13):</p>
+<ul class="simple">
+<li>Warn visibly about permission problems with the config file</li>
+<li>Better error message when there is no local domain configured</li>
+<li>Setup ldap child logging from IPA backend</li>
+<li>Check the services started against a list of known services</li>
+<li>Handle spaces in config parser</li>
+<li>Fail on nonexistent input file</li>
+<li>Do not start with provider=files</li>
+<li>Reduce code duplication between LDAP child and Kerberos child</li>
+<li>Change ares usage to be c-ares 1.7.0 compatible</li>
+<li>Import ares 1.7.0 helpers</li>
+<li>Don&#8217;t build the SRV and TXT parsing code except for tests</li>
+<li>Document the failover feature in manpages</li>
+<li>Consolidate code for splitting strings by separator</li>
+</ul>
+<p>Martin Nagy (3):</p>
+<ul class="simple">
+<li>Fix egg-info file generation in the spec file</li>
+<li>Add some debugging statements to fail_over and resolver</li>
+<li>Correctly restart server status after the timeout</li>
+</ul>
+<p>Simo Sorce (17):</p>
+<ul class="simple">
+<li>Fix tabs</li>
+<li>Fix memberof plugin</li>
+<li>Compute and save memberuid in cache as well</li>
+<li>Use memberuid and not member in group enumerations</li>
+<li>Use the custom password field in groups too.</li>
+<li>Resolve nested groups also when rfc2307bis is used</li>
+<li>Make strdn build functions more available</li>
+<li>Fix nested group memberships</li>
+<li>Allow nesting to fix
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/310">#310</a></li>
+<li>Fix bug <a class="reference external" href="https://fedorahosted.org/sssd/ticket/311">#311</a>, properly
+set callback attribute</li>
+<li>Change dhash API to be talloc-friendly</li>
+<li>dhash: Add private pointer for delete callback</li>
+<li>Add comments to document latest changes</li>
+<li>Add rebuild task to memberof plugin</li>
+<li>Handle the special 02 upgrade case for 04-&gt;05</li>
+<li>Fix for <a class="reference external" href="https://fedorahosted.org/sssd/ticket/316">#316</a></li>
+<li>Fix for <a class="reference external" href="https://fedorahosted.org/sssd/ticket/322">#322</a>, update
+from old database versions.</li>
+</ul>
+<p>Stephen Gallagher (28):</p>
+<ul class="simple">
+<li>Remove ELAPI from build and tarball</li>
+<li>Stop configuring ELAPI</li>
+<li>Make debug log timestamps human-readable</li>
+<li>Raise debug log level for LDB_DEBUG_WARNING</li>
+<li>Add allocation error check</li>
+<li>Avoid returning uninitialized result.</li>
+<li>Fix potential uninitialized value errors in nsssrv_cmd.c</li>
+<li>Fix potential uninitialized value error in responder_dp.c</li>
+<li>SSSDDomain.remove_provider() requires only the provider type</li>
+<li>Make SSSDDomain.remove_provider() remove configured options</li>
+<li>Run dhash tests</li>
+<li>Add SSSDDomain.set_name() function to SSSDConfig API</li>
+<li>Reduce the verbosity of the SSSDConfigTest</li>
+<li>Fix broken SSSDChangeConf.set() function</li>
+<li>Fix SSSDConfig API bugs around [de-]activation of domains</li>
+<li>Fix RPM spec for RHEL6</li>
+<li>SSSDConfig API: fix deactivate_domain()</li>
+<li>SSSDConfig.get_domain() should properly detect active state</li>
+<li>Ensure that list_active_domains returns the real value</li>
+<li>Properly deny id_provider=files</li>
+<li>Add missing options to sssd-ipa configuraion</li>
+<li>Add missing SSSDConfig file for IPA for make install</li>
+<li>Fix processing of Boolean values in SSSDConfig</li>
+<li>Add &#8216;permit&#8217; and &#8216;deny&#8217; access providers to SSSDConfig API</li>
+<li>Remove default for ldap_use_start_tls in IPA providers</li>
+<li>Run SSSDConfig tests during &#8216;make check&#8217;</li>
+<li>Fix stupid copy-paste error</li>
+<li>Updating to version 0.99.1</li>
+</ul>
+<p>Sumit Bose (13):</p>
+<ul class="simple">
+<li>Do not include libsss_ipa.la in rpm package</li>
+<li>Immediately return a krb5 change password request when offline</li>
+<li>Check LDAP structure before calling ldap_unbind_ext()</li>
+<li>Add sysdb_search_custom request</li>
+<li>Do not treat missing proc files as errors.</li>
+<li>Add basic OS detection</li>
+<li>Make packaging of *.egg-info files more flexible</li>
+<li>Try to renew Kerberos credentials</li>
+<li>Add checks to test the memberuid handling</li>
+<li>Add offline support for ipa_access</li>
+<li>Add dummy credentials to an empty ccache file</li>
+<li>Always update sysdb to the latest version</li>
+<li>Fix DEBUG message for sysdb_init</li>
+</ul>
+<p>beckerde (1):</p>
+<ul class="simple">
+<li>Add Spanish translation</li>
+</ul>
+<p>ruigo (1):</p>
+<ul class="simple">
+<li>Add Portuguese translation</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-0.99.1.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-0.99.1.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

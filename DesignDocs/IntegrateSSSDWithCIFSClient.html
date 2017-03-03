@@ -1,0 +1,224 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Integrate SSSD with CIFS Client &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="integrate-sssd-with-cifs-client">
+<h1>Integrate SSSD with CIFS Client<a class="headerlink" href="#integrate-sssd-with-cifs-client" title="Permalink to this headline">¶</a></h1>
+<p>Related tickets:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1534">​RFE Integrate SSSD with CIFS
+client</a></li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1588">​RFE Allow SSSD to be used with smbd
+shares</a></li>
+</ul>
+<p>Designs and tickets this design (might) depend:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/DesignDocs/NSSResponderIDMappingCalls.html">​ID Mapping calls for the NSS
+responder</a></li>
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/DesignDocs/GlobalCatalogLookups.html">​Global Catalog Lookups in
+SSSD</a></li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1559">​RFE Use the getpwnam()/getgrnam() interface as a gateway to resolve
+SID to Names</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem Statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>Although mapping of Posix UIDs and SIDs is not needed mounting a CIFS
+share it might become necessary when working with files on the share,
+e.g. when modifying ACLs. Up to version 5.8 the cifs-utils package uses
+Winbind for this exclusively and the following binaries were linked
+against libwbclient:</p>
+<ul class="simple">
+<li>/usr/bin/getcifsacl</li>
+<li>/usr/bin/setcifsacl</li>
+<li>/usr/sbin/cifs.idmap</li>
+</ul>
+<p>With version 5.9 of cifs-utils a plugin interface was introduced by Jeff
+Layton (Thank you very much Jeff) to allow services other than winbind
+to handle the mapping of Posix UIDs and SIDs. SSSD will provide a plugin
+to allow the cifs-utils to ask SSSD to map the ID. With this plugin an
+SSSD client can access a CIFS share with the same functionality as a
+client running Winbind.</p>
+</div>
+<div class="section" id="use-case">
+<h2>Use Case<a class="headerlink" href="#use-case" title="Permalink to this headline">¶</a></h2>
+<p>Environment where FreeIPA and AD trusts are used already, but also Samba
+file server should be used. It&#8217;s important that UNIX IDs are mapped the
+same way in all utilities, then and all IDs are consistent.</p>
+</div>
+<div class="section" id="overview-of-the-solution">
+<h2>Overview of the solution<a class="headerlink" href="#overview-of-the-solution" title="Permalink to this headline">¶</a></h2>
+<p>There are two parts of this feature - a plugin for cifs-utils and a
+library implementing the winbind API, but with SSSD calls. Both these
+parts are fairly self-contained and do not touch the SSSD internals. See
+the next section for the implementation details.</p>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<p>The plugin interface is defined in cifsidmap.h which can be found in the
+cifs-utils-devel package. For easier reference a copy of the relevant
+section is included below.</p>
+<ul class="simple">
+<li>From the 6 expected functions, cifs_idmap_init_plugin() and
+cifs_idmap_exit_plugin() are obvious.</li>
+<li>cifs_idmap_sid_to_str() and cifs_idmap_str_to_sid() are
+SID-to-Name and Name-to-SID mappings as discussed in
+NSSResponderIDMappingCalls. I think the new libsss_nss_idmap.so
+mentioned there can be used here, too.</li>
+<li>cifs_idmap_sids_to_ids() and cifs_idmap_ids_to_sids() are the
+ID mapping calls. Although it might be possible possible to map IDs
+algorithmically without talking to SSSD I think those calls should
+also reach out to SSSD to do the mapping. The main reason is to allow
+other kind of mappings (e.g. using Posix attributes if available in
+AD).</li>
+</ul>
+<p>SSSD will provide a plugin which will basically act as a wrapper for the
+calls in libsss_nss_idmap.so.</p>
+<p>The libwbclient plugin will include implementation of the following
+functions that call into SSSD:</p>
+</div>
+<div class="section" id="how-to-test">
+<h2>How to test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="testing-with-getcifsacl">
+<h3>Testing with getcifsacl<a class="headerlink" href="#testing-with-getcifsacl" title="Permalink to this headline">¶</a></h3>
+<p>If there is no plugin for the CIFS client utilities or the plugin cannot
+resolve the SIDs to names getcifsacl will only show the SID strings in
+the outout:</p>
+<p>otherwise the output might look like</p>
+</div>
+<div class="section" id="testing-with-cifsacl-option-to-mount-cifs">
+<h3>Testing with cifsacl option to mount.cifs<a class="headerlink" href="#testing-with-cifsacl-option-to-mount-cifs" title="Permalink to this headline">¶</a></h3>
+<p>If the cifsacl mount option is used the cifs kernel module will call
+cifs.idmap to translate the Windows SIDs into the corresponding
+UIDs/GIDs of the client system so that the ownership of the files in the
+mounted file system is not mapped to the user how mounted the file
+system, but corresponds to the owning user and group of the Windows
+domain.</p>
+</div>
+<div class="section" id="testing-the-libwbclient-api">
+<h3>Testing the libwbclient API<a class="headerlink" href="#testing-the-libwbclient-api" title="Permalink to this headline">¶</a></h3>
+<p>Switching between the Winbind implementation and the SSSD implementation
+can be done using alternatives:</p>
+<p>When SSSD is set as the libwbclient implementation, you can test the
+calls using wbinfo:</p>
+<p>The following switches can be used to test the functions mentioned in
+the implementation section:</p>
+</div>
+</div>
+<div class="section" id="additional-links">
+<h2>Additional links<a class="headerlink" href="#additional-links" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/Windows_Integration_Guide/sssd-ad-integration.html#CIFS-SSSD">​https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/Windows_Integration_Guide/sssd-ad-integration.html#CIFS-SSSD</a></p>
+</div>
+<div class="section" id="author-s">
+<h2>Author(s)<a class="headerlink" href="#author-s" title="Permalink to this headline">¶</a></h2>
+<p>Sumit Bose &lt;<a class="reference external" href="mailto:sbose&#37;&#52;&#48;redhat&#46;com">​sbose<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Integrate SSSD with CIFS Client</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem Statement</a></li>
+<li><a class="reference internal" href="#use-case">Use Case</a></li>
+<li><a class="reference internal" href="#overview-of-the-solution">Overview of the solution</a></li>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a></li>
+<li><a class="reference internal" href="#how-to-test">How to test</a><ul>
+<li><a class="reference internal" href="#testing-with-getcifsacl">Testing with getcifsacl</a></li>
+<li><a class="reference internal" href="#testing-with-cifsacl-option-to-mount-cifs">Testing with cifsacl option to mount.cifs</a></li>
+<li><a class="reference internal" href="#testing-the-libwbclient-api">Testing the libwbclient API</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#additional-links">Additional links</a></li>
+<li><a class="reference internal" href="#author-s">Author(s)</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/IntegrateSSSDWithCIFSClient.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/IntegrateSSSDWithCIFSClient.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

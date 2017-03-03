@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#Highlights">Highlights</a></li>
+<li><a class="reference external" href="#TicketsFixed">Tickets Fixed</a></li>
+<li><a class="reference external" href="#DetailedChangelog">Detailed Changelog</a></li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Fixed a potential segfault when SRV records are used to discover
+services</li>
+<li>The client libraries now use robust mutexes to avoid a potential
+deadlock if a thread was cancelled while holding a mutex</li>
+<li>Do not return an error when the SELinux support is not configured</li>
+<li>Fixed returning an error to the PAM stack when the SSSD was
+performing authentication but the kpasswd server was unreachable</li>
+<li>The SSSD used to skip a whole nesting level instead of a single
+already processed group when loading nested group membership
+structure</li>
+<li>Added support for terminating idle connections and make the idle
+timeout configurable</li>
+<li>The sss_ssh_knownostsproxy command no longer aborts when processing
+a host without DNS records</li>
+<li>The shadowLastChange attribute is noe correctly updated with days
+since the Epoch, not seconds</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1356">​https://fedorahosted.org/sssd/ticket/1356</a>
+SSH: Don&#8217;t abort connection in sss_ssh_knownhostsproxy when DNS
+records are missing</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1271">​https://fedorahosted.org/sssd/ticket/1271</a>
+Use HTML_TIMESTAMP instead of HTML_FOOTER_DESCRIPTION</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1360">​https://fedorahosted.org/sssd/ticket/1360</a>
+Provide &#8220;service filter&#8221; for SELinux context</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1354">​https://fedorahosted.org/sssd/ticket/1354</a>
+Add support for terminating idle connections</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1452">​https://fedorahosted.org/sssd/ticket/1452</a>
+KRB5: Only return PAM error for unreachable kpasswd when performing
+chpass</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1419">​https://fedorahosted.org/sssd/ticket/1419</a>
+Fixed wrong number in shadowLastChange</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1460">​https://fedorahosted.org/sssd/ticket/1460</a>
+Use PTHREAD_MUTEX_ROBUST to avoid deadlock in the client</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1515">​https://fedorahosted.org/sssd/ticket/1515</a>
+KRB5: Return PAM_AUTH_ERR on incorrect password</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1364">​https://fedorahosted.org/sssd/ticket/1364</a>
+FO: Check server validity before setting status</li>
+</ul>
+</div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Jakub Hrozek (8):</p>
+<ul class="simple">
+<li>Use HTML_TIMESTAMP instead of HTML_FOOTER_DESCRIPTION</li>
+<li>Send the correct enumeration request</li>
+<li>Process all groups from a single nesting level</li>
+<li>SYSDB: Make sysdb_attrs_get_el_int() public</li>
+<li>KRB5: Only return PAM error for unreachable kpasswd when performing
+chpass</li>
+<li>Use PTHREAD_MUTEX_ROBUST to avoid deadlock in the client</li>
+<li>KRB5: Return PAM_AUTH_ERR on incorrect password</li>
+<li>FO: Check server validity before setting status</li>
+</ul>
+<p>Jan Cholasta (3):</p>
+<ul class="simple">
+<li>SSH: Update sss_ssh_knownhostsproxy manual page</li>
+<li>SSH: Supress error message output in sss_ssh_knownhostsproxy</li>
+<li>SSH: Don&#8217;t abort connection in sss_ssh_knownhostsproxy when DNS
+records are missing</li>
+</ul>
+<p>Jan Zeleny (2):</p>
+<ul class="simple">
+<li>Provide &#8220;service filter&#8221; for SELinux context</li>
+<li>Fixed wrong number in shadowLastChange</li>
+</ul>
+<p>Shantanu Goel (4):</p>
+<ul class="simple">
+<li>Set return errno to the value prior to calling close().</li>
+<li>Log message if close() fails in destructor.</li>
+<li>Do not send SIGPIPE on disconnection</li>
+<li>Add support for terminating idle connections</li>
+</ul>
+<p>Stephen Gallagher (2):</p>
+<ul class="simple">
+<li>Bumping version to 1.8.5</li>
+<li>Make the client idle timeout configurable</li>
+</ul>
+<p>Timo Aaltonen (1):</p>
+<ul class="simple">
+<li>Move SELinux processing from session to account PAM stack</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.8.5.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.8.5.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

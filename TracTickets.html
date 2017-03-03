@@ -1,0 +1,324 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>The Trac Ticket System &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="the-trac-ticket-system">
+<h1>The Trac Ticket System<a class="headerlink" href="#the-trac-ticket-system" title="Permalink to this headline">¶</a></h1>
+<div class="system-message"><p><strong>Error: Macro TracGuideToc(None) failed</strong></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;NoneType&#39;</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span> <span class="s1">&#39;find&#39;</span>
+</pre></div>
+</div>
+</div><p>The Trac ticket database provides simple but effective tracking of
+issues and bugs within a project.</p>
+<p>As the central project management element of Trac, tickets can be used
+for <strong>project tasks</strong>, <strong>feature requests</strong>, <strong>bug reports</strong>, <strong>software
+support issues</strong> among others.</p>
+<p>As with the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracWiki.html">TracWiki</a>, this
+subsystem has been designed with the goal of making user contribution
+and participation as simple as possible. It should be as easy as
+possible to report bugs, ask questions, suggest improvements and discuss
+resolutions.</p>
+<p>An issue is assigned to a person who must resolve it or reassign the
+ticket to someone else. All tickets can be edited, annotated, assigned,
+prioritized and discussed at any time.</p>
+<blockquote>
+<div>However, some Trac installations may put restrictions in place about</div></blockquote>
+<p>who can change what. For example, the default installation doesn&#8217;t
+permit to non-authenticated users (&#8220;anonymous&#8221; users) to change
+anything, even to comment on an issue, for obvious spam prevention
+reasons. Check the local contributing policy, which you can usually find
+on the front page
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiStart.html">WikiStart</a>, or
+contact your local Trac administrator.</p>
+<div class="section" id="ticket-fields">
+<h2>Ticket Fields<a class="headerlink" href="#ticket-fields" title="Permalink to this headline">¶</a></h2>
+<p>A ticket contains the following information attributes:</p>
+<ul class="simple">
+<li><strong>Reporter</strong> — The author of the ticket.</li>
+<li><strong>Type</strong> — The nature of the ticket (for example, defect or
+enhancement request). See
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TicketTypes.html">TicketTypes?</a>
+for more details.</li>
+<li><strong>Component</strong> — The project module or subsystem this ticket concerns.</li>
+<li><strong>Version</strong> — Version of the project that this ticket pertains to.</li>
+<li><strong>Keywords</strong> — Keywords that a ticket is marked with. Useful for
+searching and report generation.</li>
+<li><strong>Priority</strong> — The importance of this issue, ranging from <em>trivial</em>
+to <em>blocker</em>. A pull-down if different priorities where defined.</li>
+<li><strong>Milestone</strong> — When this issue should be resolved at the latest. A
+pull-down menu containing a list of milestones.</li>
+<li><strong>Assigned to/Owner</strong> — Principal person responsible for handling the
+issue.</li>
+<li><strong>Cc</strong> — A comma-separated list of other users or E-Mail addresses to
+notify. <em>Note that this does not imply responsiblity or any other
+policy.</em></li>
+<li><strong>Resolution</strong> — Reason for why a ticket was closed. One of
+<code class="docutils literal"><span class="pre">fixed</span></code>, <code class="docutils literal"><span class="pre">invalid</span></code>, <code class="docutils literal"><span class="pre">wontfix</span></code>, <code class="docutils literal"><span class="pre">duplicate</span></code>, <code class="docutils literal"><span class="pre">worksforme</span></code>.</li>
+<li><strong>Status</strong> — What is the current status? One of <code class="docutils literal"><span class="pre">new</span></code>,
+<code class="docutils literal"><span class="pre">assigned</span></code>, <code class="docutils literal"><span class="pre">closed</span></code>, <code class="docutils literal"><span class="pre">reopened</span></code>.</li>
+<li><strong>Summary</strong> — A brief description summarizing the problem or issue.
+Simple text without
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html">WikiFormatting</a>.</li>
+<li><strong>Description</strong> — The body of the ticket. A good description should
+be specific, descriptive and to the point. Accepts
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html">WikiFormatting</a>.</li>
+</ul>
+<p><strong>Notes:</strong></p>
+<ul class="simple">
+<li>Versions of Trac prior to 0.9 did not have the <em>type</em> field, but
+instead provided a <em>severity</em> field and different default values for
+the <em>priority</em> field. This change was done to simplify the ticket
+model by removing the somewhat blurry distinction between <em>priority</em>
+and <em>severity</em>. However, the old model is still available if you
+prefer it: just add/modify the default values of the <em>priority</em> and
+<em>severity</em>, and optionally hide the <em>type</em> field by removing all the
+possible values through
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracAdmin.html">trac-admin</a>.</li>
+<li>the <a class="reference external" href="http://trac.edgewall.org/intertrac/TicketTypes">​type</a>,
+<a class="reference external" href="http://trac.edgewall.org/intertrac/TicketComponent">​component</a>,
+version, priority and severity fields can be managed with
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracAdmin.html">trac-admin</a> or
+with the <a class="reference external" href="http://trac.edgewall.org/intertrac/WebAdmin">​WebAdmin</a>
+plugin.</li>
+<li>Description of the builtin <em>priority</em> values is available at
+<a class="reference external" href="http://trac.edgewall.org/intertrac/TicketTypes%23Whyistheseverityfieldgone">​TicketTypes</a></li>
+</ul>
+</div>
+<div class="section" id="changing-and-commenting-tickets">
+<h2>Changing and Commenting Tickets<a class="headerlink" href="#changing-and-commenting-tickets" title="Permalink to this headline">¶</a></h2>
+<p>With appropriate permissions, as already mentioned
+<a class="reference external" href="https://fedorahosted.org/sssd#edit-permissions">above</a>, a ticket
+entered into Trac can at any time be modified by <strong>annotating</strong>.</p>
+<p>Then, annotations like changes and comments to the ticket are logged as
+a part of the ticket itself. When viewing a ticket, the history of
+changes will appear below the main ticket area.</p>
+<p>Comment editing (available since 0.12) is meant to be used to make small
+corrections to comments, like fixing formatting, forgotten
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html">WikiFormatting</a>
+or spelling errors, not major edits. For longer edits, you should be
+adding a new comment instead. Editing a comment will not produce a new
+entry on <a class="reference external" href="https://fedorahosted.org/sssd/timeline">timeline</a> while
+entering a new comment or other changes will do.</p>
+<p>All edits (field changes, new comments, comment edits) update the &#8220;last
+changed&#8221; time of the ticket.</p>
+<p><strong>Notes:</strong></p>
+<ul class="simple">
+<li>An important feature is being able to use
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracLinks.html">TracLinks</a> and
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html">WikiFormatting</a>
+in ticket descriptions and comments. Use
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracLinks.html">TracLinks</a> to
+refer to other issues, changesets or files to make your ticket more
+specific and easier to understand.</li>
+<li>See
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracNotification.html">TracNotification</a>
+for how to configure email notifications of ticket changes.</li>
+<li>See
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracWorkflow.html">TracWorkflow</a>
+for information about the state transitions (ticket lifecycle), and
+how this workflow can be customized.</li>
+</ul>
+</div>
+<div class="section" id="default-values-for-drop-down-fields">
+<h2>Default Values for Drop-Down Fields<a class="headerlink" href="#default-values-for-drop-down-fields" title="Permalink to this headline">¶</a></h2>
+<p>The option selected by default for the various drop-down fields can be
+set in <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">trac.ini</a>,
+in the <code class="docutils literal"><span class="pre">[ticket]</span></code> section:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">default_component</span></code>: Name of the component selected by default</li>
+<li><code class="docutils literal"><span class="pre">default_milestone</span></code>: Name of the default milestone</li>
+<li><code class="docutils literal"><span class="pre">default_priority</span></code>: Default priority value</li>
+<li><code class="docutils literal"><span class="pre">default_severity</span></code>: Default severity value</li>
+<li><code class="docutils literal"><span class="pre">default_type</span></code>: Default ticket type</li>
+<li><code class="docutils literal"><span class="pre">default_version</span></code>: Name of the default version</li>
+<li><code class="docutils literal"><span class="pre">default_owner</span></code>: Name of the default owner. If set to the text &#8220;&lt;
+default &gt;&#8221; (the default value), the component owner is used.</li>
+</ul>
+<p>If any of these options are omitted, the default value will either be
+the first in the list, or an empty value, depending on whether the field
+in question is required to be set. Some of these can be chosen through
+the <a class="reference external" href="http://trac.edgewall.org/intertrac/WebAdmin">​WebAdmin</a> plugin
+in the &#8220;Ticket System&#8221; section (others in the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#ticket-section">[ticket]</a>
+section in <code class="docutils literal"><span class="pre">trac.ini</span></code>).</p>
+</div>
+<div class="section" id="hiding-fields-and-adding-custom-fields">
+<h2>Hiding Fields and Adding Custom Fields<a class="headerlink" href="#hiding-fields-and-adding-custom-fields" title="Permalink to this headline">¶</a></h2>
+<p>Many of the default ticket fields can be hidden from the ticket web
+interface simply by removing all the possible values through
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracAdmin.html">trac-admin</a>. This
+of course only applies to drop-down fields, such as <em>type</em>, <em>priority</em>,
+<em>severity</em>, <em>component</em>, <em>version</em> and <em>milestone</em>.</p>
+<p>Trac also lets you add your own custom ticket fields. See
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTicketsCustomFields.html">TracTicketsCustomFields</a>
+for more information.</p>
+</div>
+<div class="section" id="assign-to-as-drop-down-list">
+<h2>Assign-to as Drop-Down List<a class="headerlink" href="#assign-to-as-drop-down-list" title="Permalink to this headline">¶</a></h2>
+<p>If the list of possible ticket owners is finite, you can change the
+<em>assign-to</em> ticket field from a text input to a drop-down list. This is
+done by setting the <code class="docutils literal"><span class="pre">restrict_owner</span></code> option of the <code class="docutils literal"><span class="pre">[ticket]</span></code>
+section in
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">trac.ini</a> to
+“true”. In that case, Trac will use the list of all users who have
+accessed the project to populate the drop-down field.</p>
+<p>To appear in the dropdown list, a user needs be registered with the
+project, <em>i.e.</em> a user session should exist in the database. Such an
+entry is automatically created in the database the first time the user
+submits a change in the project, for example when editing the user&#8217;s
+details in the <em>Settings</em> page, or simply by authenticating if the user
+has a login. Also, the user must have <code class="docutils literal"><span class="pre">TICKET_MODIFY</span></code>
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracPermissions.html">permissions</a>.</p>
+<p><strong>Notes:</strong></p>
+<ul class="simple">
+<li>See <a class="reference external" href="http://pacopablo.com/wiki/pacopablo/blog/set-assign-to-drop-down">​Populating Assign To Drop
+Down</a>
+on how to add user entries at database level</li>
+<li>If you need serious flexibility and aren&#8217;t afraid of a little plugin
+coding of your own, see
+<a class="reference external" href="http://trac-hacks.org/wiki/FlexibleAssignToPlugin">​FlexibleAssignTo</a>
+(disclosure: I&#8217;m the author)</li>
+<li>Activating this option may cause some performance degradation, read
+more about this in the <a class="reference external" href="http://trac.edgewall.org/intertrac/TracPerformance%23Configuration">​Trac
+performance</a>
+page.</li>
+</ul>
+</div>
+<div class="section" id="preset-values-for-new-tickets">
+<h2>Preset Values for New Tickets<a class="headerlink" href="#preset-values-for-new-tickets" title="Permalink to this headline">¶</a></h2>
+<p>To create a link to the new-ticket form filled with preset values, you
+need to call the <code class="docutils literal"><span class="pre">/newticket?</span></code> URL with <code class="docutils literal"><span class="pre">variable=value</span></code> separated
+by <code class="docutils literal"><span class="pre">&amp;</span></code>.</p>
+<p>Possible variables are :</p>
+<ul class="simple">
+<li><strong>type</strong> — The type droplist</li>
+<li><strong>reporter</strong> — Name or email of the reporter</li>
+<li><strong>summary</strong> — Summary line for the ticket</li>
+<li><strong>description</strong> — Long description of the ticket</li>
+<li><strong>component</strong> — The component droplist</li>
+<li><strong>version</strong> — The version droplist</li>
+<li><strong>severity</strong> — The severity droplist</li>
+<li><strong>keywords</strong> — The keywords</li>
+<li><strong>priority</strong> — The priority droplist</li>
+<li><strong>milestone</strong> — The milestone droplist</li>
+<li><strong>owner</strong> — The person responsible for the ticket</li>
+<li><strong>cc</strong> — The list of emails for notifying about the ticket change</li>
+</ul>
+<div class="line-block">
+<div class="line">Example:
+<em>``[/newticket?summary=Compile%20Error&amp;version=1.0&amp;component=gui]``</em></div>
+</div>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracGuide.html">TracGuide</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracWiki.html">TracWiki</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTicketsCustomFields.html">TracTicketsCustomFields</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracNotification.html">TracNotification</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracReports.html">TracReports</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracQuery.html">TracQuery</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">The Trac Ticket System</a><ul>
+<li><a class="reference internal" href="#ticket-fields">Ticket Fields</a></li>
+<li><a class="reference internal" href="#changing-and-commenting-tickets">Changing and Commenting Tickets</a></li>
+<li><a class="reference internal" href="#default-values-for-drop-down-fields">Default Values for Drop-Down Fields</a></li>
+<li><a class="reference internal" href="#hiding-fields-and-adding-custom-fields">Hiding Fields and Adding Custom Fields</a></li>
+<li><a class="reference internal" href="#assign-to-as-drop-down-list">Assign-to as Drop-Down List</a></li>
+<li><a class="reference internal" href="#preset-values-for-new-tickets">Preset Values for New Tickets</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracTickets.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracTickets.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

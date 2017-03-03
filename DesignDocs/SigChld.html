@@ -1,0 +1,283 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Common SIGCHLD handler &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#CommonSIGCHLDhandler">Common SIGCHLD handler</a></li>
+<li><a class="reference external" href="#AlternateProposal">Alternate Proposal</a><ol class="arabic">
+<li><a class="reference external" href="#structsss_child_ctxchild_ctx">struct sss_child_ctx
+*child_ctx</a><ol class="arabic">
+<li><a class="reference external" href="#members">members</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#structsss_sigchild_ctxsigchld_ctx">struct sss_sigchild_ctx
+*sigchld_ctx</a><ol class="arabic">
+<li><a class="reference external" href="#members1">members</a></li>
+<li><a class="reference external" href="#Function">Function</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#sss_child_register">sss_child_register</a><ol class="arabic">
+<li><a class="reference external" href="#Prototype">Prototype</a></li>
+<li><a class="reference external" href="#Function1">Function</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#sss_child_handler">sss_child_handler</a><ol class="arabic">
+<li><a class="reference external" href="#Prototype1">Prototype</a></li>
+<li><a class="reference external" href="#Function2">Function</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#sss_child_fn_t">sss_child_fn_t</a><ol class="arabic">
+<li><a class="reference external" href="#Prototype2">Prototype</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#sss_child_destructor">sss_child_destructor</a></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</div><p>This design page is related to the following ticket:
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/1004">​https://fedorahosted.org/sssd/ticket/1004</a></p>
+<div class="section" id="common-sigchld-handler">
+<h1>Common SIGCHLD handler<a class="headerlink" href="#common-sigchld-handler" title="Permalink to this headline">¶</a></h1>
+<p>I took some inspiration in the SIGUSR1 signal handling in
+data_provider_be.c. The SIGUSR1 signal is apparently used to force
+offline behavior on providers.</p>
+<p>DP backend enables providers to register callbacks for the
+online/offline event. I thought it would be a good idea to make SIGCHLD
+handling consistent with what is already in place.</p>
+<p>For online/offline event, these functions are defined:</p>
+<p>be_add_online_cb</p>
+<p>be_run_online_cb</p>
+<p>be_add_offline_cb</p>
+<p>be_run_offline_cb</p>
+<p>They give providers the option to register additional callbacks to
+handle these event in their own way. The list of callbacks is stored on
+the backend context (struct be_ctx).</p>
+<p>However there is one difference between the SIGCHLD and SIGUSR1
+scenarios: online/offline callbacks are called serially - always all of
+them. While the SIGCHLD handler has to invoke callbacks for the
+appropriate PIDs only. This means we can&#8217;t use the underlying callbacks
+handling functions already in place (be_run_cb and be_run_cb_step).</p>
+<p>I propose creating new similar functions (be_run_sigchld_cb and
+be_run_sigchld_cb_step). They would work in a similar manner to the
+previously mentioned (be_run_cb and be_run_cb_step respectively)
+with the difference that:</p>
+<ol class="arabic simple">
+<li>each step would check with waitpid first and invoke the callback only
+if the child has exited</li>
+</ol>
+<ol class="arabic simple" start="2">
+<li>we would use tevent_immediate events instead of timers (as discussed
+on IRC with Stephen)</li>
+</ol>
+<p>Advantages of this approach:</p>
+<ol class="arabic simple">
+<li>consistent with online/offline callbacks for providers</li>
+</ol>
+<ol class="arabic simple" start="2">
+<li>relatively easy to implement</li>
+</ol>
+</div>
+<div class="section" id="alternate-proposal">
+<h1>Alternate Proposal<a class="headerlink" href="#alternate-proposal" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="struct-sss-child-ctx-child-ctx">
+<h2>struct sss_child_ctx *child_ctx<a class="headerlink" href="#struct-sss-child-ctx-child-ctx" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="members">
+<h3>members<a class="headerlink" href="#members" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">pid_t</span> <span class="pre">pid</span></code></li>
+<li><code class="docutils literal"><span class="pre">sss_child_cb_fn</span> <span class="pre">cb</span></code></li>
+<li><code class="docutils literal"><span class="pre">void</span> <span class="pre">*pvt</span></code></li>
+<li><code class="docutils literal"><span class="pre">struct</span> <span class="pre">sss_sigchild_ctx</span> <span class="pre">*sigchld_ctx</span></code></li>
+</ul>
+</div>
+</div>
+<div class="section" id="struct-sss-sigchild-ctx-sigchld-ctx">
+<h2>struct sss_sigchild_ctx *sigchld_ctx<a class="headerlink" href="#struct-sss-sigchild-ctx-sigchld-ctx" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>members<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">struct</span> <span class="pre">tevent_context</span> <span class="pre">*ev</span></code></li>
+<li><code class="docutils literal"><span class="pre">hash_table_t</span> <span class="pre">*children</span></code></li>
+<li><code class="docutils literal"><span class="pre">int</span> <span class="pre">options</span></code></li>
+</ul>
+</div>
+<div class="section" id="function">
+<h3>Function<a class="headerlink" href="#function" title="Permalink to this headline">¶</a></h3>
+<p>This object should be initialized at process startup time. The
+hash_table should be initialized with <code class="docutils literal"><span class="pre">sss_hash_create()</span></code> to maintain
+talloc compatibility. This hash should be keyed by integer (the PID) and
+should contain <code class="docutils literal"><span class="pre">struct</span> <span class="pre">sss_child_ctx</span> <span class="pre">*</span></code> objects as its values. The
+<code class="docutils literal"><span class="pre">options</span></code> member should be a bitmask allowing WUNTRACED and/or
+WCONTINUED. The handler will ALWAYS add WNOHANG.</p>
+</div>
+</div>
+<div class="section" id="sss-child-register">
+<h2>sss_child_register<a class="headerlink" href="#sss-child-register" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="prototype">
+<h3>Prototype<a class="headerlink" href="#prototype" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="id2">
+<h3>Function<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>This function registers a callback with private data in a hash table
+contained within sigchld_ctx. It constructs a
+<code class="docutils literal"><span class="pre">struct</span> <span class="pre">sss_child_ctx</span> <span class="pre">*</span></code> consisting of the pid, cb and pvt. It will
+also create a destructor for this object which will remove the entry
+from the hash. This is so that it the consumer can choose when to stop
+monitoring the child (such as if the <code class="docutils literal"><span class="pre">waitpid()</span></code> call returned
+SIGSTOP/SIGCONT or other non-terminating results. It can also be used to
+programmatically change the callback at need.</p>
+</div>
+</div>
+<div class="section" id="sss-child-handler">
+<h2>sss_child_handler<a class="headerlink" href="#sss-child-handler" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id3">
+<h3>Prototype<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="id4">
+<h3>Function<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>This is the master SIGCHLD handler. It would be invoked any time that
+the process receives a SIGCHLD signal.</p>
+<p>When the signal is removed, it should call
+<code class="docutils literal"><span class="pre">waitpid(-1,</span> <span class="pre">&amp;status,</span> <span class="pre">WNOHANG</span> <span class="pre">&amp;</span> <span class="pre">sigchld_ctx-&gt;options);</span></code> repeatedly
+until <code class="docutils literal"><span class="pre">waitpid()</span></code> returns 0. For each child received, the pid should
+be looked up in the hash table and the matching callback should be
+invoked.</p>
+</div>
+</div>
+<div class="section" id="sss-child-fn-t">
+<h2>sss_child_fn_t<a class="headerlink" href="#sss-child-fn-t" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id5">
+<h3>Prototype<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="sss-child-destructor">
+<h2>sss_child_destructor<a class="headerlink" href="#sss-child-destructor" title="Permalink to this headline">¶</a></h2>
+<p>Talloc_destructor to remove a <code class="docutils literal"><span class="pre">struct</span> <span class="pre">sss_child_ctx</span> <span class="pre">*</span></code> from the hash
+table of the <code class="docutils literal"><span class="pre">struct</span> <span class="pre">sss_sigchild_ctx</span> <span class="pre">*</span></code> that contains it.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Common SIGCHLD handler</a></li>
+<li><a class="reference internal" href="#alternate-proposal">Alternate Proposal</a><ul>
+<li><a class="reference internal" href="#struct-sss-child-ctx-child-ctx">struct sss_child_ctx *child_ctx</a><ul>
+<li><a class="reference internal" href="#members">members</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#struct-sss-sigchild-ctx-sigchld-ctx">struct sss_sigchild_ctx *sigchld_ctx</a><ul>
+<li><a class="reference internal" href="#id1">members</a></li>
+<li><a class="reference internal" href="#function">Function</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sss-child-register">sss_child_register</a><ul>
+<li><a class="reference internal" href="#prototype">Prototype</a></li>
+<li><a class="reference internal" href="#id2">Function</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sss-child-handler">sss_child_handler</a><ul>
+<li><a class="reference internal" href="#id3">Prototype</a></li>
+<li><a class="reference internal" href="#id4">Function</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sss-child-fn-t">sss_child_fn_t</a><ul>
+<li><a class="reference internal" href="#id5">Prototype</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sss-child-destructor">sss_child_destructor</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/SigChld.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/SigChld.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,336 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Feature Name &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="feature-name">
+<h1>Feature Name<a class="headerlink" href="#feature-name" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2579">​https://fedorahosted.org/sssd/ticket/2579</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>The next IPA release will support one-way trusts. SSSD needs to add
+support for this feature in its server mode.</p>
+</div>
+<div class="section" id="use-cases">
+<h2>Use cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+<p>One-way trust to Active Directory where FreeIPA realm trusts Active
+Directory forest using cross-forest trust feature of AD but the AD
+forest does not trust FreeIPA realm. Users from AD forest can access
+resources in FreeIPA realm.</p>
+</div>
+<div class="section" id="overview-of-the-solution">
+<h2>Overview of the solution<a class="headerlink" href="#overview-of-the-solution" title="Permalink to this headline">¶</a></h2>
+<p>At a high level, SSSD needs to examine the trust objects whether they
+are one-way or two way trusts. For each one-way trust, SSSD needs to
+fetch and store the keytab and use the keytab to secure the connection.
+For two-way trusts, we can keep using the existing code that reuses the
+IPA realm and the system keytab for both IPA and AD connectins. Care
+must be taken to remove keytabs of trusts that were removed as well.</p>
+<p>Fetching the keytab would be done by calling the <code class="docutils literal"><span class="pre">ipa-getkeytab</span></code>
+utility for every one-way trust. The keytab would only be (re)fetched if
+it&#8217;s missing or if attempting to use the keytab failed. On the IPA
+server, we must make sure that the IPA server identity is allowed to
+read the keytab.</p>
+<p>Because handling multiple keytabs increases the risk of failing
+connections in case the trust wasn&#8217;t setup correctly, we need to modify
+the failover code to not set the whole back end offline in case
+connecting to a subdomain AD server fails. Instead, the subdomain will
+be marked as inactive for a short period of time, during which it would
+act as offline. The proper way of solving this problem would be to
+rework the failover module so that it can act per domain, not only per
+back end, however, that change is out of scope for this release.</p>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<p>This section describes all the required changes in detail.</p>
+<div class="section" id="reading-the-subdomains-in-the-ipa-subdomain-handler">
+<h3>Reading the subdomains in the IPA subdomain handler<a class="headerlink" href="#reading-the-subdomains-in-the-ipa-subdomain-handler" title="Permalink to this headline">¶</a></h3>
+<p>The IPA subdomain handler will include the attribute
+<code class="docutils literal"><span class="pre">ipaNTTrustDirection</span></code> when reading the trust objects. Currently this
+attribute is not readable by the host principal, so the IPA ACIs must be
+relaxed (ipa ticket?). If the trust direction is set to an OR of
+<code class="docutils literal"><span class="pre">lsa.LSA_TRUST_DIRECTION_OUTBOUND</span></code> and
+<code class="docutils literal"><span class="pre">lsa.LSA_TRUST_DIRECTION_INBOUND</span></code>, then it&#8217;s a two-way trust and we&#8217;ll
+just use the existing code that re-uses the IPA keytab for the AD
+trusted domain as well. If the attribute is only
+<code class="docutils literal"><span class="pre">lsa.LSA_TRUST_DIRECTION_OUTBOUND</span></code>, we handle the trust as a one-way
+trust. The trust type can be stored in <code class="docutils literal"><span class="pre">ipa_ad_server_ctx</span></code>. If the
+trust direction is set to <code class="docutils literal"><span class="pre">lsa.LSA_TRUST_DIRECTION_INBOUND</span></code> only, then
+we would log this trust object as unsupported and continue.</p>
+<p>Each <code class="docutils literal"><span class="pre">sss_domain_info</span></code> structure will be created as <code class="docutils literal"><span class="pre">inactive</span></code> in
+the subdomain code. After enumerating the trusted domains, the subdomain
+handler will check if a keytab already exists for every one-way trusted
+domain. If yes, the domain is ready to use and can be enabled. If there
+is no keytab, the subdomain handler will fork out a call to
+<code class="docutils literal"><span class="pre">ipa-getkeytab</span></code>, fetch the keytab and store it under
+<code class="docutils literal"><span class="pre">/var/lib/sss/keytabs</span></code>. The <code class="docutils literal"><span class="pre">ipa-getkeytab</span></code> call will be done using
+Kerberos credentials the host has. IPA ACIs must be modified accordingly
+to allow the IPA server principals to fetch the trust keytabs, but noone
+else. The SSSD invocation of <code class="docutils literal"><span class="pre">ipa-getkeytab</span></code> will not limit the
+enctypes in any way, we just rely on IPA creating the objects in LDAP in
+the correct manner.</p>
+<p>The directory <code class="docutils literal"><span class="pre">/var/lib/sss/keytabs</span></code> must only be accessible to the
+sssd user. As an additional security measure, the directory will also
+receive a SELinux context stricter than the default <code class="docutils literal"><span class="pre">sssd_var_lib_t</span></code>.
+That way, processes that are able to access the sssd state directory,
+which is public, will not be able to access the keytabs. If fetching the
+keytab succeeds, the domain would be enabled. The SELinux policy must
+also be adjusted to allow calling <code class="docutils literal"><span class="pre">ipa-getkeytab</span></code> by the <code class="docutils literal"><span class="pre">sssd_be</span></code>
+process.</p>
+<p>If any trust relationships were removed, the corresponding keytabs must
+be removed from the disk as well.</p>
+</div>
+<div class="section" id="changes-to-the-ad-id-ctx-instantiation">
+<h3>Changes to the AD id_ctx instantiation<a class="headerlink" href="#changes-to-the-ad-id-ctx-instantiation" title="Permalink to this headline">¶</a></h3>
+<p>With two-way trust, we can keep using the default IPA principal and
+keytab.</p>
+<p>With one-way trust, the keytab retrieved from the IPA server must be
+used. Also, the principal must be passed into the
+<code class="docutils literal"><span class="pre">ad_create_default_options</span></code> function. The custom values must be set
+before we proceed to instantiate LDAP provider options. The only AD
+provider option we need to set is AD_KRB5_REALM.</p>
+<p>In the LDAP provider, we must take care that the following sdap options
+are set correctly:</p>
+<ul class="simple">
+<li>SDAP_SASL_AUTHID - must be set to the NetBIOS name of the IPA
+domain. (A domain <code class="docutils literal"><span class="pre">TRUST.COM</span></code> would set this value to <code class="docutils literal"><span class="pre">TRUST$</span></code>.
+We would use the <code class="docutils literal"><span class="pre">IPA_FLATNAME</span></code> attribute, not truncate the DNS
+domain).</li>
+<li>SDAP_SASL_REALM - must be set to the AD realm</li>
+<li>SDAP_KRB5_KEYTAB - must be set to the per-domain keytab retrieved
+from IPA</li>
+</ul>
+<p>The AD provider eventually calls <code class="docutils literal"><span class="pre">sdap_set_sasl_options()</span></code> from the
+LDAP provider, we need to make sure this function receives the correct
+values. During experimentation we were able to show that using multiple
+different SASL users and different realms doesn&#8217;t cause any problems in
+SASL or LDAP libraries.</p>
+<p>The only place that will keep using the IPA realm is the failover
+instantiation. We need to keep using this hack until failover is
+per-backend.</p>
+</div>
+<div class="section" id="subdomain-offline-status-changes">
+<h3>Subdomain offline status changes<a class="headerlink" href="#subdomain-offline-status-changes" title="Permalink to this headline">¶</a></h3>
+<p>At the moment, the whole back end can be either online or offline and
+the status applies to both the main domain and the subdomains alike. As
+an effect, a failure to connect to a subdomain server would also make
+the main domain operate offline. In many subdomain setups, it&#8217;s actually
+more convenient not to, because the subdomain server might be on a
+different network segment, behind a different firewall etc. Instead, the
+domain should only be made inactive.</p>
+<p>The <code class="docutils literal"><span class="pre">sss_domain_info</span></code> structure would convert the &#8216;bool disabled&#8217;
+parameter into an <code class="docutils literal"><span class="pre">enum</span> <span class="pre">sss_domain_state</span></code>. The supported values would
+be:</p>
+<ul class="simple">
+<li><em>disabled</em> - the domain should not be used by either responder or
+provider. It was removed or disabled on the server.</li>
+<li><em>active</em> - the domain can be used by a responder and the data
+provider would forward its request to the backend</li>
+<li><em>inactive</em> - the domain can be used by a responder, but the data
+provider would just shortcut as if the domain was offline. For now,
+this option will be used by subdomains only.</li>
+</ul>
+<p>The implementation would include renaming the existing
+<code class="docutils literal"><span class="pre">be_mark_offline()</span></code> function to be called <code class="docutils literal"><span class="pre">be_mark_dom_offline()</span></code>
+and modifying its behaviour. The existing code that sets the offline
+status and runs the offline callbacks would be called for parent domains
+only. For subdomains, we would mark the subdomain as inactive and
+schedule a tevent request that would unconditionally reset inactive
+domain to active. The request would be scheduled after
+<code class="docutils literal"><span class="pre">offline_timeout</span></code> seconds to be consistent with main domains from
+user&#8217;s perspective. Likewise, the <code class="docutils literal"><span class="pre">be_reset_offline()</span></code> function will
+be extended to reset inactive domains to active as well as the SIGUSR1
+and SIGUSR2 signal handlers. Finally, all calls to the
+<code class="docutils literal"><span class="pre">be_is_offline()</span></code> function should be inspected and the invocations
+that are per-domain should be converted to a new function
+<code class="docutils literal"><span class="pre">be_dom_is_offline()</span></code> that would check the offline status for parent
+domains and the offline state for subdomains. We should also make sure
+the backend offline status structure is opaque as currently its
+internals are readable by external users as well. Making the offline
+status opaque would make it safer to perform modifications to the
+offline code.</p>
+<p>In both offline and inactive cases, the ID handlers would reply with
+<code class="docutils literal"><span class="pre">DP_ERR_OFFLINE</span></code>. The crucial difference between offline and inactive
+at this point would be that inactive domains are re-activated
+undonditionally. When we modify the failover code to handle domains
+separately, we&#8217;ll be able to leverage per-domain online checks or
+online/offline callbacks as well.</p>
+</div>
+<div class="section" id="detecting-re-established-trusts-and-re-fetching-the-keytabs">
+<h3>Detecting re-established trusts and re-fetching the keytabs<a class="headerlink" href="#detecting-re-established-trusts-and-re-fetching-the-keytabs" title="Permalink to this headline">¶</a></h3>
+<p>The trust keytabs would be fetched on each SSSD restart. This may seem
+like a bit of a churn, but retrieving the keytab should be relatively
+cheap since the SSSD instance runs on the local server. The advantage of
+retrieving the keytabs again is that a simple sssd service restart would
+provide an option for the admin to start from a clean slate. Either way,
+SSSD service restarts on the server should be quite rare.</p>
+<p>In cases the <code class="docutils literal"><span class="pre">sdap_kinit_send()</span></code> request fails, the sdap code would
+return a special error code instead of blindly returning <code class="docutils literal"><span class="pre">EIO</span></code> as it
+does at the moment. When the <code class="docutils literal"><span class="pre">ipa_get_ad_acct</span></code> request receives this
+error code, it would re-run the subdomain request in order to check if
+the trust relationship still exists and in order to re-fetch the keytab
+again. In order to be able to run the subdomain request separately from
+the subdomain back end handler, the subdomain code must be wrapped into
+a separate tevent request as the code currently assumes it&#8217;s being
+called from the subdomain backend handler only.</p>
+<p>After the keytabs are fetched again, we would attempt to detect if the
+trust has been re-established by comparing the keys in the keytab. Using
+krb5 calls to read the keytab is fine in the back end code, because the
+keytabs will be readable by the SSSD user and could be accessed from the
+provider code without elevating privileges. We can&#8217;t rely on <code class="docutils literal"><span class="pre">kvno</span></code>
+here, because it is generally always 1. In case the keys differ, then
+trust was re-established. In that case would re-set the inactive domain
+status and re-run the account request. If the keys are the same, we just
+leave the domain as inactive. The <code class="docutils literal"><span class="pre">ipa_ad_trust_ctx</span></code> structure for
+each trust would contain a flag that would track that we already tried
+refreshing the keytab so that we don&#8217;t download them on each failed
+attempt. This flag would be cleared by the online callbacks (either
+periodical or with SIGUSR2).</p>
+<p>In case the trust went away, the subdomain code should remove the
+trusted domain already with the existing code (however, this must be
+tested). In this case, also the keytab must be removed.</p>
+</div>
+</div>
+<div class="section" id="future-work">
+<h2>Future work<a class="headerlink" href="#future-work" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Handling failover and offline status on per-domain basis instead of
+per-backend basis should be done in the next release.</li>
+<li>If we ever need to store the keytabs in the database instead of on
+the filesystem, we might want to switch from calling ipa-getkeytab to
+calling the LDAP extended operation ourselves. However, this is not
+planned at the moment.</li>
+</ul>
+</div>
+<div class="section" id="configuration-changes">
+<h2>Configuration changes<a class="headerlink" href="#configuration-changes" title="Permalink to this headline">¶</a></h2>
+<p>none</p>
+</div>
+<div class="section" id="how-to-test">
+<h2>How To Test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<p>Establish a one-way trust relationship with an AD domain. Make sure both
+IPA and AD users are resolvable. It&#8217;s prudent to test combinations of
+one-way and two-way trusts with different forests. Make sure removing a
+trust relationship removes the keytab from the filesystem. Make sure
+that SSSD handles re-establishing a trust relationship.</p>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Jakub Hrozek &lt;<a class="reference external" href="mailto:jhrozek&#37;&#52;&#48;redhat&#46;com">​jhrozek<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Feature Name</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem statement</a></li>
+<li><a class="reference internal" href="#use-cases">Use cases</a></li>
+<li><a class="reference internal" href="#overview-of-the-solution">Overview of the solution</a></li>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a><ul>
+<li><a class="reference internal" href="#reading-the-subdomains-in-the-ipa-subdomain-handler">Reading the subdomains in the IPA subdomain handler</a></li>
+<li><a class="reference internal" href="#changes-to-the-ad-id-ctx-instantiation">Changes to the AD id_ctx instantiation</a></li>
+<li><a class="reference internal" href="#subdomain-offline-status-changes">Subdomain offline status changes</a></li>
+<li><a class="reference internal" href="#detecting-re-established-trusts-and-re-fetching-the-keytabs">Detecting re-established trusts and re-fetching the keytabs</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#future-work">Future work</a></li>
+<li><a class="reference internal" href="#configuration-changes">Configuration changes</a></li>
+<li><a class="reference internal" href="#how-to-test">How To Test</a></li>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/OneWayTrusts.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/OneWayTrusts.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

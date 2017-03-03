@@ -1,0 +1,436 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Add host access control support for LDAP (similar to pam_host_attr)</li>
+<li>Finer-grained control on principals used with Kerberos (such as for
+FAST or validation)</li>
+<li>Added a new tool <code class="docutils literal"><span class="pre">sss_cache</span></code> to allow selective expiring of cached
+entries</li>
+<li>Added support for LDAP DEREF and ASQ controls<ul>
+<li>This will result in a marked speedup when dealing with initgroups
+requests of users in many groups</li>
+</ul>
+</li>
+<li>Added access control features for Novell Directory Server</li>
+<li>FreeIPA dynamic DNS update now checks first to see if an update is
+needed<ul>
+<li>Previously we would always issue an update upon any &#8216;going online&#8217;
+event</li>
+</ul>
+</li>
+<li>Complete rewrite of the HBAC library</li>
+<li>New libraries: libipa_hbac and libipa_hbac-python</li>
+</ul>
+</div>
+<div class="section" id="detailed-changelog-since-1-5-1">
+<h1>Detailed Changelog since 1.5.1<a class="headerlink" href="#detailed-changelog-since-1-5-1" title="Permalink to this headline">¶</a></h1>
+<p>Gowrishankar Rajaiyan (2):</p>
+<ul class="simple">
+<li>removing password option functionality</li>
+<li>updating sss_obfuscate man page accordingly</li>
+</ul>
+<p>Jakub Hrozek (92):</p>
+<ul class="simple">
+<li>Use realm for basedn instead of IPA domain</li>
+<li>Reset server status after timeout</li>
+<li>Prevent segfault in failover code</li>
+<li>Always expire host name resolution</li>
+<li>Run callbacks if server IP changes</li>
+<li>Mention Samba libraries URLs in BUILD.txt</li>
+<li>Fix LDAP search filter for nested initgroups</li>
+<li>Add originalDN to fake groups</li>
+<li>Use fake groups during IPA schema initgroups</li>
+<li>Return from functions in LDAP provider after marking request as
+failed</li>
+<li>Fix typo in sdap_nested_group_process_step</li>
+<li>Mark transaction as done when cancelled</li>
+<li>Only save members for successfully saved groups</li>
+<li>Do not attempt to resolve nameless servers</li>
+<li>Don&#8217;t pass NULL to printf for TLS errors</li>
+<li>Fix unchecked return values of pam_add_response</li>
+<li>Remove detection of duplicates from SRV result processing</li>
+<li>Use safe alignment macros for in-tree SRV record parsing</li>
+<li>The systemd unit file should not require DBus</li>
+<li>Provide a configuration option to use systemd unit file</li>
+<li>Only check systemd unit dir if systemd is selected</li>
+<li>Set same status for duplicate servers</li>
+<li>Add user and group search LDAP filter options</li>
+<li>Case insensitive originalDN test</li>
+<li>Require openssl-devel is libcrypto backend is selected</li>
+<li>Warn that some crypto features are implemented in NSS only</li>
+<li>Disable libcrypto code</li>
+<li>Do not leak LDAP paging controls</li>
+<li>Fix order of arguments in select_principal_from_keytab() call</li>
+<li>Do not leak pcre context</li>
+<li>Do not leak LDAP URI with high log level</li>
+<li>Do not leak netgroups hash table</li>
+<li>Remove unused constants from data_provider.h</li>
+<li>Use a temporary memory context in expand_ccname_template</li>
+<li>Set c-ares to retry nameservers</li>
+<li>Remove append_attrs_to_array</li>
+<li>Rename label in expand_ccname_template</li>
+<li>Add a new option to override primary GID number</li>
+<li>Add a new option to override home directory value</li>
+<li>Add new options to override shell value</li>
+<li>sdap_get_generic_ext</li>
+<li>Generic dereference data structures and utilities</li>
+<li>Add support for Attribute Scoped Queries</li>
+<li>OpenLDAP dereference searches</li>
+<li>Generic dereference search</li>
+<li>Change sysdb_add_fake_user to add OriginalDN</li>
+<li>Use fake users during RFC2307bis nested group processing</li>
+<li>Refactor RFC2307bis nested group processing</li>
+<li>Use dereference when processing RFC2307bis nested groups</li>
+<li>Fix bad comparison in sdap_has_deref_support</li>
+<li>Fix uninitialized pointer read in sdap_x_deref_parse_entry</li>
+<li>Fix uninitialized scalar variable in
+sdap_nested_group_check_cache</li>
+<li>Separate return paths for success and failure in
+sdap_nested_group_check_cache</li>
+<li>Add utility function to return IP address as string</li>
+<li>Add a utility function to escape IPv6 address for use in URIs</li>
+<li>Use escaped IP addresses in LDAP provider</li>
+<li>Escape IPv6 IP addresses in the IPA provider</li>
+<li>Make parse_args skip extra spaces</li>
+<li>Unit test for parge_args</li>
+<li>Add new resolv_hostent data structure and utility functions</li>
+<li>Resolve hosts by name from files into resolv_hostent</li>
+<li>Resolve hosts by name from DNS into resolv_hostent</li>
+<li>Switch resolver to using resolv_hostent and honor TTL</li>
+<li>Provide TTL structure names for c-ares &lt; 1.7</li>
+<li>Test NULL server hostname in fail over tests</li>
+<li>Log nsupdate message</li>
+<li>ipa_dyndns: Use sockaddr_storage for storing IP addresses</li>
+<li>Provide python bindings for the HBAC evaluator library</li>
+<li>Move IP adress escaping from the LDAP namespace</li>
+<li>Escape IP address in kdcinfo</li>
+<li>Do not hardcode default resolver timeout</li>
+<li>Split reading resolver family order into a separate function</li>
+<li>Allow returning arbitrary address from resolv_hostent as string</li>
+<li>Check DNS records before updating</li>
+<li>Remove unused krb5_service structure member</li>
+<li>Use ares_search instead of ares_query for hostname resolution</li>
+<li>Fixes for python HBAC bindings</li>
+<li>Fix python HBAC bindings for python &lt;= 2.4</li>
+<li>Do not add a NULL host parsed from LDAP URI</li>
+<li>Only print server address if one is available</li>
+<li>Rename fo_get_server_name to fo_get_server_str_name</li>
+<li>fo_get_server_name() getter for a server name</li>
+<li>Fix indexing of skipped groups</li>
+<li>Set gidNumber of non-posix groups to 0 even on updates</li>
+<li>Explicitly ignore groups with gidNumber=0</li>
+<li>Remove dead code from python HBAC bindings</li>
+<li>Handle allocation error in python HBAC bindings</li>
+<li>UTF8 HBAC test</li>
+<li>Wrong paramater to sysdb_attrs_add_uint32</li>
+<li>Change the default value of ldap_tls_cacert in IPA provider</li>
+<li>HBAC rule validation Python bindings</li>
+<li>Request password control unconditionally during bind</li>
+</ul>
+<p>Jan Zeleny (28):</p>
+<ul class="simple">
+<li>Remove unused be_check_online() SBUS call</li>
+<li>Remove unused sysdb_attrs object</li>
+<li>Fix one unlikely case of failure in sdap_id_op module</li>
+<li>Add last usn checking after reconnection</li>
+<li>Extend and move function for finding principal in keytab</li>
+<li>Allow new option to specify principal for FAST</li>
+<li>Don&#8217;t use negative cache in netgroup lookup</li>
+<li>Configuration parsing updates</li>
+<li>Added originalDN to attributes with case-insensitive search</li>
+<li>Modify principal selection for keytab authentication</li>
+<li>Fixed lastUSN checking improvements</li>
+<li>Make sysdb_ctx_list public structure</li>
+<li>Add a function for searching netgroups with custom filter</li>
+<li>Cache cleaning tool</li>
+<li>Some minor fixes and changes in sysdb_ops</li>
+<li>Man page for sss_cache</li>
+<li>Added some kerberos functions for building on RHEL5</li>
+<li>Fixed &#8211;debug-to-files for nss and pam services</li>
+<li>Fixed wrong variable in sdap_initgr_nested_store</li>
+<li>Possible memory leak fixed</li>
+<li>Fixed unitialized return value in match_principal</li>
+<li>Fixed unitialized pointer in select_principal_from_keytab</li>
+<li>Fixed uninitialized value in sss_cache</li>
+<li>Fixed copying of pam_data structure</li>
+<li>Added sysdb_attrs_get_bool() function</li>
+<li>Non-posix group processing - sysdb changes</li>
+<li>Non-posix group processing - ldap provider and nss responder</li>
+<li>Fall back to polling when inotify fails</li>
+</ul>
+<p>John Hodrien (1):</p>
+<ul class="simple">
+<li>Add vetoed_shells option</li>
+</ul>
+<p>Kaushik Banerjee (1):</p>
+<ul class="simple">
+<li>Changing default to Default for consistency</li>
+</ul>
+<p>Matthew Ife (1):</p>
+<ul class="simple">
+<li>Replace system() function with fork and execl call.</li>
+</ul>
+<p>Pierre Ossman (1):</p>
+<ul class="simple">
+<li>Add host access control support</li>
+</ul>
+<p>Simo Sorce (8):</p>
+<ul class="simple">
+<li>Check that the socket is really ours before attempting to close it.</li>
+<li>Use neutral name for functions used by both pam and nss</li>
+<li>sysdb: use header defined macros instead of explicit values</li>
+<li>memberof: fix calculation of replaced members</li>
+<li>memberof: free delete operation apyload once done</li>
+<li>clients: use poll instead of select</li>
+<li>fix typos</li>
+<li>sss_client: avoid leaking file descriptors</li>
+</ul>
+<p>Stephen Gallagher (96):</p>
+<ul class="simple">
+<li>Update version to 1.5.2dev</li>
+<li>Sanitize search filters for nested group lookups</li>
+<li>Bumping version to 1.6.0dev</li>
+<li>Wrap cleanup task in a sysdb transaction</li>
+<li>Add additional indexing for sysdb</li>
+<li>Make the domain argument mandatory in sss_obfuscate</li>
+<li>Gracefully handle permission errors in sss_obfuscate</li>
+<li>Make SSSDConfig API configuration readable</li>
+<li>Only print &#8220;no matching service rule&#8221; when appropriate</li>
+<li>Clear up -Wunused-but-set-variable warnings</li>
+<li>Fix cleanup transaction</li>
+<li>Fix module registration with newer LDB libraries.</li>
+<li>Verify LDAP file descriptor validity</li>
+<li>Minor specfile changes</li>
+<li>Detect the proper location for memberof.so</li>
+<li>Fix specfile for RHEL5</li>
+<li>Do not attempt to use START_TLS on SSL connections</li>
+<li>Point the IPA provider at the compat tree for netgroups</li>
+<li>Remove cached user entry if initgroups returns ENOENT</li>
+<li>Perform initgroups lookups for all domains</li>
+<li>IPA provider: remove deleted groups during initgroups()</li>
+<li>Allow krb5_realm to override ipa_domain</li>
+<li>Add krb5_realm to the basic IPA options</li>
+<li>Fix uninitialized value error in ipa_get_id_options()</li>
+<li>Add transifex_client configuration</li>
+<li>Add new translations from Transifex</li>
+<li>Update translation sources</li>
+<li>Require existence of GID number and name in group searches</li>
+<li>Require existence of username, uid and gid for user enumeration</li>
+<li>Add support for krb5 access provider to SSSDConfig API</li>
+<li>Fix incorrect return value check</li>
+<li>Create sysdb_get_rdn() function</li>
+<li>Add sysdb_attrs_primary_name()</li>
+<li>Ignore aliases for users</li>
+<li>RFC2307: Ignore aliases for groups</li>
+<li>RFC2307bis: Ignore aliases for groups</li>
+<li>Use sysdb_attrs_primary_name() in
+sdap_initgr_nested_store_group</li>
+<li>Add sysdb_attrs_primary_name_list() routine</li>
+<li>Don&#8217;t crash if we get a multivalued name without an origDN</li>
+<li>Don&#8217;t crash on error if _name parameter unspecified</li>
+<li>Check result of talloc_strdup() properly</li>
+<li>sss_obfuscate: Avoid traceback on ctrl+d</li>
+<li>sss_obfuscate: abort on ctrl+c</li>
+<li>Always complete the transaction in
+sdap_process_group_members_2307</li>
+<li>RFC2307: Ignore zero-length member names in group lookups</li>
+<li>Fall back to cn if gecos is not available</li>
+<li>Never remove gecos from the sysdb cache</li>
+<li>Do not throw a DP error when failing to delete a nonexistent entity</li>
+<li>Add debug logging to the negative cache</li>
+<li>Fix a regression with the negative cache in multi-domain
+configurations</li>
+<li>Fix regression where nonexistent entries were never added to the
+negative cache</li>
+<li>Don&#8217;t leak memory if sysdb_domain_init() fails</li>
+<li>Run all appropriate upgrades</li>
+<li>Reopen the LDB after modifying it</li>
+<li>Always generate kpasswdinfo file</li>
+<li>Add value of the last USN to server configuration</li>
+<li>simple provider: Don&#8217;t treat primary GID lookup failures as fatal</li>
+<li>Log the LDAP message type we&#8217;re processing</li>
+<li>Enable paging support for LDAP</li>
+<li>Add ldap_page_size configuration option</li>
+<li>Add &#8220;description&#8221; option to SSSDConfig API</li>
+<li>Regular translation update</li>
+<li>Fix IPA config bug with SDAP_KRB5_REALM</li>
+<li>Fix segfault in IPA provider</li>
+<li>Fix bad password caching when using automatic TGT renewal</li>
+<li>Fix minor typo in error message</li>
+<li>Override config file debug_level with command-line</li>
+<li>Include manpage for sss_cache</li>
+<li>Create common sss_monitor_init()</li>
+<li>Allow changing the log level without restart</li>
+<li>IPA Provider: don&#8217;t fail if user is not a member of any groups</li>
+<li>Build SSSD plugins without a version number</li>
+<li>Build sssd utils as a libtool helper library</li>
+<li>Import config.h earlier</li>
+<li>Make &#8220;password&#8221; the default for ldap_default_authtok_type</li>
+<li>Add more detail to ldap_uri manpage entry</li>
+<li>Fix typo in initgroups negative cache check</li>
+<li>Ensure that SSSD always Requires: the primary-arch sssd-client</li>
+<li>Do not attempt to close() a file descriptor &lt; 0</li>
+<li>Add helper function msgs2attrs_array</li>
+<li>Add HBAC evaluator and tests</li>
+<li>Add helper functions for looking up HBAC rule components</li>
+<li>Remove old HBAC implementation</li>
+<li>Add new HBAC lookup and evaluation routines</li>
+<li>Add ipa_hbac_refresh option</li>
+<li>Add ipa_hbac_treat_deny_as option</li>
+<li>Treat NULL or empty rhost as unknown</li>
+<li>Allow NULL memctx in sysdb_custom_subtree_dn</li>
+<li>libipa_hbac: Support case-insensitive comparisons with UTF8</li>
+<li>Fix memory leak in ipa_hbac_evaluate_rules</li>
+<li>Fix incorrect NULL check in ipa_hbac_common.c</li>
+<li>Converge accept_fd_handler and accept_priv_fd_handler</li>
+<li>Require matched version and release for libipa_hbac</li>
+<li>Remove incorrect private variable</li>
+<li>Add rule validator to libipa_hbac</li>
+<li>Allow LDAP to decide when an expiration warning is warranted</li>
+</ul>
+<p>Sumit Bose (38):</p>
+<ul class="simple">
+<li>Fix handling of translated man pages in spec file</li>
+<li>Remove LDAP_DEPRECATED</li>
+<li>Make &#8216;make check&#8217; look nice again</li>
+<li>Introduce sysdb_ldb_connect()</li>
+<li>Check LDB_MODULES_PATH for sysdb</li>
+<li>Fix for generating lists of translated man pages</li>
+<li>Remove renewal item if it is not re-added</li>
+<li>Check ccache file for renewable TGTs at startup</li>
+<li>Do not try to delete sysbd memberOf attribute</li>
+<li>Fixes for dynamic DNS update</li>
+<li>Add missing name to struct getent_ctx for missing netgroup</li>
+<li>Refactor set_netgroup_entry()</li>
+<li>Change state of hash entry if netgroup cannot be parsed</li>
+<li>Release handle if not connected</li>
+<li>Sanitize DN when searching the original DN in the cache</li>
+<li>Read only rootDSE data if rootDSE is available</li>
+<li>Initialise srv_opts even if rootDSE is missing</li>
+<li>Initialise rootdse to NULL if not available</li>
+<li>Return pam data to the renewal item if renewal fails</li>
+<li>Add support for openldap24 package on RHEL 5.7</li>
+<li>Set _GNU_SOURCE globally</li>
+<li>Remove unused defines from configure.ac</li>
+<li>Include string.h in sss_cli.h</li>
+<li>Sanitize username during initgroups call</li>
+<li>Add online callback only once for TGT renewal</li>
+<li>Delete cached ccache file if password is expired</li>
+<li>Fix two typos</li>
+<li>Add missing libsss_util to proxy provider</li>
+<li>Fix proxy provider return code for secondary missing groups</li>
+<li>Do not check pwdAttribute</li>
+<li>Add sockaddr_storage to sdap_service</li>
+<li>Add sdap_call_conn_cb() to call add connection callback directly</li>
+<li>Use name based URI instead of IP address based URIs</li>
+<li>Use ldap_init_fd() instead of ldap_initialize() if available</li>
+<li>Do not access state after tevent_req_done() is called.</li>
+<li>Call ldap_install_tls() on ldaps connections</li>
+<li>Add support for experimental features</li>
+<li>Add LDAP access control based on NDS attributes</li>
+</ul>
+<p>pbrezina (1):</p>
+<ul class="simple">
+<li>silence compilation warnings on RHEL5</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#detailed-changelog-since-1-5-1">Detailed Changelog since 1.5.1</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.6.0.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.6.0.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

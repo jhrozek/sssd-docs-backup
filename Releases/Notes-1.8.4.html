@@ -1,0 +1,203 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#Highlights">Highlights</a></li>
+<li><a class="reference external" href="#TicketsFixed">Tickets Fixed</a></li>
+<li><a class="reference external" href="#DetailedChangelog">Detailed Changelog</a></li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Fix a bug causing AD servers not to fail over properly when the KDC
+on the primary server is down</li>
+<li>Fix an endianness bug on big-endian systems when looking up services</li>
+<li>Fix a segfault dealing with nested groups</li>
+<li>Make the nowait cache updates work for netgroups</li>
+<li>Fix a regression that broke domains with
+<code class="docutils literal"><span class="pre">use_fully_qualified_names</span> <span class="pre">=</span> <span class="pre">True</span></code></li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/1206">#1206</a></dt>
+<dd>RHEL5 detection in sssd.spec.in does not work</dd>
+<dt><a class="reference external" href="/sssd/ticket/1321">#1321</a></dt>
+<dd>Warning in debug log about nscd</dd>
+<dt><a class="reference external" href="/sssd/ticket/1322">#1322</a></dt>
+<dd>Special-case LDAP_SIZELIMIT_EXCEEDED when handling ldap return
+codes</dd>
+<dt><a class="reference external" href="/sssd/ticket/1324">#1324</a></dt>
+<dd>LDAP provider needs to use all available servers for GSSAPI if the
+child times out</dd>
+<dt><a class="reference external" href="/sssd/ticket/1325">#1325</a></dt>
+<dd>heimdal: configure: Kerberos locator plugin cannot be build</dd>
+<dt><a class="reference external" href="/sssd/ticket/1329">#1329</a></dt>
+<dd>Group enumeration fails in proxy provider</dd>
+<dt><a class="reference external" href="/sssd/ticket/1333">#1333</a></dt>
+<dd>Potential NULL dereference in proxy provider</dd>
+<dt><a class="reference external" href="/sssd/ticket/1335">#1335</a></dt>
+<dd>sss_groupadd no longer detects duplicate GID numbers</dd>
+<dt><a class="reference external" href="/sssd/ticket/1338">#1338</a></dt>
+<dd>sssd does not provide maps for automounter when custom schema is
+being used</dd>
+<dt><a class="reference external" href="/sssd/ticket/1340">#1340</a></dt>
+<dd>SSSD netgroups do not honor entry_cache_nowait_percentage</dd>
+<dt><a class="reference external" href="/sssd/ticket/1343">#1343</a></dt>
+<dd>sssd_be crashed with SIGSEGV in _tevent_schedule_immediate()</dd>
+<dt><a class="reference external" href="/sssd/ticket/1344">#1344</a></dt>
+<dd>Loading of selinux user maps broken</dd>
+<dt><a class="reference external" href="/sssd/ticket/1348">#1348</a></dt>
+<dd>Service lookups by port number doesn&#8217;t work on s390x/ppc64 arches</dd>
+</dl>
+</div></div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Ariel Barria (2):</p>
+<ul class="simple">
+<li>Potential NULL dereference in proxy provider</li>
+<li>Warn to syslog when dereference requests fail</li>
+</ul>
+<p>Jakub Hrozek (11):</p>
+<ul class="simple">
+<li>Special-case LDAP_SIZELIMIT_EXCEEDED</li>
+<li>Kerberos locator: Include the correct krb5.h header file</li>
+<li>krb5 locator: Do not leak addrinfo</li>
+<li>Try all KDCs when getting TGT for LDAP</li>
+<li>Send the correct enumeration request</li>
+<li>SYSDB: Handle user and group renames better</li>
+<li>Use the sysdb attribute name, not LDAP attribute name</li>
+<li>LDAP nested groups: Do not process callback with _post deep in the
+nested structure</li>
+<li>Use sized_string correctly in FQDN domains</li>
+<li>Send 16bit protocol numbers from the sss_client</li>
+<li>Revert the client packet length, too, after reverting the packet
+protocol</li>
+</ul>
+<p>Jan Engelhardt (1):</p>
+<ul class="simple">
+<li>build: resolve link failure</li>
+</ul>
+<p>Jan Zeleny (1):</p>
+<ul class="simple">
+<li>Fixed issue in SELinux user maps</li>
+</ul>
+<p>Stef Walter (3):</p>
+<ul class="simple">
+<li>Limit krb5_get_init_creds_keytab() to etypes in keytab</li>
+<li>If canon&#8217;ing principals, write ccache with updated default principal</li>
+<li>Remove erroneous failure message in find_principal_in_keytab</li>
+</ul>
+<p>Stephen Gallagher (7):</p>
+<ul class="simple">
+<li>Bump version to 1.8.4</li>
+<li>murmurhash: Relax inline requirement</li>
+<li>RPM: Allow running &#8216;make rpms&#8217; on RHEL 5 machines</li>
+<li>NSS: Expire in-memory netgroup cache before the nowait timeout</li>
+<li>KRB5: Avoid NULL-dereference with empty keytab</li>
+<li>NSS: Restore original protocol for getservbyport</li>
+<li>Updating translations for 1.8.4 release</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.8.4.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.8.4.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

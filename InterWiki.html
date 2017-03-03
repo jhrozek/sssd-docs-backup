@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Support for InterWiki links &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="support-for-interwiki-links">
+<h1>Support for <a class="reference external" href="https://docs.pagure.org/sssd-test2/InterWiki.html">InterWiki</a> links<a class="headerlink" href="#support-for-interwiki-links" title="Permalink to this headline">¶</a></h1>
+<p><em>(since
+`​0.10 &lt;http://trac.edgewall.org/intertrac/milestone%3A0.10&gt;`__)</em></p>
+<div class="section" id="definition">
+<h2>Definition<a class="headerlink" href="#definition" title="Permalink to this headline">¶</a></h2>
+<p>An <a class="reference external" href="https://docs.pagure.org/sssd-test2/InterWiki.html">InterWiki</a>
+link can be used for referring to a Wiki page located in another Wiki
+system, and by extension, to any object located in any other Web
+application, provided a simple URL mapping can be done.</p>
+<p>At the extreme,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InterWiki.html">InterWiki</a>
+prefixes can even be used to simply introduce links to new protocols,
+such as <code class="docutils literal"><span class="pre">tsvn:</span></code> used by
+<a class="reference external" href="http://trac.edgewall.org/intertrac/TortoiseSvn">​TortoiseSvn</a>.</p>
+</div>
+<div class="section" id="link-syntax">
+<h2>Link Syntax<a class="headerlink" href="#link-syntax" title="Permalink to this headline">¶</a></h2>
+<p>The link is composed by the targeted Wiki (or system) name, followed by
+a colon (e.g. <code class="docutils literal"><span class="pre">MeatBall:</span></code>), followed by a page specification in the
+target. Note that, as for
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InterTrac.html">InterTrac</a>
+prefixes,
+<strong>`InterWiki &lt;https://docs.pagure.org/sssd-test2/InterWiki.html&gt;`__
+prefixes are case insensitive</strong>.</p>
+<p>The target Wiki URL is looked up in the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InterMapTxt.html">InterMapTxt</a>
+wiki page, modelled after
+<a class="reference external" href="http://www.usemod.com/cgi-bin/mb.pl?InterMapTxt">​MeatBall:InterMapTxt</a>.</p>
+<p>In addition to traditional
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InterWiki.html">InterWiki</a> links,
+where the target is simply <em>appended</em> to the URL, Trac supports
+parametric
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InterWiki.html">InterWiki</a> URLs:
+identifiers <code class="docutils literal"><span class="pre">$1</span></code>, <code class="docutils literal"><span class="pre">$2</span></code>, ... in the URL will be replaced by
+corresponding arguments. The argument list is formed by splitting the
+page identifier using the &#8221;:&#8221; separator.</p>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>If the following is an excerpt of the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InterMapTxt.html">InterMapTxt</a>
+page:</p>
+<p>Then,</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">MoinMoin:InterWikiMap</span></code> should be rendered as
+<a class="reference external" href="http://moinmoin.wikiwikiweb.de/InterWikiMap">​MoinMoin:InterWikiMap</a>
+and the <em>title</em> for that link would be &#8220;InterWikiMap in MoinMoin&#8221;</li>
+<li><code class="docutils literal"><span class="pre">Trac-ML:4346</span></code> should be rendered as
+<a class="reference external" href="http://thread.gmane.org/gmane.comp.version-control.subversion.trac.general/4346">​Trac-ML:4346</a>
+and the <em>title</em> for that link would be &#8220;Message 4346 in Trac Mailing
+List&#8221;</li>
+</ul>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InterTrac.html">InterTrac</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InterMapTxt.html">InterMapTxt</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Support for InterWiki links</a><ul>
+<li><a class="reference internal" href="#definition">Definition</a></li>
+<li><a class="reference internal" href="#link-syntax">Link Syntax</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/InterWiki.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/InterWiki.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

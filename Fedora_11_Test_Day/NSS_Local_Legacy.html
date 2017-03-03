@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Description &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#Description">Description</a></li>
+<li><a class="reference external" href="#HowtoTest">How to Test</a></li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="description">
+<h1>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h1>
+<p>This test will verify whether the SSSD is appropriately serving legacy
+local users through NSS.</p>
+</div>
+<div class="section" id="how-to-test">
+<h1>How to Test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h1>
+<ol class="arabic">
+<li><p class="first">Follow the steps in <a class="reference external" href="https://docs.pagure.org/sssd-test2/Fedora_11_Test_Day/Installation.html">Installing the
+SSSD</a>.
+If you are running the Test Day LiveCD, you may skip this step.</p>
+</li>
+<li><p class="first">Restart the SSSD service (as root):</p>
+</li>
+<li><p class="first">Verify that the SSSD services are running:</p>
+</li>
+<li><p class="first">Enable the use of the SSSD in nsswitch.conf. Change the following
+lines of /etc/nsswitch.conf from:</p>
+<p>to</p>
+</li>
+<li><p class="first">Verify that your local users are served to NSS from the SSSD
+(<code class="docutils literal"><span class="pre">-s</span> <span class="pre">sss</span></code> specifies that NSS should search only the sss provider)</p>
+<p>You should see all users from your /etc/passwd file whose UIDs are in
+the range 500-5000 (as specified in the sssd.conf)</p>
+</li>
+<li><p class="first">Request a specific user from the SSSD (pick one from the list
+returned in the previous step)</p>
+<p>You should see something similar to the following output:</p>
+</li>
+<li><p class="first">Verify that your local groups are served to NSS from the SSSD</p>
+<p>You should see all groups fom your /etc/group file whose GIDs are in
+the range 500-5000 (as specified in the sssd.conf)</p>
+</li>
+<li><p class="first">Verify that you can request the information from a single valid group</p>
+</li>
+</ol>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Description</a></li>
+<li><a class="reference internal" href="#how-to-test">How to Test</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Fedora_11_Test_Day/NSS_Local_Legacy.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Fedora_11_Test_Day/NSS_Local_Legacy.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

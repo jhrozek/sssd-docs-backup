@@ -1,0 +1,231 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ID Mapping calls for the NSS responder &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id-mapping-calls-for-the-nss-responder">
+<h1>ID Mapping calls for the NSS responder<a class="headerlink" href="#id-mapping-calls-for-the-nss-responder" title="Permalink to this headline">¶</a></h1>
+<p>Related tickets:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1534">​RFE Integrate SSSD with CIFS
+client</a></li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1557">​RFE Use the Global Catalog in SSSD for the AD
+provider</a></li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1559">​RFE Use the getpwnam()/getgrnam() interface as a gateway to resolve
+SID to Names</a></li>
+</ul>
+<p>Related design documents:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/DesignDocs/IntegrateSSSDWithCIFSClient.html">​Integrate SSSD with CIFS
+Client</a></li>
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/DesignDocs/GlobalCatalogLookups.html">​Global Catalog Lookups in
+SSSD</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem Statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>When SSSD is used in environments with AD, either as a member of the AD
+domain or as a member of a trusted IPA domain, it has to map users and
+groups managed by AD to a POSIX ID. The AD user and groups are
+identified by</p>
+<ul class="simple">
+<li>a name which may change</li>
+<li>a unique SID which never changes, i.e. new SID == new object</li>
+</ul>
+<p>Applications interacting tightly with users and groups from AD domains
+e.g.</p>
+<ul class="simple">
+<li>samba</li>
+<li>cifs-client</li>
+<li>FreeIPA</li>
+</ul>
+<p>need to know which SID relates to which POSIX ID or name.</p>
+<p>Mapping a SID to a user or group would be possible with the current
+interfaces as described in ticket
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/1559">#1559</a>. But getting a SID
+for a user or a group would be at least hard and ugly if not impossible.
+I think the solution proposed in ticket
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/1559">#1559</a> is a good and
+useful shortcut. But by making the *bySID lookups also available via a
+new calls applications will have a more reliable interface, e.g. by
+allowing more specific error codes (see details below).</p>
+</div>
+<div class="section" id="overview-of-the-solution">
+<h2>Overview of the solution<a class="headerlink" href="#overview-of-the-solution" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<p>The NSS responder will be extended with four new calls:</p>
+<p>Alternatively SSS_NSS_GETSIDBYID and SSS_NSS_GETIDBYSID could be
+implemented to take an return arrays SIDs and POSIX IDs respectively as
+the related cifs_idmap API calls (see <a class="reference external" href="https://docs.pagure.org/sssd-test2/DesignDocs/IntegrateSSSDWithCIFSClient.html">​Integrate SSSD with CIFS
+Client</a>).
+I took the approach mentioned above because it better matches the other
+NSS responder calls and additionally I do not like the implicit required
+ordering in the input and output array.</p>
+<p>After receiving the request the NSS responder will first check if it can
+create the response from cached data. If not the request is forwarded to
+the providers. For the *byName and *byID calls the corresponding
+existing interface can be used. For the *bySID call a new call must be
+added to the providers. Currently only the IPA and AD provider will
+support the new calls. If the provider cannot handle the requests it
+will return an appropriate error code which it return to the client via
+the NSS responder.</p>
+<p>Additionally on the provider side it must be ensured that the string
+representation of the SID is saved in the cache. It looks that this is
+already the case for the AD provider. But I think this is currently not
+the case for the IPA provider for both IPA and trusted users. Also the
+PAC responder should add the SID to the cache object.</p>
+<p>The sid2name extended operation on the FreeIPA server should get a new
+request type and corresponding response types so that the SID is
+returned with the user and group data. (A ticket for this should be
+opened for FreeIPA if this design is approved.)</p>
+<div class="section" id="c-api">
+<h3>C-API<a class="headerlink" href="#c-api" title="Permalink to this headline">¶</a></h3>
+<p>The C-API for those calls will be made available in a new library
+libsss_nss_idmap (other names are welcome). Like the other client
+libraries this library will just offer an easy way to send the requests
+to SSSD and receive the responses, all processing is done by SSSD not by
+the library. In contrast to libnss_sss loaded via glibc into client
+programs the new library can be linked with other programs. The new
+calls will be declared in a header sss_nss_idmap.h and can have
+reasonable return values to make error detection an reporting easier for
+the clients using the new API.</p>
+<p>Currently I do not see a strong requirement to allow different kind of
+memory allocators (e.g. talloc).</p>
+<p>I think it is not necessary to add special set of return values/error
+code but the standard ones are sufficient. Maybe ENETUNREACH it indicate
+that SSSD could not find the right domain for the request could be
+replaced by a better one. (EDOM would be a candidate, but imo it should
+be reserved for mathematical operations.)</p>
+</div>
+<div class="section" id="python-bindings">
+<h3>Python bindings<a class="headerlink" href="#python-bindings" title="Permalink to this headline">¶</a></h3>
+<p>To allow easy usage of the new calls by the FreeIPA python framework,
+python binding would be useful.</p>
+</div>
+<div class="section" id="lookup-utility">
+<h3>Lookup utility<a class="headerlink" href="#lookup-utility" title="Permalink to this headline">¶</a></h3>
+<p>A small utility sss_idmap (other names are welcome) will be added which
+offers access to the new calls via libsss_nss_idmap. This utility will
+make testing easier and might help user and administrators as well.</p>
+<p>The following diagram illustrates the data flow and the communication
+between the different components (Dmitri Pal kindly provided the
+diagram).</p>
+</div>
+</div>
+<div class="section" id="how-to-test">
+<h2>How to test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<p>The sss_idmap utility or the python bindings can be used to create
+tests, e.g.</p>
+</div>
+<div class="section" id="author-s">
+<h2>Author(s)<a class="headerlink" href="#author-s" title="Permalink to this headline">¶</a></h2>
+<p>Sumit Bose &lt;<a class="reference external" href="mailto:sbose&#37;&#52;&#48;redhat&#46;com">​sbose<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ID Mapping calls for the NSS responder</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem Statement</a></li>
+<li><a class="reference internal" href="#overview-of-the-solution">Overview of the solution</a></li>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a><ul>
+<li><a class="reference internal" href="#c-api">C-API</a></li>
+<li><a class="reference internal" href="#python-bindings">Python bindings</a></li>
+<li><a class="reference internal" href="#lookup-utility">Lookup utility</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-test">How to test</a></li>
+<li><a class="reference internal" href="#author-s">Author(s)</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/NSSResponderIDMappingCalls.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/NSSResponderIDMappingCalls.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

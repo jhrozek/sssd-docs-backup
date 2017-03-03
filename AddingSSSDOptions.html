@@ -1,0 +1,247 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Adding a new SSSD option &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="adding-a-new-sssd-option">
+<h1>Adding a new SSSD option<a class="headerlink" href="#adding-a-new-sssd-option" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>This wiki page should help developers understand which places need to
+be touched when a new option should be added. This process is quite
+manual at the moment and this page is meant as a stopgap until a
+better solution is developed.</li>
+</ul>
+<div class="section" id="sssd-conf-and-confdb">
+<h2>sssd.conf and confdb<a class="headerlink" href="#sssd-conf-and-confdb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>SSSD configuration is normally placed in <code class="docutils literal"><span class="pre">/etc/sssd/sssd.conf</span></code> and
+optionally in include directories. The format is a Windows-style INI
+format. However, SSSD doesn&#8217;t read from the file directly, it reads
+configuration from a config database, or confdb for short. When the
+main sssd process starts, it reads the plaintext config files and
+dumps the resulting config into confdb.</li>
+<li>Thes confdb file can be inspected manually with</li>
+</ul>
+</div>
+<div class="section" id="two-kinds-of-sssd-options">
+<h2>Two kinds of SSSD options<a class="headerlink" href="#two-kinds-of-sssd-options" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>SSSD has two basic kinds of options - raw config database options and
+data provider options. The former are used in the main sssd process
+and the responders, the latter in providers. The raw options are read
+directly from the database using calls like <code class="docutils literal"><span class="pre">confdb_get_string</span></code>.
+The data provider options are an abstraction over that where the
+programmer describes the option in a <code class="docutils literal"><span class="pre">dp_option</span></code> structure and the
+provider fills the option value into the <code class="docutils literal"><span class="pre">dp_option</span></code> structure
+field on startup.</li>
+</ul>
+</div>
+<div class="section" id="adding-the-option">
+<h2>Adding the option<a class="headerlink" href="#adding-the-option" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>This section describes what files must be touched in order for the
+new option to be added.</li>
+<li><strong>Man pages</strong><ul>
+<li><code class="docutils literal"><span class="pre">src/man/sssd.conf.5.xml</span></code> (Raw)</li>
+<li><code class="docutils literal"><span class="pre">src/man/sssd-&lt;provider&gt;.5.xml</span></code> (Data Provider)</li>
+</ul>
+</li>
+<li><strong>Python config API</strong><ul>
+<li><code class="docutils literal"><span class="pre">src/config/SSSDConfig/__init__.py.in</span></code></li>
+<li><code class="docutils literal"><span class="pre">src/config/SSSDConfigTest.py</span></code></li>
+<li><code class="docutils literal"><span class="pre">src/config/etc/sssd.api.conf</span></code> (Raw)</li>
+<li><code class="docutils literal"><span class="pre">src/config/etc/sssd.api.d/sssd-&lt;provider&gt;.conf</span></code> (Data Provider)</li>
+</ul>
+</li>
+<li><strong>Confdb</strong> (Raw)<ul>
+<li><code class="docutils literal"><span class="pre">src/confdb/confdb.h</span></code></li>
+</ul>
+</li>
+<li><strong>dp_option Structure</strong> (Data provider)<ul>
+<li><code class="docutils literal"><span class="pre">src/providers/&lt;provider&gt;/&lt;provider&gt;_opts.c</span></code></li>
+</ul>
+</li>
+<li><strong>Config Checking schema</strong><ul>
+<li><code class="docutils literal"><span class="pre">src/config/cfg_rules.ini</span></code></li>
+</ul>
+</li>
+</ul>
+<div class="section" id="the-man-pages">
+<h3>The man pages<a class="headerlink" href="#the-man-pages" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>The man page files are in XML format inside the <code class="docutils literal"><span class="pre">src/man/</span></code>
+directory identifying the manual section number in the filename. XML
+elements must have matching opening and closing tags and options will
+normally be defined between opening <code class="docutils literal"><span class="pre">&lt;varlistentry&gt;</span></code> and closing
+<code class="docutils literal"><span class="pre">&lt;/varlistentry&gt;</span></code> tags. Man page descriptions should be
+informational enough for end-users to understand and explicitly state
+the Default value when the option is not added.</li>
+<li>Data provider options will be included in the associated data
+provider man page <code class="docutils literal"><span class="pre">sssd-&lt;provider&gt;.5.xml</span></code> while raw options will be
+added to the <code class="docutils literal"><span class="pre">sssd.conf.5.xml</span></code></li>
+</ul>
+</div>
+<div class="section" id="the-python-config-api">
+<h3>The python config API<a class="headerlink" href="#the-python-config-api" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>The option name and a concise description will be added under the
+correct option [section] in <code class="docutils literal"><span class="pre">src/config/SSSDConfig/__init__.py.in</span></code></li>
+<li>The option name also will be added in the appropriate list in
+<code class="docutils literal"><span class="pre">src/config/SSSDConfigTest.py</span></code></li>
+<li>Modification to the config validation file
+<code class="docutils literal"><span class="pre">src/config/etc/sssd.api.conf</span></code> will be done to include raw options
+in the format <em>option = type, subtype, mandatory[, default]</em> under
+the correct [section]. Data provider options will be added to the
+file <code class="docutils literal"><span class="pre">src/config/etc/sssd.api.d/sssd-&lt;provider&gt;.conf</span></code>. These files
+get copied into <code class="docutils literal"><span class="pre">/usr/share/sssd/</span></code> on the SSSD-installed system.</li>
+</ul>
+</div>
+<div class="section" id="confdb-h">
+<h3>confdb.h<a class="headerlink" href="#confdb-h" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Only for raw options, a macro will be created in the format in the
+header file <code class="docutils literal"><span class="pre">src/confdb/confdb.h</span></code> to add the option into the confDB</li>
+</ul>
+</div>
+<div class="section" id="dp-option-structure">
+<h3>dp_option structure<a class="headerlink" href="#dp-option-structure" title="Permalink to this headline">¶</a></h3>
+<p>only for data provider options</p>
+</div>
+<div class="section" id="config-checking-schema">
+<h3>config checking schema<a class="headerlink" href="#config-checking-schema" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>The option will be added to the appropriate section in
+<code class="docutils literal"><span class="pre">src/config/cfg_rules.ini</span></code> for config file validation(new in 1.14)</li>
+</ul>
+</div>
+<div class="section" id="retrieving-the-option">
+<h3>Retrieving the option<a class="headerlink" href="#retrieving-the-option" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">The option needs to be retrieved either by using the confdb_get*
+functions or accessing the dp_option fields</p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">confdb_get_string</span></code> example to retrieve the <code class="docutils literal"><span class="pre">id_provider</span></code> option
+from the confdb domain section:</p>
+</div></blockquote>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="https://git.fedorahosted.org/cgit/sssd.git/commit/?id=544a20de7667f05c1a406c4dea0706b0ab507430">​Raw option
+&#8216;certificate_verification&#8217;</a></li>
+<li><a class="reference external" href="https://git.fedorahosted.org/cgit/sssd.git/commit/?id=d6342c92c226becbdd254f90a0005b8c00c300dc">​Data provider option
+&#8216;ad_enabled_domains&#8217;</a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Adding a new SSSD option</a><ul>
+<li><a class="reference internal" href="#sssd-conf-and-confdb">sssd.conf and confdb</a></li>
+<li><a class="reference internal" href="#two-kinds-of-sssd-options">Two kinds of SSSD options</a></li>
+<li><a class="reference internal" href="#adding-the-option">Adding the option</a><ul>
+<li><a class="reference internal" href="#the-man-pages">The man pages</a></li>
+<li><a class="reference internal" href="#the-python-config-api">The python config API</a></li>
+<li><a class="reference internal" href="#confdb-h">confdb.h</a></li>
+<li><a class="reference internal" href="#dp-option-structure">dp_option structure</a></li>
+<li><a class="reference internal" href="#config-checking-schema">config checking schema</a></li>
+<li><a class="reference internal" href="#retrieving-the-option">Retrieving the option</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/AddingSSSDOptions.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/AddingSSSDOptions.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

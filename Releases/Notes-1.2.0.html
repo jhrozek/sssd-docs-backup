@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Support ServiceGroups for FreeIPA v2 HBAC rules</li>
+<li>Fix long-standing issue with auth_provider = proxy</li>
+<li>Better logging for TLS issues in LDAP</li>
+</ul>
+</div>
+<div class="section" id="detailed-release-notes">
+<h1>Detailed Release Notes<a class="headerlink" href="#detailed-release-notes" title="Permalink to this headline">¶</a></h1>
+<p>David O&#8217;Brien (1):</p>
+<ul class="simple">
+<li>Copy-edit and format review sssd.conf</li>
+</ul>
+<p>Jakub Hrozek (1):</p>
+<ul class="simple">
+<li>SSSDConfigAPI fixes</li>
+</ul>
+<p>Petter Reinholdtsen (1):</p>
+<ul class="simple">
+<li>Remove bash-isms from configure macros</li>
+</ul>
+<p>Piotr Drąg (1):</p>
+<ul class="simple">
+<li>Update pl translation</li>
+</ul>
+<p>Stephen Gallagher (9):</p>
+<ul class="simple">
+<li>Add a better error message for TLS failures</li>
+<li>Add enumerate details to the manpage and examples</li>
+<li>Make data provider id_callback public</li>
+<li>Fix error reporting for be_pam_handler</li>
+<li>Proxy provider PAM handling in child process</li>
+<li>Display name of PAM action in pam_print_data()</li>
+<li>Fix queuing bug in proxy provider</li>
+<li>Support password changes in chpass_provider = proxy</li>
+<li>Release SSSD version 1.2.0</li>
+</ul>
+<p>Sumit Bose (9):</p>
+<ul class="simple">
+<li>Reset run_online_cb flag even if there are no callbacks</li>
+<li>Fix check if LDAP id provider is already initialized</li>
+<li>Defer sbus_dispatch() for 30ms during reconnect</li>
+<li>Copy pam data from DBus message</li>
+<li>Remove signal event if child was terminated by a signal</li>
+<li>Do not modify IPA_DOMAIN when setting Kerberos realm</li>
+<li>Move parse_args() to util</li>
+<li>Check ipaEnabledFlag</li>
+<li>Use new schema for HBAC service checks</li>
+</ul>
+<p>Yuri Chornoivan (1):</p>
+<ul class="simple">
+<li>Update uk translation</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#detailed-release-notes">Detailed Release Notes</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.2.0.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.2.0.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

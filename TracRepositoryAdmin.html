@@ -1,0 +1,474 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Repository Administration &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="repository-administration">
+<h1>Repository Administration<a class="headerlink" href="#repository-administration" title="Permalink to this headline">¶</a></h1>
+<div class="wiki-toc"><ol class="arabic simple">
+<li><a class="reference external" href="#QuickStart">Quick start</a></li>
+<li><a class="reference external" href="#Repositories">Specifying repositories</a><ol class="arabic">
+<li><cite>In ``trac.ini`</cite> &lt;#ReposTracIni&gt;`__</li>
+<li><a class="reference external" href="#ReposDatabase">In the database</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#Synchronization">Repository synchronization</a><ol class="arabic">
+<li><a class="reference external" href="#MercurialRepositories">Mercurial Repositories</a></li>
+<li><a class="reference external" href="#ExplicitSync">Explicit synchronization</a></li>
+<li><a class="reference external" href="#PerRequestSync">Per-request synchronization</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#Migration">Migration from a single-repository setup
+(Subversion)</a></li>
+<li><a class="reference external" href="#MigrationMercurial">Migration from a single-repository setup
+(Mercurial)</a></li>
+<li><a class="reference external" href="#Troubleshooting">Troubleshooting</a><ol class="arabic">
+<li><a class="reference external" href="#trac-post-commit-hook">My trac-post-commit-hook doesn&#8217;t work
+anymore</a></li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="quick-start">
+<h2>Quick start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Manage repositories in the &#8220;Repository&#8221; admin panel, with
+<code class="docutils literal"><span class="pre">trac-admin</span></code> or in the <code class="docutils literal"><span class="pre">[repositories]</span></code> section of
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#repositories-section">trac.ini</a>.</li>
+<li>Set up a call to <code class="docutils literal"><span class="pre">trac-admin</span> <span class="pre">$ENV</span> <span class="pre">changeset</span> <span class="pre">added</span> <span class="pre">$REPO</span> <span class="pre">$REV</span></code> in
+the post-commit hook of each repository. Additionally, add a call to
+<code class="docutils literal"><span class="pre">trac-admin</span> <span class="pre">$ENV</span> <span class="pre">changeset</span> <span class="pre">modified</span> <span class="pre">$REPO</span> <span class="pre">$REV</span></code> in the
+post-revprop-change hook of repositories allowing revision property
+changes.</li>
+<li>Set the <code class="docutils literal"><span class="pre">[trac]</span> <span class="pre">repository_sync_per_request</span></code> option to an empty
+value to disable per-request syncing.</li>
+<li>Make sure the user under which your Subversion hooks are run has
+write access to the Trac environment, or use a tool like <code class="docutils literal"><span class="pre">sudo</span></code> to
+temporarily elevate privileges.</li>
+</ul>
+</div>
+<div class="section" id="specifying-repositories">
+<h2>Specifying repositories<a class="headerlink" href="#specifying-repositories" title="Permalink to this headline">¶</a></h2>
+<p>Starting with 0.12, Trac can handle more than one repository per
+environment. The pre-0.12 way of specifying the repository with the
+<code class="docutils literal"><span class="pre">repository_dir</span></code> and <code class="docutils literal"><span class="pre">repository_type</span></code> options in the <code class="docutils literal"><span class="pre">[trac]</span></code>
+section of
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">trac.ini</a> is still
+supported, but two new mechanisms allow including additional
+repositories into an environment.</p>
+<p>It is also possible to define aliases of repositories, that act as
+&#8220;pointers&#8221; to real repositories. This can be useful when renaming a
+repository, to avoid breaking all the links to the old name.</p>
+<p>A number of attributes can be associated with each repository, which
+define the repository&#8217;s location, type, name and how it is displayed in
+the source browser. The following attributes are supported:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="5%" />
+<col width="95%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><strong>Attribute</strong></th>
+<th class="head"><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">alias</span></code></td>
+<td>A repository having an <code class="docutils literal"><span class="pre">alias</span></code> attribute is an alias to a real repository. All <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracLinks.html">TracLinks</a> referencing the alias resolve to the aliased repository. Note that multiple indirection is not supported, so an alias must always point to a real repository. The <code class="docutils literal"><span class="pre">alias</span></code> and <code class="docutils literal"><span class="pre">dir</span></code> attributes are mutually exclusive.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">description</span></code></td>
+<td>The text specified in the <code class="docutils literal"><span class="pre">description</span></code> attribute is displayed below the top-level entry for the repository in the source browser. It supports <a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html">WikiFormatting</a>.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">dir</span></code></td>
+<td>The <code class="docutils literal"><span class="pre">dir</span></code> attribute specifies the location of the repository in the filesystem. It corresponds to the value previously specified in the option <code class="docutils literal"><span class="pre">[trac]</span> <span class="pre">repository_dir</span></code>. The <code class="docutils literal"><span class="pre">alias</span></code> and <code class="docutils literal"><span class="pre">dir</span></code> attributes are mutually exclusive.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">hidden</span></code></td>
+<td>When set to <code class="docutils literal"><span class="pre">true</span></code>, the repository is hidden from the repository index page in the source browser. Browsing the repository is still possible, and links referencing the repository remain valid.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">type</span></code></td>
+<td>The <code class="docutils literal"><span class="pre">type</span></code> attribute sets the type of version control system used by the repository. Trac supports Subversion out-of-the-box, and plugins add support for many other systems. If <code class="docutils literal"><span class="pre">type</span></code> is not specified, it defaults to the value of the <code class="docutils literal"><span class="pre">[trac]</span> <span class="pre">repository_type</span></code> option.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">url</span></code></td>
+<td>The <code class="docutils literal"><span class="pre">url</span></code> attribute specifies the root URL to be used for checking out from the repository. When specified, a &#8220;Repository URL&#8221; link is added to the context navigation links in the source browser, that can be copied into the tool used for creating the working copy.</td>
+</tr>
+</tbody>
+</table>
+<p>A repository <code class="docutils literal"><span class="pre">name</span></code> and one of <code class="docutils literal"><span class="pre">alias</span></code> or <code class="docutils literal"><span class="pre">dir</span></code> attributes are
+mandatory. All others are optional.</p>
+<p>After adding a repository, the cache for that repository must be
+re-synchronized once with the <code class="docutils literal"><span class="pre">trac-admin</span> <span class="pre">$ENV</span> <span class="pre">repository</span> <span class="pre">resync</span></code>
+command.</p>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">repository</span> <span class="pre">resync</span> <span class="pre">&lt;repos&gt;</span></code></dt>
+<dd>Re-synchronize Trac with a repository.</dd>
+</dl>
+<div class="section" id="in-trac-ini">
+<h3>In <code class="docutils literal"><span class="pre">trac.ini</span></code><a class="headerlink" href="#in-trac-ini" title="Permalink to this headline">¶</a></h3>
+<p>Repositories and repository attributes can be specified in the
+<code class="docutils literal"><span class="pre">[repositories]</span></code> section of
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#repositories-section">trac.ini</a>.
+Every attribute consists of a key structured as <code class="docutils literal"><span class="pre">{name}.{attribute}</span></code>
+and the corresponding value separated with an equal sign (<code class="docutils literal"><span class="pre">=</span></code>). The
+name of the default repository is empty.</p>
+<p>The main advantage of specifying repositories in <code class="docutils literal"><span class="pre">trac.ini</span></code> is that
+they can be inherited from a global configuration (see the <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#GlobalConfiguration">global
+configuration</a>
+section of
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">TracIni</a>). One
+drawback is that, due to limitations in the <code class="docutils literal"><span class="pre">ConfigParser</span></code> class used
+to parse <code class="docutils literal"><span class="pre">trac.ini</span></code>, the repository name is always all-lowercase.</p>
+<p>The following example defines two Subversion repositories named
+<code class="docutils literal"><span class="pre">project</span></code> and <code class="docutils literal"><span class="pre">lib</span></code>, and an alias to <code class="docutils literal"><span class="pre">project</span></code> as the default
+repository. This is a typical use case where a Trac environment
+previously had a single repository (the <code class="docutils literal"><span class="pre">project</span></code> repository), and was
+converted to multiple repositories. The alias ensures that links
+predating the change continue to resolve to the <code class="docutils literal"><span class="pre">project</span></code> repository.</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">repositories</span><span class="p">]</span>
+<span class="n">project</span><span class="o">.</span><span class="n">dir</span> <span class="o">=</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">repos</span><span class="o">/</span><span class="n">project</span>
+<span class="n">project</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">This</span> <span class="ow">is</span> <span class="n">the</span> <span class="s1">&#39;&#39;</span><span class="n">main</span><span class="s1">&#39;&#39;</span> <span class="n">project</span> <span class="n">repository</span><span class="o">.</span>
+<span class="n">project</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">svn</span>
+<span class="n">project</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">example</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">svn</span><span class="o">/</span><span class="n">project</span>
+<span class="n">project</span><span class="o">.</span><span class="n">hidden</span> <span class="o">=</span> <span class="n">true</span>
+
+<span class="n">lib</span><span class="o">.</span><span class="n">dir</span> <span class="o">=</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">repos</span><span class="o">/</span><span class="n">lib</span>
+<span class="n">lib</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">This</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">secondary</span> <span class="n">library</span> <span class="n">code</span><span class="o">.</span>
+<span class="n">lib</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">svn</span>
+<span class="n">lib</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">example</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">svn</span><span class="o">/</span><span class="n">lib</span>
+
+<span class="o">.</span><span class="n">alias</span> <span class="o">=</span> <span class="n">project</span>
+</pre></div>
+</div>
+</div><p>Note that <code class="docutils literal"><span class="pre">name.alias</span> <span class="pre">=</span> <span class="pre">target</span></code> makes <code class="docutils literal"><span class="pre">name</span></code> an alias for the
+<code class="docutils literal"><span class="pre">target</span></code> repo, not the other way around.</p>
+</div>
+<div class="section" id="in-the-database">
+<h3>In the database<a class="headerlink" href="#in-the-database" title="Permalink to this headline">¶</a></h3>
+<p>Repositories can also be specified in the database, using either the
+&#8220;Repositories&#8221; admin panel under &#8220;Version Control&#8221;, or the
+<code class="docutils literal"><span class="pre">trac-admin</span> <span class="pre">$ENV</span> <span class="pre">repository</span></code> commands.</p>
+<p>The admin panel shows the list of all repositories defined in the Trac
+environment. It allows adding repositories and aliases, editing
+repository attributes and removing repositories. Note that repositories
+defined in <code class="docutils literal"><span class="pre">trac.ini</span></code> are displayed but cannot be edited.</p>
+<p>The following
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracAdmin.html">trac-admin</a>
+commands can be used to perform repository operations from the command
+line.</p>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">repository</span> <span class="pre">add</span> <span class="pre">&lt;repos&gt;</span> <span class="pre">&lt;dir&gt;</span> <span class="pre">[type]</span></code></dt>
+<dd>Add a repository <code class="docutils literal"><span class="pre">&lt;repos&gt;</span></code> located at <code class="docutils literal"><span class="pre">&lt;dir&gt;</span></code>, and optionally
+specify its type.</dd>
+<dt><code class="docutils literal"><span class="pre">repository</span> <span class="pre">alias</span> <span class="pre">&lt;name&gt;</span> <span class="pre">&lt;target&gt;</span></code></dt>
+<dd>Create an alias <code class="docutils literal"><span class="pre">&lt;name&gt;</span></code> for the repository <code class="docutils literal"><span class="pre">&lt;target&gt;</span></code>.</dd>
+<dt><code class="docutils literal"><span class="pre">repository</span> <span class="pre">remove</span> <span class="pre">&lt;repos&gt;</span></code></dt>
+<dd>Remove the repository <code class="docutils literal"><span class="pre">&lt;repos&gt;</span></code>.</dd>
+<dt><code class="docutils literal"><span class="pre">repository</span> <span class="pre">set</span> <span class="pre">&lt;repos&gt;</span> <span class="pre">&lt;key&gt;</span> <span class="pre">&lt;value&gt;</span></code></dt>
+<dd>Set the attribute <code class="docutils literal"><span class="pre">&lt;key&gt;</span></code> to <code class="docutils literal"><span class="pre">&lt;value&gt;</span></code> for the repository
+<code class="docutils literal"><span class="pre">&lt;repos&gt;</span></code>.</dd>
+</dl>
+<p>Note that the default repository has an empty name, so it will likely
+need to be quoted when running <code class="docutils literal"><span class="pre">trac-admin</span></code> from a shell.
+Alternatively, the name &#8220;<code class="docutils literal"><span class="pre">(default)</span></code>&#8221; can be used instead, for example
+when running <code class="docutils literal"><span class="pre">trac-admin</span></code> in interactive mode.</p>
+</div>
+</div>
+<div class="section" id="repository-synchronization">
+<h2>Repository synchronization<a class="headerlink" href="#repository-synchronization" title="Permalink to this headline">¶</a></h2>
+<p>Prior to 0.12, Trac synchronized its cache with the repository on every
+HTTP request. This approach is not very efficient and not practical
+anymore with multiple repositories. For this reason, explicit
+synchronization through post-commit hooks was added.</p>
+<p>There is also new functionality in the form of a repository listener
+extension point <em>(IRepositoryChangeListener)</em> that is triggered by the
+post-commit hook when a changeset is added or modified, and can be used
+by plugins to perform actions on commit.</p>
+<div class="section" id="mercurial-repositories">
+<h3>Mercurial Repositories<a class="headerlink" href="#mercurial-repositories" title="Permalink to this headline">¶</a></h3>
+<p>Please note that at the time of writing, no initial resynchronization or
+any hooks are necessary for Mercurial repositories - see
+<a class="reference external" href="http://trac.edgewall.org/intertrac/%239485">​#9485</a> for more
+information.</p>
+</div>
+<div class="section" id="explicit-synchronization">
+<h3>Explicit synchronization<a class="headerlink" href="#explicit-synchronization" title="Permalink to this headline">¶</a></h3>
+<p>This is the preferred method of repository synchronization. It requires
+setting the <code class="docutils literal"><span class="pre">[trac]</span>&#160; <span class="pre">repository_sync_per_request</span></code> option in
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#trac-section">trac.ini</a>
+to an empty value, and adding a call to <code class="docutils literal"><span class="pre">trac-admin</span></code> in the
+post-commit hook of each repository. Additionally, if a repository
+allows changing revision metadata, a call to <code class="docutils literal"><span class="pre">trac-admin</span></code> must be
+added to the post-revprop-change hook as well.</p>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">changeset</span> <span class="pre">added</span> <span class="pre">&lt;repos&gt;</span> <span class="pre">&lt;rev&gt;</span> <span class="pre">[…]</span></code></dt>
+<dd>Notify Trac that one or more changesets have been added to a
+repository.</dd>
+<dt><code class="docutils literal"><span class="pre">changeset</span> <span class="pre">modified</span> <span class="pre">&lt;repos&gt;</span> <span class="pre">&lt;rev&gt;</span> <span class="pre">[…]</span></code></dt>
+<dd>Notify Trac that metadata on one or more changesets in a repository
+has been modified.</dd>
+</dl>
+<p>The <code class="docutils literal"><span class="pre">&lt;repos&gt;</span></code> argument can be either a repository name (use
+&#8220;<code class="docutils literal"><span class="pre">(default)</span></code>&#8221; for the default repository) or the path to the
+repository.</p>
+<p>Note that you may have to set the environment variable
+PYTHON_EGG_CACHE to the same value as was used for the web server
+configuration before calling trac-admin, if you changed it from its
+default location. See <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracPlugins.html">Trac
+Plugins</a> for
+more information.</p>
+<p>The following examples are complete post-commit and post-revprop-change
+scripts for Subversion. They should be edited for the specific
+environment, marked executable (where applicable) and placed in the
+<code class="docutils literal"><span class="pre">hooks</span></code> directory of each repository. On Unix (<code class="docutils literal"><span class="pre">post-commit</span></code>):</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="ch">#!/bin/sh</span>
+<span class="n">export</span> <span class="n">PYTHON_EGG_CACHE</span><span class="o">=</span><span class="s2">&quot;/path/to/dir&quot;</span>
+<span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">trac</span><span class="o">-</span><span class="n">admin</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">env</span> <span class="n">changeset</span> <span class="n">added</span> <span class="s2">&quot;$1&quot;</span> <span class="s2">&quot;$2&quot;</span>
+</pre></div>
+</div>
+</div><p>Note: Ubuntu doesn&#8217;t seem to like /usr/bin/trac-admin, so just use:</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="ch">#!/bin/sh</span>
+<span class="n">export</span> <span class="n">PYTHON_EGG_CACHE</span><span class="o">=</span><span class="s2">&quot;/path/to/dir&quot;</span>
+<span class="n">trac</span><span class="o">-</span><span class="n">admin</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">env</span><span class="o">/</span> <span class="n">changeset</span> <span class="n">added</span> <span class="s2">&quot;$1&quot;</span> <span class="s2">&quot;$2&quot;</span>
+</pre></div>
+</div>
+</div><p>On Windows (<code class="docutils literal"><span class="pre">post-commit.cmd</span></code>):</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="nd">@C</span><span class="p">:</span>\<span class="n">Python26</span>\<span class="n">Scripts</span>\<span class="n">trac</span><span class="o">-</span><span class="n">admin</span><span class="o">.</span><span class="n">exe</span> <span class="n">C</span><span class="p">:</span>\<span class="n">path</span>\<span class="n">to</span>\<span class="n">env</span> <span class="n">changeset</span> <span class="n">added</span> <span class="s2">&quot;%1&quot;</span> <span class="s2">&quot;%2&quot;</span>
+</pre></div>
+</div>
+</div><p>The post-revprop-change hook for Subversion is very similar. On Unix
+(<code class="docutils literal"><span class="pre">post-revprop-change</span></code>):</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="ch">#!/bin/sh</span>
+<span class="n">export</span> <span class="n">PYTHON_EGG_CACHE</span><span class="o">=</span><span class="s2">&quot;/path/to/dir&quot;</span>
+<span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">trac</span><span class="o">-</span><span class="n">admin</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">env</span> <span class="n">changeset</span> <span class="n">modified</span> <span class="s2">&quot;$1&quot;</span> <span class="s2">&quot;$2&quot;</span>
+</pre></div>
+</div>
+</div><p>On Windows (<code class="docutils literal"><span class="pre">post-revprop-change.cmd</span></code>):</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="nd">@C</span><span class="p">:</span>\<span class="n">Python26</span>\<span class="n">Scripts</span>\<span class="n">trac</span><span class="o">-</span><span class="n">admin</span><span class="o">.</span><span class="n">exe</span> <span class="n">C</span><span class="p">:</span>\<span class="n">path</span>\<span class="n">to</span>\<span class="n">env</span> <span class="n">changeset</span> <span class="n">modified</span> <span class="s2">&quot;%1&quot;</span> <span class="s2">&quot;%2&quot;</span>
+</pre></div>
+</div>
+</div><p>The Unix variants above assume that the user running the Subversion
+commit has write access to the Trac environment, which is the case in
+the standard configuration where both the repository and Trac are served
+by the web server. If you access the repository through another means,
+for example <code class="docutils literal"><span class="pre">svn+ssh://</span></code>, you may have to run <code class="docutils literal"><span class="pre">trac-admin</span></code> with
+different privileges, for example by using <code class="docutils literal"><span class="pre">sudo</span></code>.</p>
+<p>Note that calling <code class="docutils literal"><span class="pre">trac-admin</span></code> in your Subversion hooks can slow down
+the commit and log editing operations on the client side. You might want
+to use the
+<a class="reference external" href="http://trac.edgewall.org/intertrac/source%3Atrunk/contrib/trac-svn-hook">​contrib/trac-svn-hook</a>
+script which starts <code class="docutils literal"><span class="pre">trac-admin</span></code> in an asynchronous way. The script
+also comes with a number of safety checks and usage advices which should
+make it easier to set up and test your hooks. There&#8217;s no equivalent
+<code class="docutils literal"><span class="pre">trac-svn-hook.bat</span></code> for Windows yet, but the script can be run by
+Cygwin&#8217;s bash.</p>
+<p>See the <a class="reference external" href="http://svnbook.red-bean.com/en/1.5/svn.reposadmin.create.html#svn.reposadmin.create.hooks">​section about
+hooks</a>
+in the Subversion book for more information. Other repository types will
+require different hook setups.</p>
+<p>Git hooks can be used in the same way for explicit syncing of git
+repositories. Add the following to <code class="docutils literal"><span class="pre">.git/hooks/post-commit</span></code>:</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span>REV=$(git rev-parse HEAD)
+trac-admin /path/to/env changeset added &lt;my-repository&gt; $REV
+</pre></div>
+</div>
+</div><p>For Mercurial, add the following entries to the <code class="docutils literal"><span class="pre">.hgrc</span></code> file of each
+repository accessed by Trac (if
+<a class="reference external" href="http://trac.edgewall.org/intertrac/TracMercurial">​TracMercurial</a> is
+installed in a Trac <code class="docutils literal"><span class="pre">plugins</span></code> directory, download
+<a class="reference external" href="https://fedorahosted.org/sssd/browser/plugins/0.13/mercurial-plugin/tracext/hg/hooks.py">hooks.py</a>
+and place it somewhere accessible):</p>
+<div class="code"><div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">hooks</span><span class="p">]</span>
+<span class="p">;</span> <span class="n">If</span> <span class="n">mercurial</span><span class="o">-</span><span class="n">plugin</span> <span class="ow">is</span> <span class="n">installed</span> <span class="n">globally</span>
+<span class="n">commit</span> <span class="o">=</span> <span class="n">python</span><span class="p">:</span><span class="n">tracext</span><span class="o">.</span><span class="n">hg</span><span class="o">.</span><span class="n">hooks</span><span class="o">.</span><span class="n">add_changesets</span>
+<span class="n">changegroup</span> <span class="o">=</span> <span class="n">python</span><span class="p">:</span><span class="n">tracext</span><span class="o">.</span><span class="n">hg</span><span class="o">.</span><span class="n">hooks</span><span class="o">.</span><span class="n">add_changesets</span>
+
+<span class="p">;</span> <span class="n">If</span> <span class="n">mercurial</span><span class="o">-</span><span class="n">plugin</span> <span class="ow">is</span> <span class="n">installed</span> <span class="ow">in</span> <span class="n">a</span> <span class="n">Trac</span> <span class="n">plugins</span> <span class="n">directory</span>
+<span class="n">commit</span> <span class="o">=</span> <span class="n">python</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">hooks</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="n">add_changesets</span>
+<span class="n">changegroup</span> <span class="o">=</span> <span class="n">python</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">hooks</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="n">add_changesets</span>
+
+<span class="p">[</span><span class="n">trac</span><span class="p">]</span>
+<span class="n">env</span> <span class="o">=</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">env</span>
+<span class="n">trac</span><span class="o">-</span><span class="n">admin</span> <span class="o">=</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">trac</span><span class="o">-</span><span class="n">admin</span>
+</pre></div>
+</div>
+</div></div>
+<div class="section" id="per-request-synchronization">
+<h3>Per-request synchronization<a class="headerlink" href="#per-request-synchronization" title="Permalink to this headline">¶</a></h3>
+<p>If the post-commit hooks are not available, the environment can be set
+up for per-request synchronization. In that case, the
+<code class="docutils literal"><span class="pre">[trac]</span> <span class="pre">repository_sync_per_request</span></code> option in
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#trac-section">trac.ini</a>
+must be set to a comma-separated list of repository names to be
+synchronized.</p>
+<p>Note that in this case, the changeset listener extension point is not
+called, and therefore plugins using it will not work correctly.</p>
+</div>
+</div>
+<div class="section" id="migration-from-a-single-repository-setup-subversion">
+<h2>Migration from a single-repository setup (Subversion)<a class="headerlink" href="#migration-from-a-single-repository-setup-subversion" title="Permalink to this headline">¶</a></h2>
+<p>The following procedure illustrates a typical migration from a
+Subversion single-repository setup to multiple repositories.</p>
+<ol class="arabic simple">
+<li>Remove the default repository specification from the
+<code class="docutils literal"><span class="pre">[trac]</span> <span class="pre">repository_dir</span></code> option.</li>
+<li>Add the main repository as a named repository.</li>
+<li>Re-synchronize the main repository.</li>
+<li>Set up post-commit and post-revprop-change hooks on the &#8220;main&#8221;
+repository, and set <code class="docutils literal"><span class="pre">[trac]</span> <span class="pre">repository_sync_per_request</span></code> to an
+empty value.</li>
+<li>Add an alias to the main repository as the default repository (by
+leaving out the the <code class="docutils literal"><span class="pre">name</span></code>, e.g. <code class="docutils literal"><span class="pre">.alias</span> <span class="pre">=</span> <span class="pre">main</span></code>). This ensures
+that all links predating the migration still resolve to the main
+repository.</li>
+<li>Repeat steps 2, 3 and 4 to add other &#8220;named&#8221; repositories as needed.</li>
+</ol>
+</div>
+<div class="section" id="migration-from-a-single-repository-setup-mercurial">
+<h2>Migration from a single-repository setup (Mercurial)<a class="headerlink" href="#migration-from-a-single-repository-setup-mercurial" title="Permalink to this headline">¶</a></h2>
+<p>The following procedure illustrates a typical migration from a Mercurial
+single-repository setup to multiple repositories. Please note that at
+the time of writing, no initial resynchronization or any hooks are
+necessary for Mercurial repositories - see
+<a class="reference external" href="http://trac.edgewall.org/intertrac/ticket%3A9485">​#9485</a> for more
+information.</p>
+<ol class="arabic simple">
+<li>Upgrade to the latest version of the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracMercurial.html">TracMercurial?</a>
+plugin.</li>
+<li>Remove the default repository specification from the
+<code class="docutils literal"><span class="pre">[trac]</span> <span class="pre">repository_dir</span></code> option.</li>
+<li>Add the main repository as a named repository.</li>
+<li>Add an alias to the main repository as the default repository (by
+leaving out the the <code class="docutils literal"><span class="pre">name</span></code>, e.g. <code class="docutils literal"><span class="pre">.alias</span> <span class="pre">=</span> <span class="pre">main</span></code>). This ensures
+that all links predating the migration still resolve to the main
+repository.</li>
+<li>Repeat step 3 to add other &#8220;named&#8221; repositories as needed.</li>
+</ol>
+</div>
+<div class="section" id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="my-trac-post-commit-hook-doesn-t-work-anymore">
+<h3>My trac-post-commit-hook doesn&#8217;t work anymore<a class="headerlink" href="#my-trac-post-commit-hook-doesn-t-work-anymore" title="Permalink to this headline">¶</a></h3>
+<p>You must now use the optional components from
+<code class="docutils literal"><span class="pre">tracopt.ticket.commit_updater.*</span></code>, which you can activate through the
+Plugins panel in the Administrative part of the web interface, or by
+directly modifying the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#components-section">&#8220;[components]&#8221;</a>
+section in the trac.ini. Be sure to use <a class="reference external" href="https://fedorahosted.org/sssd#ExplicitSync">explicit
+synchronization</a> as
+explained above.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Repository Administration</a><ul>
+<li><a class="reference internal" href="#quick-start">Quick start</a></li>
+<li><a class="reference internal" href="#specifying-repositories">Specifying repositories</a><ul>
+<li><a class="reference internal" href="#in-trac-ini">In <code class="docutils literal"><span class="pre">trac.ini</span></code></a></li>
+<li><a class="reference internal" href="#in-the-database">In the database</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#repository-synchronization">Repository synchronization</a><ul>
+<li><a class="reference internal" href="#mercurial-repositories">Mercurial Repositories</a></li>
+<li><a class="reference internal" href="#explicit-synchronization">Explicit synchronization</a></li>
+<li><a class="reference internal" href="#per-request-synchronization">Per-request synchronization</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#migration-from-a-single-repository-setup-subversion">Migration from a single-repository setup (Subversion)</a></li>
+<li><a class="reference internal" href="#migration-from-a-single-repository-setup-mercurial">Migration from a single-repository setup (Mercurial)</a></li>
+<li><a class="reference internal" href="#troubleshooting">Troubleshooting</a><ul>
+<li><a class="reference internal" href="#my-trac-post-commit-hook-doesn-t-work-anymore">My trac-post-commit-hook doesn&#8217;t work anymore</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracRepositoryAdmin.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracRepositoryAdmin.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

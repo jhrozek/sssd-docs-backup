@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Kerberos &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#Kerberos">Kerberos</a><ol class="arabic">
+<li><a class="reference external" href="#AutomaticTGTAcquisition">Automatic TGT Acquisition</a></li>
+<li><a class="reference external" href="#AutomaticTicketRenewal">Automatic Ticket Renewal</a></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="kerberos">
+<h1>Kerberos<a class="headerlink" href="#kerberos" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="automatic-tgt-acquisition">
+<h2>Automatic TGT Acquisition<a class="headerlink" href="#automatic-tgt-acquisition" title="Permalink to this headline">¶</a></h2>
+<p>You probably already know all about how the System Security Services
+Daemon can make your offline life easier by enabling cached-credential
+login to your system while you don’t have access to the central
+authentication servers.</p>
+<p>What you might not know, however, is that when using SSSD to perform
+Kerberos auth, it’s also possible to configure it to automatically
+acquire your network credentials when you go online. By setting the
+‘krb5_store_password_if_offline’ option to ‘True’ in the
+[domain/DOMAINNAME] sections of sssd.conf, you can configure SSSD to
+store a user’s password when they log in while offline (for example,
+working from home). Then later, if access to the network KDC is restored
+(for example, connecting to the VPN), SSSD will perform a kinit on your
+behalf to automatically acquire a TGT for single-sign-on with your
+network resources.</p>
+<p>Now, some of you will be saying to yourselves: “Wait, doesn’t this mean
+that my password is being stored on the system in a readable way?”. This
+is true but not the whole story. Yes, the password is stored on the
+system in such a way that SSSD (and theoretically the root user on the
+system, with some effort) can read the password. Without doing so, there
+would be no way for us to acquire the ticket granting ticket on your
+behalf. However, we do store the password in the most secure way
+possible: in the kernel keyring. This makes it very difficult for root
+to gain access to this password and essentially impossible for any
+non-root process. The risk factor is not zero, which explains why this
+is an optional feature, disabled by default. However, in the common
+laptop case (where it’s assumed that the owner of the laptop is likely
+to be its only user), this security/convenience trade-off is probably
+worthwhile.</p>
+</div>
+<div class="section" id="automatic-ticket-renewal">
+<h2>Automatic Ticket Renewal<a class="headerlink" href="#automatic-ticket-renewal" title="Permalink to this headline">¶</a></h2>
+<p>The second advanced Kerberos feature I’d like to discuss today is
+automatic ticket renewal. User processes sometimes need access to the
+user’s Kerberos credentials, even when the user is no longer logged in.
+An example might be a regular cron job that the user wants to run every
+day a few hours after leaving work. With traditional Kerberos
+configurations, this user would be forced to remember to manually renew
+his Kerberos credentials before leaving for the day, to ensure that the
+expiration time on his TGT did not expire before his cron job completed.</p>
+<p>With SSSD 1.5.0 and later, it can be configured to automatically renew
+Kerberos tickets for the full renewable life of the TGT. This is
+different from the automatic TGT acquisition above, as we do not need to
+store the user’s Kerberos password to accomplish this. It does require
+some additional configuration on the KDC server, however.</p>
+<p>If the KDC permits users to request “renewable” TGT tickets, then what
+it is allowing the user to do is to use their current TGT in place of
+their password in order to acquire an updated TGT (with a later
+expiration).</p>
+<p>SSSD 1.5.0 and later can set two options to enable it to automatically
+renew the user’s TGT for as long as the KDC permits.</p>
+<p>The first option is krb5_renewable_lifetime. When set, it specifies
+the maximum renewable duration that the SSSD will attempt to request
+from the KDC. Note that this is only a request, and the KDC itself may
+choose to return a much shorter duration, or disallow renewals entirely.</p>
+<p>Assuming that a renewable ticket was granted, the second option is
+krb5_renew_interval. This option specifies how often the SSSD should
+poll to see if any of the user TGTs have gone beyond 50% of their
+current lifetime. If they have, SSSD will perform a TGT renewal on the
+user’s behalf, extending the lifetime of the TGT.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Kerberos</a><ul>
+<li><a class="reference internal" href="#automatic-tgt-acquisition">Automatic TGT Acquisition</a></li>
+<li><a class="reference internal" href="#automatic-ticket-renewal">Automatic Ticket Renewal</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TipsAndTricks.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TipsAndTricks.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

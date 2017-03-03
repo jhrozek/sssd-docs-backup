@@ -1,0 +1,488 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Frequently Asked Questions &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#FrequentlyAskedQuestions">Frequently Asked Questions</a><ol class="arabic">
+<li><a class="reference external" href="#WhatistheSystemSecurityServicesDaemon">What is the System Security Services
+Daemon?</a><ol class="arabic">
+<li><a class="reference external" href="#WhatplatformsrunSSSD">What platforms run SSSD?</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#Whatbranchesaremaintainedupstreamatagiventime">What branches are maintained upstream at a given
+time?</a></li>
+<li><a class="reference external" href="#Features">Features</a><ol class="arabic">
+<li><a class="reference external" href="#HowdoIconfigureSSSDtotalktoanActiveDirectoryserver">How do I configure SSSD to talk to an Active Directory
+server?</a></li>
+<li><a class="reference external" href="#WhenshouldIenableenumerationinSSSDorWhyisenumerationdisabledbydefault">When should I enable enumeration in SSSD? or Why is
+enumeration disabled
+…</a></li>
+<li><a class="reference external" href="#WhydoesSSSD1.7.0andlaterignoresourcehostgrouprulesinHBAC">Why does SSSD (1.7.0 and later) ignore source host[group]
+rules in
+HBAC?</a></li>
+<li><a class="reference external" href="#WhatLDAPschemashouldIuse">What LDAP schema should I
+use?</a></li>
+<li><a class="reference external" href="#HowdoIconfigurecachingofsudorulesorautofsmaps">How do I configure caching of sudo rules or autofs
+maps?</a></li>
+<li><a class="reference external" href="#Whydosomeusersappearasgroupmemberseveniftheyarenot">Why do some users appear as group members even if they are
+not?</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#Troubleshooting">Troubleshooting</a><ol class="arabic">
+<li><a class="reference external" href="#BasicsofTroubleshooting">Basics of Troubleshooting</a></li>
+<li><a class="reference external" href="#CommonIssues">Common Issues</a><ol class="arabic">
+<li><a class="reference external" href="#IdontseeanygroupswhenIrunidusername">I don&#8217;t see any groups when I run &#8216;id
+username&#8217;</a></li>
+<li><a class="reference external" href="#Idontseeanygroupmemberswhenrunninggetentgroupgroupname">I don&#8217;t see any group members when running &#8216;getent group
+groupname&#8217;</a></li>
+<li><a class="reference external" href="#AuthenticationfailsagainstLDAP">Authentication fails against
+LDAP</a></li>
+<li><a class="reference external" href="#ConnectiontoLDAPserversonnon-standardportsfail">Connection to LDAP servers on non-standard ports
+fail</a></li>
+<li><a class="reference external" href="#referral">Referral chasing seems to be slowing down the
+SSSD</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#Troubleshooting1">Troubleshooting</a></li>
+<li><a class="reference external" href="#Gettinghelp">Getting help</a></li>
+<li><a class="reference external" href="#Trackingbugsandenhancementrequests">Tracking bugs and enhancement
+requests</a></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="frequently-asked-questions">
+<h1>Frequently Asked Questions<a class="headerlink" href="#frequently-asked-questions" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-is-the-system-security-services-daemon">
+<h2>What is the System Security Services Daemon?<a class="headerlink" href="#what-is-the-system-security-services-daemon" title="Permalink to this headline">¶</a></h2>
+<p>SSSD is a system daemon. Its primary function is to provide access to
+identity and authentication remote resource through a common framework
+that can provide caching and offline support to the system. It provides
+PAM and NSS modules, and in the future will support D-BUS based
+interfaces for extended user information. It provides also a better
+database to store local users as well as extended user data.</p>
+<p>An excellent write-up on SSSD was created by Marko Myllynen and
+submitted to LWN.net: <a class="reference external" href="http://lwn.net/Articles/457415/">​SSSD: System Security Services
+Daemon</a></p>
+<div class="section" id="what-platforms-run-sssd">
+<h3>What platforms run SSSD?<a class="headerlink" href="#what-platforms-run-sssd" title="Permalink to this headline">¶</a></h3>
+<p>We are currently aware of the following Linux distributions shipping
+some version of SSSD.</p>
+<ul class="simple">
+<li><a class="reference external" href="http://fedoraproject.org">​The Fedora Project</a> - This is the
+platform used by the original developers</li>
+<li><a class="reference external" href="http://www.redhat.com">​Red Hat Enterprise Linux</a></li>
+<li><a class="reference external" href="http://www.centos.org">​CentOS</a></li>
+<li><a class="reference external" href="http://www.opensuse.org">​openSUSE</a></li>
+<li><a class="reference external" href="http://www.debian.org">​Debian</a></li>
+<li><a class="reference external" href="http://www.ubuntu.com">​Ubuntu</a></li>
+<li><a class="reference external" href="http://www.gentoo.org">​Gentoo</a></li>
+<li><a class="reference external" href="http://www.mandriva.org">​Mandriva</a></li>
+<li><a class="reference external" href="http://www.archlinux.org">​Arch Linux</a> via
+<a class="reference external" href="http://aur.archlinux.org/packages.php?K=sssd">​AUR</a></li>
+</ul>
+<p>In theory, SSSD should compile and run (hopefully without modification)
+on any modern Linux distribution. Non-Linux platforms such as the BSD
+distributions are not yet fully supported, though some work is ongoing
+to port SSSD to
+<a class="reference external" href="http://portsmon.freebsd.org/portoverview.py?category=security&amp;portname=sssd">​FreeBSD</a></p>
+<p>If you know of any other distributions shipping SSSD, please <a class="reference external" href="mailto:sssd-devel&#37;&#52;&#48;lists&#46;fedorahosted&#46;org">​tell
+us</a>!</p>
+</div>
+</div>
+<div class="section" id="what-branches-are-maintained-upstream-at-a-given-time">
+<h2>What branches are maintained upstream at a given time?<a class="headerlink" href="#what-branches-are-maintained-upstream-at-a-given-time" title="Permalink to this headline">¶</a></h2>
+<p>In general, the SSSD upstream supports at least one stable branch and
+one LTM branch at the same time. The branches designated as LTM
+(long-term maintenance) are supported for longer time than other
+releases with fixes for important bugs and security patches.</p>
+<p>The regular releases are more frequent than LTM releases and are intened
+for users who like to use the latest functionality. The LTM releases are
+targeted at users who prefer to run very stable codebase and don&#8217;t need
+the latest features.</p>
+<p>An LTM release is maintained until the next LTM release comes out. After
+that, the LTM released is declared as end-of-life, but may still receive
+critical security fixes for up to one year to allow users to easily
+migrate to the next LTM release.</p>
+<p>For more detailed information on our releases, see our
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases.html">Releases</a> page.</p>
+</div>
+<div class="section" id="features">
+<h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="how-do-i-configure-sssd-to-talk-to-an-active-directory-server">
+<h3>How do I configure SSSD to talk to an Active Directory server?<a class="headerlink" href="#how-do-i-configure-sssd-to-talk-to-an-active-directory-server" title="Permalink to this headline">¶</a></h3>
+<p>Our fantastic user community has contributed and maintains a wiki page
+dedicated to this goal: <a class="reference external" href="https://docs.pagure.org/sssd-test2/Configuring_sssd_with_ad_server.html">Configuring sssd to authenticate with a Windows
+2008 or later Domain
+Server</a></p>
+<p>Please be aware of <a class="reference external" href="https://fedorahosted.org/sssd#referral">a possible slowdown when using referrals with Active
+Directory</a></p>
+</div>
+<div class="section" id="when-should-i-enable-enumeration-in-sssd-or-why-is-enumeration-disabled-by-default">
+<h3>When should I enable enumeration in SSSD? or Why is enumeration disabled by default?<a class="headerlink" href="#when-should-i-enable-enumeration-in-sssd-or-why-is-enumeration-disabled-by-default" title="Permalink to this headline">¶</a></h3>
+<p>&#8220;Enumeration&#8221; is SSSD&#8217;s term for &#8220;reading in and displaying all the
+values of a particular map (users, groups, etc.)&#8221;. We disable this by
+default in the SSSD in order to minimize the load on the servers with
+which SSSD must communicate. In most operation, listing the complete set
+of users or groups will never be necessary. Applications will generally
+request information about specific users or groups.</p>
+<p>Enumerating all entries has a negative impact in load on the server and
+performance on the client (as we have to save all of the complex
+relationships between users and the groups to which they belong in the
+local cache). So because of this, we ship with enumerations disabled
+(the same behavior as the Samba project&#8217;s winbind).</p>
+<p>You should only enable enumerations (and the resultant performance
+issues) if you have applications or scripts in your environment that
+absolutely must be able to retrieve the complete lists. In these cases,
+enumeration can be enabled by setting</p>
+<p>in your <code class="docutils literal"><span class="pre">sssd.conf</span></code> file.</p>
+</div>
+<div class="section" id="why-does-sssd-1-7-0-and-later-ignore-source-host-group-rules-in-hbac">
+<h3>Why does SSSD (1.7.0 and later) ignore source host[group] rules in HBAC?<a class="headerlink" href="#why-does-sssd-1-7-0-and-later-ignore-source-host-group-rules-in-hbac" title="Permalink to this headline">¶</a></h3>
+<p>There are two serious problems with the srchost feature. In order to do
+srchost processing, SSSD needs to trust the value passed to it by PAM
+for the <code class="docutils literal"><span class="pre">pam_data-&gt;srchost</span></code> field. Unfortunately, the PAM
+specification does not specify the format that this field must take.
+Different login programs provide different values for this field (such
+as IP address, short hostname or FQDN) and yet others simply pass a
+value provided by the remote host. As a result, SSSD has no way of
+verifying whether the remote client is actually who they say they are.</p>
+<p>The second issue is that support of srchost rules requires significantly
+more processing and bigger LDAP lookups, as every client is now required
+to retrieve the complete list of hosts and hostgroups from the FreeIPA
+server, where otherwise it would only need to download the specification
+for the current host (and any groups that contain it). Eliminating the
+srchost rules results in at least one order of magnitude performance
+increase (more in slow LDAP environments).</p>
+<p>So the combination of unreliability and slow performance resulted in our
+making the decision to opt to disable the srchost rules by default
+(treating them as &#8220;allow connection from any source&#8221;). It is possible to
+re-enable these rules with <code class="docutils literal"><span class="pre">ipa_hbac_support_srchost</span> <span class="pre">=</span> <span class="pre">True</span></code> in
+<code class="docutils literal"><span class="pre">sssd.conf</span></code></p>
+</div>
+<div class="section" id="what-ldap-schema-should-i-use">
+<h3>What LDAP schema should I use?<a class="headerlink" href="#what-ldap-schema-should-i-use" title="Permalink to this headline">¶</a></h3>
+<p>The LDAP schema defines the set of default attribute names retreived on
+the server as well as meaning of some of the attributes, notably
+membership attributes. The two most widely used schemas are rfc2307 and
+rfc2307bis with rfc2307 being the default. When using the rfc2307
+schema, group members are listed by name in the <code class="docutils literal"><span class="pre">memberUid</span></code> attribute.
+When using the rfc2307bis schema, group members are listed by DN and
+stored in the <code class="docutils literal"><span class="pre">member</span></code> (or sometimes <code class="docutils literal"><span class="pre">uniqueMember</span></code>) attribute.</p>
+</div>
+<div class="section" id="how-do-i-configure-caching-of-sudo-rules-or-autofs-maps">
+<h3>How do I configure caching of sudo rules or autofs maps?<a class="headerlink" href="#how-do-i-configure-caching-of-sudo-rules-or-autofs-maps" title="Permalink to this headline">¶</a></h3>
+<p>The SSSD manual pages only contain reference documentation on the
+options provided. However, two blog posts are available that describe
+how to configure
+<a class="reference external" href="https://jhrozek.wordpress.com/2012/03/31/access-your-remote-sudo-rules-offline-with-sssd/">​sudo</a>
+and
+<a class="reference external" href="https://jhrozek.wordpress.com/2012/05/01/how-to-cache-automounter-maps-using-sssd/">​autofs</a>
+caching in a more tutorial-like form.</p>
+</div>
+<div class="section" id="why-do-some-users-appear-as-group-members-even-if-they-are-not">
+<h3>Why do some users appear as group members even if they are not?<a class="headerlink" href="#why-do-some-users-appear-as-group-members-even-if-they-are-not" title="Permalink to this headline">¶</a></h3>
+<p>Starting with SSSD 1.9.0, we took a different approach in how we store
+group members for performance reasons. While this new approach provides
+a notable performance boost, there are some situations when a user might
+be removed from a nested group but still show up as a member of a parent
+group.</p>
+<p>When group information is requested, the SSSD doesn&#8217;t download all the
+information about all members, but rather just downloads the list of
+user names and stores this list in the cache along with the group
+object. The list of members is returned from cache until the group
+object expires and is refreshed during an identity lookup such as
+invoking getent group from shell or calling getgrnam from a C program.</p>
+<p>On the other hand, the membership information is always refreshed during
+a login, so that access control always operates on the most recent set
+of data in order to avoid unauthorized access or denial of access.</p>
+</div>
+</div>
+<div class="section" id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="basics-of-troubleshooting">
+<h3>Basics of Troubleshooting<a class="headerlink" href="#basics-of-troubleshooting" title="Permalink to this headline">¶</a></h3>
+<p>When something is not working right, your first step should be to enable
+debug logging. You can do this in any section in the <code class="docutils literal"><span class="pre">sssd.conf</span></code> file
+by setting <code class="docutils literal"><span class="pre">debug_level</span> <span class="pre">=</span> <span class="pre">N</span></code> where N is a bitmask of log levels to
+display. At the time of this writing (SSSD 1.7.0), the usage of each of
+these levels is still a bit inconsistent, but we are standardizing on
+the following levels:</p>
+<p>For backwards-compatibility, the log levels zero through nine map to the
+above by including the specified level and lower.</p>
+</div>
+<div class="section" id="common-issues">
+<h3>Common Issues<a class="headerlink" href="#common-issues" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="i-don-t-see-any-groups-when-i-run-id-username">
+<h4>I don&#8217;t see any groups when I run &#8216;id username&#8217;<a class="headerlink" href="#i-don-t-see-any-groups-when-i-run-id-username" title="Permalink to this headline">¶</a></h4>
+</div>
+<div class="section" id="i-don-t-see-any-group-members-when-running-getent-group-groupname">
+<h4>I don&#8217;t see any group members when running &#8216;getent group groupname&#8217;<a class="headerlink" href="#i-don-t-see-any-group-members-when-running-getent-group-groupname" title="Permalink to this headline">¶</a></h4>
+<p>This may be due to an incorrect <code class="docutils literal"><span class="pre">ldap_schema</span></code> setting in the
+<code class="docutils literal"><span class="pre">[domain/DOMAINNAME]</span></code> section of sssd.conf.</p>
+<p>SSSD supports three LDAP schema types: RFC 2307, RFC 2307bis and IPA
+(the last being an extension of RFC 2307bis including memberOf
+backlinks).</p>
+<p>By default, SSSD will use the more common RFC 2307 schema. The
+difference between RFC 2307 and RFC 2307bis is the way which group
+membership is stored in the LDAP server. In an RFC 2307 server, group
+members are stored as the multi-valued attribute <code class="docutils literal"><span class="pre">memberuid</span></code> which
+contains the <em>name</em> of the users that are members. In an RFC2307bis
+server, group members are stored as the multi-valued attribute
+<code class="docutils literal"><span class="pre">member</span></code> (or sometimes <code class="docutils literal"><span class="pre">uniqueMember</span></code>) which contains the <em>DN</em> of
+the user or group that is a member of this group. RFC2307bis allows
+nested groups to be maintained as well.</p>
+<p>So the first thing to try when you hit this situation is to try setting
+<code class="docutils literal"><span class="pre">ldap_schema</span> <span class="pre">=</span> <span class="pre">rfc2307bis</span></code>, deleting
+<code class="docutils literal"><span class="pre">/var/lib/sss/db/cache_DOMAINNAME.ldb</span></code> and restarting SSSD. If that
+still doesn&#8217;t work, add <code class="docutils literal"><span class="pre">ldap_group_member</span> <span class="pre">=</span> <span class="pre">uniqueMember</span></code>, delete the
+cache and restart once more. If that still doesn&#8217;t work, it&#8217;s time to
+<a class="reference external" href="https://fedorahosted.org/sssd/newticket">​file a bug</a>.</p>
+<p>The recent glibc versions (Fedora 17 and later) also include a new NSS
+database <code class="docutils literal"><span class="pre">initgroups</span></code>, which defaults to <code class="docutils literal"><span class="pre">files</span></code> only. In order for
+initgroups to function correctly, you can either append the <code class="docutils literal"><span class="pre">sss</span></code>
+module in the same way as <code class="docutils literal"><span class="pre">passwd</span></code> and <code class="docutils literal"><span class="pre">group</span></code> databases or comment
+out the <code class="docutils literal"><span class="pre">initgroups</span></code> line completely. If your system configuration was
+generated by authconfig, the <code class="docutils literal"><span class="pre">initgroups</span></code> line is commented out by
+authconfig.</p>
+</div>
+<div class="section" id="authentication-fails-against-ldap">
+<h4>Authentication fails against LDAP<a class="headerlink" href="#authentication-fails-against-ldap" title="Permalink to this headline">¶</a></h4>
+<p>SSSD is stricter than pam_ldap. In order to perform an authentication,
+SSSD requires that the communication channel be encrypted. This means
+that if <code class="docutils literal"><span class="pre">sssd.conf</span></code> has <code class="docutils literal"><span class="pre">ldap_uri</span> <span class="pre">=</span> <span class="pre">ldap://&lt;server&gt;</span></code>, it will
+attempt to encrypt the communication channel with TLS (transport layer
+security). If <code class="docutils literal"><span class="pre">sssd.conf</span></code> has <code class="docutils literal"><span class="pre">ldap_uri</span> <span class="pre">=</span> <span class="pre">ldaps://&lt;server&gt;</span></code>, then
+SSL will be used instead of TLS. This requires that the LDAP server</p>
+<ol class="arabic simple">
+<li>Supports TLS or SSL</li>
+<li>Has TLS access enabled on the standard LDAP port (389) (or alternate
+port, if specified in the <code class="docutils literal"><span class="pre">ldap_uri</span></code> or has SSL access enabled on
+the standard LDAPS port (or alternate port).</li>
+<li>Has a valid certificate trust</li>
+</ol>
+<p>The first two of these requirements must be handled by the LDAP server
+administrator. Check with them that this is supported. If it is not,
+tell them to add it! (Or find out if there are alternate, secure
+authentication providers such as Kerberos available).</p>
+<p>This last requirement is the cause of most issues with authenticating
+against LDAP. If the client does not have proper trust of the LDAP
+server certificate, it will be unable to validate the connection, and
+SSSD will refuse to send the password. This is done because the LDAP
+protocol requires that the password is sent plaintext to the LDAP
+server. If the communication channel is not encrypted, it is trivial for
+any computer on the network(s) between the client and server to sniff
+the users&#8217; passwords. pam_ldap allowed such authentications to occur,
+but it was an inexcusable security breach.</p>
+<p>If the certificate is not trusted, a syslog message is written,
+indicating that TLS encryption could not be started, as well as any
+additional information provided by the openldap libraries.</p>
+<p>The first step to resolving this is to contact your LDAP server
+administrator to acquire a copy of the public CA certificate for the
+certificate authority used to sign the LDAP server certificate. This
+should be placed on the filesystem and a directive should be added to
+<code class="docutils literal"><span class="pre">sssd.conf</span></code> to locate it: <code class="docutils literal"><span class="pre">ldap_tls_cacert</span> <span class="pre">=</span> <span class="pre">/path/to/cacert</span></code></p>
+<p>If the LDAP server is self-signed (or for testing purposes while
+awaiting a response from the server administrator), the config option
+<code class="docutils literal"><span class="pre">ldap_tls_reqcert</span> <span class="pre">=</span> <span class="pre">never</span></code> can be added to the <code class="docutils literal"><span class="pre">sssd.conf</span></code>, which
+will tell SSSD to blindly trust the certificate provided by the LDAP
+server. <strong>This is a security risk</strong>. It is possible for an attacker to
+run a man-in-the-middle attack if your clients are not properly
+validating certificates against a CA. Do not set this option in
+production.</p>
+<p>If the logs aren&#8217;t helping, you can verify your configuration by taking
+the following steps: Verify that the services work when not called by
+SSSD.</p>
+<p>Using a LDAP server IP of 10.1.0.7 and a base of dc=example,dc=com, you
+could search using a simple anonymous bind and with mandatory TLS to
+confirm LDAP server connectivity using ldapsearch:</p>
+<p>If this fails with</p>
+<p>most likely you do not have a correct CA certificate available in the
+correct location.</p>
+<p>One other common certificate issue is with servers that have multiple
+hostnames. When connecting with SSL or TLS, the hostname used to connect
+must include the fully-qualified domain name specified by the
+certificate subject or subjectAltName. In most cases, this means that
+specifying an LDAP URI with a numeric IP address will fail to work with
+SSL/TLS.</p>
+</div>
+<div class="section" id="connection-to-ldap-servers-on-non-standard-ports-fail">
+<h4>Connection to LDAP servers on non-standard ports fail<a class="headerlink" href="#connection-to-ldap-servers-on-non-standard-ports-fail" title="Permalink to this headline">¶</a></h4>
+<p>On systems running SELinux in enforcing mode (such as Fedora, Red Hat
+Enterprise Linux and CentOS), you need to modify your client machine&#8217;s
+SELinux policy to allow contacting that port. For example, if you are
+communicating with an LDAP server running on port 1389, you would need
+to run the command (as root):</p>
+<p>This tells the SELinux policy that port 1389 is defined as an LDAP port
+(to which SSSD has access to talk). This would need to be done on each
+of your client machines (or coordinated with some tool like puppet).</p>
+</div>
+<div class="section" id="referral-chasing-seems-to-be-slowing-down-the-sssd">
+<h4>Referral chasing seems to be slowing down the SSSD<a class="headerlink" href="#referral-chasing-seems-to-be-slowing-down-the-sssd" title="Permalink to this headline">¶</a></h4>
+<p>There can be a performance penalty if the SSSD performs a large number
+of referral chasing operations. You can tell a referral rebind operation
+from the logs:</p>
+<p>Unless your environment requires the use of referrals, you can try
+setting the <code class="docutils literal"><span class="pre">ldap_referrals</span></code> options to <code class="docutils literal"><span class="pre">false</span></code> and restarting the
+SSSD. Some users have reported improved performance after turning the
+referral chasing off especially in the case of Microsoft Active
+Directory.</p>
+</div>
+</div>
+<div class="section" id="id1">
+<h3>Troubleshooting<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>There is a <a class="reference external" href="https://docs.pagure.org/sssd-test2/Troubleshooting.html">dedicated
+page</a> on the
+SSSD wiki that describes how to troubleshoot problems and how to submit
+a detailed bug report.</p>
+</div>
+<div class="section" id="getting-help">
+<h3>Getting help<a class="headerlink" href="#getting-help" title="Permalink to this headline">¶</a></h3>
+<p>SSSD has a dedicated <a class="reference external" href="https://fedorahosted.org/mailman/listinfo/sssd-users">​user support mailing
+list</a>.</p>
+<p>SSSD development discussions occur either on the <a class="reference external" href="https://fedorahosted.org/mailman/listinfo/sssd-devel">​SSSD development
+list</a> or on the
+<a class="reference external" href="irc://irc.freenode.net/sssd">​#sssd IRC channel</a> on
+<a class="reference external" href="http://freenode.net/">​freenode</a>.</p>
+</div>
+<div class="section" id="tracking-bugs-and-enhancement-requests">
+<h3>Tracking bugs and enhancement requests<a class="headerlink" href="#tracking-bugs-and-enhancement-requests" title="Permalink to this headline">¶</a></h3>
+<p>If you think you have found a bug or would like to file an enhancement
+request, create a <a class="reference external" href="https://fedorahosted.org/sssd/newticket">​new
+ticket</a> in the SSSD
+FedoraHosted Trac instance. Logging into the Trac instance requires a
+Fedora Account System login. To create one, use the <a class="reference external" href="https://admin.fedoraproject.org/accounts/">​FAS
+interface</a>.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Frequently Asked Questions</a><ul>
+<li><a class="reference internal" href="#what-is-the-system-security-services-daemon">What is the System Security Services Daemon?</a><ul>
+<li><a class="reference internal" href="#what-platforms-run-sssd">What platforms run SSSD?</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#what-branches-are-maintained-upstream-at-a-given-time">What branches are maintained upstream at a given time?</a></li>
+<li><a class="reference internal" href="#features">Features</a><ul>
+<li><a class="reference internal" href="#how-do-i-configure-sssd-to-talk-to-an-active-directory-server">How do I configure SSSD to talk to an Active Directory server?</a></li>
+<li><a class="reference internal" href="#when-should-i-enable-enumeration-in-sssd-or-why-is-enumeration-disabled-by-default">When should I enable enumeration in SSSD? or Why is enumeration disabled by default?</a></li>
+<li><a class="reference internal" href="#why-does-sssd-1-7-0-and-later-ignore-source-host-group-rules-in-hbac">Why does SSSD (1.7.0 and later) ignore source host[group] rules in HBAC?</a></li>
+<li><a class="reference internal" href="#what-ldap-schema-should-i-use">What LDAP schema should I use?</a></li>
+<li><a class="reference internal" href="#how-do-i-configure-caching-of-sudo-rules-or-autofs-maps">How do I configure caching of sudo rules or autofs maps?</a></li>
+<li><a class="reference internal" href="#why-do-some-users-appear-as-group-members-even-if-they-are-not">Why do some users appear as group members even if they are not?</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#troubleshooting">Troubleshooting</a><ul>
+<li><a class="reference internal" href="#basics-of-troubleshooting">Basics of Troubleshooting</a></li>
+<li><a class="reference internal" href="#common-issues">Common Issues</a><ul>
+<li><a class="reference internal" href="#i-don-t-see-any-groups-when-i-run-id-username">I don&#8217;t see any groups when I run &#8216;id username&#8217;</a></li>
+<li><a class="reference internal" href="#i-don-t-see-any-group-members-when-running-getent-group-groupname">I don&#8217;t see any group members when running &#8216;getent group groupname&#8217;</a></li>
+<li><a class="reference internal" href="#authentication-fails-against-ldap">Authentication fails against LDAP</a></li>
+<li><a class="reference internal" href="#connection-to-ldap-servers-on-non-standard-ports-fail">Connection to LDAP servers on non-standard ports fail</a></li>
+<li><a class="reference internal" href="#referral-chasing-seems-to-be-slowing-down-the-sssd">Referral chasing seems to be slowing down the SSSD</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id1">Troubleshooting</a></li>
+<li><a class="reference internal" href="#getting-help">Getting help</a></li>
+<li><a class="reference internal" href="#tracking-bugs-and-enhancement-requests">Tracking bugs and enhancement requests</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/FAQ.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/FAQ.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

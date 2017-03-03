@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>This is a bugfix release. No new features have been added. The most
+important bugs fixed include:</li>
+<li>Potential crash when one of two parallel requests would expire the
+list of servers resolved from a SRV query</li>
+<li>Fixed a crash that occured when a service was requested by both name
+and protocol</li>
+<li>A sudo rules refresh is only scheduled when the sudo service is
+actually configured.</li>
+<li>The evaluation of default SELinux rules was changed to match the IPA
+server expectations</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/1331">#1331</a></dt>
+<dd>Off-by-one error in sss_hmac_sha1</dd>
+<dt><a class="reference external" href="/sssd/ticket/1364">#1364</a></dt>
+<dd>[abrt] sssd-1.8.3-11.fc16: set_server_common_status: Process
+/usr/libexec/sssd/sssd_be was killed by signal 11 (SIGSEGV)</dd>
+<dt><a class="reference external" href="/sssd/ticket/1438">#1438</a></dt>
+<dd>SSSD crashes at boot time</dd>
+<dt><a class="reference external" href="/sssd/ticket/1452">#1452</a></dt>
+<dd>Authentication fails if kpasswd cannot be resolved</dd>
+<dt><a class="reference external" href="/sssd/ticket/1454">#1454</a></dt>
+<dd>if allocation fails, sss_mmap_cache_init may dereference NULL
+pointer</dd>
+<dt><a class="reference external" href="/sssd/ticket/1458">#1458</a></dt>
+<dd>Full sudo refresh is scheduled even if there is no sudo responder</dd>
+<dt><a class="reference external" href="/sssd/ticket/1466">#1466</a></dt>
+<dd>Proxy: Cannot retrieve an user after a group he is a member of was
+retrieved</dd>
+<dt><a class="reference external" href="/sssd/ticket/1467">#1467</a></dt>
+<dd>enumeration is broken in the proxy provider</dd>
+<dt><a class="reference external" href="/sssd/ticket/1479">#1479</a></dt>
+<dd>Hbac logs show wrong rule name granting access</dd>
+<dt><a class="reference external" href="/sssd/ticket/1486">#1486</a></dt>
+<dd>[abrt] sssd-1.8.4-14.fc17: sss_ldap_init_send: Process
+/usr/libexec/sssd/sssd_be was killed by signal 11 (SIGSEGV)</dd>
+<dt><a class="reference external" href="/sssd/ticket/1496">#1496</a></dt>
+<dd>[abrt] sssd-1.8.4-14.fc17: ldap_pvt_sasl_getmechs: Process
+/usr/libexec/sssd/sssd_be was killed by signal 11 (SIGSEGV)</dd>
+<dt><a class="reference external" href="/sssd/ticket/1505">#1505</a></dt>
+<dd>sudo with sss backend should use ipa_hostname</dd>
+<dt><a class="reference external" href="/sssd/ticket/1509">#1509</a></dt>
+<dd>libsss_sudo is not updated when yum update sssd is called</dd>
+<dt><a class="reference external" href="/sssd/ticket/1513">#1513</a></dt>
+<dd>Change the processing of the SELinux default map</dd>
+<dt><a class="reference external" href="/sssd/ticket/1515">#1515</a></dt>
+<dd>pam_sss report System Error on wrong password</dd>
+<dt><a class="reference external" href="/sssd/ticket/1516">#1516</a></dt>
+<dd>krb5_mod_ccname should cancel the transaction at one place only</dd>
+<dt><a class="reference external" href="/sssd/ticket/1519">#1519</a></dt>
+<dd>membership of IPA hostgroups is not evaluated when treating them as
+netgroups</dd>
+</dl>
+</div></div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Jakub Hrozek (12):</p>
+<ul class="simple">
+<li>Bumping version for the 1.9.0 beta 7 release</li>
+<li>libsss_sudo should have a versioned dependency on SSSD</li>
+<li>KRB5: cancel the sysdb transaction on one place only</li>
+<li>KRB5: Return PAM_AUTH_ERR on incorrect password</li>
+<li>RPM:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/BuildRequire.html">BuildRequire?</a>
+selinux-policy-targeted</li>
+<li>SYSDB: NULL-terminate the output of sysdb_get_{ranges,subdomains}</li>
+<li>KRB5: Add a missing string argument</li>
+<li>NSS: Fix off-by-one error in parse_getservbyname</li>
+<li>FO: Check server validity before setting status</li>
+<li>DB: Always write the SELinux object to sysdb</li>
+<li>SELinux: Always use the default if it exists on the server</li>
+<li>Updating the translations for the 1.9.0 RC1 release</li>
+</ul>
+<p>Ondrej Kos (1):</p>
+<ul class="simple">
+<li>Out-of-bounds read fix in hmac-sha-1</li>
+</ul>
+<p>Pavel Březina (3):</p>
+<ul class="simple">
+<li>netgroup: resolve hostgroup membership correctly</li>
+<li>be_process_init(): free ctx on error</li>
+<li>backend: initialize sudo only when it is enabled in services</li>
+</ul>
+<p>Simo Sorce (1):</p>
+<ul class="simple">
+<li>Remove obsolete comment</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.9.0rc1.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.9.0rc1.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

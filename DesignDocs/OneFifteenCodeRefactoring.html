@@ -1,0 +1,532 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Code refactoring for the 1.15 release &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="code-refactoring-for-the-1-15-release">
+<h1>Code refactoring for the 1.15 release<a class="headerlink" href="#code-refactoring-for-the-1-15-release" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li>please see inline</li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>SSSD is being very actively developed, adding several major features in
+each release. We need to make sure the code stays maintainable and
+adding new features in the upcoming release won&#8217;t increase the cost of
+maintaining SSSD long-term.</p>
+<p>Since SSSD releases are primarily being driven by Fedora and RHEL
+releases, the Red Hat employed developers have a fixed amount of time
+for code refactoring. Of course, community members and developers are
+free to submit their patches on their schedule &#8211; although discussion on
+the list would be needed prior to merging any refactoring to not disrupt
+SSSD release quality for everyone.</p>
+</div>
+<div class="section" id="use-cases">
+<h2>Use cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+<p>A typical use-case would be: &#8220;A feature X depends on module Y that
+either is missing some functionality that is missing or a module that
+has outlived its initial design. Changing Y in that module would allow
+us to implement X more easily or with less maintenance effort in the
+future&#8221;.</p>
+<p>The goal is to prepare the code for upcoming features without
+regressing, so testing after the refactoring is done is mandatory. We
+should consider also doing an upstream (pre)release to make it easier to
+test the changes.</p>
+</div>
+<div class="section" id="proposed-items-to-be-refactored">
+<h2>Proposed items to be refactored<a class="headerlink" href="#proposed-items-to-be-refactored" title="Permalink to this headline">¶</a></h2>
+<p>This section lists the proposed tickets along with justifications, scope
+and test impact.</p>
+<p>Given the fixed amount of time, each refactoring has a scope, expressed
+in just three high-level buckets - large (a couple of weeks, might take
+most of the time of the refactoring &#8220;sprint&#8221;), medium (a week to two
+weeks) or small (a couple of days, up to a week). Each item also lists
+the affected modules or functionality, so that we know where we need to
+improve tests.</p>
+<div class="section" id="use-the-shared-cache-req-module-for-responder-look-ups">
+<h3>Use the shared <code class="docutils literal"><span class="pre">cache_req</span></code> module for responder look-ups<a class="headerlink" href="#use-the-shared-cache-req-module-for-responder-look-ups" title="Permalink to this headline">¶</a></h3>
+<p>Currently each responder (except the InfoPipe responder and several
+parts of the NSS responder) copy the logic that checks the cache and
+contacts the Data Provider if needed. In 1.15, we should add the missing
+functionality into the cache_req module and convert the existing
+responders (especially those that look up users and groups, not
+necessarily other objects like autofs maps or hosts..) to cache_req.</p>
+<div class="section" id="benefit-to-sssd">
+<h4>Benefit to SSSD<a class="headerlink" href="#benefit-to-sssd" title="Permalink to this headline">¶</a></h4>
+<p>In 1.15, we should look at allowing lookups from trusted domain with a
+shortname. But we need to take performance into account and avoid
+cycling over all domains including their LDAP server. Then we could
+switch to checking the caches of all domains first before checking each
+domain&#8217;s cache and then its server.</p>
+<p>This goal is tracked by
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/843">​https://fedorahosted.org/sssd/ticket/843</a>
+(Login time increases strongly if more than one domain is configured)
+and ultimately by
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/3001">​https://fedorahosted.org/sssd/ticket/3001</a>
+([RFE] Short name input format with SSSD for users from all domains when
+domain autodiscovery is used).</p>
+</div>
+<div class="section" id="tracking-tickets">
+<h4>Tracking tickets<a class="headerlink" href="#tracking-tickets" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/3151">​https://fedorahosted.org/sssd/ticket/3151</a>
+- cache_req: complete the needs of NSS responders</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1126">​https://fedorahosted.org/sssd/ticket/1126</a>
+- Reuse cache_req() in responder code</li>
+</ul>
+</div>
+<div class="section" id="testing">
+<h4>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h4>
+<p>We already have NSS and PAM responder tests. We need to extend them
+further to make sure all codepaths we change are tested.</p>
+</div>
+<div class="section" id="scope">
+<h4>Scope<a class="headerlink" href="#scope" title="Permalink to this headline">¶</a></h4>
+<p>Large</p>
+</div>
+</div>
+<div class="section" id="refactor-group-lookups-for-better-performance">
+<h3>Refactor group lookups for better performance<a class="headerlink" href="#refactor-group-lookups-for-better-performance" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">sdap_async_groups.c</span></code> module grew organically over time. At the
+moment, the module is quite hard to read and repeats some potentially
+expensive operations (like looping over all attributes or all members)
+several times.</p>
+<p>In order to improve performance, we should refactor this module and test
+it extensively.</p>
+<div class="section" id="id1">
+<h4>Benefit to SSSD<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal"><span class="pre">sdap_async_groups.c</span></code> module would be better maintainable and we
+would remove some performance bottlenecks from the code.</p>
+</div>
+<div class="section" id="id2">
+<h4>Tracking tickets<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/3211">​https://fedorahosted.org/sssd/ticket/3211</a>
+- Refactor the sdap_async_groups.c module</li>
+</ul>
+</div>
+<div class="section" id="id3">
+<h4>Testing<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<p>LDAP group lookups can be tested using integration tests, &#8220;just&#8221; all
+cases we change must have corresponding test cases.</p>
+</div>
+<div class="section" id="id4">
+<h4>Scope<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<p>Medium</p>
+</div>
+</div>
+<div class="section" id="refactor-the-sdap-id-ops-c-module">
+<h3>Refactor the sdap_id_ops.c module<a class="headerlink" href="#refactor-the-sdap-id-ops-c-module" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">sdap_id_ops.c</span></code> module was written in time where SSSD only
+supported a single domain. One of the things that are repeatedly biting
+us is that the module can set the fail over status of the whole domain
+to offline. Moreover, the module has no tests and is not easy to read.</p>
+<p>At this time, it&#8217;s not clear whether the refactoring would just result
+in documenting and testing the module or if it would be worth for
+example making the module return error codes for connection errors and
+let the caller handle the errors. Alternatively, we might decide to do
+even more work and let the fail over code work per-domain, not per-back
+end, which probably wouldn&#8217;t be doable in the given scope. More research
+is needed.</p>
+<div class="section" id="id5">
+<h4>Benefit to SSSD<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<p>The module would be better maintainable (currently there are some
+codepaths where we even don&#8217;t know why they were added anymore..), have
+tests and we would work towards removing issues with trusted domains
+setting SSSD to the offline mode.</p>
+</div>
+<div class="section" id="id6">
+<h4>Tracking tickets<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1507">​https://fedorahosted.org/sssd/ticket/1507</a>
+- Investigate terminating connections in sdap_ops.c and comment the
+code some more</li>
+</ul>
+<p>Other related tickets include:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2767">​https://fedorahosted.org/sssd/ticket/2767</a>
+- The sdap_op code always ends request with EAGAIN</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2976">​https://fedorahosted.org/sssd/ticket/2976</a>
+- sdap code can mark the whole sssd_be offline</li>
+</ul>
+</div>
+<div class="section" id="id7">
+<h4>Testing<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h4>
+<p>Currently upstream has only basic tests with the integration tests.
+Downstream has tests for fail over as well.</p>
+</div>
+<div class="section" id="id8">
+<h4>Scope<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h4>
+<p>Medium to large, depending on what changes we decide to do.</p>
+</div>
+</div>
+<div class="section" id="provide-a-way-to-pass-intermediate-data-between-requests">
+<h3>Provide a way to pass intermediate data between requests<a class="headerlink" href="#provide-a-way-to-pass-intermediate-data-between-requests" title="Permalink to this headline">¶</a></h3>
+<p>As long as a request is confined within a single domain, we can pass
+around <code class="docutils literal"><span class="pre">sysdb_attrs</span></code> or a similar data structure between different
+requests and avoid a costly cache writes. However, when a request must
+include processing in two different domain types, for example an IPA
+domain that includes overrides, the only way to pass intermediate data
+is to call a sysdb transaction and save the data to cache so that
+another request can read them.</p>
+<div class="section" id="id9">
+<h4>Benefit to SSSD<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h4>
+<p>Performance benefit in case SSSD must call identity lookup requests from
+different domains.</p>
+</div>
+<div class="section" id="id10">
+<h4>Tracking tickets<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2943">​https://fedorahosted.org/sssd/ticket/2943</a>
+- Split out the requests for IPA users and groups that include
+overrides into reusable requests</li>
+</ul>
+</div>
+<div class="section" id="id11">
+<h4>Testing<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h4>
+<p>Unfortunately, there are no upstream tests for requests that include
+overrides. Testing would be provided by downstream tests.</p>
+</div>
+<div class="section" id="id12">
+<h4>Scope<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h4>
+<p>Medium to large</p>
+</div>
+</div>
+<div class="section" id="upstream-the-poc-tests-that-utilize-samba-ad-for-ad-provider-testing">
+<h3>Upstream the PoC tests that utilize Samba AD for AD provider testing<a class="headerlink" href="#upstream-the-poc-tests-that-utilize-samba-ad-for-ad-provider-testing" title="Permalink to this headline">¶</a></h3>
+<p>At the moment, we don&#8217;t have any upstream tests for the AD provider and
+we rely on downstream and manual testing completely. Nikolai Kondrashov
+wrote a proof-of-concept patches that provisions an AD DC server
+provided by the Samba project using the cwrap wrapper libraries. The
+scope of this effort would be to upstream this work.</p>
+<div class="section" id="id13">
+<h4>Benefit to SSSD<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h4>
+<p>SSSD integration tests would allow us to write tests for the AD
+provider.</p>
+</div>
+<div class="section" id="id14">
+<h4>Tracking tickets<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2818">​https://fedorahosted.org/sssd/ticket/2818</a>
+- Investigate if Samba4 in Fedora can be used for SSSD CI</li>
+</ul>
+</div>
+<div class="section" id="id15">
+<h4>Testing<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h4>
+<p>Some basic tests like looking up a user or a group would be part of this
+effort.</p>
+</div>
+<div class="section" id="id16">
+<h4>Scope<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h4>
+<p>Medium</p>
+</div>
+</div>
+<div class="section" id="decrease-the-functionality-of-the-monitor-process">
+<h3>Decrease the functionality of the monitor process<a class="headerlink" href="#decrease-the-functionality-of-the-monitor-process" title="Permalink to this headline">¶</a></h3>
+<p>SSSD is gradually moving to socket-activated services and in general
+more self-contained services rather than implementing a service manager
+in the monitor process. The scope of this work would be to further
+decrease the dependence of services on the monitor process, such as
+moving the register functionality to the services themselves.
+Ultimately, the monitor process would perform one-time tasks such as
+converting the configuration from INI to confdb and exit.</p>
+<p>Other work might include a fallback configuration or starting the
+services and domains even without having them explicitly enumerated in
+the services section.</p>
+<div class="section" id="id17">
+<h4>Benefit to SSSD<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h4>
+<p>Socket-activatable services would be better manageable by SSSD.</p>
+</div>
+<div class="section" id="id18">
+<h4>Tracking tickets<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2231">​https://fedorahosted.org/sssd/ticket/2231</a>
+- RFE: Drop the monitor process</li>
+</ul>
+</div>
+<div class="section" id="id19">
+<h4>Testing<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h4>
+<p>There are no upstream test for this functionality at the moment. Some
+service restart tests exist in downstream, though.</p>
+</div>
+<div class="section" id="id20">
+<h4>Scope<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h4>
+<p>Medium to large, but hopefully this task could be split into several
+smaller tasks.</p>
+</div>
+</div>
+<div class="section" id="memory-cache-changes">
+<h3>Memory cache changes<a class="headerlink" href="#memory-cache-changes" title="Permalink to this headline">¶</a></h3>
+<p>There are several improvements to the memory cache that we have been
+discussing lately, including a memory cache for by-SID lookups or having
+the memory cache respect case insensitive domains. The goal of this task
+would be to investigate what needs to be changed in the memory cache in
+order to implement these improvements.</p>
+<div class="section" id="id21">
+<h4>Benefit to SSSD<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h4>
+<p>Better performance through leveraging memory cache for SID lookups and
+lookups in case insensitive domains.</p>
+</div>
+<div class="section" id="id22">
+<h4>Tracking tickets<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/3193">​https://fedorahosted.org/sssd/ticket/3193</a>
+- [RFE] Support aliases in the memory cache</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2727">​https://fedorahosted.org/sssd/ticket/2727</a>
+- Add a memcache for SID-by-id lookups</li>
+</ul>
+</div>
+<div class="section" id="id23">
+<h4>Testing<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h4>
+<p>We already have tests for memory cache which could be extended. Tests
+for by-SID lookups would probably require us to add the Samba-based
+tests first.</p>
+</div>
+<div class="section" id="id24">
+<h4>Scope<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h4>
+<p>Probably large, but more investigation is needed.</p>
+</div>
+</div>
+<div class="section" id="sbus-api-improvements">
+<h3>SBUS API Improvements<a class="headerlink" href="#sbus-api-improvements" title="Permalink to this headline">¶</a></h3>
+<p>Our internal d-bus interface got a lot of new functionality to properly
+support D-Bus on public level. The
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InfoPipe.html">InfoPipe?</a>
+responder has grown and also our internal communication between
+responders and providers has become more advanced.</p>
+<p>The more we use it, the more it seems that the API that takes care of
+managing/terminating/error sbus requests is not optimal, since it
+requires a lot of glue code and often requires several output places and
+return code.</p>
+<p>We should base sbus handlers on tevent to make sure there is only one
+output place and return code (when tevent request finishes) and we
+should also improve and simplify API that is used by handlers.</p>
+<div class="section" id="id25">
+<h4>Benefit to SSSD<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h4>
+<p>SSSD depends on D-Bus (and thus on sbus) more and more and we will keep
+adding new functionality. Reducing the amount of code that needs to be
+added and simplified logic will helps us to develop more stable code
+more quickly.</p>
+</div>
+<div class="section" id="id26">
+<h4>Tracking tickets<a class="headerlink" href="#id26" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>none currently</li>
+</ul>
+</div>
+<div class="section" id="id27">
+<h4>Testing<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h4>
+<p>Sbus is currently heavily tested. We may want to add new tests for
+new/changed API.</p>
+</div>
+<div class="section" id="id28">
+<h4>Scope<a class="headerlink" href="#id28" title="Permalink to this headline">¶</a></h4>
+<p>Small.</p>
+</div>
+</div>
+<div class="section" id="failover-refactoring">
+<h3>Failover refactoring<a class="headerlink" href="#failover-refactoring" title="Permalink to this headline">¶</a></h3>
+<p>Failover mechanism wasn&#8217;t prepared for subdomains and we run into
+troubles every now and then. We added several workarounds for cases
+where the original code wasn&#8217;t sufficient but it made the code just more
+confused. At this moment nobody understands it but bugs keeps comming.</p>
+<p>We should have a separate failover context for each domain, instead of
+one per whole backend. It must be possible to set different srv
+mechanism for each context. DNS resolver and cache should be shared
+between contexts.</p>
+<div class="section" id="id29">
+<h4>Benefit to SSSD<a class="headerlink" href="#id29" title="Permalink to this headline">¶</a></h4>
+<p>We remove old and problematic code that knowbody understands. We can
+improve site discovery for trusted domains and we can have better
+control over subdomain server resolution.</p>
+</div>
+<div class="section" id="id30">
+<h4>Tracking tickets<a class="headerlink" href="#id30" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2393">​https://fedorahosted.org/sssd/ticket/2393</a></li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2394">​https://fedorahosted.org/sssd/ticket/2394</a></li>
+</ul>
+</div>
+<div class="section" id="id31">
+<h4>Testing<a class="headerlink" href="#id31" title="Permalink to this headline">¶</a></h4>
+<p>Downstream tests should remain functional, but upstream test will become
+invalid.</p>
+</div>
+<div class="section" id="id32">
+<h4>Scope<a class="headerlink" href="#id32" title="Permalink to this headline">¶</a></h4>
+<p>Probably out of four week scope.</p>
+</div>
+</div>
+</div>
+<div class="section" id="how-to-test">
+<h2>How To Test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<p>Run all available upstream and downstream tests, if possible, extend the
+upstream tests.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Code refactoring for the 1.15 release</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem statement</a></li>
+<li><a class="reference internal" href="#use-cases">Use cases</a></li>
+<li><a class="reference internal" href="#proposed-items-to-be-refactored">Proposed items to be refactored</a><ul>
+<li><a class="reference internal" href="#use-the-shared-cache-req-module-for-responder-look-ups">Use the shared <code class="docutils literal"><span class="pre">cache_req</span></code> module for responder look-ups</a><ul>
+<li><a class="reference internal" href="#benefit-to-sssd">Benefit to SSSD</a></li>
+<li><a class="reference internal" href="#tracking-tickets">Tracking tickets</a></li>
+<li><a class="reference internal" href="#testing">Testing</a></li>
+<li><a class="reference internal" href="#scope">Scope</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#refactor-group-lookups-for-better-performance">Refactor group lookups for better performance</a><ul>
+<li><a class="reference internal" href="#id1">Benefit to SSSD</a></li>
+<li><a class="reference internal" href="#id2">Tracking tickets</a></li>
+<li><a class="reference internal" href="#id3">Testing</a></li>
+<li><a class="reference internal" href="#id4">Scope</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#refactor-the-sdap-id-ops-c-module">Refactor the sdap_id_ops.c module</a><ul>
+<li><a class="reference internal" href="#id5">Benefit to SSSD</a></li>
+<li><a class="reference internal" href="#id6">Tracking tickets</a></li>
+<li><a class="reference internal" href="#id7">Testing</a></li>
+<li><a class="reference internal" href="#id8">Scope</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#provide-a-way-to-pass-intermediate-data-between-requests">Provide a way to pass intermediate data between requests</a><ul>
+<li><a class="reference internal" href="#id9">Benefit to SSSD</a></li>
+<li><a class="reference internal" href="#id10">Tracking tickets</a></li>
+<li><a class="reference internal" href="#id11">Testing</a></li>
+<li><a class="reference internal" href="#id12">Scope</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#upstream-the-poc-tests-that-utilize-samba-ad-for-ad-provider-testing">Upstream the PoC tests that utilize Samba AD for AD provider testing</a><ul>
+<li><a class="reference internal" href="#id13">Benefit to SSSD</a></li>
+<li><a class="reference internal" href="#id14">Tracking tickets</a></li>
+<li><a class="reference internal" href="#id15">Testing</a></li>
+<li><a class="reference internal" href="#id16">Scope</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#decrease-the-functionality-of-the-monitor-process">Decrease the functionality of the monitor process</a><ul>
+<li><a class="reference internal" href="#id17">Benefit to SSSD</a></li>
+<li><a class="reference internal" href="#id18">Tracking tickets</a></li>
+<li><a class="reference internal" href="#id19">Testing</a></li>
+<li><a class="reference internal" href="#id20">Scope</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#memory-cache-changes">Memory cache changes</a><ul>
+<li><a class="reference internal" href="#id21">Benefit to SSSD</a></li>
+<li><a class="reference internal" href="#id22">Tracking tickets</a></li>
+<li><a class="reference internal" href="#id23">Testing</a></li>
+<li><a class="reference internal" href="#id24">Scope</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sbus-api-improvements">SBUS API Improvements</a><ul>
+<li><a class="reference internal" href="#id25">Benefit to SSSD</a></li>
+<li><a class="reference internal" href="#id26">Tracking tickets</a></li>
+<li><a class="reference internal" href="#id27">Testing</a></li>
+<li><a class="reference internal" href="#id28">Scope</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#failover-refactoring">Failover refactoring</a><ul>
+<li><a class="reference internal" href="#id29">Benefit to SSSD</a></li>
+<li><a class="reference internal" href="#id30">Tracking tickets</a></li>
+<li><a class="reference internal" href="#id31">Testing</a></li>
+<li><a class="reference internal" href="#id32">Scope</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-test">How To Test</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/OneFifteenCodeRefactoring.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/OneFifteenCodeRefactoring.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

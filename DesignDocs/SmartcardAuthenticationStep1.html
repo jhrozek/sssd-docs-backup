@@ -1,0 +1,299 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Smartcard authentication - Step 1 (local authentication) &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="smartcard-authentication-step-1-local-authentication">
+<h1>Smartcard authentication - Step 1 (local authentication)<a class="headerlink" href="#smartcard-authentication-step-1-local-authentication" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/546">​https://fedorahosted.org/sssd/ticket/546</a></li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2711">​https://fedorahosted.org/sssd/ticket/2711</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>Smartcard based authentication is another alternative to password based
+authentication. Other than OTP tokens where all authentication data can
+be entered at a password prompt Smartcards require special hardware and
+software to access the credentials stored on the card.</p>
+<p>Currently solutions are based on the pam_pkcs11 module which e.g.
+requires special configuration to map the certificate stored on a
+Smartcard to a user. Since SSSD already can map certificates to users
+(see e.g.
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/LookupUsersByCertificate.html">LookupUsersByCertificate?</a>)
+integration would be much easier. Additionally features like different
+authentication types per user or per service would only be possible with
+SSSD.</p>
+</div>
+<div class="section" id="use-cases">
+<h2>Use cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="local-authentication">
+<h3>Local authentication<a class="headerlink" href="#local-authentication" title="Permalink to this headline">¶</a></h3>
+<p>If there is a Smartcard reader connected to a system the user can
+authenticate to the system by placing his smartcard into the reader,
+give his name (might not be needed in some cases) and the Smartcard PIN
+at the login prompt and is authenticated successfully if the certificate
+on the Smartcard is valid and satisfies other, configurable criteria.
+This includes authentication at a text or graphical console but local
+services like <em>su</em> and <em>sudo</em> as well.</p>
+</div>
+<div class="section" id="remote-authentication-with-ssh">
+<h3>Remote authentication with ssh<a class="headerlink" href="#remote-authentication-with-ssh" title="Permalink to this headline">¶</a></h3>
+<p>To avoid password authentication ssh supports public-private key based
+authentication from the beginning. Since the certificates on the
+Smartcard are stored together with the PIN protected private key this
+key material can be used for ssh authentication as well. On the client
+side a ssh client program is needed which is able to access the
+Smartcard. On the server side only the public key from the certificate
+is needed in a suitable format for ssh. With the help of the
+<em>sss_ssh_authorized_keys</em> utility SSSD can make this information
+available to the sshd running on the server if the certificate is stored
+together with the other user data in a central storage, e.g. LDAP.</p>
+</div>
+</div>
+<div class="section" id="overview-of-the-solution">
+<h2>Overview of the solution<a class="headerlink" href="#overview-of-the-solution" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="configuration-changes">
+<h2>Configuration changes<a class="headerlink" href="#configuration-changes" title="Permalink to this headline">¶</a></h2>
+<p>To enable certificate based authentication in SSSD <em>pam_cert_auth</em>
+must be set to <em>True</em> in the <em>[pam]</em> section of <em>sssd.conf</em>.</p>
+<p>Additional option to tune e.g. the certificate validation will be added
+later.</p>
+</div>
+<div class="section" id="how-to-test">
+<h2>How to test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<p>In the following it is assumed that SSSD is running on an IPA client.</p>
+<div class="section" id="hardware-reader-and-card">
+<h3>Hardware reader and card<a class="headerlink" href="#hardware-reader-and-card" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="configuring-ipa-client-for-local-authentication-with-a-smartcard">
+<h4>Configuring IPA client for local authentication with a Smartcard<a class="headerlink" href="#configuring-ipa-client-for-local-authentication-with-a-smartcard" title="Permalink to this headline">¶</a></h4>
+<p>The most easy way to test is with a Smartcard reader and a Smartcard. If
+the Smartcard reader is supported by the <em>coolkey</em> package the needed
+PKCS<a class="reference external" href="https://fedorahosted.org/sssd/ticket/11">#11</a> modules is
+already added to the central NSS database at /etc/pki/nssdb during the
+installation of the package. In case a different
+PKCS<a class="reference external" href="https://fedorahosted.org/sssd/ticket/11">#11</a> module is needed
+it can be added with modutil</p>
+<p>(if the PKCS<a class="reference external" href="https://fedorahosted.org/sssd/ticket/11">#11</a> modules
+in not in the default library search path and full path is needed).</p>
+<p>Now <em>certutil</em> should ask for a PIN and show your certificate, if the
+reader is connected and the card is in</p>
+<p>Most probably the certificate on the card is currently not assigned to
+an IPA user. To do this the certificate can be extracted with</p>
+<p>which will dump the PEM encoded certificate. Since the <em>ipa</em> utility
+expected the base64 string from the PEM encoding in a single line</p>
+<p>will dump it in a single line. Now <em>ipa user-mod username
+&#8211;certificate=MIIE......</em> can be used to load the certificate into the
+user entry. Please note that the &#8211;certificate option is only available
+with FreeIPA 4.2 or later.</p>
+<p>If <em>pam_cert_auth = True</em> in the <em>[pam]</em> section of <em>sssd.conf</em>, the
+card is inserted in the reader and the certificate loaded in the user
+entry e.g. the console login prompt should now ask for a PIN instead of
+a password and if the correct PIN is entered the user should be
+successfully authenticated and logged in.</p>
+</div>
+<div class="section" id="runnning-a-ssh-client-with-smartcard-support">
+<h4>Runnning a ssh client with Smartcard support<a class="headerlink" href="#runnning-a-ssh-client-with-smartcard-support" title="Permalink to this headline">¶</a></h4>
+<p>The <em>ssh</em> client program distributed with Fedora or RHEL contains
+patches which add Smartcard support to the utility. To activate it the
+needed PKCS<a class="reference external" href="https://fedorahosted.org/sssd/ticket/11">#11</a> module to
+talk to the Smartcard reader has to be made available with the <em>-I</em>
+option</p>
+<p>where the certificate has to be added to the IPA user entry as described
+above.</p>
+</div>
+</div>
+<div class="section" id="software-certificates-with-libsoftokn3-so">
+<h3>Software certificates with libsoftokn3.so<a class="headerlink" href="#software-certificates-with-libsoftokn3-so" title="Permalink to this headline">¶</a></h3>
+<p>First a certificate together with the private key is needed.
+Instructions how to create certificates with FreeIPA can e.g. be found
+at
+<a class="reference external" href="http://www.freeipa.org/page/PKI">​http://www.freeipa.org/page/PKI</a>.
+Please store the certificate in a NSS database. Since in this this first
+step the user is looked up with the help of the full certificate any
+certificate valid for client authentication can be used. This means
+instead of creating a new one an existing certificate can be used.
+<strong>Please do this only in test environment which will be discarded
+afterwards. Copying certificates from a production environment is a
+security breach.</strong></p>
+<div class="section" id="id1">
+<h4>Configuring IPA client for local authentication with a Smartcard<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<p>Like in the case with a hardware reader a
+PKCS<a class="reference external" href="https://fedorahosted.org/sssd/ticket/11">#11</a> module to access
+the certificate in the NSS DB must be added to the systems NSS DB in
+/etc/pki/nssdb. The
+PKCS<a class="reference external" href="https://fedorahosted.org/sssd/ticket/11">#11</a> module for
+accessing certificates and private keys in a NSS database is
+<em>libsoftokn3.so</em>. But unfortunately this module needs some configuration
+option when loaded. Although I guess <em>modutil</em> should work as well I was
+only able to add the needed parameters with <em>pk11install</em> from the
+coolkey package. In the following we assume that the certificate and the
+private key is stored in an NSS DB called <em>my_cert</em> in the home
+directory of the user.</p>
+<p>If <em>pam_cert_auth = True</em> in the <em>[pam]</em> section of <em>sssd.conf</em>, and
+the certificate loaded in the user entry e.g. the console login prompt
+should now ask for a PIN instead of a password and if the correct PIN is
+entered the user should be successfully authenticated and logged in.</p>
+</div>
+<div class="section" id="running-ssh-client-with-smartcard-support">
+<h4>Running ssh client with Smartcard support<a class="headerlink" href="#running-ssh-client-with-smartcard-support" title="Permalink to this headline">¶</a></h4>
+<p>The PKCS<a class="reference external" href="https://fedorahosted.org/sssd/ticket/11">#11</a> module for
+accessing certificates and private keys in a NSS database is
+<em>libsoftokn3.so</em>. But unfortunately this modules needs some
+configuration option when loaded and there is (afaik) currently no way
+to pass them with the <em>ssh</em> command. Luckily there is p11-kit which can
+be used to load <em>libsoftokn3.so</em> with options. In the following we
+assume that the certificate and the private key is stored in an NSS DB
+call <em>my_cert</em> in the home directory of the user.</p>
+<p>To configure p11-kit make sure <em>~/.config/pkcs11</em> and
+<em>~/.config/pkcs11/modules</em> exists and create the following two files:</p>
+<p>On 64bit systems you have to use <em>/usr/lib64/libsoftokn3.so</em>.</p>
+<p>Now <em>ssh</em> can be called with <em>/usr/lib/p11-kit-proxy.so</em> (or the 64bit
+version)</p>
+</div>
+</div>
+<div class="section" id="software-certificates-with-libsofthsm2-so">
+<h3>Software certificates with libsofthsm2.so<a class="headerlink" href="#software-certificates-with-libsofthsm2-so" title="Permalink to this headline">¶</a></h3>
+<p>Since the <em>libsoftokn3.so</em>
+PKCS<a class="reference external" href="https://fedorahosted.org/sssd/ticket/11">#11</a> module requires
+additional configuration which most consumers like the <em>ssh</em> client (see
+above) or <em>kinit</em> do not support and the workaround with
+<em>p11-kit-proxy.so</em> might not always be possible the following section
+will show how the <em>libsofthsm2.so</em>
+PKCS<a class="reference external" href="https://fedorahosted.org/sssd/ticket/11">#11</a> module from the
+<a class="reference external" href="http://www.opendnssec.org/">​OpenDNSSEC</a> project can be used. As
+above we assume that the certificate and the corresponding private key
+are available.</p>
+</div>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Sumit Bose &lt;<a class="reference external" href="mailto:sbose&#37;&#52;&#48;redhat&#46;com">​sbose<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Smartcard authentication - Step 1 (local authentication)</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem statement</a></li>
+<li><a class="reference internal" href="#use-cases">Use cases</a><ul>
+<li><a class="reference internal" href="#local-authentication">Local authentication</a></li>
+<li><a class="reference internal" href="#remote-authentication-with-ssh">Remote authentication with ssh</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#overview-of-the-solution">Overview of the solution</a></li>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a></li>
+<li><a class="reference internal" href="#configuration-changes">Configuration changes</a></li>
+<li><a class="reference internal" href="#how-to-test">How to test</a><ul>
+<li><a class="reference internal" href="#hardware-reader-and-card">Hardware reader and card</a><ul>
+<li><a class="reference internal" href="#configuring-ipa-client-for-local-authentication-with-a-smartcard">Configuring IPA client for local authentication with a Smartcard</a></li>
+<li><a class="reference internal" href="#runnning-a-ssh-client-with-smartcard-support">Runnning a ssh client with Smartcard support</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#software-certificates-with-libsoftokn3-so">Software certificates with libsoftokn3.so</a><ul>
+<li><a class="reference internal" href="#id1">Configuring IPA client for local authentication with a Smartcard</a></li>
+<li><a class="reference internal" href="#running-ssh-client-with-smartcard-support">Running ssh client with Smartcard support</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#software-certificates-with-libsofthsm2-so">Software certificates with libsofthsm2.so</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/SmartcardAuthenticationStep1.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/SmartcardAuthenticationStep1.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

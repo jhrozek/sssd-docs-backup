@@ -1,0 +1,422 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Trac plugins &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="trac-plugins">
+<h1>Trac plugins<a class="headerlink" href="#trac-plugins" title="Permalink to this headline">¶</a></h1>
+<div class="system-message"><p><strong>Error: Macro TracGuideToc(None) failed</strong></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;NoneType&#39;</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span> <span class="s1">&#39;find&#39;</span>
+</pre></div>
+</div>
+</div><p>From version 0.9 onwards, Trac is extensible with
+<a class="reference external" href="http://trac.edgewall.org/intertrac/PluginList">​plugins</a>. Plugin
+functionality is based on the <a class="reference external" href="http://trac.edgewall.org/intertrac/TracDev/ComponentArchitecture">​component
+architecture</a>,
+with peculiarities described in the <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracDev/PluginDevelopment.html">plugin
+development?</a>
+page.</p>
+<div class="section" id="plugin-discovery">
+<h2>Plugin discovery<a class="headerlink" href="#plugin-discovery" title="Permalink to this headline">¶</a></h2>
+<p>From the user&#8217;s point of view, a plugin is either a standalone .py file
+or an .egg package. Trac looks for plugins in the global shared plugins
+directory (see <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#GlobalConfiguration">Global
+Configuration</a>)
+and in the <code class="docutils literal"><span class="pre">plugins</span></code> directory of the local
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracEnvironment.html">TracEnvironment</a>.
+Components defined in globally-installed plugins should be explicitly
+enabled in the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#components-section">[components]</a>
+section of the trac.ini file.</p>
+</div>
+<div class="section" id="requirements-for-trac-eggs">
+<h2>Requirements for Trac eggs<a class="headerlink" href="#requirements-for-trac-eggs" title="Permalink to this headline">¶</a></h2>
+<p>To use egg-based plugins in Trac, you need to have
+<a class="reference external" href="http://peak.telecommunity.com/DevCenter/setuptools">​setuptools</a>
+(version 0.6) installed.</p>
+<p>To install <code class="docutils literal"><span class="pre">setuptools</span></code>, download the bootstrap module
+<a class="reference external" href="http://peak.telecommunity.com/dist/ez_setup.py">​ez_setup.py</a> and
+execute it as follows:</p>
+<p>If the <code class="docutils literal"><span class="pre">ez_setup.py</span></code> script fails to install the setuptools release,
+you can download it from
+<a class="reference external" href="http://www.python.org/pypi/setuptools">​PyPI</a> and install it
+manually.</p>
+<p>Plugins can also consist of a single <code class="docutils literal"><span class="pre">.py</span></code> file dropped directly into
+either the project&#8217;s or the shared <code class="docutils literal"><span class="pre">plugins</span></code> directory.</p>
+</div>
+<div class="section" id="installing-a-trac-plugin">
+<h2>Installing a Trac plugin<a class="headerlink" href="#installing-a-trac-plugin" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="for-a-single-project">
+<h3>For a single project<a class="headerlink" href="#for-a-single-project" title="Permalink to this headline">¶</a></h3>
+<p>Plugins are typically packaged as <a class="reference external" href="http://peak.telecommunity.com/DevCenter/PythonEggs">​Python
+eggs</a>. That means
+they are .zip archives with the file extension <code class="docutils literal"><span class="pre">.egg</span></code>.</p>
+<p>If you have downloaded a source distribution of a plugin, and want to
+build the <code class="docutils literal"><span class="pre">.egg</span></code> file:</p>
+<ul class="simple">
+<li>Unpack the source. It should provide <code class="docutils literal"><span class="pre">setup.py</span></code>.</li>
+<li>Run:</li>
+</ul>
+<p>You should have a *.egg file. Examine the output of running python to
+find where this was created.</p>
+<p>Once you have the plugin archive, copy it into the <code class="docutils literal"><span class="pre">plugins</span></code> directory
+of the <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracEnvironment.html">project
+environment</a>.
+Also, make sure that the web server has sufficient permissions to read
+the plugin egg. Then restart the web server. If you are running as a
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracStandalone.html">&#8220;tracd&#8221; standalone
+server</a>,
+restart tracd (kill and run again).</p>
+<p>To uninstall a plugin installed this way, remove the egg from the
+<code class="docutils literal"><span class="pre">plugins</span></code> directory and restart the web server.</p>
+<p>Note: the Python version that the egg is built with <em>must</em> match the
+Python version with which Trac is run. For example, if you&#8217;re running
+Trac under Python 2.5, but have upgraded your standalone Python to 2.6,
+the eggs won&#8217;t be recognized.</p>
+<p>Note also: in a multi-project setup, a pool of Python interpreter
+instances will be dynamically allocated to projects based on need; since
+plugins occupy a place in Python&#8217;s module system, the first version of
+any given plugin to be loaded will be used for all projects. In other
+words, you cannot use different versions of a single plugin in two
+projects of a multi-project setup. It may be safer to install plugins
+for all projects (see below), and then enable them selectively on a
+project-by-project basis.</p>
+</div>
+<div class="section" id="for-all-projects">
+<h3>For all projects<a class="headerlink" href="#for-all-projects" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="with-an-egg-file">
+<h4>With an .egg file<a class="headerlink" href="#with-an-egg-file" title="Permalink to this headline">¶</a></h4>
+<p>Some plugins (such as
+<a class="reference external" href="http://trac.edgewall.org/intertrac/SpamFilter">​SpamFilter</a>) are
+downloadable as an <code class="docutils literal"><span class="pre">.egg</span></code> file that can be installed with the
+<code class="docutils literal"><span class="pre">easy_install</span></code> program:</p>
+<p>If <code class="docutils literal"><span class="pre">easy_install</span></code> is not on your system, see the Requirements section
+above to install it. Windows users will need to add the <code class="docutils literal"><span class="pre">Scripts</span></code>
+directory of their Python installation (for example,
+<code class="docutils literal"><span class="pre">C:\Python24\Scripts</span></code>) to their <code class="docutils literal"><span class="pre">PATH</span></code> environment variable (see
+<a class="reference external" href="http://peak.telecommunity.com/DevCenter/EasyInstall#windows-notes">​easy_install Windows
+notes</a>
+for more information).</p>
+<p>If Trac reports permission errors after installing a zipped egg, and you
+would rather not bother providing a egg cache directory writable by the
+web server, you can get around it by simply unzipping the egg. Just pass
+<code class="docutils literal"><span class="pre">--always-unzip</span></code> to <code class="docutils literal"><span class="pre">easy_install</span></code>:</p>
+<p>You should end up with a directory having the same name as the zipped
+egg (complete with <code class="docutils literal"><span class="pre">.egg</span></code> extension) and containing its uncompressed
+contents.</p>
+<p>Trac also searches for plugins installed in the shared plugins directory
+<em>(since 0.10)</em>; see
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#GlobalConfiguration">TracIni#GlobalConfiguration</a>.
+This is a convenient way to share the installation of plugins across
+several, but not all, environments.</p>
+</div>
+<div class="section" id="from-source">
+<h4>From source<a class="headerlink" href="#from-source" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal"><span class="pre">easy_install</span></code> makes installing from source a snap. Just give it the
+URL to either a Subversion repository or a tarball/zip of the source:</p>
+</div>
+<div class="section" id="enabling-the-plugin">
+<h4>Enabling the plugin<a class="headerlink" href="#enabling-the-plugin" title="Permalink to this headline">¶</a></h4>
+<p>Unlike plugins installed per-environment, you&#8217;ll have to explicitly
+enable globally installed plugins via
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">trac.ini</a>. This
+also applies to plugins installed in the shared plugins directory, i.e.
+the path specified in the <code class="docutils literal"><span class="pre">[inherit]</span> <span class="pre">plugins_dir</span></code> configuration
+option.</p>
+<p>This is done in the <code class="docutils literal"><span class="pre">[components]</span></code> section of the configuration file.
+For example:</p>
+<p>The name of the option is the Python package of the plugin. This should
+be specified in the documentation of the plugin, but can also be easily
+discovered by looking at the source (look for a top-level directory that
+contains a file named <code class="docutils literal"><span class="pre">__init__.py</span></code>).</p>
+<p>Note: After installing the plugin, you must restart your web server.</p>
+</div>
+<div class="section" id="uninstalling">
+<h4>Uninstalling<a class="headerlink" href="#uninstalling" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal"><span class="pre">easy_install</span></code> or <code class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span></code> does not have an uninstall
+feature. Hower, it is usually quite trivial to remove a
+globally-installed egg and reference:</p>
+<ol class="arabic simple">
+<li>Do <code class="docutils literal"><span class="pre">easy_install</span> <span class="pre">-m</span> <span class="pre">[plugin</span> <span class="pre">name]</span></code> to remove references from
+<code class="docutils literal"><span class="pre">$PYTHONLIB/site-packages/easy-install.pth</span></code> when the plugin
+installed by setuptools.</li>
+<li>Delete executables from <code class="docutils literal"><span class="pre">/usr/bin</span></code>, <code class="docutils literal"><span class="pre">/usr/local/bin</span></code>, or
+<code class="docutils literal"><span class="pre">C:\\Python*\Scripts</span></code>. To find what executables are involved, refer
+to the <code class="docutils literal"><span class="pre">[console-script]</span></code> section of <code class="docutils literal"><span class="pre">setup.py</span></code>.</li>
+<li>Delete the .egg file or folder from where it&#8217;s installed (usually
+inside <code class="docutils literal"><span class="pre">$PYTHONLIB/site-packages/</span></code>).</li>
+<li>Restart the web server.</li>
+</ol>
+<p>If you are uncertain about the location of the egg, here&#8217;s a small tip
+to help locate an egg (or any package). Just replace <code class="docutils literal"><span class="pre">myplugin</span></code> with
+whatever namespace the plugin uses (as used when enabling the plugin):</p>
+</div>
+</div>
+</div>
+<div class="section" id="setting-up-the-plugin-cache">
+<h2>Setting up the plugin cache<a class="headerlink" href="#setting-up-the-plugin-cache" title="Permalink to this headline">¶</a></h2>
+<p>Some plugins will need to be extracted by the Python eggs runtime
+(<code class="docutils literal"><span class="pre">pkg_resources</span></code>), so that their contents are actual files on the file
+system. The directory in which they are extracted defaults to
+<code class="docutils literal"><span class="pre">.python-eggs</span></code> in the home directory of the current user, which may or
+may not be a problem. You can, however, override the default location
+using the <code class="docutils literal"><span class="pre">PYTHON_EGG_CACHE</span></code> environment variable.</p>
+<p>To do this from the Apache configuration, use the <code class="docutils literal"><span class="pre">SetEnv</span></code> directive:</p>
+<p>This works whether you&#8217;re using the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracCgi.html">CGI</a> or the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracModPython.html">mod_python</a>
+front-end. Put this directive next to where you set the path to the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracEnvironment.html">Trac
+environment</a>,
+i.e. in the same <code class="docutils literal"><span class="pre">&lt;Location&gt;</span></code> block.</p>
+<p>For example (for CGI):</p>
+<p>Or (for mod_python):</p>
+<p>For <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracFastCgi.html">FastCGI</a>,
+you&#8217;ll need to <code class="docutils literal"><span class="pre">-initial-env</span></code> option, or whatever is provided by your
+web server for setting environment variables.</p>
+<blockquote>
+<div><em>Note: that if you already use -initial-env to set the project
+directory for either a single project or parent you will need to add
+an additional -initial-env directive to the FastCgiConfig directive.
+I.e.</em></div></blockquote>
+<div class="section" id="about-hook-scripts">
+<h3>About hook scripts<a class="headerlink" href="#about-hook-scripts" title="Permalink to this headline">¶</a></h3>
+<p>If you&#8217;ve set up some subversion hook scripts that call the Trac engine,
+such as the post-commit hook script provided in the <code class="docutils literal"><span class="pre">/contrib</span></code>
+directory, make sure you define the <code class="docutils literal"><span class="pre">PYTHON_EGG_CACHE</span></code> environment
+variable within these scripts as well.</p>
+</div>
+</div>
+<div class="section" id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="is-setuptools-properly-installed">
+<h3>Is setuptools properly installed?<a class="headerlink" href="#is-setuptools-properly-installed" title="Permalink to this headline">¶</a></h3>
+<p>Try this from the command line:</p>
+<p>If you get <strong>no output</strong>, setuptools <strong>is</strong> installed. Otherwise, you&#8217;ll
+need to install it before plugins will work in Trac.</p>
+</div>
+<div class="section" id="did-you-get-the-correct-version-of-the-python-egg">
+<h3>Did you get the correct version of the Python egg?<a class="headerlink" href="#did-you-get-the-correct-version-of-the-python-egg" title="Permalink to this headline">¶</a></h3>
+<p>Python eggs have the Python version encoded in their filename. For
+example, <code class="docutils literal"><span class="pre">MyPlugin-1.0-py2.5.egg</span></code> is an egg for Python 2.5, and will
+<strong>not</strong> be loaded if you&#8217;re running a different Python version (such as
+2.4 or 2.6).</p>
+<p>Also, verify that the egg file you downloaded is indeed a .zip archive.
+If you downloaded it from a Trac site, chances are you downloaded the
+HTML preview page instead.</p>
+</div>
+<div class="section" id="is-the-plugin-enabled">
+<h3>Is the plugin enabled?<a class="headerlink" href="#is-the-plugin-enabled" title="Permalink to this headline">¶</a></h3>
+<p>If you install a plugin globally (i.e., <em>not</em> inside the <code class="docutils literal"><span class="pre">plugins</span></code>
+directory of the Trac project environment), you must explicitly enable
+it in <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">trac.ini</a>.
+Make sure that:</p>
+<ul class="simple">
+<li>...you actually added the necessary line(s) to the <code class="docutils literal"><span class="pre">[components]</span></code>
+section.</li>
+<li>...the package/module names are correct.</li>
+<li>...the value is &#8220;enabled&#8221;, not &#8220;enable&#8221; or &#8220;Enable&#8221;.</li>
+</ul>
+</div>
+<div class="section" id="check-the-permissions-on-the-egg-file">
+<h3>Check the permissions on the .egg file<a class="headerlink" href="#check-the-permissions-on-the-egg-file" title="Permalink to this headline">¶</a></h3>
+<p>Trac must be able to read the .egg file.</p>
+</div>
+<div class="section" id="check-the-log-files">
+<h3>Check the log files<a class="headerlink" href="#check-the-log-files" title="Permalink to this headline">¶</a></h3>
+<p>Enable <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracLogging.html">logging</a>
+and set the log level to <code class="docutils literal"><span class="pre">DEBUG</span></code>, then watch the log file for messages
+about loading plugins.</p>
+</div>
+<div class="section" id="verify-you-have-proper-permissions">
+<h3>Verify you have proper permissions<a class="headerlink" href="#verify-you-have-proper-permissions" title="Permalink to this headline">¶</a></h3>
+<p>Some plugins require you have special permissions in order to use them.
+<a class="reference external" href="http://trac.edgewall.org/intertrac/WebAdmin">​WebAdmin</a>, for
+example, requires the user to have TRAC_ADMIN permissions for it to
+show up on the navigation bar.</p>
+</div>
+<div class="section" id="is-the-wrong-version-of-the-plugin-loading">
+<h3>Is the wrong version of the plugin loading?<a class="headerlink" href="#is-the-wrong-version-of-the-plugin-loading" title="Permalink to this headline">¶</a></h3>
+<p>If you put your plugins inside plugins directories, and certainly if you
+have more than one project, you need to make sure that the correct
+version of the plugin is loading. Here are some basic rules:</p>
+<ul class="simple">
+<li>Only one version of the plugin can be loaded for each running Trac
+server (i.e., each Python process). The Python namespaces and module
+list will be shared, and it cannot handle duplicates. Whether a
+plugin is <code class="docutils literal"><span class="pre">enabled</span></code> or <code class="docutils literal"><span class="pre">disabled</span></code> makes no difference.</li>
+<li>A globally-installed plugin (typically <code class="docutils literal"><span class="pre">setup.py</span> <span class="pre">install</span></code>) will
+override any version in the global or project plugins directories. A
+plugin from the global plugins directory will be located <em>before</em> any
+project plugins directory.</li>
+<li>If your Trac server hosts more than one project (as with
+<code class="docutils literal"><span class="pre">TRAC_ENV_PARENT_DIR</span></code> setups), having two versions of a plugin in
+two different projects will give uncertain results. Only one of them
+will load, and the one loaded will be shared by both projects. Trac
+will load the first plugin found, usually from the project that
+receives the first request.</li>
+<li>Having more than one version listed inside Python site-packages is
+fine (i.e., installed with <code class="docutils literal"><span class="pre">setup.py</span> <span class="pre">install</span></code>) &#8211; setuptools will
+make sure you get the version installed most recently. However, don&#8217;t
+store more than one version inside a global or project plugins
+directory &#8211; neither version number nor installed date will matter at
+all. There is no way to determine which one will be located first
+when Trac searches the directory for plugins.</li>
+</ul>
+</div>
+<div class="section" id="if-all-of-the-above-failed">
+<h3>If all of the above failed<a class="headerlink" href="#if-all-of-the-above-failed" title="Permalink to this headline">¶</a></h3>
+<p>Okay, so the logs don&#8217;t mention plugins, the egg is readable, the Python
+version is correct, <em>and</em> the egg has been installed globally (and is
+enabled in trac.ini)... and it <em>still</em> doesn&#8217;t work or give any error
+messages or any other indication as to why. Hop on the
+<a class="reference external" href="http://trac.edgewall.org/intertrac/IrcChannel">​IrcChannel</a> and ask
+away!</p>
+</div>
+</div>
+<div class="section" id="web-based-plugin-administration">
+<h2>Web-based plugin administration<a class="headerlink" href="#web-based-plugin-administration" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference external" href="https://docs.pagure.org/sssd-test2/WebAdmin.html">WebAdmin?</a>
+plugin (part of the core since 0.11) offers limited support for plugin
+configuration through the web to users with <code class="docutils literal"><span class="pre">TRAC_ADMIN</span></code> permission:</p>
+<ul class="simple">
+<li>en/disabling installed plugins</li>
+<li>installing plugins by uploading them as eggs</li>
+</ul>
+<p>You probably want to disable the second function for security reasons:
+in <code class="docutils literal"><span class="pre">trac.ini</span></code>, in the <code class="docutils literal"><span class="pre">[components]</span></code> section, add the line</p>
+<p>This disables the whole panel, so the first function will no longer be
+available either.</p>
+<hr class="docutils" />
+<p>See also
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracGuide.html">TracGuide</a>,
+<a class="reference external" href="http://trac.edgewall.org/intertrac/PluginList">​plugin list</a>,
+<a class="reference external" href="http://trac.edgewall.org/intertrac/TracDev/ComponentArchitecture">​component
+architecture</a>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Trac plugins</a><ul>
+<li><a class="reference internal" href="#plugin-discovery">Plugin discovery</a></li>
+<li><a class="reference internal" href="#requirements-for-trac-eggs">Requirements for Trac eggs</a></li>
+<li><a class="reference internal" href="#installing-a-trac-plugin">Installing a Trac plugin</a><ul>
+<li><a class="reference internal" href="#for-a-single-project">For a single project</a></li>
+<li><a class="reference internal" href="#for-all-projects">For all projects</a><ul>
+<li><a class="reference internal" href="#with-an-egg-file">With an .egg file</a></li>
+<li><a class="reference internal" href="#from-source">From source</a></li>
+<li><a class="reference internal" href="#enabling-the-plugin">Enabling the plugin</a></li>
+<li><a class="reference internal" href="#uninstalling">Uninstalling</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#setting-up-the-plugin-cache">Setting up the plugin cache</a><ul>
+<li><a class="reference internal" href="#about-hook-scripts">About hook scripts</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#troubleshooting">Troubleshooting</a><ul>
+<li><a class="reference internal" href="#is-setuptools-properly-installed">Is setuptools properly installed?</a></li>
+<li><a class="reference internal" href="#did-you-get-the-correct-version-of-the-python-egg">Did you get the correct version of the Python egg?</a></li>
+<li><a class="reference internal" href="#is-the-plugin-enabled">Is the plugin enabled?</a></li>
+<li><a class="reference internal" href="#check-the-permissions-on-the-egg-file">Check the permissions on the .egg file</a></li>
+<li><a class="reference internal" href="#check-the-log-files">Check the log files</a></li>
+<li><a class="reference internal" href="#verify-you-have-proper-permissions">Verify you have proper permissions</a></li>
+<li><a class="reference internal" href="#is-the-wrong-version-of-the-plugin-loading">Is the wrong version of the plugin loading?</a></li>
+<li><a class="reference internal" href="#if-all-of-the-above-failed">If all of the above failed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#web-based-plugin-administration">Web-based plugin administration</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracPlugins.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracPlugins.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

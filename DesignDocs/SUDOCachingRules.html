@@ -1,0 +1,283 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Important sudo attributes &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="important-sudo-attributes">
+<h1>Important sudo attributes<a class="headerlink" href="#important-sudo-attributes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><strong>sudoHost</strong> - to what host does the rule apply<ul>
+<li><em>ALL</em> - all hostnames</li>
+<li><em>hostname</em></li>
+<li><em>IP address</em></li>
+<li><em>+netgroup</em></li>
+<li><em>regular expression</em> - contains one of &#8220;\?*[]&#8221;</li>
+</ul>
+</li>
+<li><strong>sudoUser</strong> - to what user does the rule apply<ul>
+<li><em>username</em></li>
+<li><em>#uid</em></li>
+<li><em>%group</em></li>
+<li><em>+netgroup</em></li>
+</ul>
+</li>
+<li><strong>sudoOrder</strong> - rules ordering</li>
+<li><strong>sudoNotBefore</strong> and <strong>sudoNotAfter</strong> - time constraints</li>
+</ul>
+<p>Complete LDAP schema can be found
+<a class="reference external" href="http://www.gratisoft.us/sudo/man/1.8.4/sudoers.ldap.man.html">​here</a>.</p>
+</div>
+<div class="section" id="common">
+<h1>Common<a class="headerlink" href="#common" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="per-host-update">
+<h2>Per host update<a class="headerlink" href="#per-host-update" title="Permalink to this headline">¶</a></h2>
+<p>Per host update returns all rules that:</p>
+<ul class="simple">
+<li>sudoHost equals to ALL</li>
+<li>direct match with sudoHost (by hostname or address)</li>
+<li>contains regular expression (will be filtered by sudo)</li>
+<li>contains netgroup (will be filtered by sudo)</li>
+</ul>
+<p>Hostname match is performed in sudo source in
+<em>plugin/sudoers/ldap.c/sudo_ldap_check_host()</em>.</p>
+</div>
+<div class="section" id="per-user-update">
+<h2>Per user update<a class="headerlink" href="#per-user-update" title="Permalink to this headline">¶</a></h2>
+<p>Per user update returns all rules that:</p>
+<ul class="simple">
+<li>sudoUser equals to ALL</li>
+<li>direct match with username, #uid or %group names</li>
+<li>contains +netgroup (will be filtered by sudo)</li>
+</ul>
+<p>Username match is performed via LADP filter in sudo source in
+<em>plugin/sudoers/ldap.c/sudo_ldap_result_get()</em>.</p>
+</div>
+<div class="section" id="smart-refresh">
+<h2>Smart refresh<a class="headerlink" href="#smart-refresh" title="Permalink to this headline">¶</a></h2>
+<p>Download only rules that were modified or newly created since the last
+refresh.</p>
+</div>
+</div>
+<div class="section" id="implementation">
+<h1>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h1>
+<p>We will be looking for modified and newly created rules in short
+intervals. Expiration of the rules is handled per user during the
+execution time of <em>sudo</em>. We will also do periodical full refresh to
+ensure consistency even if the <em>sudo</em> command is not used.</p>
+<div class="section" id="sysdb-attributes">
+<h2>SysDB attributes<a class="headerlink" href="#sysdb-attributes" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line"><strong>sudoLastSmartRefreshTime</strong> on <em>ou=SUDOers</em> - when the last smart
+refresh was performed</div>
+<div class="line"><strong>sudoLastFullRefreshTime</strong> on <em>ou=SUDOers</em> - when the last full
+refresh was performed</div>
+<div class="line"><strong>sudoNextFullRefreshTime</strong> on <em>ou=SUDOers</em> - when the next full is
+scheduled</div>
+<div class="line"><strong>dataExpireTimestamp</strong> on each rule - when the rule will be
+considered as expired</div>
+</div>
+</div>
+<div class="section" id="data-provider">
+<h2>Data provider<a class="headerlink" href="#data-provider" title="Permalink to this headline">¶</a></h2>
+<p>Data provider will be performing following actions:</p>
+<div class="section" id="a-periodical-download-of-changed-or-newly-created-rules-per-host-smart-refresh">
+<h3>A. Periodical download of changed or newly created rules (per host smart refresh)<a class="headerlink" href="#a-periodical-download-of-changed-or-newly-created-rules-per-host-smart-refresh" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">Interval is configurable via
+<strong>ldap_sudo_changed_refresh_interval</strong> (default: 15 minutes)</div>
+<div class="line">Enable <em>modifyTimestamp</em> with
+<strong>ldap_sudo_modify_timestamp_enabled</strong> (default: false)</div>
+</div>
+<ol class="arabic simple">
+<li><strong>if</strong> server has changed <strong>then</strong> do <strong>C</strong></li>
+<li><strong>else if</strong> <em>entryUSN</em> is available <strong>then</strong><ol class="arabic">
+<li>refresh rules per host, where entryUSN &gt; currentHighestUSN</li>
+<li><strong>goto</strong> 3.2.</li>
+</ol>
+</li>
+<li><strong>else if</strong> <em>modifyTimestamp</em> is enabled <strong>then</strong><ol class="arabic">
+<li>refresh rules per host, where entryUSN &gt; currentHighestUSN</li>
+<li><em>sudoLastSmartRefreshTime</em> := current time</li>
+<li>nextrefrest := (current time +
+<em>ldap_sudo_changed_refresh_interval</em>)</li>
+<li><strong>if</strong> nextrefresh &gt;= <em>sudoNextFullRefreshTime</em> AND nextrefresh &lt;
+(<em>sudoNextFullRefreshTime</em> +
+<em>ldap_sudo_changed_refresh_interval</em>) <strong>then</strong><ol class="arabic">
+<li>nextrefresh := (<em>sudoNextFullRefreshTime</em> +
+<em>ldap_sudo_changed_refresh_interval</em>)</li>
+</ol>
+</li>
+<li>schedule next smart refresh</li>
+</ol>
+</li>
+<li><strong>else</strong> do nothing</li>
+</ol>
+</div>
+<div class="section" id="b-periodical-full-refresh-of-all-rules">
+<h3>B. Periodical full refresh of all rules<a class="headerlink" href="#b-periodical-full-refresh-of-all-rules" title="Permalink to this headline">¶</a></h3>
+<p>Configurable via <strong>ldap_sudo_full_refresh_interval</strong> (default: 360
+minutes)</p>
+<ol class="arabic simple">
+<li>do <strong>C</strong></li>
+<li><em>sudoLastFullRefreshTime</em> := current time</li>
+<li><em>sudoNextFullRefreshTime</em> := (current time +
+<em>ldap_sudo_full_refresh_interval</em>)</li>
+<li>schedule next full refresh</li>
+</ol>
+</div>
+<div class="section" id="c-on-demand-full-refresh-of-all-rules">
+<h3>C. On demand full refresh of all rules<a class="headerlink" href="#c-on-demand-full-refresh-of-all-rules" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li>Download all rules per host</li>
+<li>Deletes all rules from the sysdb</li>
+<li>Store downloaded rule in the sysdb</li>
+</ol>
+</div>
+<div class="section" id="d-on-demand-refresh-of-specific-rules">
+<h3>D. On demand refresh of specific rules<a class="headerlink" href="#d-on-demand-refresh-of-specific-rules" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li>Download the rules</li>
+<li>Delete them from the sysdb</li>
+<li>Store downloaded rule in the sysdb</li>
+</ol>
+</div>
+</div>
+<div class="section" id="responder">
+<h2>Responder<a class="headerlink" href="#responder" title="Permalink to this headline">¶</a></h2>
+<p><strong>sudo_timed</strong> (default: false) - filter rules by time constraints?</p>
+<ol class="arabic simple">
+<li>search sysdb per user</li>
+<li>refresh all expired rules</li>
+<li><strong>if</strong> any rule was deleted <strong>then</strong><ol class="arabic">
+<li>schedule <strong>C</strong> (out of band)</li>
+<li>search sysdb per user</li>
+</ol>
+</li>
+<li><strong>if</strong> <em>sudo_timed</em> = false <strong>then</strong> filter rules by time
+constraints</li>
+<li>sort rules</li>
+<li>return rules to sudo</li>
+</ol>
+</div>
+</div>
+<div class="section" id="questions">
+<h1>Questions<a class="headerlink" href="#questions" title="Permalink to this headline">¶</a></h1>
+<ol class="arabic simple">
+<li>Should we also do per user smart updates when the user runs <em>sudo</em>?</li>
+<li>Should we create a tool to force full refresh of the rules
+immediately?</li>
+</ol>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Important sudo attributes</a></li>
+<li><a class="reference internal" href="#common">Common</a><ul>
+<li><a class="reference internal" href="#per-host-update">Per host update</a></li>
+<li><a class="reference internal" href="#per-user-update">Per user update</a></li>
+<li><a class="reference internal" href="#smart-refresh">Smart refresh</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementation">Implementation</a><ul>
+<li><a class="reference internal" href="#sysdb-attributes">SysDB attributes</a></li>
+<li><a class="reference internal" href="#data-provider">Data provider</a><ul>
+<li><a class="reference internal" href="#a-periodical-download-of-changed-or-newly-created-rules-per-host-smart-refresh">A. Periodical download of changed or newly created rules (per host smart refresh)</a></li>
+<li><a class="reference internal" href="#b-periodical-full-refresh-of-all-rules">B. Periodical full refresh of all rules</a></li>
+<li><a class="reference internal" href="#c-on-demand-full-refresh-of-all-rules">C. On demand full refresh of all rules</a></li>
+<li><a class="reference internal" href="#d-on-demand-refresh-of-specific-rules">D. On demand refresh of specific rules</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#responder">Responder</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#questions">Questions</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/SUDOCachingRules.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/SUDOCachingRules.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

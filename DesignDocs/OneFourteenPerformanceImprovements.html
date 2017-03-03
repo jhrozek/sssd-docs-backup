@@ -1,0 +1,264 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Feature Name &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="feature-name">
+<h1>Feature Name<a class="headerlink" href="#feature-name" title="Permalink to this headline">¶</a></h1>
+<p>SSSD Performance enhancements for the 1.14 release</p>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2602">​https://fedorahosted.org/sssd/ticket/2602</a></li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2062">​https://fedorahosted.org/sssd/ticket/2062</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>At the moment SSSD doesn&#8217;t perform well in large environments. Most of
+the use-cases we&#8217;ve had reported revolved around logins of users who are
+members of large groups or a large amount of groups. Another reported
+use-case was the time it takes to resolve a large group.</p>
+<p>While workarounds are available for some of the issues (such as using
+<code class="docutils literal"><span class="pre">ignore_group_members</span></code> for resolution of large groups), our goal is to
+be able to perform well without these workarounds.</p>
+</div>
+<div class="section" id="use-cases">
+<h2>Use cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>User who is a member of a large amount of AD groups logs in to a
+Linux server that is a member of the AD domain.</li>
+<li>User who is a member of a large amount of AD or IPA groups logs in to
+a Linux server that is a member of an IPA domain with a trust
+relationship to an AD domain</li>
+<li>Administrator of a Linux server runs &#8220;ls -l&#8221; in a directory where
+files are owned by a large group. An example would be group called
+&#8220;students&#8221; in an university setup</li>
+</ul>
+</div>
+<div class="section" id="overview-of-the-solution">
+<h2>Overview of the solution<a class="headerlink" href="#overview-of-the-solution" title="Permalink to this headline">¶</a></h2>
+<p>During performance analysis with systemtap, we found out that the
+biggest delay happens when SSSD writes an entry to the cache, especially
+for large group entries. This is also confirmed by empirical evidence
+from our users, where most deployments were OK with SSSD performance
+once the cache was moved to tmpfs or even when <code class="docutils literal"><span class="pre">ignore_group_members</span></code>
+option was enabled.</p>
+<p>We can&#8217;t skip cache writes completely, even if no attributes changed,
+because we store also the expiration timestamps in the cache. Also, even
+if a single attribute (like the timestamp) changes, ldb would need to
+unpack the whole entry, change the record, pack it back and then write
+the whole blob.</p>
+<p>In order to mitigate the costly cache writes, we should avoid writing
+the whole cache entry on every cache update, but only write the entries
+if something actually changed.</p>
+<p>To avoid this, we will split the monolithic ldb cache representing the
+sysdb cache into two ldb files. One would contain the entry itself and
+would be fully synchronous. The other (new one) would only contain the
+timestamps and would be open using the <code class="docutils literal"><span class="pre">LDB_FLG_NOSYNC</span></code> to avoid
+synchronous cache writes.</p>
+<p>This would have two advantages:</p>
+<ol class="arabic simple">
+<li>If we detect that the entry hasn&#8217;t changed on the LDAP server at all,
+we could avoid writing into the main ldb cache which would still be
+costly. We would use the value of the <code class="docutils literal"><span class="pre">modifyTimestamp</span></code> attribute
+of the LDAP entry to see if the entry had changed or not.</li>
+<li>The writes to the new async ldb cache would be much faster, because
+the entry is smaller and because the writes wouldn&#8217;t call <code class="docutils literal"><span class="pre">fsync()</span></code>
+due to using the async flag, but rather rely on the underlying
+filesystem to sync the data to the disk.</li>
+</ol>
+<p>On SSSD shutdown, we would write a canary to both the timestamp cache
+and the main sysdb cache, denoting graceful shutdown. On SSSD startup,
+if the canary wasn&#8217;t found or if the values differ, we would just ditch
+the timestamp cache, which would result in refresh and write of the
+entry on the next lookup.</p>
+<p>The basic idea is to use a combination of the operational
+<code class="docutils literal"><span class="pre">modifyTimestamp</span></code> attribute and checking the entry itself to see if
+the entry changed at all and if not, avoid writing to the cache.</p>
+<p>Checking the value of <code class="docutils literal"><span class="pre">modifyTimestamp</span></code> would be enough for group
+entries, which should be the first iteration of this work. For checking
+if other entries (mostly users) have changed, we need to compare the
+value of the attributes in the cache with what we are about to store in
+the cache.</p>
+<p>Therefore, these enhancements are proposed for the 1.14 versions, sorted
+by the importance as observed with systemtap testing:</p>
+<ul class="simple">
+<li>only write the cache entry if the <code class="docutils literal"><span class="pre">modifyTimestamp</span></code> of the original
+entry had changed. If it hasn&#8217;t changed, only the timestamps would be
+written to the timestamp cache</li>
+<li>if the <code class="docutils literal"><span class="pre">modifyTimestamp</span></code> had changed, compare the attributes of the
+cache entry with the attributes we are about to write. If there are
+no differences, only write to the timestamp cache</li>
+<li>refactor the nested group processing to make sure expensive lookups
+(such as lookups of all members of the group, there can potentially
+be thousands of these) are only performed once and intermediate
+results are stored in-memory.</li>
+<li>attempt to shortcut parsing the attributes of the entry returned from
+LDAP sooner. The idea behind this is that if the <code class="docutils literal"><span class="pre">modifyTimestamp</span></code>
+did not change, we can reuse the entry we already cached.</li>
+</ul>
+<p>Minor enhancements in later versions might include:</p>
+<ul class="simple">
+<li>using syncrepl in the server mode for HBAC rules and external groups
+in refreshAndPersistMode. This would provide performance benefit for
+legacy clients that rely on server&#8217;s HBAC rules for access control.</li>
+<li>using syncrepl in the server mode for external groups in
+refreshAndPersistMode. This would mainly simplify the external groups
+handling, rather than improve performance</li>
+<li>A lot of time is spent looking up attributes in the <code class="docutils literal"><span class="pre">sysdb_attrs</span></code>
+array. This is something we might want to optimize after we&#8217;re done
+with the cache writes.</li>
+<li>We might even consider offering syncrepl in refreshOnly mode as an
+client-side option for enumeration. However, this would have to be an
+opt-in because every refresh causes the server to walk the changelog
+since the last refresh operation. Enabling this option on all clients
+would trash the server performance.</li>
+</ul>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal"><span class="pre">sysdb_ctx</span></code> already contains a handle of the main sysdb cache. We
+would add another ldb file that only contains the timestamp and the DN
+of an entry. This ldb file would be opened in the nosync mode.
+Attributes used for lookups, like <code class="docutils literal"><span class="pre">dataExpireTimestamp</span></code> must be
+indexed in this database as well.</p>
+<p>When storing a user or a group to sysdb using functions like
+<code class="docutils literal"><span class="pre">sysdb_store_user</span></code>, we first check the difference between
+<code class="docutils literal"><span class="pre">modifyTimestamp</span></code> attributes. If there are no differences, only the
+timestamp attributes, such as <code class="docutils literal"><span class="pre">lastUpdate</span></code> or <code class="docutils literal"><span class="pre">dataExpireTimestamp</span></code>
+would be updated in the timestamp cache. We need to do this check in the
+lower-level sysdb calls to make sure this enhancement also works for
+users and groups retrieved through the extop plugin.</p>
+<p>If the value of <code class="docutils literal"><span class="pre">modifyTimestamp</span></code> differs, we proceed to checking the
+diff between values in the cache and the values read from LDAP.</p>
+<p>Details about shortcut of attribute parsing will be added to this design
+page later.</p>
+</div>
+<div class="section" id="configuration-changes">
+<h2>Configuration changes<a class="headerlink" href="#configuration-changes" title="Permalink to this headline">¶</a></h2>
+<p>Currently no configuration changes are expected. We might add some if we
+decide to implement on-demand syncrepl.</p>
+</div>
+<div class="section" id="how-to-test">
+<h2>How To Test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<p>If the entries on the server did not change (except timestamps), then
+actions like user and group lookups and logins should be considerably
+faster.</p>
+<p>The SSSD should also correctly detect when the entries in fact did
+change on the server. In this case, a full cache write will be
+performed.</p>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Jakub Hrozek &lt;<a class="reference external" href="mailto:jhrozek&#37;&#52;&#48;redhat&#46;com">​jhrozek<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;
+with the kind help of</li>
+<li>Sumit Bose &lt;<a class="reference external" href="mailto:sbose&#37;&#52;&#48;redhat&#46;com">​sbose<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+<li>Ludwig Krispenz
+&lt;<a class="reference external" href="mailto:lkrispen&#37;&#52;&#48;redhat&#46;com">​lkrispen<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+<li>Simo Sorce &lt;<a class="reference external" href="mailto:simo&#37;&#52;&#48;redhat&#46;com">​simo<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Feature Name</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem statement</a></li>
+<li><a class="reference internal" href="#use-cases">Use cases</a></li>
+<li><a class="reference internal" href="#overview-of-the-solution">Overview of the solution</a></li>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a></li>
+<li><a class="reference internal" href="#configuration-changes">Configuration changes</a></li>
+<li><a class="reference internal" href="#how-to-test">How To Test</a></li>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/OneFourteenPerformanceImprovements.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/OneFourteenPerformanceImprovements.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

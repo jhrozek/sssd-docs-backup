@@ -1,0 +1,632 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Running SSSD as a non-root user &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="running-sssd-as-a-non-root-user">
+<h1>Running SSSD as a non-root user<a class="headerlink" href="#running-sssd-as-a-non-root-user" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2370">​https://fedorahosted.org/sssd/ticket/2370</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>Currently, all SSSD processes run as the root user. However, if one of
+the processes was compromised, this might lead to compromising the whole
+system, especially if additional measures like SELinux were not enabled.
+It would improve security if instead SSSD was running as its own private
+user, This design page summarizes what would be needed to run sssd as a
+non-privileged user and all the cases that currently require a root
+user.</p>
+</div>
+<div class="section" id="use-case">
+<h2>Use case<a class="headerlink" href="#use-case" title="Permalink to this headline">¶</a></h2>
+<p>This is a general use-case, following the principle of least privilege.
+The processes should not run as root unless they really need the root
+privileges.</p>
+<div class="section" id="implementation-details">
+<h3>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h3>
+<p>At a higher level, the changes would amount to:</p>
+<ul class="simple">
+<li>A new system user would be created. This user must be added in
+sssd.spec during the <code class="docutils literal"><span class="pre">%pre</span></code> section.</li>
+<li>Files that were used by sssd and previously owned by root should now
+be owned as the sssd user. This includes the LDB databases.</li>
+<li>Responders and back ends would drop privileges and become the sssd
+user as soon as possible, ideally as the first action after startup.</li>
+<li>Short-lived processes that are spawned by <code class="docutils literal"><span class="pre">sssd_be</span></code> but might still
+require elevated privileges would be setuid root.</li>
+</ul>
+<p>The changes to individual binaries and files are described in more
+detail below. After the changes are implemented, the code that runs as
+root will be reduced to the monitor process and the setuid helpers.</p>
+</div>
+<div class="section" id="a-new-system-user">
+<h3>A new system user<a class="headerlink" href="#a-new-system-user" title="Permalink to this headline">¶</a></h3>
+<p>The sssd will run as a new system user called simply <code class="docutils literal"><span class="pre">sssd</span></code>. We do not
+need to have the UID fixed across systems as no files owned by SSSD are
+shared among different systems. The user will be simply added during the
+<code class="docutils literal"><span class="pre">%pre</span></code> phase:</p>
+<p>As it&#8217;s common practice for system users, the shell will be
+<code class="docutils literal"><span class="pre">/sbin/nologin</span></code> so the user cannot log in into the system.</p>
+</div>
+</div>
+<div class="section" id="configuration-options">
+<h2>Configuration options<a class="headerlink" href="#configuration-options" title="Permalink to this headline">¶</a></h2>
+<p>To be on the safe side, sssd will allow configuring the user to run as.
+This option will also allow root, to allow users to keep the old
+behaviour around in case they hit a bug with the unprivileged process.
+As a first step, we will include these options, but leave the default as
+&#8216;root&#8217;. When we&#8217;re certain the non-root sssd works for most users as a
+non-privileged user, we will switch the default to the sssd user.</p>
+<div class="section" id="dropping-privileges-of-the-sssd-processes">
+<h3>Dropping privileges of the SSSD processes<a class="headerlink" href="#dropping-privileges-of-the-sssd-processes" title="Permalink to this headline">¶</a></h3>
+<p>The goal is for the &#8220;worker&#8221; processes (that is, both responders and
+providers) to drop the root privileges as soon as possible - typically
+right after startup, or alternatively after completing any work that
+requires root privileges such as opening a file. Because the processes
+might have to keep the root privileges after startup, the monitor
+process would still be running as root.</p>
+</div>
+</div>
+<div class="section" id="monitor-sssd">
+<h2>Monitor (sssd)<a class="headerlink" href="#monitor-sssd" title="Permalink to this headline">¶</a></h2>
+<p>The monitor process would keep running as root. This is in order to be
+able to fork and exec processes that are initially privileged without
+making them all setuid. As a future enhancement, the process management
+functionality of the monitor will be delegated to systemd (see ticket
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/2243">#2243</a>).</p>
+</div>
+<div class="section" id="responders">
+<h2>Responders<a class="headerlink" href="#responders" title="Permalink to this headline">¶</a></h2>
+<p>The responder processes are by nature &#8216;readers&#8217; that mostly read data
+from cache and request cache updates from the back end processes.</p>
+<p>The NSS responder can drop privileges after startup. The files that the
+NSS responder reads (sysdb, confdb, NSS pipe) and writes (memory cache,
+debug logs, NSS pipe) will be owned by the sssd user.</p>
+<p>The PAM responder can drop privileges after startup. The files that the
+PAM responder reads (sysdb, confdb, PAM public pipe) and writes (debug
+logs, PAM pipe) will be owned by the sssd user.</p>
+<p>In order to keep the privileged pipe only owned by the root user, we
+would open the pipe prior to becoming user and pass the file descriptor.</p>
+<p>The InfoPipe responder can drop privileges after startup. The files that
+the InfoPipe responder reads (sysdb, confdb) and writes (debug logs, PAM
+pipe) will be owned by the sssd user.</p>
+<p>Contrary to other responders, the InfoPipe responder doesn&#8217;t have a
+public pipe. The InfoPipe responder also binds to the system bus, we
+must also convert the bus policy file to allow the sssd user to bind to
+the bus.</p>
+<p>Currently there is also functionality to modify sssd.conf from the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InfoPipe.html">InfoPipe?</a>. During
+feature design review, it was suggested that a configuration interface
+doesn&#8217;t belong to the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InfoPipe.html">InfoPipe?</a> code at
+all and should be moved to a separate helper. Until that is done, the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InfoPipe.html">InfoPipe?</a>
+responder must keep running as root. The work on splitting the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InfoPipe.html">InfoPipe?</a> is
+tracked by
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/2395">​https://fedorahosted.org/sssd/ticket/2395</a></p>
+<p>The Autofs, SUDO and SSH responders only read from the sysdb, confdb and
+their respective UNIX public pipes. These responders also only write to
+the debug logs and the public pipe, all of which would be owned by the
+sssd user. This means the Autofs, SUDO and SSH responders can drop
+privileges right after startup.</p>
+</div>
+<div class="section" id="providers">
+<h2>Providers<a class="headerlink" href="#providers" title="Permalink to this headline">¶</a></h2>
+<p>The providers are dynamically loadable libraries that are loaded by the
+<code class="docutils literal"><span class="pre">sssd_be</span></code> process. After startup, the sssd_be process dlopens the
+provider library and dlsyms the handlers. During sssd operation, the
+<code class="docutils literal"><span class="pre">sssd_be</span></code> process mostly unpacks requests arriving on the SBUS and
+calls the provider-specific handlers.</p>
+<p>Several areas of the initialization still require elevated privileges:</p>
+<ul class="simple">
+<li>Checking for principals in the keytab</li>
+<li>Checking for user TGTs to be renewed</li>
+</ul>
+<p>Therefore, the initialization is still performed with root privileges
+and sssd_be drops to a non-root user post initialization. See the
+&#8220;Future Enhancements&#8221; section for ideas on reducing the code that runs
+as root during initialization even further.</p>
+</div>
+<div class="section" id="short-lived-processes">
+<h2>Short-lived processes<a class="headerlink" href="#short-lived-processes" title="Permalink to this headline">¶</a></h2>
+<p>The purpose of the short-lived processes is to avoid blocking calls by
+performing an otherwise blocking action in a completely separate
+process.</p>
+<p>The ldap_child subprocess primes the credential cache used to establish
+GSSAPI-encrypted connection. In order to do so, the ldap_child process
+needs to be able to read the keytab, which is readable by root only.
+Therefore, the ldap_child process is setuid root, with permissions set
+to 4750 to make sure only the sssd user can run the ldap_child process.
+As soon as the credentials are obtained, the ldap_child drops
+privileges and continues running as the sssd user &#8211; hence also the
+resulting ccache is owned by the sssd user.</p>
+<p>The user krb5_child runs as depends on how the SSSD back end is set up.
+In the simplest case, where neither validation nor FAST are used, the
+krb5_child can drop privileges to the user who is logging in after
+startup and runs unprivileged except for the initialization part.</p>
+<p>In case either validation or FAST are used, part of the krb5_child runs
+as root. Once the resulting ccache is validated using the keytab, the
+krb5_child process drops privileges to the user who is logging in.</p>
+<p>See the &#8220;Future Enhancements section&#8221; for discussion of using the MEMORY
+ccache to reduce the time krb5_child runs as root.</p>
+<p>In general, we can&#8217;t make assumptions on what the PAM module we wrap
+using the proxy backend requires, so at least the part of proxy child
+that runs the PAM conversation should run as root. During development,
+we should consider splitting the proxy_child into a small setuid helper
+that would still run privileged and only wrap the PAM module and the
+rest of the proxy_child that would run unprivileged.</p>
+<p>The gpo_child process connects to a SMB share, downloads a GPO policy
+file and stores it locally, by default in <code class="docutils literal"><span class="pre">/var/lib/sss/gpo_cache</span></code>.
+The gpo_child authenticates to the SMB share using Kerberos; the
+ccache, as created by ldap_child is already accessible to the sssd
+user. Since that directory would be owned by the sssd user, the
+gpo_child could run unprivileged.</p>
+<p>The SSH helpers already run non-privileged. <code class="docutils literal"><span class="pre">sss_ssh_knownhostsproxy</span></code>
+runs as the user who initiated the SSH session.
+<code class="docutils literal"><span class="pre">sss_ssh_authorizedkeys</span></code> runs as the user specified with the
+AuthorizedKeysCommandUser directive in sshd_config.</p>
+</div>
+<div class="section" id="command-line-tools">
+<h2>Command line tools<a class="headerlink" href="#command-line-tools" title="Permalink to this headline">¶</a></h2>
+<p>There are two general kinds of command line tools we ship with the SSSD
+- tools that manage accounts in the local backend and SSSD management
+tools. All tools check if they are executed by root currently. I think
+this check makes sense and should stay because all the tool are intended
+for administrative purposes only.</p>
+<p>Some of the tools can be changed to drop privileges. However, the attach
+surface of these tools is small, so changing them is not a priority.
+This effort is rather tracked in the Future Enhancements.</p>
+<p>The tools either write (`sss_useradd, userdel, usermod, sss_groupadd,
+groupdel,
+groupmod<code class="docutils literal"><span class="pre">)</span> <span class="pre">or</span> <span class="pre">read</span>&#160; <span class="pre">(</span></code>sss_groupshow<a href="#id1"><span class="problematic" id="id2">``</span></a>) the <a href="#id3"><span class="problematic" id="id4">``</span></a>sssd.ldb` file.
+But additionally, these tools also set the SELinux context of the user.
+Since there is no capability to call semanage, setting the context still
+requires root privileges.</p>
+<p>These two tools function similarly to the local backend management
+tools, except they manipulate the domain cache. The cache is also owned
+and writable by the sssd user, so would be safe to drop privileges here,
+too.</p>
+<p>The sss_debuglevel tool changes the debug level of sssd on the fly. The
+tool writes new debug level values to the confdb (owned by sssd) and
+touches sssd.conf (ownership tbd). The tool can drop privileges to sssd
+after startup.</p>
+<p>The sss_obfuscate tool is written in Python and manipulates the
+sssd.conf file by obfuscating the input and using it as a value of the
+<code class="docutils literal"><span class="pre">ldap_default_authtok</span></code> configuration option. For dropping privileges
+of the sss_obfuscate tool, we can use the python bindings of libcap-ng.
+Again, making this tool non-privileged is not a priority.</p>
+<div class="section" id="external-resources-currently-requiring-root-access">
+<h3>External resources currently requiring root access<a class="headerlink" href="#external-resources-currently-requiring-root-access" title="Permalink to this headline">¶</a></h3>
+<p>This part of the design page summarizes which external resources,
+typically file system objects currently require SSSD to have elevated
+privileges.</p>
+<p>For filesystem objects, we can either change their owner to the sssd
+local user, add an ACL or open them as the privileged process and pass
+the file descriptor.</p>
+</div>
+</div>
+<div class="section" id="sssd-configuration-file">
+<h2>SSSD configuration file<a class="headerlink" href="#sssd-configuration-file" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Filesystem path: <code class="docutils literal"><span class="pre">/etc/sssd/sssd.conf</span></code></li>
+<li>Current owner and permissions: root.root 0600</li>
+<li>Read by: The monitor process</li>
+<li>Written to by: The InfoPipe responder and users of the configAPI,
+such as sss_obfuscate or authconfig</li>
+<li><em>Change: Currently the permissions will stay the same as the monitor
+process and the
+`InfoPipe? &lt;https://docs.pagure.org/sssd-test2/InfoPipe.html&gt;`__
+still run as root</em></li>
+</ul>
+</div>
+<div class="section" id="debug-logs">
+<h2>Debug logs<a class="headerlink" href="#debug-logs" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Filesystem path: <code class="docutils literal"><span class="pre">/var/log/sssd/*.log</span></code></li>
+<li>Current owner and permissions: root.root 0600</li>
+<li>Read by: N/A, only externally by admin</li>
+<li>Written to by: monitor, providers, responders, child processes</li>
+<li><em>New owner and permissions: sssd.sssd 0600</em></li>
+</ul>
+</div>
+<div class="section" id="the-configuration-database">
+<h2>The configuration database<a class="headerlink" href="#the-configuration-database" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Filesystem path: <code class="docutils literal"><span class="pre">/var/lib/sss/db/config.ldb</span></code></li>
+<li>Current owner and permissions: root.root 0600</li>
+<li>Read by: responders, providers, monitor, command-line tools</li>
+<li>Written to by: The monitor process, sssd-ad (a single confdb_set
+call), sss_debuglevel, sssd_ifp</li>
+<li><em>New owner and permissions: sssd.sssd 0600</em></li>
+</ul>
+</div>
+<div class="section" id="the-on-disk-cache-sysdb">
+<h2>The on-disk cache (sysdb)<a class="headerlink" href="#the-on-disk-cache-sysdb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Filesystem path: <code class="docutils literal"><span class="pre">/var/lib/sss/db/cache_$domain.ldb</span></code></li>
+<li>Current owner and permissions: root.root 0600</li>
+<li>Read by: responders, providers, command-line tools</li>
+<li>Written to by: sssd_be, the CLI tools</li>
+<li><em>New owner and permissions: sssd.sssd 0600</em></li>
+</ul>
+</div>
+<div class="section" id="memory-cache">
+<h2>Memory Cache<a class="headerlink" href="#memory-cache" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Filesystem path: <code class="docutils literal"><span class="pre">/var/lib/sss/mc/{passwd,group}</span></code></li>
+<li>Current owner and permissions: root.root 0644</li>
+<li>Read by: The SSS NSS module</li>
+<li>Written to by: The NSS responder</li>
+<li><em>New owner: sssd.sssd permissions will stay the same</em></li>
+</ul>
+</div>
+<div class="section" id="kerberos-keytab">
+<h2>Kerberos keytab<a class="headerlink" href="#kerberos-keytab" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Filesystem path: configurable, <code class="docutils literal"><span class="pre">/etc/krb5.keytab</span></code> by default</li>
+<li>Current owner and permissions: root.root 0600</li>
+<li>Read by: LDAP, KRB5, IPA, AD providers, krb5_child, ldap_child</li>
+<li>Written to by: sssd_be, the CLI tools</li>
+<li><em>Change: No change at the moment. The keytab will be kept readable by
+the root user only</em></li>
+</ul>
+</div>
+<div class="section" id="kerberos-user-credential-cache">
+<h2>Kerberos user credential cache<a class="headerlink" href="#kerberos-user-credential-cache" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Filesystem path: Configurable, only if FILE or DIR based cache is
+used, which is not the default anymore</li>
+<li>Current owner and permissions: the user who logged in, 0600</li>
+<li>Read by: KRB5, AD, IPA, krb5_child, libkrb5 externally</li>
+<li>Written to by: krb5_child</li>
+<li><em>Change: No change, the credential cache will still be written as the
+user in question</em></li>
+</ul>
+</div>
+<div class="section" id="kerberos-ldap-credential-cache">
+<h2>Kerberos LDAP credential cache<a class="headerlink" href="#kerberos-ldap-credential-cache" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Filesystem path: <code class="docutils literal"><span class="pre">/var/lib/sss/db/ccache_$domain</span></code></li>
+<li>Current owner and permissions: root.root 0600</li>
+<li>Read by: AD, IPA and LDAP providers (coded up in LDAP provider tree)</li>
+<li>Written to by: ldap_child</li>
+<li>No change needed since ldap_child will run as the sssd user in the
+new design</li>
+<li><em>New owner and permissions: sssd.sssd 0600</em></li>
+</ul>
+</div>
+<div class="section" id="kerberos-kdcinfo-files">
+<h2>Kerberos kdcinfo files<a class="headerlink" href="#kerberos-kdcinfo-files" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Filesystem path: <code class="docutils literal"><span class="pre">/var/lib/sss/pubconf/*</span></code></li>
+<li>Current owner and permissions: root.root. The directory has
+permissions of 0755, the files 0644</li>
+<li>Read by: libkrb5</li>
+<li>Written to by: LDAP, KRB5, IPA, AD providers, krb5_child,
+ldap_child</li>
+<li><em>New owner and permissions: Both directory and files will be owned by
+sssd.sssd, the permissions will stay the same</em></li>
+</ul>
+</div>
+<div class="section" id="selinux-user-mappings">
+<h2>SELinux user mappings<a class="headerlink" href="#selinux-user-mappings" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Filesystem path: <code class="docutils literal"><span class="pre">/etc/selinux/targeted/logins</span></code></li>
+<li>Current owner and permissions: root.root. The directory has
+permissions of 0755, the files 0644</li>
+<li>Read by: pam_selinux</li>
+<li>Written to by: IPA provider</li>
+<li><em>Change: libsemanage will be used to set the labels instead. Since
+setting the label is a privileged operation and sssd_be runs
+unprivileged, setting the label was moved to a separate child
+process, selinux_child</em></li>
+</ul>
+</div>
+<div class="section" id="unix-pipes">
+<h2>UNIX pipes<a class="headerlink" href="#unix-pipes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Filesystem path: <code class="docutils literal"><span class="pre">/var/lib/sss/pipes/</span></code></li>
+<li>Current owner and permissions: root.root. The directory has
+permissions of 0755, the files 0666. There is one pipe per responder.</li>
+<li>Read by: client modules, all responders except InfoPipe</li>
+<li>Written to by: client modules, responders</li>
+<li><em>New owner and permissions: Both directory and files will be owned by
+sssd.sssd, the permissions will stay the same</em></li>
+</ul>
+</div>
+<div class="section" id="unix-pam-private-pipe">
+<h2>UNIX PAM private pipe<a class="headerlink" href="#unix-pam-private-pipe" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Filesystem path: <code class="docutils literal"><span class="pre">/var/lib/sss/pipes/private/pam</span></code></li>
+<li>Current owner and permissions: root.root. The directory has
+permissions of 0700, the files 0600. Only the PAM responder uses the
+private pipe.</li>
+<li>Read by: PAM responder</li>
+<li>Written to by: PAM client module</li>
+<li><em>New owner and permissions: The directory will be owned by sssd.sssd,
+the file will stay the same</em></li>
+</ul>
+</div>
+<div class="section" id="data-provider-private-pipes">
+<h2>Data Provider private pipes<a class="headerlink" href="#data-provider-private-pipes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Filesystem path: <code class="docutils literal"><span class="pre">/var/lib/sss/pipes/private/sbus-dp_$domain.$PID</span></code></li>
+<li>Current owner and permissions: root.root. The directory has
+permissions of 0700, the files 0600.</li>
+<li>Read by: Responders</li>
+<li>Written to by: Data Provider</li>
+<li><em>New owner and permissions: Both directory and files will be owned by
+sssd.sssd, the permissions will stay the same</em></li>
+</ul>
+<div class="section" id="kerberos-configuration-file">
+<h3>Kerberos configuration file<a class="headerlink" href="#kerberos-configuration-file" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Filesystem path: <code class="docutils literal"><span class="pre">/etc/krb5.conf</span></code></li>
+<li>Read by: libkrb5</li>
+<li>Written to by: The IPA and AD providers &#8220;touch&#8221; the file in order to
+make libkrb5 re-read it</li>
+<li><em>Change: The file can be opened before dropping privileges and we can
+keep the fd around. Alternatively, the modification can be performed
+with a setuid helper</em></li>
+</ul>
+</div>
+<div class="section" id="configuration-changes">
+<h3>Configuration changes<a class="headerlink" href="#configuration-changes" title="Permalink to this headline">¶</a></h3>
+<p>There is a new option called <code class="docutils literal"><span class="pre">user</span></code> that allows the administrator to
+configure the user sssd runs as. Please note that it makes sense to only
+use either root or the user sssd was configured with.</p>
+</div>
+<div class="section" id="how-to-test">
+<h3>How to test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h3>
+<p>Test ordinary SSSD operations. Everything must work as it used to
+before. Pay special attention to operations that involve the short-lived
+processes, like GSSAPI LDAP provider authentication or Kerberos user
+authentication.</p>
+<p>Upgrade testing must be performed as well.</p>
+</div>
+<div class="section" id="future-enhancements">
+<h3>Future Enhancements<a class="headerlink" href="#future-enhancements" title="Permalink to this headline">¶</a></h3>
+<p>During the design or implementation, we identified several ideas for
+improvement. Even though we don&#8217;t need to implement these now, it makes
+sense to keep the description in this design page for future.</p>
+</div>
+</div>
+<div class="section" id="allow-the-infopipe-responder-to-run-as-sssd-user">
+<h2>Allow the InfoPipe responder to run as sssd user<a class="headerlink" href="#allow-the-infopipe-responder-to-run-as-sssd-user" title="Permalink to this headline">¶</a></h2>
+<p>In 1.12.3, sssd.conf is still owned by root, mostly because there is a
+number of programs like authconfig that generate sssd.conf as root.
+Moreover, in enterprise setups, the sssd.conf would be pushed to the
+client with a tool such as puppet that would still use the same
+privileges.</p>
+<p>Therefore, even rootless sssd needs to handle sssd.conf owned by root,
+at least for the time being. We can even chown the file to sssd user
+after startup or move the write-operation in
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InfoPipe.html">InfoPipe?</a> to a
+privileged helper.</p>
+<ul class="simple">
+<li>Tracked by:
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/2395">​https://fedorahosted.org/sssd/ticket/2395</a></li>
+</ul>
+</div>
+<div class="section" id="allow-the-command-line-tools-to-run-unprivileged">
+<h2>Allow the command line tools to run unprivileged<a class="headerlink" href="#allow-the-command-line-tools-to-run-unprivileged" title="Permalink to this headline">¶</a></h2>
+<p>Some command line tools can be run unprivileged - see the section called
+&#8220;Command Line Tools&#8221;. However, changing them is not a priority as they
+are short-lived and in general only accept switches, not free-form
+input.</p>
+<ul class="simple">
+<li>Tracked by:
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/2500">​https://fedorahosted.org/sssd/ticket/2500</a></li>
+</ul>
+</div>
+<div class="section" id="splitting-the-back-end-initialization-into-privileged-and-unprivileged-part">
+<h2>Splitting the back end initialization into privileged and unprivileged part<a class="headerlink" href="#splitting-the-back-end-initialization-into-privileged-and-unprivileged-part" title="Permalink to this headline">¶</a></h2>
+<p>It was proposed on the sssd-devel list that the initialization of the
+sssd_be process is split into a privileged and non-privileged function.
+The back end would open all providers, call the privileged
+initialization functions and then drop privileges. Currenly all
+initialization is done as root, which is not strictly required in many
+setups.</p>
+<ul class="simple">
+<li>Tracked by:
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/2504">​https://fedorahosted.org/sssd/ticket/2504</a></li>
+</ul>
+</div>
+<div class="section" id="using-kerberos-memory-cache-to-avoid-further-restrict-running-kerberos-helpers-as-root">
+<h2>Using Kerberos MEMORY cache to avoid further restrict running Kerberos helpers as root<a class="headerlink" href="#using-kerberos-memory-cache-to-avoid-further-restrict-running-kerberos-helpers-as-root" title="Permalink to this headline">¶</a></h2>
+<p>Sumit proposed that the keytab is read to a MEMORY type after child
+process startup so krb5_child and ldap_child can drop root privileges
+sooner. There are even some proof-of-concept patches <a class="reference external" href="https://lists.fedorahosted.org/pipermail/sssd-devel/2014-November/022403.html">​on
+sssd-devel</a></p>
+<ul class="simple">
+<li>Tracked by:
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/2503">​https://fedorahosted.org/sssd/ticket/2503</a></li>
+</ul>
+</div>
+<div class="section" id="using-libcap-ng-to-drop-the-privileges">
+<h2>Using libcap-ng to drop the privileges<a class="headerlink" href="#using-libcap-ng-to-drop-the-privileges" title="Permalink to this headline">¶</a></h2>
+<p>Once we need to not only drop privileges but also retain some capability
+(CAP_AUDIT comes to mind), we&#8217;ll need to use something like
+<a class="reference external" href="https://people.redhat.com/sgrubb/libcap-ng/">​libcap-ng</a> instead of
+handling capabilities ourselves with prctl</p>
+<p>The downside is obviously the extra dependency, but libcap-ng has a
+small footprint and is already used by packages that are present on
+most, if not all, modern Linux installations, such as dbus.</p>
+<p>We would keep the existing code around as a fallback for environments
+that don&#8217;t have the libcap-ngs library available, such as non-Linux
+systems or embedded systems. Because the code wouldn&#8217;t be enabled by
+default, it&#8217;s important to have unit tests for the privilege drop. For
+unit testing both options (libcap-ng and our own code),
+<a class="reference external" href="http://cwrap.org/uid_wrapper.html">​uid_wrapper</a> and
+<a class="reference external" href="http://cwrap.org/nss_wrapper.html">​nss_wrapper</a> are the best
+choice.</p>
+<ul class="simple">
+<li>Tracked by:
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/2482">​https://fedorahosted.org/sssd/ticket/2482</a></li>
+</ul>
+</div>
+<div class="section" id="merge-the-ldap-child-and-krb5-child-processes">
+<h2>Merge the ldap_child and krb5_child processes<a class="headerlink" href="#merge-the-ldap-child-and-krb5-child-processes" title="Permalink to this headline">¶</a></h2>
+<p>During design review, it was also proposed to look into merging the
+ldap_child and krb5_child as the code performs similar tasks The new
+krb5_child would act as an ldap_child based on a command line option
+value.</p>
+<ul class="simple">
+<li>Tracked by:
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/2502">​https://fedorahosted.org/sssd/ticket/2502</a></li>
+</ul>
+<div class="section" id="authors">
+<h3>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Sumit Bose &lt;<a class="reference external" href="mailto:sbose&#37;&#52;&#48;redhat&#46;com">​sbose<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+<li>Jakub Hrozek &lt;<a class="reference external" href="mailto:jhrozek&#37;&#52;&#48;redhat&#46;com">​jhrozek<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+<li>Simo Sorce &lt;<a class="reference external" href="mailto:simo&#37;&#52;&#48;redhat&#46;com">​simo<span>&#64;</span>redhat<span>&#46;</span>com</a></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Running SSSD as a non-root user</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem statement</a></li>
+<li><a class="reference internal" href="#use-case">Use case</a><ul>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a></li>
+<li><a class="reference internal" href="#a-new-system-user">A new system user</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuration-options">Configuration options</a><ul>
+<li><a class="reference internal" href="#dropping-privileges-of-the-sssd-processes">Dropping privileges of the SSSD processes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#monitor-sssd">Monitor (sssd)</a></li>
+<li><a class="reference internal" href="#responders">Responders</a></li>
+<li><a class="reference internal" href="#providers">Providers</a></li>
+<li><a class="reference internal" href="#short-lived-processes">Short-lived processes</a></li>
+<li><a class="reference internal" href="#command-line-tools">Command line tools</a><ul>
+<li><a class="reference internal" href="#external-resources-currently-requiring-root-access">External resources currently requiring root access</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sssd-configuration-file">SSSD configuration file</a></li>
+<li><a class="reference internal" href="#debug-logs">Debug logs</a></li>
+<li><a class="reference internal" href="#the-configuration-database">The configuration database</a></li>
+<li><a class="reference internal" href="#the-on-disk-cache-sysdb">The on-disk cache (sysdb)</a></li>
+<li><a class="reference internal" href="#memory-cache">Memory Cache</a></li>
+<li><a class="reference internal" href="#kerberos-keytab">Kerberos keytab</a></li>
+<li><a class="reference internal" href="#kerberos-user-credential-cache">Kerberos user credential cache</a></li>
+<li><a class="reference internal" href="#kerberos-ldap-credential-cache">Kerberos LDAP credential cache</a></li>
+<li><a class="reference internal" href="#kerberos-kdcinfo-files">Kerberos kdcinfo files</a></li>
+<li><a class="reference internal" href="#selinux-user-mappings">SELinux user mappings</a></li>
+<li><a class="reference internal" href="#unix-pipes">UNIX pipes</a></li>
+<li><a class="reference internal" href="#unix-pam-private-pipe">UNIX PAM private pipe</a></li>
+<li><a class="reference internal" href="#data-provider-private-pipes">Data Provider private pipes</a><ul>
+<li><a class="reference internal" href="#kerberos-configuration-file">Kerberos configuration file</a></li>
+<li><a class="reference internal" href="#configuration-changes">Configuration changes</a></li>
+<li><a class="reference internal" href="#how-to-test">How to test</a></li>
+<li><a class="reference internal" href="#future-enhancements">Future Enhancements</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#allow-the-infopipe-responder-to-run-as-sssd-user">Allow the InfoPipe responder to run as sssd user</a></li>
+<li><a class="reference internal" href="#allow-the-command-line-tools-to-run-unprivileged">Allow the command line tools to run unprivileged</a></li>
+<li><a class="reference internal" href="#splitting-the-back-end-initialization-into-privileged-and-unprivileged-part">Splitting the back end initialization into privileged and unprivileged part</a></li>
+<li><a class="reference internal" href="#using-kerberos-memory-cache-to-avoid-further-restrict-running-kerberos-helpers-as-root">Using Kerberos MEMORY cache to avoid further restrict running Kerberos helpers as root</a></li>
+<li><a class="reference internal" href="#using-libcap-ng-to-drop-the-privileges">Using libcap-ng to drop the privileges</a></li>
+<li><a class="reference internal" href="#merge-the-ldap-child-and-krb5-child-processes">Merge the ldap_child and krb5_child processes</a><ul>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/NotRootSSSD.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/NotRootSSSD.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

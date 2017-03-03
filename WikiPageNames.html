@@ -1,0 +1,164 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Wiki Page Names &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="wiki-page-names">
+<h1>Wiki Page Names<a class="headerlink" href="#wiki-page-names" title="Permalink to this headline">¶</a></h1>
+<div class="system-message"><p><strong>Error: Macro TracGuideToc(None) failed</strong></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;NoneType&#39;</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span> <span class="s1">&#39;find&#39;</span>
+</pre></div>
+</div>
+</div><p>Wiki page names commonly use the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/CamelCase.html">CamelCase</a>
+convention. Within wiki text, any word in
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/CamelCase.html">CamelCase</a>
+automatically becomes a hyperlink to the wiki page with that name.</p>
+<p><a class="reference external" href="https://docs.pagure.org/sssd-test2/CamelCase.html">CamelCase</a> page
+names must follow these rules:</p>
+<ol class="arabic simple">
+<li>The name must consist of <strong>alphabetic characters only</strong>. No digits,
+spaces, punctuation, or underscores are allowed.</li>
+<li>A name must have at least two capital letters.</li>
+<li>The first character must be capitalized.</li>
+<li>Every capital letter must be followed by one or more lower-case
+letters.</li>
+<li>The use of slash ( / ) is permitted in page names (possibly
+representing a hierarchy).</li>
+</ol>
+<p>If you want to create a wiki page that doesn&#8217;t follow
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/CamelCase.html">CamelCase</a> rules
+you can use the following syntax:</p>
+<p>This will be rendered as:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/Wiki_page.html">Wiki_page?</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/ISO9000.html">ISO9000?</a>, and
+with a label: <a class="reference external" href="https://docs.pagure.org/sssd-test2/ISO9000.html">ISO 9000
+standard?</a></li>
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/Space%20Matters.html">Space
+Matters?</a>
+<em>(that page name embeds space characters)</em> and with a label: <a class="reference external" href="https://docs.pagure.org/sssd-test2/Space%20Matters.html">all
+about white
+space?</a></li>
+<li>or simply:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiPageName.html">WikiPageName?</a>s
+<em>(old MoinMoin&#8217;s internal free links style)</em></li>
+<li>even better, the new <a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiCreole%20link%20style.html">WikiCreole link
+style?</a>
+and with a label: <a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiCreole%20link%20style.html">WikiCreole style
+links?</a>
+<em>(since 0.12, also now adopted by MoinMoin)</em></li>
+</ul>
+<p>Starting with Trac 0.11, it&#8217;s also possible to link to a specific
+<em>version</em> of a Wiki page, as you would do for a specific version of a
+file, for example:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiStart?version=1.html">WikiStart&#64;1</a>.</p>
+<p>You can also prevent a
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/CamelCase.html">CamelCase</a> name
+to be interpreted as a
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracLinks.html">TracLinks</a>, by
+quoting it. See
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracLinks.html#EscapingLinks">TracLinks#EscapingLinks</a>.</p>
+<p>As visible in the example above, one can also append an anchor to a Wiki
+page name, in order to link to a specific section within that page. The
+anchor can easily be seen by hovering the mouse over a section heading,
+then clicking on the ¶ sign that appears at its end. The anchor is
+usually generated automatically, but it&#8217;s also possible to specify it
+explicitly: see
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html#using-explicit-id-in-heading">WikiFormatting#using-explicit-id-in-heading</a>.</p>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiNewPage.html">WikiNewPage</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html">WikiFormatting</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracWiki.html">TracWiki</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracLinks.html">TracLinks</a></p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/WikiPageNames.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/WikiPageNames.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

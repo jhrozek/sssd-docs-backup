@@ -1,0 +1,289 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Unicode Support in Trac &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="unicode-support-in-trac">
+<h1>Unicode Support in Trac<a class="headerlink" href="#unicode-support-in-trac" title="Permalink to this headline">¶</a></h1>
+<div class="system-message"><p><strong>Error: Macro TracGuideToc(None) failed</strong></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;NoneType&#39;</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span> <span class="s1">&#39;find&#39;</span>
+</pre></div>
+</div>
+</div><p>Trac stores all text using UTF-8 encoding, including text in tickets and
+wiki pages. Internal processing of text uses true Unicode
+representations.</p>
+<p>As such, it supports most (all?) commonly used character encodings.</p>
+<p>If the default encoding in your source code repository is not UTF-8, you
+can specify it in the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#trac-section">trac.ini</a>,
+for example:</p>
+<p>You also must make sure that your <a class="reference external" href="http://trac.edgewall.org/intertrac/DatabaseBackend">​database
+backend</a> stores
+its data in UTF-8; otherwise strange things will happen.</p>
+<div class="line-block">
+<div class="line">To convert your database to UTF-8, the easiest way is to dump the
+database, convert the dump into UTF-8 and then import the converted
+dump back into the database.</div>
+<div class="line">You can use
+<a class="reference external" href="http://www.gnu.org/software/libiconv/documentation/libiconv/iconv.1.html">​iconv</a>
+to convert the dump.</div>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="arabic">
+<h3>Arabic<a class="headerlink" href="#arabic" title="Permalink to this headline">¶</a></h3>
+<p>تراك يقوم بحفظ كل الكلمات باستخدام صيغة UTF-8، بما في ذلك الكلمات
+المستخدمة في صفحات التيكت والويكي.</p>
+</div>
+<div class="section" id="bulgarian">
+<h3>Bulgarian<a class="headerlink" href="#bulgarian" title="Permalink to this headline">¶</a></h3>
+<p>Българският език работи ли?</p>
+</div>
+<div class="section" id="cesky">
+<h3>Česky<a class="headerlink" href="#cesky" title="Permalink to this headline">¶</a></h3>
+<p>Čeština v kódování UTF-8, žádný problém.</p>
+</div>
+<div class="section" id="chinese">
+<h3>Chinese<a class="headerlink" href="#chinese" title="Permalink to this headline">¶</a></h3>
+<p>Traditional: 繁體中文, 漢字測試; Simplified: 简体中文，汉字测试</p>
+</div>
+<div class="section" id="croatian">
+<h3>Croatian<a class="headerlink" href="#croatian" title="Permalink to this headline">¶</a></h3>
+<p>Ako podržava srpski i slovenski mora podržavati i Hrvatski - čćžšđ ČĆŽŠĐ</p>
+</div>
+<div class="section" id="english">
+<h3>English<a class="headerlink" href="#english" title="Permalink to this headline">¶</a></h3>
+<p>Yes indeed, Trac supports English. Fully.</p>
+</div>
+<div class="section" id="francais">
+<h3>Français<a class="headerlink" href="#francais" title="Permalink to this headline">¶</a></h3>
+<p>Il est possible d&#8217;écrire en Français : à, ç, û, ...</p>
+</div>
+<div class="section" id="german">
+<h3>German<a class="headerlink" href="#german" title="Permalink to this headline">¶</a></h3>
+<p>Trac-Wiki muß auch deutsche Umlaute richtig anzeigen: ö, ä, ü, Ä, Ö, Ü;
+und das scharfe ß</p>
+</div>
+<div class="section" id="greek">
+<h3>Greek<a class="headerlink" href="#greek" title="Permalink to this headline">¶</a></h3>
+<p>Τα Ελληνικά υποστηρίζονται επαρκώς επίσης.</p>
+</div>
+<div class="section" id="hebrew">
+<h3>Hebrew<a class="headerlink" href="#hebrew" title="Permalink to this headline">¶</a></h3>
+<p>אני יכול לאכול זכוכית וזה לא מזיק לי</p>
+</div>
+<div class="section" id="hindi">
+<h3>Hindi<a class="headerlink" href="#hindi" title="Permalink to this headline">¶</a></h3>
+<p>अब हिन्दी में।</p>
+</div>
+<div class="section" id="hungarian">
+<h3>Hungarian<a class="headerlink" href="#hungarian" title="Permalink to this headline">¶</a></h3>
+<p>Árvíztűrő tükörfúrógép</p>
+</div>
+<div class="section" id="icelandic">
+<h3>Icelandic<a class="headerlink" href="#icelandic" title="Permalink to this headline">¶</a></h3>
+<p>Ævar sagði við ömmu sína: Sjáðu hvað ég er stór!</p>
+</div>
+<div class="section" id="japanese">
+<h3>Japanese<a class="headerlink" href="#japanese" title="Permalink to this headline">¶</a></h3>
+<p>漢字 ひらがな カタカナ ﾊﾝｶｸｶﾅ 日本語試験</p>
+</div>
+<div class="section" id="korean">
+<h3>Korean<a class="headerlink" href="#korean" title="Permalink to this headline">¶</a></h3>
+<p>이번에는 한글로 써보겠습니다. 잘 보이나요? 한글</p>
+</div>
+<div class="section" id="latvian">
+<h3>Latvian<a class="headerlink" href="#latvian" title="Permalink to this headline">¶</a></h3>
+<p>Latviešu valoda arī strādā!</p>
+</div>
+<div class="section" id="lithuanian">
+<h3>Lithuanian<a class="headerlink" href="#lithuanian" title="Permalink to this headline">¶</a></h3>
+<p>Sudalyvaukime ir mes. Ar veikia lietuviškos raidės? ąčęėįšųūž ĄČĘĖĮŠŲŪŽ
+Žinoma, kad veikia :) Kas tie mes?</p>
+</div>
+<div class="section" id="persian-farsi">
+<h3>Persian (Farsi)<a class="headerlink" href="#persian-farsi" title="Permalink to this headline">¶</a></h3>
+<p>این یک متن فارسی است ولی امکان نوشتن مستقیم فارسی نیست چون حالت متن از
+راست به چپ و جود ندارد برای فارسی نوشتن باید از HTML استفاده کنید.</p>
+<div dir="rtl"></div><p>این نمونه یک متن از راست به چپ فارسی است که در HTML نوشته شده تا اعداد
+12345 و حروف لاتین ABCDEF در محل خودشان نمایش داده شوند.</p>
+</div>
+<div class="section" id="polish">
+<h3>Polish<a class="headerlink" href="#polish" title="Permalink to this headline">¶</a></h3>
+<p>Pchnąć w tę łódź jeża lub osiem skrzyń fig; Nocna gżegżółka zawsze
+dzienną przekuka.</p>
+</div>
+<div class="section" id="portuguese">
+<h3>Portuguese<a class="headerlink" href="#portuguese" title="Permalink to this headline">¶</a></h3>
+<p>É possível guardar caracteres especias da língua portuguesa, incluindo o
+símbolo da moeda européia &#8216;€&#8217;, trema &#8216;ü&#8217;, crase &#8216;à&#8217;, agudos &#8216;áéíóú&#8217;,
+circunflexos &#8216;âêô&#8217;, til &#8216;ãõ&#8217;, cedilha &#8216;ç&#8217;, ordinais &#8216;ªº&#8217;, grau &#8216;°¹²³&#8217;.</p>
+</div>
+<div class="section" id="russian">
+<h3>Russian<a class="headerlink" href="#russian" title="Permalink to this headline">¶</a></h3>
+<p>Проверка русского языка: кажется работает... И буква &#8220;ё&#8221; есть...</p>
+</div>
+<div class="section" id="serbian">
+<h3>Serbian<a class="headerlink" href="#serbian" title="Permalink to this headline">¶</a></h3>
+<p>Podržan, uprkos činjenici da se za njegovo pisanje koriste чак два
+алфабета.</p>
+</div>
+<div class="section" id="slovenian">
+<h3>Slovenian<a class="headerlink" href="#slovenian" title="Permalink to this headline">¶</a></h3>
+<p>Ta suhi škafec pušča vodo že od nekdaj!</p>
+</div>
+<div class="section" id="spanish">
+<h3>Spanish<a class="headerlink" href="#spanish" title="Permalink to this headline">¶</a></h3>
+<p>Esto es un pequeño texto en Español, donde el veloz murciélago hindú
+comía cardlllo y kiwi</p>
+</div>
+<div class="section" id="swedish">
+<h3>Swedish<a class="headerlink" href="#swedish" title="Permalink to this headline">¶</a></h3>
+<p>Räven raskar över isen med luva på.</p>
+</div>
+<div class="section" id="thai">
+<h3>Thai<a class="headerlink" href="#thai" title="Permalink to this headline">¶</a></h3>
+<p>Trac แสดงภาษาไทยได้อย่างถูกต้อง!</p>
+</div>
+<div class="section" id="ukrainian">
+<h3>Ukrainian<a class="headerlink" href="#ukrainian" title="Permalink to this headline">¶</a></h3>
+<p>Перевірка української мови...</p>
+</div>
+<div class="section" id="urdu">
+<h3>Urdu<a class="headerlink" href="#urdu" title="Permalink to this headline">¶</a></h3>
+<p>ٹریک اردو بھی سپورٹ کرتا ہے۔</p>
+</div>
+<div class="section" id="vietnamese">
+<h3>Vietnamese<a class="headerlink" href="#vietnamese" title="Permalink to this headline">¶</a></h3>
+<p>Viết tiếng Việt cũng được.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Unicode Support in Trac</a><ul>
+<li><a class="reference internal" href="#examples">Examples</a><ul>
+<li><a class="reference internal" href="#arabic">Arabic</a></li>
+<li><a class="reference internal" href="#bulgarian">Bulgarian</a></li>
+<li><a class="reference internal" href="#cesky">Česky</a></li>
+<li><a class="reference internal" href="#chinese">Chinese</a></li>
+<li><a class="reference internal" href="#croatian">Croatian</a></li>
+<li><a class="reference internal" href="#english">English</a></li>
+<li><a class="reference internal" href="#francais">Français</a></li>
+<li><a class="reference internal" href="#german">German</a></li>
+<li><a class="reference internal" href="#greek">Greek</a></li>
+<li><a class="reference internal" href="#hebrew">Hebrew</a></li>
+<li><a class="reference internal" href="#hindi">Hindi</a></li>
+<li><a class="reference internal" href="#hungarian">Hungarian</a></li>
+<li><a class="reference internal" href="#icelandic">Icelandic</a></li>
+<li><a class="reference internal" href="#japanese">Japanese</a></li>
+<li><a class="reference internal" href="#korean">Korean</a></li>
+<li><a class="reference internal" href="#latvian">Latvian</a></li>
+<li><a class="reference internal" href="#lithuanian">Lithuanian</a></li>
+<li><a class="reference internal" href="#persian-farsi">Persian (Farsi)</a></li>
+<li><a class="reference internal" href="#polish">Polish</a></li>
+<li><a class="reference internal" href="#portuguese">Portuguese</a></li>
+<li><a class="reference internal" href="#russian">Russian</a></li>
+<li><a class="reference internal" href="#serbian">Serbian</a></li>
+<li><a class="reference internal" href="#slovenian">Slovenian</a></li>
+<li><a class="reference internal" href="#spanish">Spanish</a></li>
+<li><a class="reference internal" href="#swedish">Swedish</a></li>
+<li><a class="reference internal" href="#thai">Thai</a></li>
+<li><a class="reference internal" href="#ukrainian">Ukrainian</a></li>
+<li><a class="reference internal" href="#urdu">Urdu</a></li>
+<li><a class="reference internal" href="#vietnamese">Vietnamese</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracUnicode.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracUnicode.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

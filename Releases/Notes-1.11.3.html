@@ -1,0 +1,257 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>This release mostly focuses on bug fixes, especially in the AD
+provider</li>
+<li>The AD provider is able to resolve group memberships for groups with
+Global and Universal scope</li>
+<li>The initgroups (get groups for user) operation for users from trusted
+AD domains was made more reliable by reading the required tokenGroups
+attribute from LDAP instead of Global Catalog</li>
+<li>A new option <code class="docutils literal"><span class="pre">ad_enable_gc</span></code> was added to the AD provider. This
+option allows the administrator to force SSSD to talk to LDAP port
+only and never try the Global Catalog</li>
+<li>The AD provider is now able to leverage the tokenGroups attribute
+even when POSIX attributes are used, providing better performance
+during logins.</li>
+<li>A memory leak in the NSS responder that affected long-lived clients
+that requested netgroup data was fixed</li>
+</ul>
+</div>
+<div class="section" id="documentation-changes">
+<h1>Documentation Changes<a class="headerlink" href="#documentation-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>A new option <code class="docutils literal"><span class="pre">ldap_group_type</span></code> was added to LDAP, IPA and AD
+providers</li>
+<li>A new option <code class="docutils literal"><span class="pre">ad_enable_gc</span></code> was added to the AD provider</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/1568">#1568</a></dt>
+<dd>[RFE] AD Provider should use tokenGroups with non-ID-mapping</dd>
+<dt><a class="reference external" href="/sssd/ticket/2077">#2077</a></dt>
+<dd>[RFE] If originalDN is not available during LDAP auth, the SSSD
+should look it up</dd>
+<dt><a class="reference external" href="/sssd/ticket/2132">#2132</a></dt>
+<dd>Improve detection of the right domain when processing group with
+members from several domains</dd>
+<dt><a class="reference external" href="/sssd/ticket/2133">#2133</a></dt>
+<dd>sss_idmap: add API to free objects allocated by the library</dd>
+<dt><a class="reference external" href="/sssd/ticket/2137">#2137</a></dt>
+<dd>SSSD fails to fetch netgroup information with setnetgrent failed
+error</dd>
+<dt><a class="reference external" href="/sssd/ticket/2138">#2138</a></dt>
+<dd>Valgrind sssd &#8220;Syscall param socketcall.sendto(msg) points to
+uninitialised byte(s)&#8221;</dd>
+<dt><a class="reference external" href="/sssd/ticket/2145">#2145</a></dt>
+<dd>Push patch to bump version-info of libsss_idmap</dd>
+<dt><a class="reference external" href="/sssd/ticket/2146">#2146</a></dt>
+<dd>sssd can&#8217;t retrieve auto.master when using the
+&#8220;default_domain_suffix&#8221; option in</dd>
+<dt><a class="reference external" href="/sssd/ticket/2147">#2147</a></dt>
+<dd>sssd_be crashes on manually adding a cleartext password to
+ldap_default_authtok</dd>
+<dt><a class="reference external" href="/sssd/ticket/2148">#2148</a></dt>
+<dd>Individual group search returned multiple results in GC lookups</dd>
+<dt><a class="reference external" href="/sssd/ticket/2154">#2154</a></dt>
+<dd>Incorrect mention of access_filter in sssd-ad manpage</dd>
+<dt><a class="reference external" href="/sssd/ticket/2156">#2156</a></dt>
+<dd>Non descriptive error message when sssd.conf is missing completely</dd>
+<dt><a class="reference external" href="/sssd/ticket/2157">#2157</a></dt>
+<dd>sssd_be segfaults if empty grop is resolved using
+ad_matching_rule</dd>
+<dt><a class="reference external" href="/sssd/ticket/2161">#2161</a></dt>
+<dd>tokenGroups do not work reliable with Global Catalog</dd>
+<dt><a class="reference external" href="/sssd/ticket/2165">#2165</a></dt>
+<dd>Update Gentoo init script</dd>
+<dt><a class="reference external" href="/sssd/ticket/2168">#2168</a></dt>
+<dd>If SSSD starts offline, subdomains list is never read.</dd>
+<dt><a class="reference external" href="/sssd/ticket/2170">#2170</a></dt>
+<dd>sssd_nss grows memory footprint when netgroups are requested</dd>
+<dt><a class="reference external" href="/sssd/ticket/2173">#2173</a></dt>
+<dd>sssd_be crashes occasionally</dd>
+<dt><a class="reference external" href="/sssd/ticket/2178">#2178</a></dt>
+<dd>AD groups with domain-local scope should be filtered out for trusted
+domains</dd>
+</dl>
+</div></div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Aron Parsons (1):</p>
+<ul class="simple">
+<li>do not use default_domain_suffix with autofs</li>
+</ul>
+<p>Jakub Hrozek (14):</p>
+<ul class="simple">
+<li>Updating the version for the 1.11.3 release</li>
+<li>Initialize sid_str to NULL to avoid freeing random data</li>
+<li>LDAP: Split out a request to search for a user w/o saving</li>
+<li>LDAP: Search for original DN during auth if it&#8217;s missing</li>
+<li>AD: Fix a typo in the man page</li>
+<li>LDAP: Initialize user count for AD matching rule</li>
+<li>SUBDOMAINS: Reuse cached results if DP is offline</li>
+<li>AD: Refresh subdomain data structures on startup</li>
+<li>IPA: Refresh subdomain data structures on startup</li>
+<li>IPA: Call ipa_ad_subdom_refresh when server mode is initialized</li>
+<li>AD: Add a utility function to create list of connections</li>
+<li>AD: Add a new option to turn off GC lookups</li>
+<li>AD: Enable fallback to LDAP of trusted domain</li>
+<li>Updating translations for the 1.11.3 release</li>
+</ul>
+<p>Jan Engelhardt (1):</p>
+<ul class="simple">
+<li>build: fix ordering of linker flags</li>
+</ul>
+<p>Lukas Slebodnik (7):</p>
+<ul class="simple">
+<li>NSS: Set packet length for initgroups</li>
+<li>LDAP: Prevent from using uninitialized sdap_options</li>
+<li>SYSDB: Skip malformed netgroup attribute.</li>
+<li>SYSDB: Sanitize filter before sysdb_search_groups</li>
+<li>SYSDB: Sanitize filter before removing ghost attrs</li>
+<li>NSS: Fix memory leak in sss_setnetgrent</li>
+<li>AUTOTOOLS: krb5 1.12 is also supported krb5 libs</li>
+</ul>
+<p>Markos Chandras (2):</p>
+<ul class="simple">
+<li>sysv/gentoo: Use xdm if possible</li>
+<li>sysv/gentoo: Send debug output to a file instead of stderr</li>
+</ul>
+<p>Pavel Březina (11):</p>
+<ul class="simple">
+<li>idmap: add API to free allocated SIDs</li>
+<li>free idmapped SIDs correctly</li>
+<li>free idmapped dom SIDs correctly</li>
+<li>free idmapped smb SIDs correctly</li>
+<li>free idmapped binary SIDs correctly</li>
+<li>pac: fix double free</li>
+<li>pac: fix potential memory leaks</li>
+<li>failover: check dns_domain if primary servers lookup failed</li>
+<li>ad: refactor tokengroups initgroups</li>
+<li>ad: use tokengroups even when id mapping is disabled</li>
+<li>Bump sss_idmap version to 3:0:3</li>
+</ul>
+<p>Pavel Reichl (3):</p>
+<ul class="simple">
+<li>monitor: Specific error message for missing sssd.conf</li>
+<li>SSSD: Improved domain detection</li>
+<li>SSSD: Unit test - sss_ldap_dn_in_search_bases</li>
+</ul>
+<p>Sumit Bose (10):</p>
+<ul class="simple">
+<li>AD: use LDAP for group lookups</li>
+<li>sss_cache: initialize names member of sss_domain_info</li>
+<li>sss_cache: fix case-sensitivity issue</li>
+<li>Add sysdb_attrs_add_lc_name_alias</li>
+<li>Use sysdb_attrs_add_lc_name_alias to add case-insensitive alias</li>
+<li>Use lower-case name for case-insensitive searches</li>
+<li>Add new option ldap_group_type</li>
+<li>Add sysdb_attrs_get_int32_t</li>
+<li>AD: filter domain local groups for trusted/sub domains</li>
+<li>AD: cross-domain membership fix</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#documentation-changes">Documentation Changes</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.11.3.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.11.3.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

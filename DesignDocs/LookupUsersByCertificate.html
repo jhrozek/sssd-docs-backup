@@ -1,0 +1,250 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Lookup Users by Certificate &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="lookup-users-by-certificate">
+<h1>Lookup Users by Certificate<a class="headerlink" href="#lookup-users-by-certificate" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2596">​https://fedorahosted.org/sssd/ticket/2596</a></li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/546">​https://fedorahosted.org/sssd/ticket/546</a></li>
+<li><a class="reference external" href="https://fedorahosted.org/freeipa/ticket/4238">​https://fedorahosted.org/freeipa/ticket/4238</a>
+(design page:
+<a class="reference external" href="http://www.freeipa.org/page/V4/User_Certificates">​http://www.freeipa.org/page/V4/User_Certificates</a>)</li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>As stated in ticket
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/2596">#2596</a> applications doing
+user authentication based on certificates, e.g. web servers, need a way
+to map the certificate presented by the client to a specific user.
+Although there are various ways to derive a user name from special
+entries in the certificate so far there is no generally accepted scheme.
+The most general and in some cases the only possible way is to look up
+the certificate directly in the LDAP server. This requires that the
+certificate is stored in the LDAP server which we will assume for this
+initial design. (In a second part user lookups based on the certificate
+content will be added, this requires that the syntax for the mapping is
+specified in
+<a class="reference external" href="http://www.freeipa.org/page/V4/User_Certificates#Certificate_Identity_Mapping">​http://www.freeipa.org/page/V4/User_Certificates#Certificate_Identity_Mapping</a>)</p>
+<p>The primary interface to lookup users by certificate would be D-BUS.</p>
+</div>
+<div class="section" id="use-cases">
+<h2>Use cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+<p>The primary use case is described in ticket
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/2596">#2596</a>. If Apache is
+configured to use certificate based client authentication modules like
+mod_lookup_identity has access to the PAM encoded certificate via
+environment variables. With this data as input mod_lookup_identity
+should call a D-BUS method like
+<em>org.freedesktop.sssd.infopipe.GetUserAttrByCert</em> which will return the
+data of the user the certificate belongs similar to the <em>GetUserAttr</em>
+method.</p>
+</div>
+<div class="section" id="overview-of-the-solution">
+<h2>Overview of the solution<a class="headerlink" href="#overview-of-the-solution" title="Permalink to this headline">¶</a></h2>
+<p>Besides adding the D-Bus method to the InfoPipe responder the generic
+LDAP backend should be able to search and read the certificate data if
+available from a LDAP server and store it to the cache. The internal
+sysdb interface must be extended to search cached entries with the
+certificate as input.</p>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ldap-backend">
+<h3>LDAP backend<a class="headerlink" href="#ldap-backend" title="Permalink to this headline">¶</a></h3>
+<p>Reading certificate data if available just requires adding a new user
+attribute which will be requested during LDAP searches for a user. In
+general the certificate is stored as a DER encoded binary on the LDAP
+server. <strong>Question: should we add an option like
+ldap_user_cert_encoding to support other encodings a server might
+send to us, or shall we add it only when there is a real use case?</strong>
+Internally the certificate should be stored DER encoded to the cache as
+well because this encoding is the most unambiguous encoding (e.g. with
+PEM encoding it is not clear if the base64 blob should have line breaks
+or not and if the enclosing &#8216;&#8212;&#8211;BEGIN CERTIFICATE&#8212;&#8211;&#8217; and &#8216;&#8212;&#8211;END
+CERTIFICATE&#8212;&#8211;&#8217; should be stored as well and if line break should be
+added here or not?)</p>
+<p>To search a user with the help of the certificate the DER encoded binary
+ticket must be transformed into a search filter. In this case it would
+be something like &#8216;userCertificate=\23\a5\3e......&#8217; where each byte
+from the certificate is is represented by a hex value pre-pendened by a
+&#8216;\&#8217;. The filter should be generated in a subroutine which accepts the
+DER encoded certificate with base64 ascii armor and returns the search
+filter. This way the subroutine can later be extended to accept
+configuration options for the identity mapping and can return different
+search filters for those cases. Since the requirement for LDAP and sysdb
+search filters are the same there should be an option indicating if a
+LDAP or sysdb filter is needed, because the attribute names might be
+different.</p>
+<p>Although it would be possible to handle the binary DER data directly I
+think using a base64 ascii armor to handle the data as a string is
+useful to avoid adding code for handling binaries e.g. in the S-BUS
+requests to the backends.</p>
+</div>
+<div class="section" id="sysdb-api">
+<h3>SYSDB API<a class="headerlink" href="#sysdb-api" title="Permalink to this headline">¶</a></h3>
+<p>A new call sysdb_search_user_by_cert() should be added which get the
+DER encoded certificate with base64 ascii armor as input and use the
+function described above to get a proper search filter. Currently it
+will be only the search filter for the binary certificate. Other than
+that the new call will act like to other sysdb_search_user_by_*()
+calls.</p>
+</div>
+<div class="section" id="infopipe">
+<h3>InfoPipe<a class="headerlink" href="#infopipe" title="Permalink to this headline">¶</a></h3>
+<p>A new method GetUSerAttrByCert() must be implemented which expected the
+PEM encoded certificate and an array of attrbute names. <strong>Question:
+Should we only support PEM here or other formats as well? In this case
+we need a third parameter indicating the encoding of the certificate
+data.</strong>.
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InfoPipe.html">InfoPipe?</a> will
+convert the certificate into DER encoding with base64 ascii armor,
+search the cache and eventually forward the request to the backend. The
+request to the backend is processed similar to a request by name, only
+that a new filter name, e.g. DP_CERT_ID &#8220;cert&#8221;, is needed.</p>
+<p>Since it is in general not obvious to which domain a certificate
+belongs, the search must iterate over all domains in case no matching
+certificate was found. For the cases where there is a strong 1:1
+relationship between the issuer of a certificate and a domain,
+configuration options for this can be added later.</p>
+</div>
+</div>
+<div class="section" id="configuration-changes">
+<h2>Configuration changes<a class="headerlink" href="#configuration-changes" title="Permalink to this headline">¶</a></h2>
+<p>A new user attribute open &#8216;ldap_user_certificate&#8217; will be added to the
+LDAP provider. By default only the IPA provider will set a value for it
+to avoid reading about 1k of data which is not needed in the other
+providers. <strong>Question: Does this make sense or shall we enable it for
+other providers as well?</strong></p>
+</div>
+<div class="section" id="how-to-test">
+<h2>How To Test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<p>First a certificate must be load to a IPA user entry, it can be any kind
+of certificate as long as it is valid an DER or PEM encoded. Until IPA
+has some import utilities ldapmodify should be used. A LDIF file might
+look like this:</p>
+<p>where MII...= indicates the base64 encoded certificate data. If you have
+a PEM encoded certificate you can just use the base64 part here. If the
+certificate is DER encoded it can be transformed to base64 with</p>
+<p>Testing can be done with the help of the dbus-send utility:</p>
+<p>The first dbus-send command shows the lookup by certificate, the
+following two just illustrate how a single property or all can be
+requested from the returned object path.</p>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Sumit Bose &lt;<a class="reference external" href="mailto:sbose&#37;&#52;&#48;redhat&#46;com">​sbose<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Lookup Users by Certificate</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem statement</a></li>
+<li><a class="reference internal" href="#use-cases">Use cases</a></li>
+<li><a class="reference internal" href="#overview-of-the-solution">Overview of the solution</a></li>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a><ul>
+<li><a class="reference internal" href="#ldap-backend">LDAP backend</a></li>
+<li><a class="reference internal" href="#sysdb-api">SYSDB API</a></li>
+<li><a class="reference internal" href="#infopipe">InfoPipe</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuration-changes">Configuration changes</a></li>
+<li><a class="reference internal" href="#how-to-test">How To Test</a></li>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/LookupUsersByCertificate.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/LookupUsersByCertificate.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

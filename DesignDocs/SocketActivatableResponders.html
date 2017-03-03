@@ -1,0 +1,235 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Socket Activatable Responders &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="socket-activatable-responders">
+<h1>Socket Activatable Responders<a class="headerlink" href="#socket-activatable-responders" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2243">​https://fedorahosted.org/sssd/ticket/2243</a></li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/3129">​https://fedorahosted.org/sssd/ticket/3129</a></li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/3245">​https://fedorahosted.org/sssd/ticket/3245</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>SSSD has some responders which don&#8217;t have to be running all the time,
+but could be socket-activated instead in platforms where it&#8217;s supported.
+That&#8217;s the case, for instance, for the IFP, ssh and sudo responders.
+Making these responders socket-activated would provide a better use
+experience, as these services could be started on-demand when a client
+needs them and exist after a period of inactivity. Currently the admin
+has to explicitly list all the services that might potentially be needed
+in the <code class="docutils literal"><span class="pre">services</span></code> section and the processes have to be running all the
+time.</p>
+</div>
+<div class="section" id="use-cases">
+<h2>Use cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="sssctl">
+<h3>sssctl<a class="headerlink" href="#sssctl" title="Permalink to this headline">¶</a></h3>
+<p>As more and more features that had been added depending on the IFP
+responder, we should make sure that the responder is activated on demand
+and the admins doesn&#8217;t have to activate it manually.</p>
+</div>
+<div class="section" id="kcm">
+<h3>KCM<a class="headerlink" href="#kcm" title="Permalink to this headline">¶</a></h3>
+<p>The KCM responder is only seldom needed, when libkrb5 needs to access
+the credentials store. At the same time, the KCM responder must be
+running if the Kerberos credentials cache defaults to <code class="docutils literal"><span class="pre">KCM</span></code>.
+Socket-activating the responder would solve both of these cases.</p>
+</div>
+<div class="section" id="autofs">
+<h3>autofs<a class="headerlink" href="#autofs" title="Permalink to this headline">¶</a></h3>
+<p>The autofs responder is typically only needed when a share is about to
+be mounted.</p>
+</div>
+</div>
+<div class="section" id="overview-of-the-solution">
+<h2>Overview of the solution<a class="headerlink" href="#overview-of-the-solution" title="Permalink to this headline">¶</a></h2>
+<p>The solution agreed on the mailing list is to add a new unit for each
+one of the responders. Once a responder is started, it will communicate
+to the monitor in order to let the monitor know that it&#8217;s up and the
+monitor will do the registration of the responder, which basically
+consists in marking the service as started, increasing the services&#8217;
+counter, getting the responder&#8217;s configuration, adding the responder to
+the service&#8217;s list. A configurable idle timeout will be implemented in
+each responder, as part of this task, in order to exit the responder in
+case it&#8217;s not used for a few minutes.</p>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<p>In order to achieve our goal we will need a small modification in
+responders&#8217; common code in order to make it ready for socket-activation,
+add some systemd units for each of the responders and finally small
+changes in the monitor code in order to manage the new activated
+service.</p>
+<p>The change in the responders&#8217; common code is quite trivial, just change
+the sss_process_init code to call activate_unix_sockets() istead of
+set_unix_socket(). Something like:</p>
+<p>The units that have to be added for each responder must look like:</p>
+<p>sssd-&#64;responder&#64;.service.in (for services which can be run as
+unprivileged user):</p>
+<p>sssd-&#64;responder&#64;.service.in (for services which cannot be run as
+unprivileged user):</p>
+<p>sssd-&#64;responder&#64;.socket.in:</p>
+<p>Some responders may have more than one socket, which is the case of PAM,
+so another unit will be needed.</p>
+<p>sssd-&#64;<a class="reference external" href="mailto:responder&#37;&#52;&#48;-priv&#46;socket&#46;in">​responder<span>&#64;</span>-priv<span>&#46;</span>socket<span>&#46;</span>in</a>:</p>
+<p>Last but not least, the IFP responder doesn&#8217;t have a socket. It&#8217;s going
+to be D-Bus activated and some small changes will be required on its
+D-Bus service unit (for platforms where systemd is supported).</p>
+<p>And, finally, the code in the monitor side will have to have some
+adjustments in order to properly deal with an empty list of services
+and, also, to register the service when it&#8217;s started.</p>
+<p>As just the responders&#8217; will be socket-activated for now, the service
+type will have to exposed and passed through sbus when calling the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/RegistrationService.html">RegistrationService?</a>
+method and the monitor will have to properly do the registration of the
+service when
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/RegistrationService.html">RegistrationService?</a>&#8216;s
+callback is triggered. As mentioned before, the &#8220;registration&#8221; that has
+to be done from the monitor&#8217;s side is:</p>
+<ul class="simple">
+<li>Mark the service as started;</li>
+<li>Increase the services&#8217; counter;</li>
+<li>Get the responders&#8217; configuration;</li>
+<li>Set the service&#8217;s restart number;</li>
+<li>Add the service to the services&#8217; list.</li>
+</ul>
+<p>&#8220;Unregistering&#8221; a socket-activated service will be done when the
+connection between the service and the monitor is closed.</p>
+</div>
+<div class="section" id="configuration-changes">
+<h2>Configuration changes<a class="headerlink" href="#configuration-changes" title="Permalink to this headline">¶</a></h2>
+<p>After this design is implemented, the &#8220;services&#8221; line in sssd.conf will
+become optional for platforms where systemd is present. Note that in
+order to keep backward compatibility, if the &#8220;services&#8221; line is present,
+the services will behave exactly as they did before these changes.</p>
+</div>
+<div class="section" id="how-to-test">
+<h2>How To Test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<p>The easiest way to test is removing the &#8220;services&#8221; line from sssd.conf
+and try to use SSSD normally. Using sssctl tool without having the ifp
+responder set in the &#8220;services&#8221; line is another way to test.</p>
+</div>
+<div class="section" id="how-to-debug">
+<h2>How To Debug<a class="headerlink" href="#how-to-debug" title="Permalink to this headline">¶</a></h2>
+<p>The easiest way to debug this new feature is taking a look on the
+responders&#8217; common initialization code and in the monitors&#8217; client
+registration code. Is worth to mention that disabling the systemd&#8217;s
+services/sockets will prevent the responders&#8217; services to be started.</p>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<p>Fabiano Fidêncio &lt;<a class="reference external" href="mailto:fidencio&#37;&#52;&#48;redhat&#46;com">​fidencio<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Socket Activatable Responders</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem statement</a></li>
+<li><a class="reference internal" href="#use-cases">Use cases</a><ul>
+<li><a class="reference internal" href="#sssctl">sssctl</a></li>
+<li><a class="reference internal" href="#kcm">KCM</a></li>
+<li><a class="reference internal" href="#autofs">autofs</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#overview-of-the-solution">Overview of the solution</a></li>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a></li>
+<li><a class="reference internal" href="#configuration-changes">Configuration changes</a></li>
+<li><a class="reference internal" href="#how-to-test">How To Test</a></li>
+<li><a class="reference internal" href="#how-to-debug">How To Debug</a></li>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/SocketActivatableResponders.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/SocketActivatableResponders.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

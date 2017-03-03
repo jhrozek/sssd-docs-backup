@@ -1,0 +1,305 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Synopsis &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#Synopsis">Synopsis</a></li>
+<li><a class="reference external" href="#Daemonoptions">Daemon options</a></li>
+<li><a class="reference external" href="#PAMresponderoptions">PAM responder options</a></li>
+<li><a class="reference external" href="#PACresponderoptions">PAC responder options</a></li>
+<li><a class="reference external" href="#IFPresponderoptions">IFP responder options</a></li>
+<li><a class="reference external" href="#Generaldomainoptions">General domain options</a></li>
+<li><a class="reference external" href="#LDAPprovideroptions">LDAP provider options</a></li>
+<li><a class="reference external" href="#Kerberosprovideroptions">Kerberos provider options</a></li>
+<li><a class="reference external" href="#Simpleaccessprovideroptions">Simple access provider options</a></li>
+<li><a class="reference external" href="#IPAandADprovideroptions">IPA and AD provider options</a></li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="synopsis">
+<h1>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h1>
+<p>This page describes SSSD options that have a security implication. It
+was last updated with SSSD 1.13.1 in mind. The option description are
+often pasted from the man pages along with a short sentence explaining
+why the option has a security implication. Please see the sssd man pages
+for a more detailed description and the default values.</p>
+<p>As a general note, the SSSD should already include secure-by-default
+options, so normally no hardening is needed after the SSSD is
+configured. A notable exception is the <code class="docutils literal"><span class="pre">user</span></code> option. Additionally,
+SSSD tends to honor settings its libraries use and only allows means to
+override the library settings with SSSD specific This is especially true
+for libkrb5 and openldap-libs.</p>
+</div>
+<div class="section" id="daemon-options">
+<h1>Daemon options<a class="headerlink" href="#daemon-options" title="Permalink to this headline">¶</a></h1>
+<p>Options in this page section control the daemon behaviour and should be
+placed in the <code class="docutils literal"><span class="pre">[sssd]</span></code> section.</p>
+<dl class="docutils">
+<dt>services</dt>
+<dd>Comma separated list of services that are started when sssd itself
+starts. It is advisable to disable services that are not required.
+The same applies for domains.</dd>
+<dt>user</dt>
+<dd>The user to drop the privileges to where appropriate to avoid
+running as the root user. At the time of writing, the default is
+still root, although SSSD in RHEL and Fedora is also configured with
+the <code class="docutils literal"><span class="pre">sssd</span></code> user in mind. Adding <code class="docutils literal"><span class="pre">user</span> <span class="pre">=</span> <span class="pre">sssd</span></code> to the <code class="docutils literal"><span class="pre">[sssd]</span></code>
+section will cause the SSSD worker processes to run as the <code class="docutils literal"><span class="pre">sssd</span></code>
+user.</dd>
+<dt>certificate_verification</dt>
+<dd>If this option is set to no_ocsp, then Online Certificate Status
+Protocol checks are completely disabled.</dd>
+</dl>
+</div>
+<div class="section" id="pam-responder-options">
+<h1>PAM responder options<a class="headerlink" href="#pam-responder-options" title="Permalink to this headline">¶</a></h1>
+<p>Options in this section configure the PAM responder and belong to the
+<code class="docutils literal"><span class="pre">[pam]</span></code> section.</p>
+<dl class="docutils">
+<dt>offline_credentials_expiration</dt>
+<dd>If the authentication provider is offline, how long should we allow
+cached logins (in days since the last successful online login).</dd>
+<dt>offline_failed_login_attempts</dt>
+<dd>If the authentication provider is offline, how many failed login
+attempts are allowed. Can prevent brute-force attacks when offline.</dd>
+<dt>offline_failed_login_delay</dt>
+<dd>The time in minutes which has to pass after
+offline_failed_login_attempts has been reached before a new login
+attempt is possible. Can prevent brute-force attacks.</dd>
+<dt>pam_verbosity</dt>
+<dd>Controls what kind of messages are shown to the user during
+authentication. The default is 0 to make sure no info is leaked
+through a side channel.</dd>
+<dt>pam_trusted_users</dt>
+<dd>Specifies the comma-separated list of UID values or user names that
+are allowed to access the PAM responder as trusted users. Can be
+used to restrict access to the PAM responder. Users not included in
+this list can only access <code class="docutils literal"><span class="pre">pam_public_domains</span></code>.</dd>
+<dt>pam_public_domains</dt>
+<dd>Specifies the comma-separated list of domain names that are
+accessible even to untrusted users.</dd>
+</dl>
+</div>
+<div class="section" id="pac-responder-options">
+<h1>PAC responder options<a class="headerlink" href="#pac-responder-options" title="Permalink to this headline">¶</a></h1>
+<p>Options in this section configure the PAC responder and belong to the
+<code class="docutils literal"><span class="pre">[pac]</span></code> section.</p>
+<dl class="docutils">
+<dt>allowed_uids</dt>
+<dd>Specifies the comma-separated list of UID values or user names that
+are allowed to access the PAC responder. By default, only root can,
+so additional values for this option should be justified.</dd>
+</dl>
+</div>
+<div class="section" id="ifp-responder-options">
+<h1>IFP responder options<a class="headerlink" href="#ifp-responder-options" title="Permalink to this headline">¶</a></h1>
+<p>Options in this section configure the InfoPipe responder and belong to
+the <code class="docutils literal"><span class="pre">[ifp]</span></code> section.</p>
+<dl class="docutils">
+<dt>allowed_uids</dt>
+<dd>Specifies the comma-separated list of UID values or user names that
+are allowed to access the IFP responder. By default, only root can,
+so additional values for this option should be justified.</dd>
+</dl>
+</div>
+<div class="section" id="general-domain-options">
+<h1>General domain options<a class="headerlink" href="#general-domain-options" title="Permalink to this headline">¶</a></h1>
+<p>Options in this page section are not related to any particular back end
+type or responder and apply to the <code class="docutils literal"><span class="pre">[domain]</span></code> section.</p>
+<dl class="docutils">
+<dt>access_provider</dt>
+<dd>contrary to other providers, the default for <code class="docutils literal"><span class="pre">access_provider</span></code> is
+permit all. Setting <code class="docutils literal"><span class="pre">access_provider</span></code> to another access control
+provider may increase security, on the other hand, if there is no
+explicit <code class="docutils literal"><span class="pre">access_provider</span></code> value, then all authenticated users are
+allowed access.</dd>
+<dt>cache_credentials</dt>
+<dd>Determines if user credentials are also cached in the local LDB
+cache. User credentials are stored in a SHA512 hash, not in
+plaintext. Setting to true would store hash of password after
+authentication.</dd>
+<dt>cache_credentials_minimal_first_factor_length</dt>
+<dd>If 2-Factor-Authentication (2FA) is used and credentials should be
+saved this value determines the minimal length the first
+authentication factor (long term password) must have to be saved as
+hash in the cache. This should avoid that the short PINs of a PIN
+based 2FA scheme are saved in the cache which would make them easy
+targets for brute-force attacks.</dd>
+<dt>account_cache_expiration</dt>
+<dd>Number of days entries are left in cache after last successful login
+before being removed during a cleanup of the cache.
+Security-paranoid environments might want to set this option
+especially if <code class="docutils literal"><span class="pre">cache_credentials</span></code> is set as well.</dd>
+</dl>
+</div>
+<div class="section" id="ldap-provider-options">
+<h1>LDAP provider options<a class="headerlink" href="#ldap-provider-options" title="Permalink to this headline">¶</a></h1>
+<p>Options in this section only apply for configurations that set any of
+the providers to <code class="docutils literal"><span class="pre">ldap</span></code>.</p>
+<dl class="docutils">
+<dt>ldap_tls_reqcert</dt>
+<dd>Specifies what checks to perform on server certificates in a TLS
+session, if any. Setting anything but <code class="docutils literal"><span class="pre">hard</span></code> or <code class="docutils literal"><span class="pre">demand</span></code> lowers
+security.</dd>
+<dt>ldap_tls_cipher_suite</dt>
+<dd>Specifies acceptable cipher suites, uses OpenLDAP defaults normally.
+In theory, the admin could set insecure ciphers here.</dd>
+<dt>ldap_id_use_start_tls</dt>
+<dd>Specifies that the id_provider connection must also use tls to
+protect the channel. Normally identity lookups happen in the clear,
+unlike authentication that must always be encrypted. Similar effect
+can be achieved with <code class="docutils literal"><span class="pre">ldap_sasl_mech=gssapi</span></code></dd>
+</dl>
+</div>
+<div class="section" id="kerberos-provider-options">
+<h1>Kerberos provider options<a class="headerlink" href="#kerberos-provider-options" title="Permalink to this headline">¶</a></h1>
+<p>Options in this section only apply for configurations that set any of
+the providers to <code class="docutils literal"><span class="pre">krb5</span></code>.</p>
+<dl class="docutils">
+<dt>krb5_validate</dt>
+<dd>Verify with the help of krb5_keytab that the TGT obtained has not
+been spoofed. Setting this option to True helps mitigate MITM
+attacks.</dd>
+<dt>krb5_store_password_if_offline</dt>
+<dd>Store the password of the user if the provider is offline in the
+kernel keyring and use it to request a TGT when the provider comes
+online again.</dd>
+<dt>krb5_use_fast</dt>
+<dd>Enables flexible authentication secure tunneling (FAST) for Kerberos
+pre-authentication.</dd>
+<dt>krb5_ccname_template</dt>
+<dd>Using certain credential cache types such as keyrings can increase
+security as the credential cache would only be accessible to the
+owner and root.</dd>
+</dl>
+</div>
+<div class="section" id="simple-access-provider-options">
+<h1>Simple access provider options<a class="headerlink" href="#simple-access-provider-options" title="Permalink to this headline">¶</a></h1>
+<p>The simple access provider provides ACLs that contain list of user or
+group names that are permitted or allowed access. It&#8217;s more secure to
+whitelist users that should be allowed access (<code class="docutils literal"><span class="pre">simple_allow_*</span></code>)
+rather then blacklist those that should be denied access
+(<code class="docutils literal"><span class="pre">simple_deny_*</span></code>)</p>
+</div>
+<div class="section" id="ipa-and-ad-provider-options">
+<h1>IPA and AD provider options<a class="headerlink" href="#ipa-and-ad-provider-options" title="Permalink to this headline">¶</a></h1>
+<p>None of the options that are specific to either IPA or AD provider have
+a security consequence. But since both IPA and AD providers are more or
+less wrappers around <code class="docutils literal"><span class="pre">id_provider=ldap</span></code> and <code class="docutils literal"><span class="pre">auth_provider=krb5</span></code>,
+any LDAP or Kerberos options can be used in IPA or AD domains as well.
+That said, both providers already use GSSAPI for identity lookups.
+Additionally, both enable <code class="docutils literal"><span class="pre">krb5_validate</span></code> by default and the IPA
+provider also sets the <code class="docutils literal"><span class="pre">krb5_use_fast</span></code> option to <code class="docutils literal"><span class="pre">try</span></code>.</p>
+<p>Please note that the IPA and AD clients are typically configured using
+tools such as <code class="docutils literal"><span class="pre">realmd</span></code> or <code class="docutils literal"><span class="pre">ipa-client-install</span></code> that may set
+additional options differently than SSSD defaults. A typical example is
+<code class="docutils literal"><span class="pre">cache_credentials</span></code> being enabled by default by
+<code class="docutils literal"><span class="pre">ipa-client-install</span></code>. In a similar manner, these installers tend to
+enable a sensible set of services (responders) that might not be
+required for security-sensitive setups.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Synopsis</a></li>
+<li><a class="reference internal" href="#daemon-options">Daemon options</a></li>
+<li><a class="reference internal" href="#pam-responder-options">PAM responder options</a></li>
+<li><a class="reference internal" href="#pac-responder-options">PAC responder options</a></li>
+<li><a class="reference internal" href="#ifp-responder-options">IFP responder options</a></li>
+<li><a class="reference internal" href="#general-domain-options">General domain options</a></li>
+<li><a class="reference internal" href="#ldap-provider-options">LDAP provider options</a></li>
+<li><a class="reference internal" href="#kerberos-provider-options">Kerberos provider options</a></li>
+<li><a class="reference internal" href="#simple-access-provider-options">Simple access provider options</a></li>
+<li><a class="reference internal" href="#ipa-and-ad-provider-options">IPA and AD provider options</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/SecuritySensitiveOptions.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/SecuritySensitiveOptions.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

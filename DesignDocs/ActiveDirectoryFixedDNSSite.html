@@ -1,0 +1,204 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Fix DNS site a client is using &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="fix-dns-site-a-client-is-using">
+<h1>Fix DNS site a client is using<a class="headerlink" href="#fix-dns-site-a-client-is-using" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2486">​https://fedorahosted.org/sssd/ticket/2486</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>Even though the Active Directory provider is able to leverage DNS sites,
+the site discovery is always automatic. There is no way to <code class="docutils literal"><span class="pre">pin</span></code> a
+particular client into a particular site. This design document describes
+a way to do so.</p>
+</div>
+<div class="section" id="use-cases">
+<h2>Use cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+<p>The site discovery relies on client being part of subnet. It is not
+always practical or even possible to assign Linux machines to the right
+subnet. Still, these clients should be able to leverage the nearest AD
+site, even at the expense of manual configuration in <code class="docutils literal"><span class="pre">sssd.conf</span></code>.</p>
+</div>
+<div class="section" id="overview-of-the-solution">
+<h2>Overview of the solution<a class="headerlink" href="#overview-of-the-solution" title="Permalink to this headline">¶</a></h2>
+<p>The SSSD will gain a new AD provider option that would, if AD sites are
+enabled, override any dynamically discovered sites. This option would
+pin the client to a particular site not only for primary domain but also
+for subdomains. The discovery search would only be used to find the
+forest we are enrolled with.</p>
+<p>For Global Catalog service discovery of the primary and secondary
+domains would then be defined as follows:</p>
+<ul class="simple">
+<li>primary domain - <code class="docutils literal"><span class="pre">$HARDCODED_SITE._sites.$FOREST</span></code></li>
+<li>backup domain - <code class="docutils literal"><span class="pre">$FOREST</span></code></li>
+</ul>
+<p>For pure LDAP searches, the domains would then be defined as:</p>
+<ul class="simple">
+<li>primary domain - <code class="docutils literal"><span class="pre">$HARDCODED_SITE._sites.$DOMAIN</span></code></li>
+<li>backup domain - <code class="docutils literal"><span class="pre">$DOMAIN</span></code></li>
+</ul>
+<p>Above, $FOREST is auto-discovered and $DOMAIN is either the SSSD domain
+name as defined in the config file (for the main SSSD domain) or
+autodiscovered from object of class <code class="docutils literal"><span class="pre">trustedDomain</span></code>.</p>
+<p>In both cases, the full DNS search consists of
+<code class="docutils literal"><span class="pre">_$service._$port.$domain</span></code>.</p>
+<p>Especially for trusted domains, the overridden search domain might not
+return anything, but the DNS resolver code is built such that it
+iterates over search domains until the search yields some result.</p>
+</div>
+<div class="section" id="authentication-against-trusted-domains">
+<h2>Authentication against trusted domains<a class="headerlink" href="#authentication-against-trusted-domains" title="Permalink to this headline">¶</a></h2>
+<p>For trusted domains, we currently always talk to a local DC which gives
+libkrb5 a referral to a trusted-domain specific DC that handles
+authentication against a KDC from the trusted domain. This process is
+completely opaque to SSSD, which means that Kerberos authentication
+doesn&#8217;t take the sites into account at all.</p>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<p>The SSSD AD provider would gain a new option called <code class="docutils literal"><span class="pre">ad_site</span></code>. This
+option would be unset by default.</p>
+<p>The SRV initialization function <code class="docutils literal"><span class="pre">ad_srv_plugin_ctx_init()</span></code> needs to be
+adjusted to accept a site override as a <code class="docutils literal"><span class="pre">const</span> <span class="pre">char</span> <span class="pre">*site_override</span></code>
+since the site name is just a string. In the default case, where the
+option is unset, this option would be set to NULL. In any case, the
+<code class="docutils literal"><span class="pre">ad_get_client_site_send()/recv()</span></code> request would run to completion
+since we need to learn the forest name anyway. If the new option is set,
+then the caller of <code class="docutils literal"><span class="pre">ad_get_client_site_recv()</span></code> would still read the
+forest value, but ignore the site value and use the value of the
+<code class="docutils literal"><span class="pre">ad_site</span></code> option instead.</p>
+</div>
+<div class="section" id="configuration-changes">
+<h2>Configuration changes<a class="headerlink" href="#configuration-changes" title="Permalink to this headline">¶</a></h2>
+<p>A new option <code class="docutils literal"><span class="pre">ad_site</span></code> as described above. The option would be both
+described in man pages and implemented in the configAPI.</p>
+</div>
+<div class="section" id="how-to-test">
+<h2>How To Test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<p>The best testing would be performed using an AD test environment
+consisting of at least two servers in the same domain. To test, join
+both DCs to the same domain. Create two sites such that the IP address
+of your SSSD client would set you in one of them.</p>
+<p>Make sure that, by default, SSSD creates the kdcinfo file using the DC
+in the autodetected site and authenticates you against the DCs from the
+autodetected site. The latter can be verified using i.e. tcpdump and
+krb5_child log files.</p>
+<p>Set the <code class="docutils literal"><span class="pre">ad_site</span></code> option to a non-default site. Verify, using tcpdump,
+kdcinfo file contents and SSSD debug logs that SSSD redirects
+communication to DCs in the non-default site.</p>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Jakub Hrozek &lt;<a class="reference external" href="mailto:jhrozek&#37;&#52;&#48;redhat&#46;com">​jhrozek<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Fix DNS site a client is using</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem statement</a></li>
+<li><a class="reference internal" href="#use-cases">Use cases</a></li>
+<li><a class="reference internal" href="#overview-of-the-solution">Overview of the solution</a></li>
+<li><a class="reference internal" href="#authentication-against-trusted-domains">Authentication against trusted domains</a></li>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a></li>
+<li><a class="reference internal" href="#configuration-changes">Configuration changes</a></li>
+<li><a class="reference internal" href="#how-to-test">How To Test</a></li>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/ActiveDirectoryFixedDNSSite.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/ActiveDirectoryFixedDNSSite.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

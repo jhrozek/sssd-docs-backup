@@ -1,0 +1,264 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>How to file a useful SSSD bug report &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><a class="reference external" href="#HowtofileausefulSSSDbugreport">How to file a useful SSSD bug
+report</a><ol class="arabic">
+<li><a class="reference external" href="#Wheretofilethebugs">Where to file the bugs?</a></li>
+<li><a class="reference external" href="#Helpusreproducethebug">Help us reproduce the bug</a></li>
+<li><a class="reference external" href="#Includenecessarydebuggingdata">Include necessary debugging
+data</a><ol class="arabic">
+<li><a class="reference external" href="#ProvidingSSSDcrashdata">Providing SSSD crash data</a></li>
+<li><a class="reference external" href="#Mindyourprivacy">Mind your privacy</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#Alwaystestthelatestavailableversion">Always test the latest available
+version</a></li>
+<li><a class="reference external" href="#Considerifthebughassecurityconsequences">Consider if the bug has security
+consequences</a></li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="how-to-file-a-useful-sssd-bug-report">
+<h1>How to file a useful SSSD bug report<a class="headerlink" href="#how-to-file-a-useful-sssd-bug-report" title="Permalink to this headline">¶</a></h1>
+<p>Unfortunately, SSSD is not perfect and sometimes, you might encounter a
+bug. This document describes how to file an SSSD bug report or an
+enhancement request. Providing accurate and well formed information
+might help us find the bug and ultimately fix it. As a bug reporter, you
+should work with us on pinpointing the bug - we should then work with
+you on fixing the bug.</p>
+<div class="section" id="where-to-file-the-bugs">
+<h2>Where to file the bugs?<a class="headerlink" href="#where-to-file-the-bugs" title="Permalink to this headline">¶</a></h2>
+<p>You&#8217;ll need a <a class="reference external" href="https://admin.fedoraproject.org/accounts/">​Fedora Account
+System</a> login to file a
+bug. When you have one, navigate to <a class="reference external" href="https://fedorahosted.org/sssd/newticket">​the new ticket
+form</a>.</p>
+<p>Some bugs will be automatically cloned from distribution bug-trackers,
+such as ​<a class="reference external" href="http://bugzilla.redhat.com">​http://bugzilla.redhat.com</a>.
+People working with upstream code should file bugs directly in Trac.</p>
+</div>
+<div class="section" id="help-us-reproduce-the-bug">
+<h2>Help us reproduce the bug<a class="headerlink" href="#help-us-reproduce-the-bug" title="Permalink to this headline">¶</a></h2>
+<p>The easier for us is to see the flaw in our environment, the easier it
+is to fix the bug. If we can&#8217;t conclusively see the bug exist, it might
+even be closed as NOTABUG. If the bug can&#8217;t be reproduced easily,
+describe your environment in detail and allow us more time to analyze
+your problem.</p>
+</div>
+<div class="section" id="include-necessary-debugging-data">
+<h2>Include necessary debugging data<a class="headerlink" href="#include-necessary-debugging-data" title="Permalink to this headline">¶</a></h2>
+<p>For both bug reports and feature requests, select the type of the ticket
+to indicate if it&#8217;s a bug report or an enhancement.</p>
+<p>Always include the following data in a bug report:</p>
+<ul>
+<li><p class="first">One bug report per ticket. If you think you found multiple problems,
+file each one in a separate ticket</p>
+</li>
+<li><p class="first">Search the ticket database for possible duplicates. If you find a
+duplicate, please add a comment saying that you encountered the
+problem as well.</p>
+</li>
+<li><p class="first">Is this a defect or an enhancement? (Tasks should be reserved for
+internal development tasks, such as creating unit tests.)</p>
+</li>
+<li><p class="first">Short summary. Good example is: &#8220;The LDAP provider segfaults when an
+invalid TLS certificate is specified&#8221;.</p>
+</li>
+<li><p class="first">Component. Please select the SSSD component most accurate for your
+issue. This will ensure that the default assignee is set correctly.</p>
+</li>
+<li><p class="first">CC (optional). If there are other parties interested in a particular
+bug, please include their Fedora usernames here.</p>
+</li>
+<li><p class="first">What platform are you on? Please provide operating system version and
+architecture.</p>
+</li>
+<li><p class="first">The SSSD version. On an RPM-based system, you can just run
+<code class="docutils literal"><span class="pre">rpm</span> <span class="pre">-q</span> <span class="pre">sssd</span></code>. (If the bug is in the current working tree, select
+the most recent released version.)</p>
+</li>
+<li><p class="first">The SSSD config file. Typically this would be located at
+<code class="docutils literal"><span class="pre">/etc/sssd/sssd.conf</span></code></p>
+</li>
+<li><p class="first">The SSSD log files with a high debug level Please see the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Troubleshooting.html">troubleshooting
+page</a> on
+information on how to gather them and other required information.
+When submitting the logs, it&#8217;s very helpful to remove the existing
+log files before running the test case. This ensures the logs only
+capture the problem and developers don&#8217;t need to weed out gigabytes
+of info.</p>
+</li>
+<li><p class="first">The steps to reproduce the bug. It&#8217;s very useful to log the times of
+the commands that reproduce the bug as you execute them. For
+instance, if two <code class="docutils literal"><span class="pre">id</span></code> commands run in sequence would give different
+information for the admin user, please run them like this:</p>
+<p>This would help us cross-link your actions with the log files.</p>
+</li>
+<li><p class="first">Describe your network topology and the server types and versions.
+This is especially important in complex setups with trusted IPA or
+Active Directory domains.</p>
+</li>
+<li><p class="first">What are the results you expect? What were the results you see
+instead? Please be specific. A bad example is &#8220;My logins are slow&#8221;. A
+much better example is &#8220;When a user who is a member of 100 groups
+logs in, his login takes 50 seconds even though a <code class="docutils literal"><span class="pre">kinit</span></code> and
+<code class="docutils literal"><span class="pre">id</span> <span class="pre">-G</span></code> for the same user are fast.&#8221;</p>
+</li>
+</ul>
+<p>Some data in the SSSD tickets are handled by the SSSD team members.
+Please leave Priority, Milestone, Keywords and Assignee to their
+defaults.</p>
+<div class="section" id="providing-sssd-crash-data">
+<h3>Providing SSSD crash data<a class="headerlink" href="#providing-sssd-crash-data" title="Permalink to this headline">¶</a></h3>
+<p>In addition to the data described above, please also provide the
+coredump and backtrace along with the bug report.</p>
+<p>If you are on a Fedora or RHEL system, abrt is a great tool for
+gathering crash info. If abrt is not available, you can retrieve the
+core file and backtrace manually. First, find out which sssd process is
+crashing. Please always make sure you have the exact matching debuginfo
+package version on your system. On Fedora and RHEL, you can easily
+install the debuginfo packages with <code class="docutils literal"><span class="pre">debuginfo-install</span> <span class="pre">sssd</span></code>. Then,
+connect to the faulty process with gdb and resume it:</p>
+<p>When the program crashes, save the core file and backtrace:</p>
+<p>Then attach the core file and the backtrace.</p>
+</div>
+<div class="section" id="mind-your-privacy">
+<h3>Mind your privacy<a class="headerlink" href="#mind-your-privacy" title="Permalink to this headline">¶</a></h3>
+<p>Both the SSSD log files and the coredumps might include confidential
+information. If you don&#8217;t like them to be exposed in the SSSD Trac
+instance, please contact some of the SSSD developers on the <code class="docutils literal"><span class="pre">#sssd</span></code>
+channel on FreeNode or on the
+<a class="reference external" href="https://lists.fedorahosted.org/mailman/listinfo/sssd-users">​sssd-users</a>
+mailing list.</p>
+</div>
+</div>
+<div class="section" id="always-test-the-latest-available-version">
+<h2>Always test the latest available version<a class="headerlink" href="#always-test-the-latest-available-version" title="Permalink to this headline">¶</a></h2>
+<p>SSSD moves at a rapid pace. It&#8217;s not useful to file a bug report against
+an old version, please upgrade to the latest release in the branch
+you&#8217;re running, if the branch is still active. You can find the tarballs
+on our <a class="reference external" href="https://docs.pagure.org/sssd-test2/Releases.html">releases
+page</a>. If you&#8217;re
+running an Enterprise or Long-Term-Maintenance distribution and can&#8217;t
+update to a newer version, consider filing a bug report in your
+distribution bug tracker instead.</p>
+<p>Alternatively, ask on the <code class="docutils literal"><span class="pre">#sssd</span></code> channel on FreeNode. Several SSSD or
+FreeIPA developers maintain private repositories with custom builds for
+stable platforms.</p>
+</div>
+<div class="section" id="consider-if-the-bug-has-security-consequences">
+<h2>Consider if the bug has security consequences<a class="headerlink" href="#consider-if-the-bug-has-security-consequences" title="Permalink to this headline">¶</a></h2>
+<p>If you think you found a bug that has security impact (allows an
+unprivileged user to take down SSSD or elevate privileges for instance),
+<strong>don&#8217;t</strong> file the bug in a public bug tracker. Instead, e-mail any of
+the SSSD developers instead.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">How to file a useful SSSD bug report</a><ul>
+<li><a class="reference internal" href="#where-to-file-the-bugs">Where to file the bugs?</a></li>
+<li><a class="reference internal" href="#help-us-reproduce-the-bug">Help us reproduce the bug</a></li>
+<li><a class="reference internal" href="#include-necessary-debugging-data">Include necessary debugging data</a><ul>
+<li><a class="reference internal" href="#providing-sssd-crash-data">Providing SSSD crash data</a></li>
+<li><a class="reference internal" href="#mind-your-privacy">Mind your privacy</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#always-test-the-latest-available-version">Always test the latest available version</a></li>
+<li><a class="reference internal" href="#consider-if-the-bug-has-security-consequences">Consider if the bug has security consequences</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Reporting_sssd_bugs.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/Reporting_sssd_bugs.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

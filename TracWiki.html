@@ -1,0 +1,182 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>The Trac Wiki System &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="the-trac-wiki-system">
+<h1>The Trac Wiki System<a class="headerlink" href="#the-trac-wiki-system" title="Permalink to this headline">¶</a></h1>
+<div class="system-message"><p><strong>Error: Macro TracGuideToc(None) failed</strong></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;NoneType&#39;</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span> <span class="s1">&#39;find&#39;</span>
+</pre></div>
+</div>
+</div><p>Trac has a built-in wiki system which you can use for organizing
+knowledge and information in a very flexible way by <a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiNewPage.html">creating
+pages</a>
+containing an intuitive and easy to learn textual markup. This text
+markup is also used in all other parts of the system, not only in <a class="reference external" href="https://docs.pagure.org/sssd-test2/TitleIndex.html">wiki
+pages</a>, but also
+in <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTickets.html">ticket</a>
+description and comments, <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracChangeset.html">check-in log
+messages</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracRoadmap.html">milestone</a>
+descriptions and
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracReports.html">report</a>
+descriptions, even in third-party extensions. It allows for formatted
+text and hyperlinks in and between all Trac modules.</p>
+<p>Editing wiki text is easy, using any web browser and a simple
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html">formatting
+system</a>,
+rather than more complex markup languages like HTML. The reasoning
+behind its design is that HTML, with its large collection of nestable
+tags, is too complicated to allow fast-paced editing, and distracts from
+the actual content of the pages. Note though that Trac also supports
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiHtml.html">HTML</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiRestructuredText.html">reStructuredText</a>
+and <a class="reference external" href="http://www.textism.com/tools/textile/">​Textile</a> as alternative
+markup formats, which can eventually be used in parts of a page (so
+called wiki “blocks”).</p>
+<p>The main goal of the wiki is to make editing text easier and <em>encourage</em>
+people to contribute and annotate text content for a project. Trac also
+provides a simple toolbar to make formatting text even easier, and
+supports the <a class="reference external" href="http://universaleditbutton.org/Universal_Edit_Button">​universal edit
+button</a> of your
+browser.</p>
+<p>The wiki itself does not enforce any structure, but rather resembles a
+stack of empty sheets of paper, where you can organize information and
+documentation as you see fit, and later reorganize if necessary. As
+contributing to a wiki is essentially building hypertext, general advice
+regarding HTML authoring apply here as well. For example, the <em>`​Style
+Guide for online hypertext &lt;http://www.w3.org/Provider/Style&gt;`__</em>
+explains how to think about the <a class="reference external" href="http://www.w3.org/Provider/Style/Structure.html">​overall structure of a
+work</a> and how to
+organize information <a class="reference external" href="http://www.w3.org/Provider/Style/WithinDocument.html">​within each
+document</a>. One
+of the most important tip is “make your HTML page such that you can read
+it even if you don&#8217;t follow any links.”</p>
+<p>Learn more about:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html">WikiFormatting</a>
+rules, including advanced topics like
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiMacros.html">WikiMacros</a>
+and
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiProcessors.html">WikiProcessors</a></li>
+<li>How to use
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiPageNames.html">WikiPageNames</a>
+and other forms of
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracLinks.html">TracLinks</a>
+which are used to refer in a precise way to any resource within Trac</li>
+</ul>
+<p>If you want to practice editing, please use the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/SandBox.html">SandBox</a>. Note that
+not all Trac wikis are editable by anyone, this depends on the local
+policy; check with your Trac administrators.</p>
+<p>Before saving your changes, you can <em>Preview</em> the page or <em>Review the
+Changes</em> you&#8217;ve made. You can get an automatic preview of the formatting
+as you type when you activate the <em>Edit Side-by-side</em> mode (you have to
+Preview the page for the setting to take effect). <em>There is a
+`configurable
+delay &lt;https://docs.pagure.org/sssd-test2/TracIni.html#trac-section&gt;`__
+between when you make your edit and when the automatic preview will
+update.</em></p>
+<p>Some more information about wikis on the web:</p>
+<ul class="simple">
+<li>A definition of <a class="reference external" href="http://wikipedia.org/wiki/Wiki">​Wiki</a>, in a
+famous wiki encyclopedia</li>
+<li>The <a class="reference external" href="http://c2.com/cgi/wiki?WikiHistory">​History</a> of the original
+wiki</li>
+<li>A wiki page explaining <a class="reference external" href="http://www.usemod.com/cgi-bin/mb.pl?WhyWikiWorks">​why wiki
+works</a></li>
+</ul>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracGuide.html">TracGuide</a></p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracWiki.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracWiki.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

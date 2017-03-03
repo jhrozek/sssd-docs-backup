@@ -1,0 +1,507 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>The Active Directory provider has changed the default value of the
+<code class="docutils literal"><span class="pre">ad_gpo_access_control</span></code> option from <code class="docutils literal"><span class="pre">permissive</span></code> to
+<code class="docutils literal"><span class="pre">enforcing</span></code>. As a consequence, the GPO access control now affects
+all clients that set <code class="docutils literal"><span class="pre">access_provider</span></code> to <code class="docutils literal"><span class="pre">ad</span></code>. In order to
+restore the previous behaviour, set <code class="docutils literal"><span class="pre">ad_gpo_access_control</span></code> to
+<code class="docutils literal"><span class="pre">permissive</span></code> or use a different <code class="docutils literal"><span class="pre">access_provider</span></code> type.</li>
+<li>Group Policy objects defined in a different AD domain that the
+computer object is defined in are now supported.</li>
+<li>Support for separate prompts when using two-factor authentication was
+added</li>
+<li>Credential caching and Offline authentication are also available when
+using two-factor authentication</li>
+<li>Added support for one-way trusts between an IPA and Active Directory
+environment. Please note that this SSSD functionality depends on IPA
+code that will be released in the IPA 4.2 version</li>
+<li>Many enhancements to the InfoPipe D-Bus API. Notably, the SSSD users
+and groups are now exposed as first-class objects. The users and
+groups can also be marked as cached and would subsequently show up in
+the Introspection output</li>
+<li>The DBus interface is now also able to look up User objects by
+certificate. This is a first part of work that will eventually allow
+smart-card authentication in SSSD.</li>
+<li>The LDAP cleanup task is now disabled by default, unless enumeration
+is enabled. Please refer to the <code class="docutils literal"><span class="pre">ldap_purge_cache_timeout</span></code> option
+in case your environment requires the cleanup task</li>
+<li>The Python bindings are now built for both Python2 and Python3</li>
+<li>The LDAP bind timeout, StartTLS timeout and password change timeout
+are now configurable using the <code class="docutils literal"><span class="pre">ldap_opt_timeout</span></code> option</li>
+</ul>
+</div>
+<div class="section" id="packaging-changes">
+<h1>Packaging Changes<a class="headerlink" href="#packaging-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>A new directory <code class="docutils literal"><span class="pre">/var/lib/sss/keytabs</span></code> is present and owned by the
+<code class="docutils literal"><span class="pre">sssd-ipa</span></code> subpackage. The SSSD stores keytabs for one-way trust
+relationships in this directory. Downstreams should make sure that
+the directory is only readable to the user who runs the SSSD service.</li>
+<li>Several packaging changes are present in this release to support the
+Python3 bindings, notably new <code class="docutils literal"><span class="pre">python-sss</span></code> and
+<code class="docutils literal"><span class="pre">python-sss-murmur</span></code> subpackages are introduced in upstream RPM
+packaging</li>
+<li>All python bindings now have a Python3 and a Python2 version in the
+upstream RPM packaging scheme</li>
+<li>The OpenSSL development library such as <code class="docutils literal"><span class="pre">openssl-devel</span></code> on
+RHEL/Fedora or
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/Debian/Ubuntu.html">Debian/Ubuntu?</a>
+<code class="docutils literal"><span class="pre">libssl-dev</span></code> is now required to support certificate operations</li>
+<li>A new internal library <code class="docutils literal"><span class="pre">libsss_cert.so</span></code> is present in this release.</li>
+</ul>
+</div>
+<div class="section" id="documentation-changes">
+<h1>Documentation Changes<a class="headerlink" href="#documentation-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>The <code class="docutils literal"><span class="pre">ad_gpo_access_control</span></code> option default has changed from
+<code class="docutils literal"><span class="pre">permissive</span></code> to <code class="docutils literal"><span class="pre">enforcing</span></code></li>
+<li>The default value of <code class="docutils literal"><span class="pre">ldap_purge_cache_timeout</span></code> changed to 0, thus
+effectivelly disabling the cleanup task.</li>
+<li>A new option <code class="docutils literal"><span class="pre">cache_credentials_minimal_first_factor_length</span></code> was
+added. This option sets constraints on the password length if
+One-Time passwords are used and credentials are to be cached. Please
+see the <code class="docutils literal"><span class="pre">sssd.conf(5)</span></code> man page for more details</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/897">#897</a></dt>
+<dd>sssd should pass -d to nsupdate when running with high log level</dd>
+<dt><a class="reference external" href="/sssd/ticket/1501">#1501</a></dt>
+<dd>Make the LDAP bind operation timeout configurable</dd>
+<dt><a class="reference external" href="/sssd/ticket/2150">#2150</a></dt>
+<dd>[RFE] Expose listing calls over D-BUS</dd>
+<dt><a class="reference external" href="/sssd/ticket/2224">#2224</a></dt>
+<dd>nsupdate stderr is not captured</dd>
+<dt><a class="reference external" href="/sssd/ticket/2236">#2236</a></dt>
+<dd>The cleanup task has no DEBUG statements</dd>
+<dt><a class="reference external" href="/sssd/ticket/2326">#2326</a></dt>
+<dd>SBUS: Flush the UID cache when we receive NameOwnerChanged</dd>
+<dt><a class="reference external" href="/sssd/ticket/2338">#2338</a></dt>
+<dd>[RFE] Implement object caching on the bus</dd>
+<dt><a class="reference external" href="/sssd/ticket/2339">#2339</a></dt>
+<dd>IFP: support multiple interfaces for object</dd>
+<dt><a class="reference external" href="/sssd/ticket/2540">#2540</a></dt>
+<dd>SSSD does not update Dynamic DNS records if the IPA domain differs
+from machine hostname&#8217;s domain</dd>
+<dt><a class="reference external" href="/sssd/ticket/2569">#2569</a></dt>
+<dd>In ipa-ad trust, with &#8216;default_domain_suffix&#8217; set to AD domain,
+IPA user are not able to log unless use_fully_qualified_names is
+set</dd>
+<dt><a class="reference external" href="/sssd/ticket/2574">#2574</a></dt>
+<dd>SSSD should be able to build python2 and python3 bindings in a one
+build</dd>
+<dt><a class="reference external" href="/sssd/ticket/2583">#2583</a></dt>
+<dd>[RFE] Homedir is always overwritten with subdomain_homedir value in
+server mode</dd>
+<dt><a class="reference external" href="/sssd/ticket/2593">#2593</a></dt>
+<dd>Does sssd-ad use the most suitable attribute for group name?</dd>
+<dt><a class="reference external" href="/sssd/ticket/2596">#2596</a></dt>
+<dd>Add a way to lookup users based on CAC identity certificates</dd>
+<dt><a class="reference external" href="/sssd/ticket/2603">#2603</a></dt>
+<dd>Make SSSD&#8217;s HBAC validation more permissive if deny rules are not
+used</dd>
+<dt><a class="reference external" href="/sssd/ticket/2609">#2609</a></dt>
+<dd>[bug] sssd always appends default_domain_suffix when checking for
+host keys</dd>
+<dt><a class="reference external" href="/sssd/ticket/2618">#2618</a></dt>
+<dd>Man sssd-ad(5) lists Group Policy Management Editor naming for some
+policies but not for all</dd>
+<dt><a class="reference external" href="/sssd/ticket/2620">#2620</a></dt>
+<dd>id_provider=proxy with auth_provider=ldap does not work reliably</dd>
+<dt><a class="reference external" href="/sssd/ticket/2625">#2625</a></dt>
+<dd>Sudo responder does not respect filter_users and filter_groups</dd>
+<dt><a class="reference external" href="/sssd/ticket/2627">#2627</a></dt>
+<dd>Disable the cleanup task by default</dd>
+<dt><a class="reference external" href="/sssd/ticket/2636">#2636</a></dt>
+<dd>RFE: Fetch keytabs for one-way trusts in IPA subdomain code</dd>
+<dt><a class="reference external" href="/sssd/ticket/2638">#2638</a></dt>
+<dd>RFE: Change ad_id_ctx instantiation in the IPA subdomain code to
+support one-way trusts</dd>
+<dt><a class="reference external" href="/sssd/ticket/2645">#2645</a></dt>
+<dd>[RFE] Support GPOs from different domain controllers</dd>
+<dt><a class="reference external" href="/sssd/ticket/2661">#2661</a></dt>
+<dd>RFE: Change AD GPO default to enforcing</dd>
+<dt><a class="reference external" href="/sssd/ticket/2666">#2666</a></dt>
+<dd>sssd with ldap backend throws error domain log</dd>
+</dl>
+</div></div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Jakub Hrozek (68):</p>
+<ul class="simple">
+<li>MAN: Fix a typo</li>
+<li>SYSDB: Reduce code duplication in sysdb_gpo.c</li>
+<li>UTIL: Make two child_common.c functions static</li>
+<li>TESTS: Cover child_common.c with unit tests</li>
+<li>LDAP: Use child_io_destructor instead of child_cleanup in a custom
+desctructor</li>
+<li>UTIL: Remove child_cleanup</li>
+<li>UTIL: Unify the fd_nonblocking implementation</li>
+<li>RESOLV: Remove obsolete in-tree implementation of SRV and TXT parsing</li>
+<li>PAM: print the pam status as string, too</li>
+<li>KRB5: More debugging for create_ccache()</li>
+<li>SDAP: Make simple bind timeout configurable</li>
+<li>SDAP: Make password change timeout configurable with
+ldap_opt_timeout</li>
+<li>SDAP: Make StartTLS bind configurable with ldap_opt_timeout</li>
+<li>SDAP: Decorate the sdap_op functions with DEBUG messages</li>
+<li>IPA: Remove the ipa_hbac_treat_deny_as option</li>
+<li>MAN: Clarify debug_level a bit</li>
+<li>SSH: Ignore the default_domain_suffix</li>
+<li>LDAP: Set sdap handle as explicitly connected in LDAP auth</li>
+<li>tests: Revert strcmp condition</li>
+<li>ncache: Fix sss_ncache_reset_permanent</li>
+<li>ncache: Silence critical error from filter_users when
+default_domain_suffix is set</li>
+<li>ncache: Add sss_ncache_reset_repopulate_permanent</li>
+<li>responders: reset ncache after domains are discovered during startup</li>
+<li>NSS: Reset negcache after checking domains</li>
+<li>MAN: Clarify how are GPO mappings called in GPO editor</li>
+<li>UTIL: Add a simple function to get the fd of debug_file</li>
+<li>dyndns: Log nsupdate stderr with a high debug level</li>
+<li>nsupdate: Append -d/-D to nsupdate with a high debug level</li>
+<li>subdom: Remove unused function get_flat_name_from_subdomain_name</li>
+<li>nss: Use negcache for getbysid requests</li>
+<li>tests: Add NSS responder tests for bysid requests</li>
+<li>LDAP: disable the cleanup task by default</li>
+<li>TESTS: Use the right testcase</li>
+<li>TESTS: Add test for get_next_domain</li>
+<li>LDAP: Do not print verbose DEBUG messages from providers that don&#8217;t
+set UUID</li>
+<li>SYSDB: Store trust direction for subdomains</li>
+<li>UTIL/SYSDB: Move new_subdomain() to sysdb_subdomains.c and make it
+private</li>
+<li>TESTS: Add a test for sysdb_subdomains.c</li>
+<li>SYSDB: Add realm to sysdb_master_domain_add_info</li>
+<li>SYSDB: Add a forest root attribute to sss_domain_info</li>
+<li>IPA: Add ipa_subdomains_handler_get_{start,cont} wrappers</li>
+<li>IPA: Check master domain record before subdomain records</li>
+<li>IPA: Fold ipa_subdom_enumerates into ipa_subdom_store</li>
+<li>IPA: Also update master domain when initializing subdom handler</li>
+<li>IPA: Move server-mode functions to a separate module</li>
+<li>IPA: Split two functions to new module ipa_subdomains_utils.c</li>
+<li>IPA: Include ipaNTTrustDirection in the attribute set for trusted
+domains</li>
+<li>IPA: Read forest name for trusted forest roots as well</li>
+<li>IPA: Make constructing an IPA server mode context async</li>
+<li>TESTS: Split off keytab creation into a common module</li>
+<li>TESTS: Add a common mock_be_ctx function</li>
+<li>TESTS: Add a common function to set up sdap_id_ctx</li>
+<li>TESTS: Move krb5_try_kdcip to nested group test</li>
+<li>TESTS: Add unit test for the subdomain_server.c module</li>
+<li>IPA: Fetch keytab for 1way trusts</li>
+<li>AD: Rename ad_set_ad_id_options to ad_set_sdap_options</li>
+<li>AD: Rename ad_create_default_options to
+ad_create_2way_trust_options</li>
+<li>AD: Split off ad_create_default_options</li>
+<li>IPA/AD: Set up AD domain in ad_create_2way_trust_options</li>
+<li>IPA: Do not set AD_KRB5_REALM twice</li>
+<li>AD: Add ad_create_1way_trust_options</li>
+<li>IPA: Utility function for setting up one-way trust context</li>
+<li>LDAP: Do not set keytab through environment variable</li>
+<li>LDAP: Consolidate SDAP_SASL_REALM/SDAP_KRB5_REALM behaviour</li>
+<li>CONFIG: Add SSS_STATEDIR as VARDIR/lib/sss</li>
+<li>BUILD: Store keytabs in /var/lib/sss/keytabs</li>
+<li>Updating the translations for the 1.13 Alpha release</li>
+<li>Updating the version.m4 file for the 1.13 Beta release</li>
+</ul>
+<p>John Dickerson (1):</p>
+<ul class="simple">
+<li>MAN: Amend the description of ignore_group_members</li>
+</ul>
+<p>Lukas Slebodnik (59):</p>
+<ul class="simple">
+<li>MAN: Remove indentation in element programlistening</li>
+<li>Fix warning: for loop has empty body</li>
+<li>Bump version to track 1.13 development</li>
+<li>SPEC: Use libnl3 for epel6</li>
+<li>MAKE: Don&#8217;t include autoconf generated file to tarball</li>
+<li>TESTS: Mock return value of sdap_get_generic_recv</li>
+<li>test_nested_groups: Additional unit tests</li>
+<li>Fix warning: equality comparison with extraneous parentheses</li>
+<li>LDAP: Conditional jump depends on uninitialised value</li>
+<li>BUILD: Remove unused libraries for pysss.so</li>
+<li>BUILD: Remove unused variables</li>
+<li>BUILD: Remove detection of type Py_ssize_t</li>
+<li>UTIL: Remove python wrapper sss_python_set_new</li>
+<li>UTIL: Remove python wrapper sss_python_set_add</li>
+<li>UTIL: Remove python wrapper sss_python_set_check</li>
+<li>UTIL: Remove compatibility macro PyModule_AddIntMacro</li>
+<li>UTIL: Remove python wrapper sss_python_unicode_from_string</li>
+<li>BUILD: Use python-config for detection *FLAGS</li>
+<li>SPEC: Use new convention for python packages</li>
+<li>SPEC: Move python bindings to separate packages</li>
+<li>BUILD: Add possibility to build python{2,3} bindings</li>
+<li>TESTS: Run python tests with all supported python versions</li>
+<li>SPEC: Replace python_ macros with python2_</li>
+<li>SPEC: Build python3 bindings on available platforms</li>
+<li>BUILD: Uninstall also symbolic links to python bindings</li>
+<li>Remove unused argument from be_nsupdate_create_fwd_msg</li>
+<li>IPA: Remove unused argument from ipa_id_get_group_uuids</li>
+<li>Remove useless assignment to function parameter</li>
+<li>PAC: Fix memory leak</li>
+<li>responder_cache: Fix warning may be used uninitialized</li>
+<li>debug-tests: Fix test with new line in debug message</li>
+<li>BUILD: Add missing header file to tarball</li>
+<li>pam_client: fix casting to const pointer</li>
+<li>test_expire: Use right assertion macro for standard functions</li>
+<li>test_ldap_auth: Use right assertion for integer comparison</li>
+<li>test_resolv_fake: Fix alignment warning</li>
+<li>PAC: Remove unused function</li>
+<li>KRB5: Unify prototype and definition</li>
+<li>util-tests: Initialize boolean variable to default value</li>
+<li>SPEC: Drop workaround for old libtool</li>
+<li>SPEC: Drop workarounds for old rpmbuild</li>
+<li>SPEC: Remove unused option</li>
+<li>SPEC: Few cosmetic changes</li>
+<li>simple_access-tests: Simplify assertion</li>
+<li>sysdb-tests: Add missing assertions</li>
+<li>sysdb-tests: test return value before output arguments</li>
+<li>ad_opts: Use different default attribute for group name</li>
+<li>BUILD: Write hints about optional python bindings</li>
+<li>sss_client: Fix mixed enums</li>
+<li>LDAP: Remove dead assignment</li>
+<li>sss_client: Fix warning &#8220;_&#8221; redefined</li>
+<li>SSSDConfigTest: Use unique temporary directory</li>
+<li>util-tests: Add validation of internal error messages</li>
+<li>SDAP: Check return value before using output arguments</li>
+<li>SDAP: Log failure from sysdb_handle_original_uuid</li>
+<li>test_ipa_subdomains_server: Run clean-up after success</li>
+<li>IFP: Fix warnings with enabled optimisation</li>
+<li>SDAP: Remove user from cache for missing user in LDAP</li>
+<li>test_ipa_subdom_server: Add missing assert</li>
+</ul>
+<p>Michal Zidek (2):</p>
+<ul class="simple">
+<li>Use FQDN if default domain was set</li>
+<li>MAN: default_domain_suffix with use_fully_qualified_names.</li>
+</ul>
+<p>Nikolai Kondrashov (3):</p>
+<ul class="simple">
+<li>BUILD: Add AM_PYTHON2_MODULE macro</li>
+<li>Add integration tests</li>
+<li>BUILD: Fix variable substitution in cwrap.m4</li>
+</ul>
+<p>Pavel Březina (53):</p>
+<ul class="simple">
+<li>tests: refactor create_dom_test_ctx()</li>
+<li>tests: add create_multidom_test_ctx()</li>
+<li>tests: add test_multidom_suite_cleanup()</li>
+<li>tests: remove code duplication in single domain cleanup</li>
+<li>responders: new interface for cache request</li>
+<li>responders: enable views in cache request</li>
+<li>IFP: use new cache interface</li>
+<li>server-tests: use strtouint32 instead strtol</li>
+<li>sbus: add new iface via sbus_conn_register_iface()</li>
+<li>sbus: move iface and object path code to separate file</li>
+<li>sbus: use &#8216;path/*&#8217; to represent a D-Bus fallback</li>
+<li>sbus: support multiple interfaces on single path</li>
+<li>sbus: add object path to sbus request</li>
+<li>sbus: add sbus_opath_hash_lookup_supported()</li>
+<li>sbus: support org.freedesktop.DBus.Introspectable</li>
+<li>sbus: support org.freedesktop.DBus.Properties</li>
+<li>sbus: unify naming of handler data variable</li>
+<li>sbus: move common opath functions from ifp to sbus code</li>
+<li>sbus: add sbus_opath_get_object_name()</li>
+<li>ifp: fix potential memory leak in
+check_and_get_component_from_path()</li>
+<li>sbus: use hard coded getters instead of generated</li>
+<li>sbus: remove unused &#8216;reply as&#8217; functions</li>
+<li>IFP: move interface definitions from ifpsrv.c into separate file</li>
+<li>IFP: unify generated interfaces names</li>
+<li>sbus codegen: do not prefix getters with iface name</li>
+<li>IFP: simplify object path constant names</li>
+<li>sbus: add constant to represent subtree</li>
+<li>be_refresh: get rid of callback pointers</li>
+<li>sysdb: use sysdb_user/group_dn</li>
+<li>cache_req tests: rename test_user to test_user_by_name</li>
+<li>cache_req tests: define user name constant</li>
+<li>cache_req: preparations for different input type</li>
+<li>cache_req: add support for user by uid</li>
+<li>cache_req: add support for group by name</li>
+<li>cache_req: remove default branch from switches</li>
+<li>cache_req: add support for group by id</li>
+<li>cmocka: include mock_parse_inp in header file</li>
+<li>cache_req: parse input name if needed</li>
+<li>cache_req: return ERR_INTERNAL if more than one entry is found</li>
+<li>sbus: provide custom error names</li>
+<li>sbus: add sbus_opath_decompose[_exact]</li>
+<li>sbus: add a{sas} get invoker</li>
+<li>IFP: add org.freedesktop.sssd.infopipe.Users</li>
+<li>IFP: add org.freedesktop.sssd.infopipe.Users.User</li>
+<li>IFP: add org.freedesktop.sssd.infopipe.Groups</li>
+<li>IFP: add org.freedesktop.sssd.infopipe.Groups.Group</li>
+<li>IFP: deprecate
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/GetUserAttr.html">GetUserAttr?</a></li>
+<li>IFP: Implement org.freedesktop.sssd.infopipe.Cache[.Object]</li>
+<li>SBUS: Use default
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/GetAll.html">GetAll?</a> invoker
+if none is set</li>
+<li>SBUS: Add support for &lt;node /&gt; in introspection</li>
+<li>IFP: Export nodes</li>
+<li>sbus: add support for incoming signals</li>
+<li>sbus: listen to
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/NameOwnerChanged.html">NameOwnerChanged?</a></li>
+</ul>
+<p>Pavel Reichl (17):</p>
+<ul class="simple">
+<li>add missing &#8216;\n&#8217; in debug messages</li>
+<li>PROXY: add missing space in debug message</li>
+<li>BUILD: fix chmake not to generate warning</li>
+<li>SDAP: log expired accounts at lower severity level</li>
+<li>KRB5: add debug hint</li>
+<li>TESTS: test expiration</li>
+<li>ldap: refactor check_pwexpire_kerberos to use util func</li>
+<li>ldap: refactor nds_check_expired to use util func</li>
+<li>Fix a few typos in comments</li>
+<li>sbus: sbus_opath_hash_add_iface free tmp talloc ctx</li>
+<li>krb5: remove field run_as_user</li>
+<li>localauth plugin: fix coverity warning</li>
+<li>dyndns: remove dupl declaration of ipa_dyndns_update</li>
+<li>dyndns: don&#8217;t pass zone directive to nsupdate</li>
+<li>dyndns: ipa_dyndns.h missed declaration of used data</li>
+<li>krb: remove duplicit decl. of write_krb5info_file</li>
+<li>IPA: Don&#8217;t override homedir with subdomain_homedir</li>
+</ul>
+<p>Stephen Gallagher (4):</p>
+<ul class="simple">
+<li>LDAP: Support returning referral information</li>
+<li>AD GPO: Support processing referrals</li>
+<li>AD GPO: Change default to &#8220;enforcing&#8221;</li>
+<li>Add Vagrant configuration for SSSD</li>
+</ul>
+<p>Sumit Bose (22):</p>
+<ul class="simple">
+<li>Add leak check and command line option to test_authtok</li>
+<li>utils: add sss_authtok_[gs]et_2fa</li>
+<li>pam: handle 2FA authentication token in the responder</li>
+<li>Add pre-auth request</li>
+<li>krb5-child: add preauth and split 2fa token support</li>
+<li>IPA: create preauth indicator file at startup</li>
+<li>pam_sss: add pre-auth and 2fa support</li>
+<li>Add cache_credentials_minimal_first_factor_length config option</li>
+<li>sysdb: add sysdb_cache_password_ex()</li>
+<li>krb5: save hash of the first authentication factor to the cache</li>
+<li>krb5: try delayed online authentication only for single factor auth</li>
+<li>2FA offline auth</li>
+<li>pam_sss: move message encoding into separate file</li>
+<li>PAM: add PAM responder unit test</li>
+<li>adding ldap_user_auth_type where missing</li>
+<li>LDAP: add ldap_user_certificate option</li>
+<li>certs: add PEM/DER conversion utilities</li>
+<li>sysdb: add sysdb_search_user_by_cert() and
+sysdb_search_object_by_cert()</li>
+<li>LDAP/IPA: add user lookup by certificate</li>
+<li>ncache: add calls for certificate based searches</li>
+<li>utils: add get_last_x_chars()</li>
+<li>IFP: add
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/FindByCertificate.html">FindByCertificate?</a>
+method for User objects</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#packaging-changes">Packaging Changes</a></li>
+<li><a class="reference internal" href="#documentation-changes">Documentation Changes</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.13.0alpha.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.13.0alpha.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

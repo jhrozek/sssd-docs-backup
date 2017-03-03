@@ -1,0 +1,288 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>The Trac Environment &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="the-trac-environment">
+<h1>The Trac Environment<a class="headerlink" href="#the-trac-environment" title="Permalink to this headline">¶</a></h1>
+<p>Trac uses a directory structure and a database for storing project data.
+The directory is referred to as the “environment”.</p>
+<div class="section" id="creating-an-environment">
+<h2>Creating an Environment<a class="headerlink" href="#creating-an-environment" title="Permalink to this headline">¶</a></h2>
+<p>A new Trac environment is created using <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracAdmin.html#initenv">trac-admin&#8217;s
+initenv</a>:</p>
+<p><code class="docutils literal"><span class="pre">trac-admin</span></code> will ask you for the name of the project and the database
+connection string (explained below).</p>
+<div class="section" id="some-useful-tips">
+<h3>Some Useful Tips<a class="headerlink" href="#some-useful-tips" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>The user under which the web server runs will require file system
+write permission to the environment directory and all the files
+inside. Please remember to set the appropriate permissions. The same
+applies to the source code repository, although the user under which
+Trac runs will only require write access to a Subversion repository
+created with the BDB file system; for other repository types, check
+the corresponding plugin&#8217;s documentation.</li>
+<li><code class="docutils literal"><span class="pre">initenv</span></code>, when using an svn repository, does not imply that
+trac-admin will perform <code class="docutils literal"><span class="pre">svnadmin</span> <span class="pre">create</span></code> for the specified
+repository path. You need to perform the <code class="docutils literal"><span class="pre">svnadmin</span> <span class="pre">create</span></code> prior to
+<code class="docutils literal"><span class="pre">trac-admin</span> <span class="pre">initenv</span></code> if you&#8217;re creating a new svn repository
+altogether with a new trac environment, otherwise you will see a
+message &#8220;Warning: couldn&#8217;t index the repository&#8221; when initializing
+the environment.</li>
+<li>Non-ascii environment paths are not supported</li>
+<li>Also, it seems that project names with spaces can be problematic for
+authentication (see
+<a class="reference external" href="http://trac.edgewall.org/intertrac/%237163">​#7163</a>).</li>
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/TracPlugins.html">TracPlugins</a>
+located in a <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#inherit-section">shared plugins
+folder</a>
+that is defined in an <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html#GlobalConfiguration">inherited
+configuration</a>
+are currently not loaded during creation, and hence, if they need to
+create extra tables for example, you&#8217;ll need to <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracUpgrade.html#UpgradetheTracEnvironment">upgrade the
+environment</a>
+before being able to use it.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="database-connection-strings">
+<h2>Database Connection Strings<a class="headerlink" href="#database-connection-strings" title="Permalink to this headline">¶</a></h2>
+<p>Since version 0.9, Trac supports both <a class="reference external" href="http://sqlite.org/">​SQLite</a>
+and <a class="reference external" href="http://www.postgresql.org/">​PostgreSQL</a> database backends.
+Preliminary support for <a class="reference external" href="http://mysql.com/">​MySQL</a> was added in
+0.10. The default is to use SQLite, which is probably sufficient for
+most projects. The database file is then stored in the environment
+directory, and can easily be <a class="reference external" href="https://docs.pagure.org/sssd-test2/TracBackup.html">backed
+up</a> together with
+the rest of the environment.</p>
+<div class="section" id="sqlite-connection-string">
+<h3>SQLite Connection String<a class="headerlink" href="#sqlite-connection-string" title="Permalink to this headline">¶</a></h3>
+<p>The connection string for an SQLite database is:</p>
+<p>where <code class="docutils literal"><span class="pre">db/trac.db</span></code> is the path to the database file within the Trac
+environment.</p>
+</div>
+<div class="section" id="postgresql-connection-string">
+<h3>PostgreSQL Connection String<a class="headerlink" href="#postgresql-connection-string" title="Permalink to this headline">¶</a></h3>
+<p>If you want to use PostgreSQL or MySQL instead, you&#8217;ll have to use a
+different connection string. For example, to connect to a PostgreSQL
+database on the same machine called <code class="docutils literal"><span class="pre">trac</span></code>, that allows access to the
+user <code class="docutils literal"><span class="pre">johndoe</span></code> with the password <code class="docutils literal"><span class="pre">letmein</span></code>, use:</p>
+<p><em>Note that due to the way the above string is parsed, the &#8220;/&#8221; and &#8220;&#64;&#8221;
+characters cannot be part of the password.</em></p>
+<p>If PostgreSQL is running on a non-standard port (for example 9342), use:</p>
+<p>On UNIX, you might want to select a UNIX socket for the transport,
+either the default socket as defined by the PGHOST environment variable:</p>
+<p>or a specific one:</p>
+<p>Note that with PostgreSQL you will have to create the database before
+running <code class="docutils literal"><span class="pre">trac-admin</span> <span class="pre">initenv</span></code>.</p>
+<p>See the <a class="reference external" href="http://www.postgresql.org/docs/">​PostgreSQL documentation</a>
+for detailed instructions on how to administer
+<a class="reference external" href="http://postgresql.org">​PostgreSQL</a>. Generally, the following is
+sufficient to create a database user named <code class="docutils literal"><span class="pre">tracuser</span></code>, and a database
+named <code class="docutils literal"><span class="pre">trac</span></code>.</p>
+<p>When running <code class="docutils literal"><span class="pre">createuser</span></code> you will be prompted for the password for
+the user &#8216;tracuser&#8217;. This new user will not be a superuser, will not be
+allowed to create other databases and will not be allowed to create
+other roles. These privileges are not needed to run a trac instance. If
+no password is desired for the user, simply remove the <code class="docutils literal"><span class="pre">-P</span></code> and <code class="docutils literal"><span class="pre">-E</span></code>
+options from the <code class="docutils literal"><span class="pre">createuser</span></code> command. Also note that the database
+should be created as UTF8. LATIN1 encoding causes errors trac&#8217;s use of
+unicode in trac. SQL_ASCII also seems to work.</p>
+<p>Under some default configurations (debian) one will have run the
+<code class="docutils literal"><span class="pre">createuser</span></code> and <code class="docutils literal"><span class="pre">createdb</span></code> scripts as the <code class="docutils literal"><span class="pre">postgres</span></code> user. For
+example:</p>
+<p>Trac uses the <code class="docutils literal"><span class="pre">public</span></code> schema by default but you can specify a
+different schema in the connection string:</p>
+</div>
+<div class="section" id="mysql-connection-string">
+<h3>MySQL Connection String<a class="headerlink" href="#mysql-connection-string" title="Permalink to this headline">¶</a></h3>
+<p>If you want to use MySQL instead, you&#8217;ll have to use a different
+connection string. For example, to connect to a MySQL database on the
+same machine called <code class="docutils literal"><span class="pre">trac</span></code>, that allows access to the user <code class="docutils literal"><span class="pre">johndoe</span></code>
+with the password <code class="docutils literal"><span class="pre">letmein</span></code>, the mysql connection string is:</p>
+</div>
+</div>
+<div class="section" id="source-code-repository">
+<h2>Source Code Repository<a class="headerlink" href="#source-code-repository" title="Permalink to this headline">¶</a></h2>
+<p>Since version 0.12, a single Trac environment can be connected to more
+than one repository. There are many different ways to connect
+repositories to an environment, see
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracRepositoryAdmin.html">TracRepositoryAdmin</a>.
+This page also details the various attributes that can be set for a
+repository (like <code class="docutils literal"><span class="pre">type</span></code>, <code class="docutils literal"><span class="pre">url</span></code>, <code class="docutils literal"><span class="pre">description</span></code>).</p>
+<p>In Trac 0.12 <code class="docutils literal"><span class="pre">trac-admin</span></code> no longer asks questions related to
+repositories. Therefore, by default Trac is not connected to any source
+code repository, and the <em>Browse Source</em> toolbar item will not be
+displayed. You can also explicitly disable the <code class="docutils literal"><span class="pre">trac.versioncontrol.*</span></code>
+components (which are otherwise still loaded)</p>
+<p>For some version control systems, it is possible to specify not only the
+path to the repository, but also a <em>scope</em> within the repository. Trac
+will then only show information related to the files and changesets
+below that scope. The Subversion backend for Trac supports this; for
+other types, check the corresponding plugin&#8217;s documentation.</p>
+<p>Example of a configuration for a Subversion repository used as the
+default repository:</p>
+<p>The configuration for a scoped Subversion repository would be:</p>
+</div>
+<div class="section" id="directory-structure">
+<h2>Directory Structure<a class="headerlink" href="#directory-structure" title="Permalink to this headline">¶</a></h2>
+<p>An environment directory will usually consist of the following files and
+directories:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">README</span></code> - Brief description of the environment.</li>
+<li><code class="docutils literal"><span class="pre">VERSION</span></code> - Contains the environment version identifier.</li>
+<li><code class="docutils literal"><span class="pre">attachments</span></code> - Attachments to wiki pages and tickets are stored
+here.</li>
+<li><code class="docutils literal"><span class="pre">conf</span></code><ul>
+<li><code class="docutils literal"><span class="pre">trac.ini</span></code> - Main configuration file. See
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">TracIni</a>.</li>
+</ul>
+</li>
+<li><code class="docutils literal"><span class="pre">db</span></code><ul>
+<li><code class="docutils literal"><span class="pre">trac.db</span></code> - The SQLite database (if you&#8217;re using SQLite).</li>
+</ul>
+</li>
+<li><code class="docutils literal"><span class="pre">htdocs</span></code> - directory containing web resources, which can be
+referenced in Genshi templates using <code class="docutils literal"><span class="pre">/htdocs/site/...</span></code> URLs.
+<em>(since 0.11)</em></li>
+<li><code class="docutils literal"><span class="pre">log</span></code> - default directory for log files, if logging is turned on
+and a relative path is given.</li>
+<li><code class="docutils literal"><span class="pre">plugins</span></code> - Environment-specific
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracPlugins.html">plugins</a>
+(Python eggs or single file plugins, since
+<a class="reference external" href="http://trac.edgewall.org/intertrac/milestone%3A0.10">​0.10</a>)</li>
+<li><code class="docutils literal"><span class="pre">templates</span></code> - Custom Genshi environment-specific templates. <em>(since
+0.11)</em><ul>
+<li><code class="docutils literal"><span class="pre">site.html</span></code> - method to customize header, footer, and style,
+described in
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracInterfaceCustomization.html#SiteAppearance">TracInterfaceCustomization#SiteAppearance</a></li>
+</ul>
+</li>
+</ul>
+<div class="section" id="caveat-don-t-confuse-a-trac-environment-directory-with-the-source-code-repository-directory">
+<h3>Caveat: don&#8217;t confuse a <em>Trac environment directory</em> with the <em>source code repository directory</em><a class="headerlink" href="#caveat-don-t-confuse-a-trac-environment-directory-with-the-source-code-repository-directory" title="Permalink to this headline">¶</a></h3>
+<p>This is a common beginners&#8217; mistake. It happens that the structure for a
+Trac environment is loosely modelled after the Subversion repository
+directory structure, but those are two disjoint entities and they are
+not and <em>must not</em> be located at the same place.</p>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracAdmin.html">TracAdmin</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracBackup.html">TracBackup</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">TracIni</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracGuide.html">TracGuide</a></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">The Trac Environment</a><ul>
+<li><a class="reference internal" href="#creating-an-environment">Creating an Environment</a><ul>
+<li><a class="reference internal" href="#some-useful-tips">Some Useful Tips</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#database-connection-strings">Database Connection Strings</a><ul>
+<li><a class="reference internal" href="#sqlite-connection-string">SQLite Connection String</a></li>
+<li><a class="reference internal" href="#postgresql-connection-string">PostgreSQL Connection String</a></li>
+<li><a class="reference internal" href="#mysql-connection-string">MySQL Connection String</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#source-code-repository">Source Code Repository</a></li>
+<li><a class="reference internal" href="#directory-structure">Directory Structure</a><ul>
+<li><a class="reference internal" href="#caveat-don-t-confuse-a-trac-environment-directory-with-the-source-code-repository-directory">Caveat: don&#8217;t confuse a <em>Trac environment directory</em> with the <em>source code repository directory</em></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracEnvironment.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracEnvironment.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,437 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>The IPA provider now supports logins with enterprise principals (also
+known as additional UPN suffixes). This functionality also enabled
+Active Directory users from trusted AD domains who use an additional
+UPN suffix to log in. Please note that this feature requires a recent
+IPA server.</li>
+<li>When a user name is overriden in an IPA domain, resolving a group
+these users are a member of now returns the overriden user names</li>
+<li>Users can be looked up by and log in with their e-mail address as an
+identifier. In order to do so, an attribute that represents the
+user&#8217;s e-mail address is fetched by default. This attribute can by
+customized by setting the <code class="docutils literal"><span class="pre">ldap_user_email</span></code> configuration option.</li>
+<li>A new <code class="docutils literal"><span class="pre">ad_enabled_domains</span></code> option was added. This option lets the
+administrator select domains that SSSD should attempt to reach in the
+AD forest SSSD is joined to. This option is useful for deployments
+where not all domains are reachable on the network level, yet the
+administrator needs to access some trusted domains and therefore
+disabling the subdomains provider completely is not desirable.</li>
+<li>The <code class="docutils literal"><span class="pre">sssctl</span></code> tool has two new commands <code class="docutils literal"><span class="pre">active-server</span></code> and
+<code class="docutils literal"><span class="pre">servers</span></code> that allow the administrator to observe the server that
+SSSD is bound to and the servers that SSSD autodiscovered</li>
+<li>SSSD used to fail to start when an attribute name is present in both
+the default SSSD attribute map and the custom
+<code class="docutils literal"><span class="pre">ldap_user_extra_attrs</span></code> map</li>
+<li>GPO policy procesing no longer fails if the gPCMachineExtensionNames
+attribute only contains whitespaces</li>
+<li>Several commits fix regressions related to switching all user and
+group names to fully qualified format, such as running <code class="docutils literal"><span class="pre">initgroups</span></code>
+for a user who is only a member of a primary group</li>
+<li>Several patches fix regressions caused by splitting the database into
+two ldb files, such as when user attributes change without increasing
+the <code class="docutils literal"><span class="pre">modifyTimestamp</span></code> attribute value</li>
+<li>systemd unit files are now shipped for the sssd-secrets responder,
+allowing the responder to be socket-activated. To do so,
+administrators should enable the <code class="docutils literal"><span class="pre">sssd-secrets.socket</span></code> and
+<code class="docutils literal"><span class="pre">sssd-secrets.service</span></code> systemd units.</li>
+<li>The <code class="docutils literal"><span class="pre">sssd</span></code> binary has a new switch <code class="docutils literal"><span class="pre">--disable-netlink</span></code> that lets
+sssd skip messages from the kernel&#8217;s netlink interface.</li>
+<li>A crash when entries with special characters such as &#8216;(&#8216; were
+requested was fixed</li>
+<li>The <code class="docutils literal"><span class="pre">ldap_rfc_2307_fallback_to_local_users</span></code> option was broken in
+the previous version. This release fixes the functionality.</li>
+</ul>
+</div>
+<div class="section" id="packaging-changes">
+<h1>Packaging Changes<a class="headerlink" href="#packaging-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>The NFS ID-mapping plugin was moved to its own subpackage</li>
+</ul>
+</div>
+<div class="section" id="documentation-changes">
+<h1>Documentation Changes<a class="headerlink" href="#documentation-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>A new option <code class="docutils literal"><span class="pre">ad_enabled_domains</span></code> was added</li>
+<li>A new LDAP attribute mapping for e-mail addresses called
+<code class="docutils literal"><span class="pre">ldap_user_email</span></code> was added</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/2789">#2789</a></dt>
+<dd>Warn if ad_server contains IP address</dd>
+<dt><a class="reference external" href="/sssd/ticket/2828">#2828</a></dt>
+<dd>Add an option to disable checking for trusted domains in the
+subdomains provider</dd>
+<dt><a class="reference external" href="/sssd/ticket/2856">#2856</a></dt>
+<dd>[RFE] Allow users to authenticate with alternative names</dd>
+<dt><a class="reference external" href="/sssd/ticket/2860">#2860</a></dt>
+<dd>Add support for disabling netlink use</dd>
+<dt><a class="reference external" href="/sssd/ticket/2948">#2948</a></dt>
+<dd>Handle overriden name of members in the memberUid attribute</dd>
+<dt><a class="reference external" href="/sssd/ticket/2958">#2958</a></dt>
+<dd>Support multiple principals for IPA users</dd>
+<dt><a class="reference external" href="/sssd/ticket/2978">#2978</a></dt>
+<dd>pid file name decalration is duplicated</dd>
+<dt><a class="reference external" href="/sssd/ticket/2987">#2987</a></dt>
+<dd>Improve information about krb5_keytab &amp; ldap_krb5_keytab option
+in sssd man pages</dd>
+<dt><a class="reference external" href="/sssd/ticket/3009">#3009</a></dt>
+<dd>sssd fails to mark a connection as bad on searches that time out</dd>
+<dt><a class="reference external" href="/sssd/ticket/3018">#3018</a></dt>
+<dd>Detect of IPA server can handle enterprise principals</dd>
+<dt><a class="reference external" href="/sssd/ticket/3024">#3024</a></dt>
+<dd>sssd-common brings in nfs-utils</dd>
+<dt><a class="reference external" href="/sssd/ticket/3064">#3064</a></dt>
+<dd>incorrect dataExpireTimestamp setting in the timestamps cache</dd>
+<dt><a class="reference external" href="/sssd/ticket/3068">#3068</a></dt>
+<dd>fixes to the initial config schema implementation</dd>
+<dt><a class="reference external" href="/sssd/ticket/3069">#3069</a></dt>
+<dd>The sssctl tool should provide information about active and
+available servers</dd>
+<dt><a class="reference external" href="/sssd/ticket/3072">#3072</a></dt>
+<dd>task: Add a 1.14 upstream repo</dd>
+<dt><a class="reference external" href="/sssd/ticket/3077">#3077</a></dt>
+<dd>sssd does not work under non-root user</dd>
+<dt><a class="reference external" href="/sssd/ticket/3084">#3084</a></dt>
+<dd>DP: Don&#8217;t pass empty string, but NULL to providers</dd>
+<dt><a class="reference external" href="/sssd/ticket/3086">#3086</a></dt>
+<dd>tools: sssctl config-check and sssctl cache ignore &#8211;help</dd>
+<dt><a class="reference external" href="/sssd/ticket/3087">#3087</a></dt>
+<dd>tools: make sssctl command names consistent</dd>
+<dt><a class="reference external" href="/sssd/ticket/3088">#3088</a></dt>
+<dd>Review and update SSSD&#8217;s wiki pages for 1.14.1 release</dd>
+<dt><a class="reference external" href="/sssd/ticket/3089">#3089</a></dt>
+<dd>Error message &#8220;Failed to retrieve users&#8221; is sometimes misleading</dd>
+<dt><a class="reference external" href="/sssd/ticket/3090">#3090</a></dt>
+<dd>Don&#8217;t print message about trust direction on clients</dd>
+<dt><a class="reference external" href="/sssd/ticket/3091">#3091</a></dt>
+<dd>remove DEBUG(SSSDBG_TRACE_INTERNAL, &#8220;Trace: ldap_result found
+nothing!\n&#8221;);</dd>
+<dt><a class="reference external" href="/sssd/ticket/3093">#3093</a></dt>
+<dd>Missing nested groups in user groups</dd>
+<dt><a class="reference external" href="/sssd/ticket/3094">#3094</a></dt>
+<dd>SELINUX_getpeercon failed [-1][Unknown error -1].</dd>
+<dt><a class="reference external" href="/sssd/ticket/3096">#3096</a></dt>
+<dd>sssctl: Time stamps without time zone information</dd>
+<dt><a class="reference external" href="/sssd/ticket/3101">#3101</a></dt>
+<dd>sssd does not start if sub-domain user is used with simple access
+provider</dd>
+<dt><a class="reference external" href="/sssd/ticket/3109">#3109</a></dt>
+<dd>Wrong pam error code returned for password change in offline mode</dd>
+<dt><a class="reference external" href="/sssd/ticket/3110">#3110</a></dt>
+<dd>Access denied after activating user in 389ds</dd>
+<dt><a class="reference external" href="/sssd/ticket/3111">#3111</a></dt>
+<dd>sssd doesn&#8217;t start on IPA client if IPA server VM is paused</dd>
+<dt><a class="reference external" href="/sssd/ticket/3120">#3120</a></dt>
+<dd>SSSD fails to start when ldap_user_extra_attrs contains mail</dd>
+<dt><a class="reference external" href="/sssd/ticket/3121">#3121</a></dt>
+<dd>[abrt] [faf] sssd: unknown function(): /usr/libexec/sssd/sssd_nss
+killed by 11</dd>
+<dt><a class="reference external" href="/sssd/ticket/3122">#3122</a></dt>
+<dd>Do not check local users with disabled local_negative_timeout</dd>
+<dt><a class="reference external" href="/sssd/ticket/3130">#3130</a></dt>
+<dd>Better error message if sssctl is ran w/o activating the IFP
+responder</dd>
+<dt><a class="reference external" href="/sssd/ticket/3132">#3132</a></dt>
+<dd>check return value of sysdb_search_user_by_upn()</dd>
+</dl>
+</div></div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Dan Lavu (1):</p>
+<ul class="simple">
+<li>MAN: Update description of sssctl</li>
+</ul>
+<p>Fabiano Fidêncio (5):</p>
+<ul class="simple">
+<li>sssctl: Use localtime for time stamps</li>
+<li>RESPONDERS: Decrease debug level for failures in
+SELINUX_getpeercon()</li>
+<li>RESPONDERS: Show a bit more info in case of SELINUX_getpeercon()
+failure</li>
+<li>RESPONDERS: Pass errno to strerror() when SELINUX_getpeercon() fails</li>
+<li>SDAP: Don&#8217;t log an op failure when no users are found</li>
+</ul>
+<p>Jakub Hrozek (18):</p>
+<ul class="simple">
+<li>Updating the version for the 1.14.1 release</li>
+<li>FO: Set port to NOT_WORKING when trying a next server</li>
+<li>LDAP: Fix storing initgroups for users with no supplementary groups</li>
+<li>LDAP: Use FQDN when linking parent LDAP groups</li>
+<li>SYSDB: Fix setting dataExpireTimestamp if sysdb is supposed to set
+the current time</li>
+<li>PAM: Do not act on ldb_message in case of a failure</li>
+<li>IPA: Check the return value of sss_parse_internal_fqname</li>
+<li>SIMPLE: Do not parse names on startup</li>
+<li>SIMPLE: Fail on any error parsing the access control list</li>
+<li>SIMPLE: Make the DP handlers testable</li>
+<li>TESTS: Use the DP handlers in simple provider tests, add more tests</li>
+<li>CONFIG: full_name_format is an allowed option for all domains</li>
+<li>CONFIG: re_expression is an allowed option for all domains</li>
+<li>SPEC: Own the secrets DB path</li>
+<li>UTIL: Use sss_atomic_read_s in generate_csprng_buffer</li>
+<li>SECRETS: Use sss_atomic_read/write for better readability</li>
+<li>BUILD: Ship systemd service file for sssd-secrets</li>
+<li>Updating the translations for the 1.14.1 release</li>
+</ul>
+<p>Justin Stephenson (4):</p>
+<ul class="simple">
+<li>Make resolv_is_address() function public and create some basic
+tests</li>
+<li>Warn if IP address is used as option for ipa_server/ad_server</li>
+<li>Monitor: Add support for disabling netlink</li>
+<li>SSSCTL: More helpful error message when
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InfoPipe.html">InfoPipe?</a> is
+disabled</li>
+</ul>
+<p>Lukas Slebodnik (37):</p>
+<ul class="simple">
+<li>sssctl: Fix error handling after memory allocation failure</li>
+<li>sssctl: Fix format string for size_t</li>
+<li>doxygen: Fix path to header file ipa_hbac.h</li>
+<li>ipa_hbac: Fix documentation for hbac_enable_debug</li>
+<li>sssctl: Fix warning maybe-uninitialized</li>
+<li>nss-srv-tests: Fix prototype of wrapped ncache functions</li>
+<li>TOOLS: Prevent dereference of null pointer</li>
+<li>sysdb-tests: Fix cast from pointer to integer</li>
+<li>SPEC: Move nfsidmap plugin to separate package</li>
+<li>test_utils: Clean files after sss_write_krb5_conf_snippet</li>
+<li>CI: Use /bin/sh as a CONFIG SHELL</li>
+<li>SECRETS: Log message for failures with removing file</li>
+<li>Amend debug messages after failure of unlink</li>
+<li>SYSDB: Do not try to modify ts cache for unsupported DNs</li>
+<li>SDAP: sanitize member name before using in filter</li>
+<li>SDAP: sysdb_search_users does not set users_count for failures</li>
+<li>SYSDB: Sanitize dn in sysdb_get_user_members_recursively</li>
+<li>LDAP: Fix Dereference after NULL check</li>
+<li>NSS: Do not check local users with disabled local_negative_timeout</li>
+<li>config_schema: Add ldap_user_email to schema</li>
+<li>intg: Make location of sssd nss module configurable</li>
+<li>intg: Allow to test netgroups</li>
+<li>NSS: Use correct name for invalidating memory cache</li>
+<li>SYSDB: Avoid optimisation with modifyTimestamp for users</li>
+<li>dyndns-tests: Fix false positive failures</li>
+<li>LDAP: Log autofs rfc2307 config changes only with enabled responder</li>
+<li>DP: Add log message for get account info</li>
+<li>ds.py: Do not call teardown in destructor</li>
+<li>test_local_domain: Restore correct env variable</li>
+<li>intg: rename test with enumeration</li>
+<li>test_enumeration: Remove test without enumeration</li>
+<li>intg: create ldap test without enumeration</li>
+<li>sssd_id.py: Primary group should be returned for initgroups</li>
+<li>intg: Fix pep8 warnings</li>
+<li>test_ldap: test nested membership with rfc2307bis</li>
+<li>test_ldap: test resolving of names with special characters</li>
+<li>intg: Test extra attributes duplicate</li>
+</ul>
+<p>Michal Židek (13):</p>
+<ul class="simple">
+<li>sssctl: config-check access check report</li>
+<li>config: override_space is monitor&#8217;s option</li>
+<li>config: Fix user_attributes</li>
+<li>config: Allow timeout for all sevices</li>
+<li>config: Add config_file_version to schema</li>
+<li>dyndns: Add checks for NULL</li>
+<li>sdap: Fix ldap_rfc_2307_fallback_to_local_users</li>
+<li>sss_ini: Change debug level of config error msgs</li>
+<li>sssctl: Consistent commands naming</li>
+<li>tools: Add missing gettext macro</li>
+<li>sssctl: Generic help for cache-upgrade and config-check</li>
+<li>gpo: gPCMachineExtensionNames with just whitespaces</li>
+<li>sdap: Skip exact duplicates when extending maps</li>
+</ul>
+<p>Pavel Březina (17):</p>
+<ul class="simple">
+<li>sssctl: move filter creation to separate function</li>
+<li>sssctl: improve readability of a condition</li>
+<li>DP: rename be_acct_req to dp_id_data</li>
+<li>DP: Initialize D-Bus as soon as possible</li>
+<li>utils: add remove_subtree</li>
+<li>sssctl: use internal API to remove files</li>
+<li>rdp: add ability to forward reply to the client request</li>
+<li>sbus: add sbus_request_reply_error()</li>
+<li>sbus: add utility function to simplify message and reply handling</li>
+<li>sssctl: use talloc with sifp</li>
+<li>failover: mark subdomain service with sd_ prefix</li>
+<li>sssctl: print active server and server list</li>
+<li>sifp: fix coverity warning</li>
+<li>sbus: allow freeing msg through dbus api when using talloc</li>
+<li>PROXY: Do not abuse data provider interface</li>
+<li>DP: Remove old data provider interface</li>
+<li>NSS: Remove unused functions</li>
+</ul>
+<p>Petr Cech (18):</p>
+<ul class="simple">
+<li>SYSDB: Fixing DB update</li>
+<li>PROVIDERS: Setting right {u,g}id if unprivileged</li>
+<li>SYSDB: Removing of duplication of sysdb_ts_cache_attrs</li>
+<li>test_utils: Fixing assignment discards &#8216;const&#8217; qualifier</li>
+<li>LDAP: Changing of confusing debug message</li>
+<li>IPA: Changing of confusing debug message</li>
+<li>Revert &#8220;LDAP: Lookup services by all protocols unless a protocol is
+specified&#8221;</li>
+<li>PROVIDER: Conversion empty string from D-Bus to NULL</li>
+<li>LDAP: Fixing wrong pam error code for passwd</li>
+<li>UTILS: Fixing duplication of pid file declaration</li>
+<li>AD_PROVIDER: Add ad_enabled_domains option</li>
+<li>AD_PROVIDER: Initializing of ad_enabled_domains</li>
+<li>AD_PROVIDER: ad_enabled_domains - only master</li>
+<li>AD_PROVIDER: ad_enabled_domains - other then master</li>
+<li>TESTS: Adding tests for ad_enabled_domains option</li>
+<li>LDAP: Adding support for SIGTERM signal</li>
+<li>LDAP: Adding SIGTERM signal before SIGKILL</li>
+<li>LDAP: Adding SIGCHLD callback</li>
+</ul>
+<p>Sumit Bose (33):</p>
+<ul class="simple">
+<li>views: allow override added for non-default views at runtime</li>
+<li>IPA: read ipaNTAdditionalSuffixes for master and trusted domains</li>
+<li>sysdb: add UPN suffix support for the master domain</li>
+<li>sysdb: make subdomain calls aware of upn_suffixes</li>
+<li>DP: add dp_get_module_data()</li>
+<li>IPA: add ipa_init_get_krb5_auth_ctx()</li>
+<li>IPA: enable enterprise principals if server supports them</li>
+<li>IPA: fix [capaths] output</li>
+<li>UTIL: make domain mapping content testable</li>
+<li>tests: add tests for sss_get_domain_mappings_content()</li>
+<li>AD: avoid memory leak in netlogon_get_domain_info() and make it
+public</li>
+<li>AD: netlogon_get_domain_info() allow missing arguments and empty
+results</li>
+<li>tests: add tests for netlogon_get_domain_info</li>
+<li>AD: replace ad_get_client_site_parse_ndr() with
+netlogon_get_domain_info()</li>
+<li>sysdb_master_domain_add_info: properly set do_update</li>
+<li>IPA: make ipa_resolve_user_list_{send|recv} public and allow AD
+users</li>
+<li>IPA: expand ghost members of AD groups in server-mode</li>
+<li>sysdb: add sysdb_get_user_members_recursively()</li>
+<li>views: properly override group member names</li>
+<li>IPA: fix lookup by UPN for subdomains</li>
+<li>LDAP: allow multiple user principals</li>
+<li>LDAP: new attribute option ldap_user_email</li>
+<li>sysdb: include email in UPN searches</li>
+<li>LDAP: include email in UPN searches</li>
+<li>NSS: add user email to fill_orig()</li>
+<li>utils: add is_email_from_domain()</li>
+<li>LDAP/IPA: add local email address to aliases</li>
+<li>NSS: continue with UPN/email search if name was not found</li>
+<li>PAM: continue with UPN/email search if name was not found</li>
+<li>NSS: use different neg cache name for UPN searches</li>
+<li>PAM: Fix domain for UPN based lookups</li>
+<li>SDAP: add special handling for IPA Kerberos enterprise principal
+strings</li>
+<li>SDAP: add enterprise principal strings for user searches</li>
+</ul>
+<p>Thorsten Scherf (1):</p>
+<ul class="simple">
+<li>Fixed some typos in man pages</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#packaging-changes">Packaging Changes</a></li>
+<li><a class="reference internal" href="#documentation-changes">Documentation Changes</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.14.1.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.14.1.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

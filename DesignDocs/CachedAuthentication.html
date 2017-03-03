@@ -1,0 +1,272 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Authenticate against cache in SSSD &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="authenticate-against-cache-in-sssd">
+<h1>Authenticate against cache in SSSD<a class="headerlink" href="#authenticate-against-cache-in-sssd" title="Permalink to this headline">¶</a></h1>
+<p>Related ticket(s):</p>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1807">​https://fedorahosted.org/sssd/ticket/1807</a></li>
+</ul>
+<div class="section" id="problem-statement">
+<h2>Problem statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>SSSD should allow cache authentication instead of authenticating
+directly against network server every time. Authenticating against the
+network many times can cause excessive application latency.</p>
+</div>
+<div class="section" id="use-cases">
+<h2>Use cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+<p>In environments with tens of thousands of users login process may become
+inappropriately long, when servers are running under high workload (e.g.
+during classes, when many users log in simultaneously).</p>
+</div>
+<div class="section" id="overview-of-the-solution">
+<h2>Overview of the solution<a class="headerlink" href="#overview-of-the-solution" title="Permalink to this headline">¶</a></h2>
+<p>Add new domain option <code class="docutils literal"><span class="pre">cached_auth_timeout</span></code> describing how long can be
+cached credentials used for cached authentication before online
+authentication must be performed. Update PAM responder functionality for
+forwarding requests to domain providers by checking if request can be
+served from cache and if so execute same code branch as for offline
+authentication instead of contacting the domain provider.</p>
+<p>If password is locally changed (via SSSD client) SSSD should use online
+authentication for the next login attempt.</p>
+<p>SSSD should immediately try an online login if the password doesn&#8217;t
+match while processing cached authentication. It will allow a user to
+correctly login if the password was changed through another client. (It
+will also make the server failed authentication counter go up if it was
+a password guessing attempt and it would also made such attempts to pay
+the full round trip to the server, which helps deter local attacks even
+if we do not do any other checks like we do for real offline
+authentication.)</p>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>extend structure <em>pam_auth_req</em><ul>
+<li>add new field <code class="docutils literal"><span class="pre">use_cached_auth</span></code> (default value is false)</li>
+</ul>
+</li>
+<li>extend structure <em>sss_domain_info</em><ul>
+<li>add new field <code class="docutils literal"><span class="pre">cached_auth_timeout</span></code> which will hold value of
+newly introduced domain option <code class="docutils literal"><span class="pre">cached_auth_timeout</span></code></li>
+</ul>
+</li>
+<li>introduce new sysdb attribute
+<code class="docutils literal"><span class="pre">SYSDB_LAST_ONLINE_AUTH_WITH_CURRENT_TOKEN</span></code><ul>
+<li>this attribute would mostly behave in the same way as
+<code class="docutils literal"><span class="pre">SYSDB_LAST_ONLINE_AUTH</span></code> but would be set to 0 when local
+password change happens</li>
+<li>this would guarantee that after local password change, next login
+attempt won&#8217;t be cached (if SSSD is in the online mode)</li>
+</ul>
+</li>
+<li>extend <em>pam_dom_forwarder()</em><ul>
+<li>set local copy of <code class="docutils literal"><span class="pre">cached_auth_timeout</span></code> to use the smaller of
+the domain&#8217;s <code class="docutils literal"><span class="pre">cached_auth_timeout</span></code> (given in seconds) and the
+<code class="docutils literal"><span class="pre">offline_credentials_expiration</span></code> (given in days, also must
+handle the special value 0 for offline_credentials_expiration)</li>
+<li>do not forward request to a domain provider if<ul>
+<li>domain uses cached credentials <em>AND</em></li>
+<li>(local) <code class="docutils literal"><span class="pre">cached_auth_timeout</span></code> is greater than 0 <em>AND</em></li>
+<li>last online login (resp. attribute
+<code class="docutils literal"><span class="pre">SYSDB_LAST_ONLINE_AUTH_WITH_CURRENT_TOKEN</span></code>) of user who is
+being authenticated is not stale (&gt; <em>now()</em> - (local)
+<code class="docutils literal"><span class="pre">cached_auth_timeout</span></code>) <em>AND</em></li>
+<li>PAM request can be handled from cache (PAM command is
+<code class="docutils literal"><span class="pre">SSS_PAM_AUTHENTICATE</span></code>)<ul>
+<li>then set <code class="docutils literal"><span class="pre">use_cached_auth</span></code> to true</li>
+<li>call <em>pam_reply()</em></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>extend <em>pam_reply()</em><ul>
+<li>extend condition for entering into block processing case when
+pam_status is PAM_AUTHINFO_UNAVAIL even for <code class="docutils literal"><span class="pre">use_cached_auth</span></code>
+being true</li>
+<li>while in this block and if PAM command is SSS_PAM_AUTHENTICATE
+then set <code class="docutils literal"><span class="pre">use_cached_auth</span></code> to false to avoid cyclic recursion
+call of <em>pam_reply()</em> which is subsequently called from
+<em>pam_handle_cached_login()</em></li>
+</ul>
+</li>
+<li>extend <em>pam_handle_cached_login()</em><ul>
+<li>if permission is denied and and cached authentication was used
+then return to <em>pam_dom_forwarder()</em> and perform online
+authentication</li>
+</ul>
+</li>
+<li>introduce function
+<em>sysdb_get_user_lastlogin_with_current_token()</em><ul>
+<li>used to obtain value of attribute
+<code class="docutils literal"><span class="pre">SYSDB_LAST_ONLINE_AUTH_WITH_CURRENT_TOKEN</span></code> for given user from
+sysdb while deciding in pam_dom_forwarder() whether
+authentication can be served from cache or domain provider must be
+contacted (no output to console should happen here)</li>
+</ul>
+</li>
+<li>when password is being changed make sure that value of
+<code class="docutils literal"><span class="pre">SYSDB_LAST_ONLINE_AUTH_WITH_CURRENT_TOKEN</span></code> is set to 0</li>
+</ul>
+</div>
+<div class="section" id="configuration-changes">
+<h2>Configuration changes<a class="headerlink" href="#configuration-changes" title="Permalink to this headline">¶</a></h2>
+<p>A new domain option <code class="docutils literal"><span class="pre">cached_auth_timeout</span></code> will be added. The value of
+this option is a time period in seconds for which cached authentication
+can be used. After this period is exceeded online authentication must be
+performed. The default value would be 0, which implies that this feature
+is by default disabled.</p>
+</div>
+<div class="section" id="how-to-test">
+<h2>How To Test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>set <code class="docutils literal"><span class="pre">cached_auth_timeout</span></code> in sssd.conf to some non-null value (e.g.
+120)</li>
+<li>erase SSSD caches and restart SSSD</li>
+<li>test with correct password<ol class="arabic">
+<li>log in as user from domain which stores credentials and then log
+out and log in again. The second login should use cached
+credentials. Output should by similar to this, especially note the
+line starting with: <strong>Authenticated with cached credentials</strong>
+(Please note that to see this console output <em>pam_verbosity = 2</em>
+must be set in pam section of sssd.conf.)</li>
+<li>for the <code class="docutils literal"><span class="pre">cached_auth_timeout</span></code> seconds since the 1st login all
+subsequent login attempts (for the same user) should be served
+from cache and domain provider should not be contacted, this can
+be verified by changing password at server.</li>
+<li>after passing more than <code class="docutils literal"><span class="pre">cached_auth_timeout</span></code> seconds since the
+1st log in an online log in should be performed.</li>
+</ol>
+</li>
+<li>test with wrong password to check if:<ol class="arabic">
+<li><em>offline_failed_login_attempts</em> is respected</li>
+<li><em>offline_failed_login_delay</em> is respected</li>
+</ol>
+</li>
+<li>change locally password<ul>
+<li>verify that subsequent login attempt is processed online and that
+new password is accepted and old one is denied</li>
+</ul>
+</li>
+<li>change password directly on server or via another client then SSSD<ul>
+<li>verify that new password is accepted and that logs inform that
+cached authentication failed and online authentication had to be
+performed (please note that old password would be accepted as SSSD
+client has no knowledge that it was changed)</li>
+</ul>
+</li>
+</ol>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Pavel Reichl &lt;<a class="reference external" href="mailto:preichl&#37;&#52;&#48;redhat&#46;com">​preichl<span>&#64;</span>redhat<span>&#46;</span>com</a>&gt;</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Authenticate against cache in SSSD</a><ul>
+<li><a class="reference internal" href="#problem-statement">Problem statement</a></li>
+<li><a class="reference internal" href="#use-cases">Use cases</a></li>
+<li><a class="reference internal" href="#overview-of-the-solution">Overview of the solution</a></li>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a></li>
+<li><a class="reference internal" href="#configuration-changes">Configuration changes</a></li>
+<li><a class="reference internal" href="#how-to-test">How To Test</a></li>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/DesignDocs/CachedAuthentication.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/DesignDocs/CachedAuthentication.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

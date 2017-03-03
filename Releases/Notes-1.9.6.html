@@ -1,0 +1,315 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>This release focused primarily on bug fixing and stabilization. Only
+minor features were added</li>
+<li>A new ignore_group_members option was added. This option can be
+used to suppress downloading group members on group lookups, making
+the group lookups much faster for environments that do not need to
+know the group members.</li>
+<li>A new option ldap_rfc2307_fallback_to_local_users was added. If
+this option is set to true, SSSD is be able to resolve local group
+members of LDAP groups.</li>
+<li>A new option ldap_disable_range_retrieval was added. Switching
+this option to True skips large Active Directory groups that might
+otherwise take a long time to download and process.</li>
+<li>A new option refresh_expired_interval was added. This option allows
+to configure a background task that would automatically refresh
+entries that are nearing their expiration time. In this release, only
+refreshing netgroups is implemented.</li>
+<li>Multiple crasher bugs in the fast in-memory cache were fixed</li>
+<li>Several commits improved portability of SSSD&#8217;s build system, allowing
+for easier builds on non-Linux platforms</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1893">​https://fedorahosted.org/sssd/ticket/1893</a>
+- Enabling enumeration causes sssd_be process to utilize 100% of the
+CPU</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1890">​https://fedorahosted.org/sssd/ticket/1890</a>
+- SSSD doesn&#8217;t display warning for last grace login.</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1733">​https://fedorahosted.org/sssd/ticket/1733</a>
+- [RFE] support autoconfiguring SUDO with ipa provider and compat
+tree</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1912">​https://fedorahosted.org/sssd/ticket/1912</a>
+- SUDO is not working for users from trusted AD domain</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1823">​https://fedorahosted.org/sssd/ticket/1823</a>
+- getgrnam / getgrgid for large user groups is too slow due to range
+retrieval functionality</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1376">​https://fedorahosted.org/sssd/ticket/1376</a>
+- [RFE] Add support for suppressing group members</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1886">​https://fedorahosted.org/sssd/ticket/1886</a>
+- If previous SRV query failed, the next try might not be retried in
+some cases</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1947">​https://fedorahosted.org/sssd/ticket/1947</a>
+- [abrt] sssd-1.10.0-4.fc19.beta1: get_server_status: Process
+/usr/libexec/sssd/sssd_be was killed by signal 11 (SIGSEGV)</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1806">​https://fedorahosted.org/sssd/ticket/1806</a>
+- sssd_be goes to 99% CPU and causes significant login delays when
+client is under load</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1693">​https://fedorahosted.org/sssd/ticket/1693</a>
+- sudoHost mismatch response is incorrect sometimes</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1933">​https://fedorahosted.org/sssd/ticket/1933</a>
+- sssd fails to resolve hosts/services once the network is up</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1846">​https://fedorahosted.org/sssd/ticket/1846</a>
+- cyclic group memberships may not work depending on order of
+operations</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2031">​https://fedorahosted.org/sssd/ticket/2031</a>
+- sssd fails instead of skipping when a sudo ldap filter returns
+entries with multiple CNs</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1932">​https://fedorahosted.org/sssd/ticket/1932</a>
+- sssd_be crashing with nested ldap groups contain a dangling member</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1759">​https://fedorahosted.org/sssd/ticket/1759</a>
+- sss_cache -N/-n should invalidate the hash table in sssd_nss</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2005">​https://fedorahosted.org/sssd/ticket/2005</a>
+- SSSD filter out ldap user/group if uid/gid is zero</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1980">​https://fedorahosted.org/sssd/ticket/1980</a>
+- SSSD service randomly dies</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1986">​https://fedorahosted.org/sssd/ticket/1986</a>
+- SYSV init script should use &#64;sbindir&#64;</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1959">​https://fedorahosted.org/sssd/ticket/1959</a>
+- Enhance sssd init script so that it would source a configuration</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1966">​https://fedorahosted.org/sssd/ticket/1966</a>
+- SSSD failover doesn&#8217;t work if the first DNS server in resolv.conf
+is unavailable</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1899">​https://fedorahosted.org/sssd/ticket/1899</a>
+- resolv-tests failing with memory leak</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2018">​https://fedorahosted.org/sssd/ticket/2018</a>
+- sssd_nss terminated with segmentation fault</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1891">​https://fedorahosted.org/sssd/ticket/1891</a>
+- unite periodic refresh API</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1713">​https://fedorahosted.org/sssd/ticket/1713</a>
+- [RFE] Add a task to the SSSD to periodically refresh cached entries</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2029">​https://fedorahosted.org/sssd/ticket/2029</a>
+- passwd returns &#8220;Authentication token manipulation error&#8221; when
+entering wrong current password</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1827">​https://fedorahosted.org/sssd/ticket/1827</a>
+- Cannot change expired password of an AD user</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1825">​https://fedorahosted.org/sssd/ticket/1825</a>
+- Invalid assignment to enum</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2059">​https://fedorahosted.org/sssd/ticket/2059</a>
+- sss_packet_grow: wrong use of module to pad data</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2049">​https://fedorahosted.org/sssd/ticket/2049</a>
+- sssd_nss core dumps under load</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2057">​https://fedorahosted.org/sssd/ticket/2057</a>
+- Data provider endianess bug</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1992">​https://fedorahosted.org/sssd/ticket/1992</a>
+- AD dyndns update crashed after attempting to update a standalone
+DNS server</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/1892">​https://fedorahosted.org/sssd/ticket/1892</a>
+- In IPA AD trust setup, the sssd logs throws
+&#8216;sysdb_search_user_by_name failed&#8217; error when AD user tries to
+login via ipa client.</li>
+<li><a class="reference external" href="https://fedorahosted.org/sssd/ticket/2126">​https://fedorahosted.org/sssd/ticket/2126</a>
+- sssd_be segfault when authenticating against active directory</li>
+</ul>
+</div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Jakub Hrozek (10):</p>
+<ul class="simple">
+<li>Bump the version for the 1.9.6 release</li>
+<li>Only try to relink ghost users if we&#8217;re not enumerating</li>
+<li>Display the last grace warning, too</li>
+<li>IPA: Do not download or store the member attribute of host groups</li>
+<li>LDAP: Fix crash when processing nested groups</li>
+<li>MAN: Clarify the min_id/max_id limits further</li>
+<li>Set default DNS resolution timeout to 6 seconds.</li>
+<li>DP: Use the correct type for DBus boolean</li>
+<li>Make IPA SELinux provider aware of subdomain users</li>
+<li>Updating Transifex URL</li>
+<li>Updating translations for the 1.9.6 release</li>
+</ul>
+<p>Lukas Slebodnik (31):</p>
+<ul class="simple">
+<li>SUDO: IPA provider</li>
+<li>Removing unused functions.</li>
+<li>Adding option to disable retrieving large AD groups.</li>
+<li>Every time use permissive control in function memberof_mod.</li>
+<li>NSS: allow removing entries from netgroup hash table</li>
+<li>NSS: Clear cached netgroups if a request comes in from the sss_cache</li>
+<li>Do not call sss_cmd_done in function check_cache.</li>
+<li>Handle too many results from getnetgr.</li>
+<li>Removing unused parameter type from
+sudosrv_get_sudorules_query_cache()</li>
+<li>mmap_cache: Skip records which doesn&#8217;t have same hash</li>
+<li>mmap_cache: Use stricter check for hash keys.</li>
+<li>UTIL: Create new wraper header file sss_endian.h</li>
+<li>CLIENT: Fix non gnu sss_strnlen implementation</li>
+<li>MONITOR: Move function declaration out of conditional build</li>
+<li>UTIL: Explicitly include header file sys/socket.h</li>
+<li>MEMBEROF: Remove temporary workaround</li>
+<li>IPA_HBAC: Explicitelly include header file time.h</li>
+<li>CONFIGURE: Get rid of bashism</li>
+<li>Include sys/types.h for types id_t and uid_t</li>
+<li>UTIL: Use standard maximum value of type size_t</li>
+<li>mmap_cache: Do not remove record from chain twice</li>
+<li>AUTOTOOLS: Add -LLIBDIR to PYTHON_LIBS</li>
+<li>AUTOTOOLS: Add missing AC_MSG_RESULT</li>
+<li>AUTOMAKE: Use portable way to link with dlopen</li>
+<li>AUTOMAKE: Use portable way to link with gettext</li>
+<li>AUTOTOOLS: Add directories for searching ldap headers and libs</li>
+<li>AUTOTOOLS: Refactor unicode library detection</li>
+<li>AUTOTOOLS: add check for type intptr_t</li>
+<li>AUTOTOOLS: Use pkg-config to detect libraries.</li>
+<li>AUTOTOOLS: More robust detection of inotify.</li>
+<li>AUTOTOOLS: Fix warnings: macro xyz not found in library</li>
+</ul>
+<p>Michal Zidek (13):</p>
+<ul class="simple">
+<li>Always set port status to neutral when resetting service.</li>
+<li>Lower timeout to contact DNS server</li>
+<li>resolv-tests failing with memory leak</li>
+<li>mmap_cache: Check if slot and name_ptr are not invalid.</li>
+<li>ldap, krb5: More descriptive msg on chpass failure.</li>
+<li>mmap_cache: Check data-&gt;name value in client code</li>
+<li>mmap_cache: Remove triple checks in client code.</li>
+<li>mmap_cache: Off by one error.</li>
+<li>mmap_cache: Use better checks for corrupted mc in responder</li>
+<li>mmap_cache: Store corrupted mmap cache before reset</li>
+<li>Rename _SSS_MC_SPECIAL</li>
+<li>man sssd: Add note about SSS_NSS_USE_MEMCACHE</li>
+<li>Check slot validity before MC_SLOT_TO_PTR.</li>
+</ul>
+<p>Paul B. Henson (1):</p>
+<ul class="simple">
+<li>Add ignore_group_members option.</li>
+</ul>
+<p>Pavel Březina (16):</p>
+<ul class="simple">
+<li>sudo responder: use fully qualified name for subdomain users</li>
+<li>failover: set state-&gt;out when meta server remains in
+SRV_RESOLVE_ERROR</li>
+<li>collapse_srv_lookup may free the server, make it clear from the API</li>
+<li>failover: if expanded server is marked as neutral, invoke srv
+collapse</li>
+<li>sudo responder: use different callback for oob refresh</li>
+<li>sudo: skip rule on error instead of failing completely</li>
+<li>sudo: print better debug message when a rule has multiple cn values</li>
+<li>init script: source /etc/sysconfig/sssd</li>
+<li>back end: periodic task API</li>
+<li>back end: periodical refresh of expired records API</li>
+<li>back end: add refresh expired records periodic task</li>
+<li>providers: refresh expired netgroups</li>
+<li>print hint about password complexity when new password is rejected</li>
+<li>sss_packet_grow: correctly pad packet length to 512B</li>
+<li>SIGCHLD handler: do not call callback when pvt data was freed</li>
+<li>is_dn(): free dn</li>
+</ul>
+<p>Simo Sorce (1):</p>
+<ul class="simple">
+<li>Add a commit template</li>
+</ul>
+<p>Stephen Gallagher (1):</p>
+<ul class="simple">
+<li>Configure SYSV init scripts properly</li>
+</ul>
+<p>Sumit Bose (2):</p>
+<ul class="simple">
+<li>sdap_get_generic_ext_send: check if we a re still connected</li>
+<li>be_spy_create: free be_req and not the long living data</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.9.6.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.9.6.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,281 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><ol class="first arabic">
+<li><a class="reference external" href="#Highlights">Highlights</a></li>
+<li><a class="reference external" href="#PackagingChanges">Packaging Changes</a></li>
+<li><a class="reference external" href="#TicketsFixed">Tickets Fixed</a></li>
+<li><a class="reference external" href="#DetailedChangelog">Detailed Changelog</a></li>
+</ol>
+</li>
+</ol>
+</div><div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>A new option, override_shell was added. If this option is set, all
+users managed by SSSD will have their shell set to its value.</li>
+<li>Many fixes for the support for setting default SELinux user context
+from FreeIPA. Most notably, the SELinux mappings can now link to HBAC
+rules as the source of users and hosts they apply to.</li>
+<li>Fixed a regression introduced in beta 5 that prevented LDAP SASL
+binds from working unless the value of ldap_sasl_minssf was
+explicitly specified.</li>
+<li>The SSSD supports the concept of a Primary Server and a Back Up
+Server. Certain servers in the fail over list can be marked as back
+up only. If the SSSD switches to a back up server because a primary
+server is not available, it would later try to re-establish a
+connection to the primary server. This feature would mainly benefit
+users who configure fail over servers from different data centers or
+geographies.</li>
+<li>A new command-line tool sss_seed is available. This tool is able to
+prime the internal cache with a user record and a cached password to
+support the scenario when a user needs to log in to the client before
+the network connection to the centralized identity source is
+established, such as the first log in to a new machine.</li>
+<li>In scenarios, where the SSSD is acting as an IPA client, it is able
+to discover and save the DNS domain-Kerberos realm mappings between
+an IPA server and a trusted Active Directory server.</li>
+</ul>
+</div>
+<div class="section" id="packaging-changes">
+<h1>Packaging Changes<a class="headerlink" href="#packaging-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>a new binary, called sss_seed is available. The binary is installed
+to /usr/sbin/sss_seed by default and includes its own manual page.</li>
+<li>The SSSD uses a new directory to store the DNS domain - Kerberos
+realm mappings. The default location is
+/var/lib/sss/pubconf/krb5.include.d</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/904">#904</a></dt>
+<dd>Create tool to seed a user for first-boot</dd>
+<dt><a class="reference external" href="/sssd/ticket/1087">#1087</a></dt>
+<dd>RFE: Allow Forcing User Shell</dd>
+<dt><a class="reference external" href="/sssd/ticket/1128">#1128</a></dt>
+<dd>Introduce the concept of a Primary Server in SSSD</dd>
+<dt><a class="reference external" href="/sssd/ticket/1185">#1185</a></dt>
+<dd>[Feature] AD Extensions</dd>
+<dt><a class="reference external" href="/sssd/ticket/1318">#1318</a></dt>
+<dd>RFE: make the NSS memory cache timeout configurable</dd>
+<dt><a class="reference external" href="/sssd/ticket/1368">#1368</a></dt>
+<dd>Missing hostid and subdomains sections in sssd-ipa.conf</dd>
+<dt><a class="reference external" href="/sssd/ticket/1380">#1380</a></dt>
+<dd>domain_realm mappings manipulation by sssd</dd>
+<dt><a class="reference external" href="/sssd/ticket/1418">#1418</a></dt>
+<dd>document how sudo works with sssd</dd>
+<dt><a class="reference external" href="/sssd/ticket/1420">#1420</a></dt>
+<dd>sudo: provide automatic configuration of machine hostnames</dd>
+<dt><a class="reference external" href="/sssd/ticket/1427">#1427</a></dt>
+<dd>Don&#8217;t refersh HBAC rules when looking up SELinux rules</dd>
+<dt><a class="reference external" href="/sssd/ticket/1429">#1429</a></dt>
+<dd>IPA session code returns error when SELinux mapping rule links to an
+HBAC rule</dd>
+<dt><a class="reference external" href="/sssd/ticket/1432">#1432</a></dt>
+<dd>Mention AD Provider in manpage of sssd.conf</dd>
+<dt><a class="reference external" href="/sssd/ticket/1433">#1433</a></dt>
+<dd>Suggested additions to manpage of sssd-ad</dd>
+<dt><a class="reference external" href="/sssd/ticket/1435">#1435</a></dt>
+<dd>SELinux specifity does not work with HBAC rules</dd>
+<dt><a class="reference external" href="/sssd/ticket/1439">#1439</a></dt>
+<dd>sss_pam needs to write out SELinux login file during the account
+phase</dd>
+<dt><a class="reference external" href="/sssd/ticket/1445">#1445</a></dt>
+<dd>The SELinux login file needs to be created by the responder, not PAM
+module</dd>
+<dt><a class="reference external" href="/sssd/ticket/1448">#1448</a></dt>
+<dd>sss_seed tool review issues</dd>
+</dl>
+</div></div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Jakub Hrozek (6):</p>
+<ul class="simple">
+<li>Bumping version to 1.9.0 beta 6</li>
+<li>Fix sysdb_search_selinux_usermap_by_username return value</li>
+<li>Fix SSSDConfigTest</li>
+<li>Fix bad check</li>
+<li>Create a domain-realm mapping for krb5.conf to be included</li>
+<li>Update translations for 1.9.0 beta 6 release</li>
+</ul>
+<p>Jan Zeleny (25):</p>
+<ul class="simple">
+<li>Added some DEBUG statements into SELinux related code</li>
+<li>Extend category support in SELinux user maps</li>
+<li>Remove ipa_selinux_map_merge()</li>
+<li>Fix linking of HBAC rules and SELinux user maps</li>
+<li>Provide counter of possible matches in SELinux IPA provider</li>
+<li>Always free request in data provider PAM callback</li>
+<li>Renamed session provider to selinux provider</li>
+<li>Move SELinux processing from session to account PAM stack</li>
+<li>Remove unused member of be_req</li>
+<li>Write SELinux config files in responder instead of PAM module</li>
+<li>Modify hbac_get_cached_rules() so it can be used outside of HBAC
+code</li>
+<li>Support fetching of HBAC rules from sysdb in SELinux code</li>
+<li>Support fetching of host from sysdb in SELinux code</li>
+<li>Primary server support: introduce concept of reconnection</li>
+<li>Primary server support: basic support in failover code</li>
+<li>Primary server support: support for &#8220;disconnecting&#8221; connections in
+LDAP</li>
+<li>Primary server support: IPA adaptation</li>
+<li>Primary server support: krb5 adaptation</li>
+<li>Primary server support: LDAP adaptation</li>
+<li>Primary server support: AD adaptation</li>
+<li>Primary server support: man page, failover section</li>
+<li>Primary server support: new option in ldap provider</li>
+<li>Primary server support: new options in krb5 provider</li>
+<li>Primary server support: new option in IPA provider</li>
+<li>Primary server support: new option in AD provider</li>
+</ul>
+<p>Michal Zidek (1):</p>
+<ul class="simple">
+<li>Added unit test for sysdb_ssh.c</li>
+</ul>
+<p>Nick Guay (1):</p>
+<ul class="simple">
+<li>First-boot sss_seed tool</li>
+</ul>
+<p>Pavel Březina (7):</p>
+<ul class="simple">
+<li>sdap_sudo.c: add missing end of line in few debug messages</li>
+<li>add hostid and subdomains sections in sssd-ipa.conf</li>
+<li>manpage: seealso - include ssh conditionally</li>
+<li>tests: allow changing cwd in all tests</li>
+<li>manpage: sssd-sudo - documents how sudo works with sssd</li>
+<li>sudo ldap provider: support autoconfiguration of hostnames</li>
+<li>Unbreak SASL</li>
+</ul>
+<p>Simo Sorce (16):</p>
+<ul class="simple">
+<li>Change subdomain_info</li>
+<li>tests: Remove useless consts</li>
+<li>80 columns police</li>
+<li>Fix double semi-colons</li>
+<li>Fix wrong elements used in comparison</li>
+<li>Use ldb_msg_add_string with bare strings</li>
+<li>Fix return error and debug message</li>
+<li>Make structure initializer more readable</li>
+<li>80 col and style fixes</li>
+<li>Use a more tractable name for subdomain request</li>
+<li>Add realm paramter to subdomain list</li>
+<li>Expose an initializer function from subdomain</li>
+<li>Change refreshing of subdomains</li>
+<li>Limit refreshes keeping track of last refresh time</li>
+<li>Add online callback to enumerate subdomains</li>
+<li>Add automatic periodic retrieval of subdomains</li>
+</ul>
+<p>Stephen Gallagher (4):</p>
+<ul class="simple">
+<li>MAN: List all available backends for provider options</li>
+<li>MAN: Improvements to the AD provider manpage</li>
+<li>NSS: Add override_shell option</li>
+<li>SYSDB: Add log message for unexpected LDB errors</li>
+</ul>
+<p>Ville Skyttä (1):</p>
+<ul class="simple">
+<li>Require and call ldconfig from subpackages if appropriate</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#packaging-changes">Packaging Changes</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.9.0beta6.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.9.0beta6.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

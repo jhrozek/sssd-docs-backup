@@ -1,0 +1,395 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using HTML in Wiki Text &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="using-html-in-wiki-text">
+<h1>Using HTML in Wiki Text<a class="headerlink" href="#using-html-in-wiki-text" title="Permalink to this headline">¶</a></h1>
+<p>Trac supports inserting HTML into any wiki context, accomplished using
+the <code class="docutils literal"><span class="pre">#!html</span></code>
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiProcessors.html">WikiProcessor</a>.</p>
+<p>However a constraint is that this HTML has to be well-formed. In
+particular you can&#8217;t insert a start tag in an <code class="docutils literal"><span class="pre">#!html</span></code> block, resume
+normal wiki text and insert the corresponding end tag in a second
+<code class="docutils literal"><span class="pre">#!html</span></code> block.</p>
+<p>Fortunately, for creating styled &lt;div&gt;s, &lt;span&gt;s or even complex tables
+containing arbitrary Wiki text, there&#8217;s a powerful alternative: use of
+dedicated <code class="docutils literal"><span class="pre">#!div</span></code>, <code class="docutils literal"><span class="pre">#!span</span></code> and <code class="docutils literal"><span class="pre">#!table</span></code>, <code class="docutils literal"><span class="pre">#!tr</span></code>, <code class="docutils literal"><span class="pre">#!td</span></code> and
+<code class="docutils literal"><span class="pre">#!th</span></code> blocks.</p>
+<p>Those Wiki processors are built-in, and does not require installing any
+additional packages.</p>
+<div class="section" id="how-to-use-html">
+<h2>How to use <code class="docutils literal"><span class="pre">#!html</span></code><a class="headerlink" href="#how-to-use-html" title="Permalink to this headline">¶</a></h2>
+<p>To inform the wiki engine that a block of text should be treated as
+HTML, use the <em>html</em> processor.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><dl class="first last docutils">
+<dt>lor: blue&#8221;&gt;HTML Test&lt;/h1&gt;</dt>
+<dd>}}}</dd>
+</dl>
+</td>
+<td><p class="first last rubric" id="html-test">HTML Test</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Note that Trac sanitizes your HTML code before displaying it. That means
+that if you try to use potentially dangerous constructs such as
+Javascript event handlers, those will be removed from the output.</p>
+<p>Since 0.11, the filtering is done by Genshi, and as such, the produced
+output will be a well-formed fragment of HTML. As noted above in the
+introduction, this mean that you can no longer use two HTML blocks, one
+for opening a &lt;div&gt;, the second for closing it, in order to wrap
+arbitrary wiki text. The new way to wrap any wiki content inside a &lt;div&gt;
+is to use the <code class="docutils literal"><span class="pre">#!div</span></code> Wiki processor.</p>
+</div>
+<div class="section" id="how-to-use-div-and-span">
+<h2>How to use <code class="docutils literal"><span class="pre">#!div</span></code> and <code class="docutils literal"><span class="pre">#!span</span></code><a class="headerlink" href="#how-to-use-div-and-span" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+<th class="head">Display</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><dl class="first docutils">
+<dt>ass.</dt>
+<dd>}}}</dd>
+</dl>
+<dl class="docutils">
+<dt>ed class that will</dt>
+<dd>be used when no class is specifi</dd>
+<dt>ed.</dt>
+<dd>}}}</dd>
+</dl>
+<dl class="docutils">
+<dt>der: 1pt dotted; margin: 1em&#8221;</dt>
+<dd><strong>compact</strong> is another predefine</dd>
+<dt>d class reducing</dt>
+<dd>the padding within the <cite>&lt;div&gt;</cite> t</dd>
+<dt>o a minimum.</dt>
+<dd>}}}</dd>
+</dl>
+<dl class="docutils">
+<dt>tyle=&#8221;border: 1pt dotted&#8221;</dt>
+<dd>Classes can be combined (here **</dd>
+<dt>wikipage** and <strong>compact</strong>)</dt>
+<dd>which results in this case in re</dd>
+<dt>duced //vertical//</dt>
+<dd>padding but there&#8217;s still some h</dd>
+<dt>orizontal space for coping</dt>
+<dd>with headings.
+}}}</dd>
+</dl>
+<dl class="last docutils">
+<dt>t dotted; margin: 1em&#8221;</dt>
+<dd><blockquote class="first">
+<div>Explicitly specifying no classes</div></blockquote>
+<dl class="last docutils">
+<dt>is //not// the same</dt>
+<dd>as specifying no class attribute</dd>
+</dl>
+</dd>
+<dt>, as this will remove</dt>
+<dd>the //wikipage// default class.
+}}}</dd>
+</dl>
+</td>
+<td><div class="first"><div class="important"></div><p><strong>important</strong> is a predefined class.</p>
+</div><div class="wikipage"
+style="border: 1pt dotted; margin<p>: 1em&#8221;&gt;</p>
+<p><strong>wikipage</strong> is another predefined
+class that will be used when no
+class is specified.</p>
+</div><div class="compact"
+style="border: 1pt dotted; margin<p>: 1em&#8221;&gt;</p>
+<p><strong>compact</strong> is another predefined
+class reducing the padding within
+the <code class="docutils literal"><span class="pre">&lt;div&gt;</span></code> to a minimum.</p>
+</div><div class="wikipage compact"
+style="border: 1pt dotted"><p>Classes can be combined (here
+<strong>wikipage</strong> and <strong>compact</strong>) which
+results in this case in reduced
+<em>vertical</em> padding but there&#8217;s still
+some horizontal space for coping
+with headings.</p>
+</div><div
+style="border: 1pt dotted; margin<p>: 1em&#8221;&gt;</p>
+<p>Explicitly specifying no classes is
+<em>not</em> the same as specifying no
+class attribute, as this will remove
+the <em>wikipage</em> default class.</p>
+<div class="last"></div></div></td>
+</tr>
+</tbody>
+</table>
+<p>Note that the contents of a <code class="docutils literal"><span class="pre">#!div</span></code> block are contained in one or more
+paragraphs, which have a non-zero top and bottom margin. This leads to
+the top and bottom padding in the example above. To remove the top and
+bottom margin of the contents, add the <code class="docutils literal"><span class="pre">compact</span></code> class to the
+<code class="docutils literal"><span class="pre">#!div</span></code>. Another predefined class besides <code class="docutils literal"><span class="pre">wikipage</span></code> and <code class="docutils literal"><span class="pre">compact</span></code>
+is <code class="docutils literal"><span class="pre">important</span></code>, which can be used to make a paragraph stand out. Extra
+CSS classes can be defined via the <code class="docutils literal"><span class="pre">site/style.css</span></code> file for example,
+see
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracInterfaceCustomization.html#SiteAppearance">TracInterfaceCustomization#SiteAppearance</a>.</p>
+<p>For spans, you should rather use the Macro call syntax:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="100%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>ze: 120%, id=anchor)]]!</td>
+</tr>
+<tr class="row-odd"><td>Display</td>
+</tr>
+<tr class="row-even"><td>Hello <em>WORLD</em> (click
+<a class="reference external" href="https://fedorahosted.org/sssd#anchor">here</a>)!</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="how-to-use-td-and-other-table-related-processors">
+<h2>How to use <code class="docutils literal"><span class="pre">#!td</span></code> and other table related processors<a class="headerlink" href="#how-to-use-td-and-other-table-related-processors" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">#!td</span></code> or <code class="docutils literal"><span class="pre">#!th</span></code> processors are actually the main ones, for creating
+table data and header cells, respectively. The other processors
+<code class="docutils literal"><span class="pre">#!table</span></code> and <code class="docutils literal"><span class="pre">#!tr</span></code> are not required for introducing a table
+structure, as <code class="docutils literal"><span class="pre">#!td</span></code> and <code class="docutils literal"><span class="pre">#!th</span></code> will do this automatically. The
+<code class="docutils literal"><span class="pre">|-</span></code> row separator can be used to start a new row when needed, but
+some may prefer to use a <code class="docutils literal"><span class="pre">#!tr</span></code> block for that, as this introduces a
+more formal grouping and offers the possibility to use an extra level of
+indentation. The main purpose of the <code class="docutils literal"><span class="pre">#!table</span></code> and <code class="docutils literal"><span class="pre">#!tr</span></code> is to give
+the possibility to specify HTML attributes, like <em>style</em> or <em>valign</em> to
+these elements.</p>
+<p>Wiki Markup</p>
+<p>Display</p>
+<p>Simple 2x2 table with rich content:</p>
+<ul class="simple">
+<li>Left</li>
+<li>Header</li>
+<li>Right</li>
+<li>Header</li>
+<li>Left</li>
+<li>Content</li>
+</ul>
+<p>RightContent</p>
+<p>... and this can be mixed</p>
+<p>with pipe-based cells</p>
+<p>Pick the style the more appropriate to your content</p>
+<p>See
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html#Tables">WikiFormatting#Tables</a>
+for details on the pipe-based table syntax.</p>
+<p>If one needs to add some attributes to the table itself...</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Left header</th>
+<th class="head">Right header</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1.1</td>
+<td>1.2</td>
+</tr>
+<tr class="row-odd"><td>2.1</td>
+<td>2.2</td>
+</tr>
+</tbody>
+</table>
+<p>Note that by default tables are assigned the &#8220;wiki&#8221; CSS class, which
+gives a distinctive look to the header cells and a default border to the
+table and cells (as can be seen for the tables on this page). By
+removing this class (<code class="docutils literal"><span class="pre">#!table</span> <span class="pre">class=&quot;&quot;</span></code>), one regains complete control
+on the table presentation. In particular, neither the table, the rows
+nor the cells will have a border, so this is a more effective way to get
+such an effect than having to specify a <code class="docutils literal"><span class="pre">style=&quot;border:</span> <span class="pre">no&quot;</span></code> parameter
+everywhere.</p>
+<p>Wiki Markup</p>
+<p>Display</p>
+<p>0</p>
+<p>1</p>
+<p>2</p>
+<p>10</p>
+<p>20</p>
+<p>30</p>
+<p>11</p>
+<p>22</p>
+<p>33</p>
+<p>numbers</p>
+<p>Other classes can be specified as alternatives (remember that you can
+define your own in
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracInterfaceCustomization.html#SiteAppearance">site/style.css</a>).</p>
+<p>Wiki Markup</p>
+<p>Display</p>
+<p>0</p>
+<p>1</p>
+<p>2</p>
+<p>10</p>
+<p>20</p>
+<p>30</p>
+<p>11</p>
+<p>22</p>
+<p>33</p>
+<p>numbers</p>
+</div>
+<div class="section" id="html-comments">
+<h2>HTML comments<a class="headerlink" href="#html-comments" title="Permalink to this headline">¶</a></h2>
+<p>HTML comments are stripped from the output of the <code class="docutils literal"><span class="pre">html</span></code> processor. To
+add an HTML comment to a wiki page, use the <code class="docutils literal"><span class="pre">htmlcomment</span></code> processor
+(available since 0.12). For example, the following code block:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="100%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Wiki Markup</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>Display</td>
+</tr>
+<tr class="row-even"><td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<p>Please note that the character sequence &#8220;<code class="docutils literal"><span class="pre">--</span></code>&#8221; is not allowed in HTML
+comments, and will generate a rendering error.</p>
+</div>
+<div class="section" id="more-information">
+<h2>More Information<a class="headerlink" href="#more-information" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://www.w3.org/">​http://www.w3.org/</a> &#8211; World Wide Web
+Consortium</li>
+<li><a class="reference external" href="http://www.w3.org/MarkUp/">​http://www.w3.org/MarkUp/</a> &#8211; HTML
+Markup Home Page</li>
+</ul>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiProcessors.html">WikiProcessors</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiFormatting.html">WikiFormatting</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/WikiRestructuredText.html">WikiRestructuredText</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Using HTML in Wiki Text</a><ul>
+<li><a class="reference internal" href="#how-to-use-html">How to use <code class="docutils literal"><span class="pre">#!html</span></code></a></li>
+<li><a class="reference internal" href="#how-to-use-div-and-span">How to use <code class="docutils literal"><span class="pre">#!div</span></code> and <code class="docutils literal"><span class="pre">#!span</span></code></a></li>
+<li><a class="reference internal" href="#how-to-use-td-and-other-table-related-processors">How to use <code class="docutils literal"><span class="pre">#!td</span></code> and other table related processors</a></li>
+<li><a class="reference internal" href="#html-comments">HTML comments</a></li>
+<li><a class="reference internal" href="#more-information">More Information</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/WikiHtml.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/WikiHtml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

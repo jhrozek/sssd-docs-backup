@@ -1,0 +1,375 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Contribute &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="wiki-toc"><ol class="arabic simple">
+<li><a class="reference external" href="#Contribute">Contribute</a><ol class="arabic">
+<li><a class="reference external" href="#ContributionPolicy">Contribution Policy</a></li>
+<li><a class="reference external" href="#SourceCodeRepository">Source Code Repository</a></li>
+<li><a class="reference external" href="#Tasksfornewcomers">Tasks for newcomers</a><ol class="arabic">
+<li><a class="reference external" href="#Gettingthesource">Getting the source</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#BuildingSSSD">Building SSSD</a><ol class="arabic">
+<li><a class="reference external" href="#UsefulTipsandinformationfordevelopers">Useful Tips and information for
+developers</a></li>
+<li><a class="reference external" href="#COPRRepository">COPR Repository</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#Sendingpatchtoupstream">Sending patch to upstream</a><ol class="arabic">
+<li><a class="reference external" href="#CodingStyle">Coding Style</a></li>
+<li><a class="reference external" href="#Submitting">Submitting</a></li>
+<li><a class="reference external" href="#Patchmetadata">Patch metadata</a></li>
+<li><a class="reference external" href="#Unittests">Unit tests</a><ol class="arabic">
+<li><a class="reference external" href="#Runningintegrationtestslocally">Running integration tests
+(locally)</a></li>
+</ol>
+</li>
+<li><a class="reference external" href="#LocalizationandInternationalization">Localization and
+Internationalization</a></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><a class="reference external" href="#LatestDocumentationandPresentations">Latest Documentation and
+Presentations</a></li>
+</ol>
+</div><div class="section" id="contribute">
+<h1>Contribute<a class="headerlink" href="#contribute" title="Permalink to this headline">¶</a></h1>
+<p>There are many ways you can contribute to the System Security Services
+Daemon. This page should provide some basic pointers.</p>
+<p>SSSD development discussions occur either on the <a class="reference external" href="https://fedorahosted.org/mailman/listinfo/sssd-devel">​SSSD development
+list</a> or on the
+<a class="reference external" href="irc://irc.freenode.net/sssd">​#sssd IRC channel</a> on
+<a class="reference external" href="http://freenode.net/">​freenode</a>. Keep in mind that SSSD developers
+are spread across different time zones, which makes mailing list
+preferred communication channel if you wish to reach the entire team.</p>
+<p>The SSSD originated as a sister-project to
+<a class="reference external" href="http://www.freeipa.org">​FreeIPA</a>, so we share many pieces.
+Contributing to FreeIPA may also help SSSD and vice versa.</p>
+<p>If you want to file a bug or enhancement request, please log in with
+your Fedora Account System credentials. If you do not have a Fedora
+Account, you can register for one at
+<a class="reference external" href="https://admin.fedoraproject.org/accounts/">​https://admin.fedoraproject.org/accounts/</a>.
+There is dedicated page about <a class="reference external" href="https://docs.pagure.org/sssd-test2/Reporting_sssd_bugs.html">​bug
+reporting</a>.</p>
+<div class="section" id="contribution-policy">
+<h2>Contribution Policy<a class="headerlink" href="#contribution-policy" title="Permalink to this headline">¶</a></h2>
+<p>All source code committed to the SSSD is assumed to be made available
+under the GPLv3+ license unless the submitter specifies another license
+at that time. The upstream SSSD maintainers reserve the right to refuse
+a submission if the license is deemed incompatible with the goals of the
+project.</p>
+</div>
+<div class="section" id="source-code-repository">
+<h2>Source Code Repository<a class="headerlink" href="#source-code-repository" title="Permalink to this headline">¶</a></h2>
+<p>For the SSSD project, we use the
+<a class="reference external" href="http://www.kernel.org/pub/software/scm/git/docs/gittutorial.html">​Git</a>
+source control system.</p>
+</div>
+<div class="section" id="tasks-for-newcomers">
+<h2>Tasks for newcomers<a class="headerlink" href="#tasks-for-newcomers" title="Permalink to this headline">¶</a></h2>
+<p>We try to mark tickets that don&#8217;t require too much existing knowledge
+with the <code class="docutils literal"><span class="pre">easyfix</span></code> keyword in Trac. We also prepared <a class="reference external" href="https://fedorahosted.org/sssd/report/34">​a Trac
+query</a> that lists the easy
+fixes. Before starting the work on any of these tickets, it might be a
+good idea to contact the SSSD developers on the <a class="reference external" href="https://lists.fedorahosted.org/archives/list/sssd-devel&#64;lists.fedorahosted.org/">​sssd-devel
+list</a>
+and check if the ticket is still valid or ask for guidance in general.</p>
+<div class="section" id="getting-the-source">
+<h3>Getting the source<a class="headerlink" href="#getting-the-source" title="Permalink to this headline">¶</a></h3>
+<p>To check out the latest SSSD sources, install git on your system
+(Instructions are for Fedora, you may need to use a platform-specific
+installation mechanism for other OSes).</p>
+<p>You can find an excellent
+<a class="reference external" href="http://www.kernel.org/pub/software/scm/git/docs/gittutorial.html">​tutorial</a>
+for using git.</p>
+<p>The first time, you will want to configure git with your name and email
+address for patch attribution:</p>
+<p>You can enable syntax highlighting at the console (for git commands such
+as &#8216;<code class="docutils literal"><span class="pre">git</span> <span class="pre">status</span></code>&#8216; and &#8216;<code class="docutils literal"><span class="pre">git</span> <span class="pre">diff</span></code>&#8216;) by setting:</p>
+<p>And if you would like to have a graphical tool for resolving merge
+conflicts, you can install and set up meld:</p>
+<p>It can be invoked with</p>
+<p>You can also enable the commit template by:</p>
+<p>Once that&#8217;s done, you can clone our upstream git repository with</p>
+<p>This will create a new subdirectory &#8216;sssd&#8217; in the current directory
+which will contain the current master sources. All development should be
+done first against the master branch, then backported to one of the
+stable branches if necessary.</p>
+</div>
+</div>
+<div class="section" id="building-sssd">
+<h2>Building SSSD<a class="headerlink" href="#building-sssd" title="Permalink to this headline">¶</a></h2>
+<p>Starting with SSSD 1.10 beta, we now include a set of helper aliases and
+environment variables in SSSD to simplify building development versions
+of SSSD on Fedora. To take advantage of them, use the following command:</p>
+<p>To build SSSD from source, follow these steps:</p>
+<ol class="arabic simple">
+<li>Install necessary tools</li>
+</ol>
+<ol class="arabic simple" start="2">
+<li>Create source rpm (run from git root directory)</li>
+<li>Install SSSD dependencies</li>
+</ol>
+<p>If you plan on working with the SSSD source often, you may want to add
+the following to your <code class="docutils literal"><span class="pre">~/.bashrc</span></code> file:</p>
+<p>You can now produce a Debug build of SSSD by running:</p>
+<p>The <code class="docutils literal"><span class="pre">reconfig</span></code> alias will run <code class="docutils literal"><span class="pre">autoreconf</span> <span class="pre">-if</span></code>, create a parallel
+build directory named after your CPU architecture (e.g. x86_64) and
+then run the configure script with the appropriate options for
+installing on a Fedora system with all experimental features enabled.</p>
+<p>The <code class="docutils literal"><span class="pre">chmake</span></code> alias will then perform the build (with build messages
+suppressed except on warning or error) as well as build and run tests.</p>
+<p>Finally, assuming you have sudo privilege, you can run the
+<code class="docutils literal"><span class="pre">sssinstall</span></code> alias to install this debug build onto the build machine.</p>
+<p>You can also directly build <strong>rpm packages</strong> for Fedora or CentOS using
+make target <em>rpms</em> or <em>prerelease-rpms</em>. The second version will create
+rpm packages with date and git hash in package release.</p>
+<p>To install SSSD on other distributions, you can run the usual Autotools
+combo:</p>
+<p>To build and install the code. Please note that by default, the
+Autotools install prefix is <code class="docutils literal"><span class="pre">/usr/local</span></code>. Also, if you are building
+and installing on a 32bit machine, you should use <code class="docutils literal"><span class="pre">/lib/</span></code> instead of
+<code class="docutils literal"><span class="pre">/lib64</span></code> for <code class="docutils literal"><span class="pre">nsslibdir</span></code> and <code class="docutils literal"><span class="pre">pammoddir</span></code>. Please note that even if
+you are installing to <code class="docutils literal"><span class="pre">/usr/local</span></code>, the NSS and PAM libraries must be
+installed to system library directories as that&#8217;s where NSS and PAM
+would be looking for them.</p>
+<div class="section" id="useful-tips-and-information-for-developers">
+<h3>Useful Tips and information for developers<a class="headerlink" href="#useful-tips-and-information-for-developers" title="Permalink to this headline">¶</a></h3>
+<p>There is a <a class="reference external" href="https://docs.pagure.org/sssd-test2/DevelTips.html">dedicated
+page</a> that
+contains a collection of tips that are useful for developers. The <a class="reference external" href="https://docs.pagure.org/sssd-test2/InternalsDocs.html">​SSSD
+Internals
+page</a> is
+useful to become more familiar with SSSD terminology, components, and
+flow between processes.</p>
+</div>
+<div class="section" id="copr-repository">
+<h3>COPR Repository<a class="headerlink" href="#copr-repository" title="Permalink to this headline">¶</a></h3>
+<p>You can download development packages from
+<a class="reference external" href="https://copr.fedoraproject.org/coprs/">​COPR</a> repo:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://copr.fedorainfracloud.org/groups/g/sssd/coprs/">​https://copr.fedorainfracloud.org/groups/g/sssd/coprs/</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="sending-patch-to-upstream">
+<h2>Sending patch to upstream<a class="headerlink" href="#sending-patch-to-upstream" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="coding-style">
+<h3>Coding Style<a class="headerlink" href="#coding-style" title="Permalink to this headline">¶</a></h3>
+<p>We have adopted the code style and formatting specification used by the
+FreeIPA project to describe our
+<a class="reference external" href="http://www.freeipa.org/page/Python_Coding_Style">​Python</a> coding
+style. For C language we also used <a class="reference external" href="http://www.freeipa.org/page/Coding_Style">​FreeIPA C
+style</a> but this style is
+currently outdated and a <a class="reference external" href="http://fedorahosted.org/sssd/wiki/CodingStyle">new updated C style
+guide</a> was written for
+SSSD.</p>
+</div>
+<div class="section" id="submitting">
+<h3>Submitting<a class="headerlink" href="#submitting" title="Permalink to this headline">¶</a></h3>
+<p>Make your changes and then add any new or modified files to a change-set
+with the command:</p>
+<p>Before submitting a patch, always make sure it <a class="reference external" href="https://docs.pagure.org/sssd-test2/Contribute.html#Runningintegrationtestslocally">​doesn&#8217;t break SSSD
+tests</a>
+and applies to the latest upstream master branch. You will want to
+rebase to this branch and fix any merge conflicts (in case someone else
+changed the same code).</p>
+<p>If this rebase has a merge conflict, you will need to resolve the
+conflict before you continue. If you get stuck or make a mistake, you
+can use</p>
+<p>This will put you right back where you started.</p>
+<p>Patches should be split so that every logical change in the large
+patchset is contained in its own patch. An example of this is <a class="reference external" href="https://fedorahosted.org/sssd/ticket/2789">​SSSD
+Ticket #2789</a> where one
+patch makes the resolv_is_address() function public with tests and the
+other adds the function in the SSSD providers.</p>
+<p>Once your changes are ready for submission, submit it via a <a class="reference external" href="https://docs.pagure.org/sssd-test2/GithubWorkflow.html">​github
+pull
+request</a>.</p>
+<p>If a patch isn&#8217;t accepted on the first review, you will need to modify
+it and resubmit it. When this happens, you will want to amend your
+changes to the existing patch with</p>
+<p>If you need to make changes to earlier patches in your tree, you can use</p>
+<p>and follow the directions in the interactive rebase to modify specific
+patches.</p>
+<p>Then just re-push the patches to github, the pull request will be
+refreshed automatically.</p>
+</div>
+<div class="section" id="patch-metadata">
+<h3>Patch metadata<a class="headerlink" href="#patch-metadata" title="Permalink to this headline">¶</a></h3>
+<p>The description associated with the patch is an important piece of
+information that allows other developers or users to see what the change
+was about, what bug did the commit fix or what feature did the commit
+implement. To structure the information many SSSD developers use the
+following format:</p>
+<ul class="simple">
+<li>one-line short description</li>
+<li>blank line</li>
+<li>ticket or bugzilla URL (if available)</li>
+<li>blank line</li>
+<li>One or more paragraphs that describe the change if it can&#8217;t be
+described fully in the one-line description</li>
+</ul>
+<p>These best practices are loosely based on the <a class="reference external" href="http://www.kernel.org/doc/Documentation/SubmittingPatches">​kernel patch submission
+recommendation</a>.</p>
+<p>An example of a patch formatted according to the above guidelines is
+commit
+<a class="reference external" href="https://fedorahosted.org/sssd/changeset/cbee11e912bb391ba254b0bac8c1159c1f634533/">cbee11e912bb391ba254b0bac8c1159c1f634533</a>:</p>
+</div>
+<div class="section" id="unit-tests">
+<h3>Unit tests<a class="headerlink" href="#unit-tests" title="Permalink to this headline">¶</a></h3>
+<p>It is preferred if a patch comes together with a unit test. SSSD uses
+the <a class="reference external" href="http://cmocka.org/">​cmocka</a> library for developing unit tests,
+although some older tests still use the <a class="reference external" href="http://check.sourceforge.net/">​check
+framework</a>. For an introduction to
+cmocka, see either the examples in the <code class="docutils literal"><span class="pre">src/tests/cmocka</span></code> directory or
+read the <a class="reference external" href="https://lwn.net/Articles/558106/">​lwn article on cmocka</a>.</p>
+<div class="section" id="running-integration-tests-locally">
+<h4>Running integration tests (locally)<a class="headerlink" href="#running-integration-tests-locally" title="Permalink to this headline">¶</a></h4>
+<p>The easiest way to run the integration tests is by running:</p>
+<p>Running the complete suite of tests may be overkill for debugging.
+Running individual tests from the suite can be done according to the
+following examples:</p>
+<p>The INTGCHECK_PYTEST_ARGS format can be checked in the <a class="reference external" href="http://doc.pytest.org/en/latest/contents.html">​PyTest
+official
+documentation</a>.</p>
+</div>
+</div>
+<div class="section" id="localization-and-internationalization">
+<h3>Localization and Internationalization<a class="headerlink" href="#localization-and-internationalization" title="Permalink to this headline">¶</a></h3>
+<p>Our development policy for the SSSD requires that any code that
+generates a user-facing message should be wrapped by GNU <code class="docutils literal"><span class="pre">gettext</span></code>
+macros so that they can eventually be translated. We use
+<a class="reference external" href="http://zanata.org/">​zanata</a> for translating.</p>
+</div>
+</div>
+</div>
+<div class="section" id="latest-documentation-and-presentations">
+<h1>Latest Documentation and Presentations<a class="headerlink" href="#latest-documentation-and-presentations" title="Permalink to this headline">¶</a></h1>
+<p>There is a dedicated page where we keep our documentation.</p>
+<ul class="simple">
+<li><a class="reference external" href="https://docs.pagure.org/sssd-test2/Documentation.html">Documentation</a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Contribute</a><ul>
+<li><a class="reference internal" href="#contribution-policy">Contribution Policy</a></li>
+<li><a class="reference internal" href="#source-code-repository">Source Code Repository</a></li>
+<li><a class="reference internal" href="#tasks-for-newcomers">Tasks for newcomers</a><ul>
+<li><a class="reference internal" href="#getting-the-source">Getting the source</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#building-sssd">Building SSSD</a><ul>
+<li><a class="reference internal" href="#useful-tips-and-information-for-developers">Useful Tips and information for developers</a></li>
+<li><a class="reference internal" href="#copr-repository">COPR Repository</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sending-patch-to-upstream">Sending patch to upstream</a><ul>
+<li><a class="reference internal" href="#coding-style">Coding Style</a></li>
+<li><a class="reference internal" href="#submitting">Submitting</a></li>
+<li><a class="reference internal" href="#patch-metadata">Patch metadata</a></li>
+<li><a class="reference internal" href="#unit-tests">Unit tests</a><ul>
+<li><a class="reference internal" href="#running-integration-tests-locally">Running integration tests (locally)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#localization-and-internationalization">Localization and Internationalization</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#latest-documentation-and-presentations">Latest Documentation and Presentations</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Contribute.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/Contribute.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,456 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>This release adds several new enhancements and fixes many bugs</li>
+<li>Notable new enhancements:<ul>
+<li>The background refresh tasks now supports refreshing users and
+groups as well. Please see the description of the
+<code class="docutils literal"><span class="pre">refresh_expired_interval</span></code> parameter in the <code class="docutils literal"><span class="pre">sssd.conf</span></code> man
+page.</li>
+<li>A new option <code class="docutils literal"><span class="pre">subdomain_inherit</span></code> was added. Options included in
+the <code class="docutils literal"><span class="pre">subdomain_inherit</span></code> option also apply for trusted domains,
+if supported. This release supports inheriting
+<code class="docutils literal"><span class="pre">ignore_group_members</span></code>, <code class="docutils literal"><span class="pre">ldap_purge_cache_timeout</span></code>,
+<code class="docutils literal"><span class="pre">ldap_use_tokengroups</span></code> and <code class="docutils literal"><span class="pre">ldap_user_principal</span></code>.</li>
+<li>When an expired account attempts to log in, a configurable error
+message can be displayed with sufficient <code class="docutils literal"><span class="pre">pam_verbosity</span></code>
+setting. Please see the description of the
+<code class="docutils literal"><span class="pre">pam_account_expired_message</span></code> option for more information.</li>
+<li>OpenLDAP ppolicy can be honored even when an alternate login
+method (such as SSH key) is used. Please see the description of
+the new <code class="docutils literal"><span class="pre">ppolicy</span></code> value of the <code class="docutils literal"><span class="pre">ldap_access_order</span></code> option.</li>
+<li>A new option <code class="docutils literal"><span class="pre">krb5_map_user</span></code> was added. This option allows the
+admin to map UNIX usernames to Kerberos principals. The option
+would be mostly useful for setups that wish to continue using UNIX
+file-based identities together with SSSD Kerberos authentication</li>
+</ul>
+</li>
+<li>The important bug fixes include:<ul>
+<li>Several AD-specific bugs that resulted in the incorrect set of
+groups being displayed after the initgroups operation were fixed</li>
+<li>Many fixes related to the IPA ID views feature are included.
+Setups using the ID views feature should update the SSSD instance
+on both IPA servers and clients.</li>
+<li>The AD provider now handles binary GUIDs correctly. This bug was
+manifested with an error message saying
+<code class="docutils literal"><span class="pre">ldb_modify</span> <span class="pre">failed:</span> <span class="pre">Invalid</span> <span class="pre">attribute</span> <span class="pre">syntax</span></code>.</li>
+<li>The AD provider no longer downloads full group objects during
+initgroups request if POSIX attributes are used. This fix may
+speed up the login times significantly.</li>
+<li>A bug that prevented the <code class="docutils literal"><span class="pre">ignore_group_members</span></code> parameter to be
+used with the AD provider was fixed</li>
+<li>The fail over code now reads and honors TTL value for SRV queries
+as well. Previously, SRV queries used a hardcoded timeout</li>
+<li>The SELinux context set up during login with an IPA provider is
+only called if the context had changed. This fixes a performance
+regression with the IPA provider.</li>
+<li>Race condition between setting the timeout in the back ends and
+reading it in the front end during initgroup operation was fixed.
+This bug affected applications that perform the <code class="docutils literal"><span class="pre">initgroups(3)</span></code>
+operation in multiple processes simultaneously.</li>
+<li>Setups that only want to use the domain SSSD is connected to, but
+not the autodiscovered trusted domains by setting
+<code class="docutils literal"><span class="pre">subdomains_provider=none</span></code> now work correctly as long as the
+domain SID is set manually in the config file</li>
+<li>In case only allow rules are used, the simple access provider is
+now able to skip unresolvable groups.</li>
+<li>The GPO access control code now handles situations where user and
+computer objects were in different domains. Previously, an attempt
+to log in as user from a different domain than computer always
+resulted in login failure.</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="packaging-changes">
+<h1>Packaging Changes<a class="headerlink" href="#packaging-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>The cmocka unit tests now require cmocka version 1.0 or later</li>
+<li>The <code class="docutils literal"><span class="pre">libsss_krb5_common.so</span></code> library had been moved to the
+sssd-common subpackage to avoid ordering issues between
+libsss_krb5_common and libsss_ldap_common</li>
+<li>The <code class="docutils literal"><span class="pre">proxy_child</span></code> helper binary was marked as setuid in order for
+the proxy provider to work without root privileges.</li>
+</ul>
+</div>
+<div class="section" id="documentation-changes">
+<h1>Documentation Changes<a class="headerlink" href="#documentation-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>A new option <code class="docutils literal"><span class="pre">subdomain_inherit</span></code> was added. See the highlights
+section for more details.</li>
+<li>A new option <code class="docutils literal"><span class="pre">krb5_map_user</span></code> was added. See the highlights section
+for more details.</li>
+<li>The <code class="docutils literal"><span class="pre">ldap_access_order</span></code> option accepts new value <code class="docutils literal"><span class="pre">ppolicy</span></code>.</li>
+<li>Account expiration message can be customized using a new option
+<code class="docutils literal"><span class="pre">pam_account_expired_message</span></code></li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/1884">#1884</a></dt>
+<dd>[RFE] Read and use the TTL value when resolving a SRV query</dd>
+<dt><a class="reference external" href="/sssd/ticket/2050">#2050</a></dt>
+<dd>ssh login reject is abrupt</dd>
+<dt><a class="reference external" href="/sssd/ticket/2083">#2083</a></dt>
+<dd>Document the best practices for AD access control</dd>
+<dt><a class="reference external" href="/sssd/ticket/2167">#2167</a></dt>
+<dd>[RFE] Allow SSSD to issue shadow expiration warning even if
+alternate authentication method is used</dd>
+<dt><a class="reference external" href="/sssd/ticket/2346">#2346</a></dt>
+<dd>[RFE] Implement background refresh for users and groups</dd>
+<dt><a class="reference external" href="/sssd/ticket/2444">#2444</a></dt>
+<dd>extop request marks dp_req as failed when an entry is not found</dd>
+<dt><a class="reference external" href="/sssd/ticket/2507">#2507</a></dt>
+<dd>Cyclic dependencies between sssd-ldap and krb5-common</dd>
+<dt><a class="reference external" href="/sssd/ticket/2509">#2509</a></dt>
+<dd>RFE: Handle setups with id_provider=proxy and auth_provider=krb5
+better</dd>
+<dt><a class="reference external" href="/sssd/ticket/2513">#2513</a></dt>
+<dd>Add a hint on using DEBUG levels to the troubleshooting page</dd>
+<dt><a class="reference external" href="/sssd/ticket/2528">#2528</a></dt>
+<dd>Document that that libkrb5 and sssd use different expansion
+templates for principals</dd>
+<dt><a class="reference external" href="/sssd/ticket/2534">#2534</a></dt>
+<dd>[RFE] Lock out ssh keys when account naturally expires</dd>
+<dt><a class="reference external" href="/sssd/ticket/2570">#2570</a></dt>
+<dd>Document how to handle setups that only wish to include certain
+groups</dd>
+<dt><a class="reference external" href="/sssd/ticket/2587">#2587</a></dt>
+<dd>With empty ipaselinuxusermapdefault security context on client is
+staff_u</dd>
+<dt><a class="reference external" href="/sssd/ticket/2588">#2588</a></dt>
+<dd>Properly handle AD&#8217;s binary objectGUID</dd>
+<dt><a class="reference external" href="/sssd/ticket/2591">#2591</a></dt>
+<dd>sssd nss bug update vs create cache</dd>
+<dt><a class="reference external" href="/sssd/ticket/2592">#2592</a></dt>
+<dd>ccname_file_dummy is not unlinked on error</dd>
+<dt><a class="reference external" href="/sssd/ticket/2598">#2598</a></dt>
+<dd>sssd_nss segfaults if initgroups request is by UPN and doesn&#8217;t find
+anything</dd>
+<dt><a class="reference external" href="/sssd/ticket/2601">#2601</a></dt>
+<dd>SSSD downloads too much information when fetching information about
+groups</dd>
+<dt><a class="reference external" href="/sssd/ticket/2604">#2604</a></dt>
+<dd>sssd_be segfault on IPA(when auth with AD trusted domain) client at
+src/providers/ipa/ipa_s2n_exop.c:1605</dd>
+<dt><a class="reference external" href="/sssd/ticket/2606">#2606</a></dt>
+<dd>GPO access control looks for computer object in user&#8217;s domain only</dd>
+<dt><a class="reference external" href="/sssd/ticket/2608">#2608</a></dt>
+<dd>sssd crashes intermittently</dd>
+<dt><a class="reference external" href="/sssd/ticket/2611">#2611</a></dt>
+<dd>sssd_be dumping core if enumeration times out</dd>
+<dt><a class="reference external" href="/sssd/ticket/2612">#2612</a></dt>
+<dd>ldap_access_order=ppolicy: Explicitly mention in manpage that
+unsupported time specification will lead to sssd denying access</dd>
+<dt><a class="reference external" href="/sssd/ticket/2613">#2613</a></dt>
+<dd>sysdb sudo search doesn&#8217;t escape special characters</dd>
+<dt><a class="reference external" href="/sssd/ticket/2614">#2614</a></dt>
+<dd>id lookup resolves &#8220;Domain Local&#8221; group and errors appear in domain
+log</dd>
+<dt><a class="reference external" href="/sssd/ticket/2624">#2624</a></dt>
+<dd>Only set the selinux context if the context differs from the local
+one</dd>
+<dt><a class="reference external" href="/sssd/ticket/2629">#2629</a></dt>
+<dd>sssd_be segfault id_provider = ad src/providers/ad/ad_gpo.c:843</dd>
+<dt><a class="reference external" href="/sssd/ticket/2630">#2630</a></dt>
+<dd>Overrides with &#8211;login work in second attempt</dd>
+<dt><a class="reference external" href="/sssd/ticket/2631">#2631</a></dt>
+<dd>idoverridegroup for ipa group with &#8211;group-name does not work</dd>
+<dt><a class="reference external" href="/sssd/ticket/2632">#2632</a></dt>
+<dd>Overridde with &#8211;login fails trusted adusers group membership
+resolution</dd>
+<dt><a class="reference external" href="/sssd/ticket/2633">#2633</a></dt>
+<dd>Group resolution is inconsistent with group overrides</dd>
+<dt><a class="reference external" href="/sssd/ticket/2634">#2634</a></dt>
+<dd>sssd nss responder gets wrong number of secondary groups</dd>
+<dt><a class="reference external" href="/sssd/ticket/2635">#2635</a></dt>
+<dd>ID mapping does not wotk with disabled subdomains</dd>
+<dt><a class="reference external" href="/sssd/ticket/2642">#2642</a></dt>
+<dd>Override for IPA users with login does not list user all groups</dd>
+<dt><a class="reference external" href="/sssd/ticket/2643">#2643</a></dt>
+<dd>autofs provider fails when default_domain_suffix and
+use_fully_qualified_names set</dd>
+<dt><a class="reference external" href="/sssd/ticket/2644">#2644</a></dt>
+<dd>ignore_group_members doesn&#8217;t work for subdomains</dd>
+<dt><a class="reference external" href="/sssd/ticket/2646">#2646</a></dt>
+<dd>Disapeared groups with ad providers and enabled
+ignore_group_members</dd>
+<dt><a class="reference external" href="/sssd/ticket/2647">#2647</a></dt>
+<dd>external users do not resolve with &#8220;default_domain_suffix&#8221; set in
+IPA server sssd.conf</dd>
+<dt><a class="reference external" href="/sssd/ticket/2649">#2649</a></dt>
+<dd>/usr/libexec/sssd/selinux_child crashes and gets avc denial when
+ssh</dd>
+<dt><a class="reference external" href="/sssd/ticket/2650">#2650</a></dt>
+<dd>Unable to resolve group memberships for AD users when using
+sssd-1.12.2-58.el7_1.6.x86_64 client in combination with
+ipa-server-3.0.0-42.el6.x86_64 with AD Trust</dd>
+<dt><a class="reference external" href="/sssd/ticket/2654">#2654</a></dt>
+<dd>sssd_be crashed if initialisation of proxy_child failed</dd>
+<dt><a class="reference external" href="/sssd/ticket/2655">#2655</a></dt>
+<dd>proxy provider does not work in non-root mode</dd>
+<dt><a class="reference external" href="/sssd/ticket/2659">#2659</a></dt>
+<dd>IPA enumeration provider crashes</dd>
+<dt><a class="reference external" href="/sssd/ticket/2663">#2663</a></dt>
+<dd>id lookup for non-root domain users doesn&#8217;t return all groups on
+first attempt</dd>
+</dl>
+</div></div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Adam Tkac (1):</p>
+<ul class="simple">
+<li>Option filter_users had no effect for retrieving sudo rules</li>
+</ul>
+<p>Aron Parsons (2):</p>
+<ul class="simple">
+<li>IPA: fix segfault in ipa_s2n_exop</li>
+<li>autofs: fix &#8216;Cannot allocate memory&#8217; with FQDNs</li>
+</ul>
+<p>Daniel Hjorth (1):</p>
+<ul class="simple">
+<li>LDAP: unlink ccname_file_dummy if there is an error</li>
+</ul>
+<p>Jakub Hrozek (34):</p>
+<ul class="simple">
+<li>Updating the version for the 1.12.5 release</li>
+<li>resolv: Use the same default timeout for SRV queries as previously</li>
+<li>FO: Use SRV TTL in fail over code</li>
+<li>selinux: Delete existing user mapping on empty default</li>
+<li>NSS: Handle ENOENT when doing initgroups by UPN</li>
+<li>selinux: Handle setup with empty default and no configured rules</li>
+<li>tests: convert all unit tests to cmocka 1.0 or later</li>
+<li>RPM:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/BuildRequire.html">BuildRequire?</a>!
+libcmocka &gt;= 1.0</li>
+<li>build: Only run cmocka tests if cmocka 1.0 or newer is available</li>
+<li>Resolv: re-read SRV query every time if its TTL is 0</li>
+<li>IPA: Use custom error codes when validating HBAC rules</li>
+<li>IPA: Drop useless sysdb parameter</li>
+<li>IPA: Only treat malformed HBAC rules as fatal if deny rules are
+enabled</li>
+<li>IPA: Deprecate the ipa_hbac_treat_deny_as option</li>
+<li>selinux: Disconnect before closing the handle</li>
+<li>selinux: Begin and end the transaction on the same nesting level</li>
+<li>selinux: Only call semanage if the context actually changes</li>
+<li>tests: Use cmocka-1.0+ API in test_sysdb_utils</li>
+<li>sysdb: Add cache_expire to the default
+sysdb_search_object_by_str_attr set</li>
+<li>SELINUX: Avoid disconnecting disconnected handle</li>
+<li>LDAP: return after tevent_req_error</li>
+<li>MAN: refresh_expired_interval also supports users and groups</li>
+<li>tests: ncache_hit must be an int to test UPNs</li>
+<li>tests: Add a getpwnam-by-UPN test</li>
+<li>Add unit tests for initgroups</li>
+<li>Download complete groups if ignore_group_members is set with
+tokengroups</li>
+<li>DP: Set extra_value to NULL for enum requests</li>
+<li>Skip enumeration requests in IPA and AD providers as well</li>
+<li>confdb: Add new option subdomain_inherit</li>
+<li>DP: Add a function to inherit DP options, if set</li>
+<li>SDAP: Add sdap_copy_map_entry</li>
+<li>UTIL: Inherit ignore_group_members</li>
+<li>subdomains: Inherit cleanup period and tokengroup settings from
+parent domain</li>
+<li>Updating translations for the 1.12.5 release</li>
+</ul>
+<p>Lukas Slebodnik (19):</p>
+<ul class="simple">
+<li>Log reason in debug message why ldb_modify failed</li>
+<li>ipa_selinux: Fix warning may be used uninitialized</li>
+<li>memberof: Do not create request with 0 attribute values</li>
+<li>CLIENT: Clear errno with enabled sss-default-nss-plugin</li>
+<li>GPO: Check return value of ad_gpo_store_policy_settings</li>
+<li>SDAP: Do not set gid 0 twice</li>
+<li>SDAP: Extract filtering AD group to function</li>
+<li>SDAP: Filter ad groups in initgroups</li>
+<li>GPO: Do not ignore missing attrs for GPOs</li>
+<li>sss_nss_idmap-tests: Use different prepared buffers for big endian</li>
+<li>SDAP: Fix id mapping with disabled subdomains</li>
+<li>SPEC: Fix cyclic dependencies between sssd-{krb5,}-common</li>
+<li>negcache: Soften condition for expired entries</li>
+<li>test_nss_srv: Use right function for storing time_t</li>
+<li>nss: Do not ignore default vaue of SYSDB_INITGR_EXPIRE</li>
+<li>SDAP: Set initgroups expire attribute at the end</li>
+<li>SDAP: Remove unnecessary argument from sdap_save_user</li>
+<li>PROXY: proxy_child should work in non-root mode</li>
+<li>PROXY: Do not register signal with SA_SIGINFO</li>
+</ul>
+<p>Michal Zidek (2):</p>
+<ul class="simple">
+<li>DEBUG: Add missing strings for error messages</li>
+<li>test: Check ERR_LAST</li>
+</ul>
+<p>Pavel Březina (8):</p>
+<ul class="simple">
+<li>be_refresh: refresh all domains in backend</li>
+<li>sdap_handle_acct_req_send: remove be_req</li>
+<li>be_refresh: refactor netgroups refresh</li>
+<li>be_refresh: add sdap_refresh_init</li>
+<li>be_refresh: support users</li>
+<li>be_refresh: support groups</li>
+<li>enumeration: fix talloc context</li>
+<li>sudo: sanitize filter values</li>
+</ul>
+<p>Pavel Reichl (18):</p>
+<ul class="simple">
+<li>PAM: do not reject abruptly</li>
+<li>PAM: new option pam_account_expired_message</li>
+<li>PAM: warn all services about account expiration</li>
+<li>PAM: check return value of confdb_get_string</li>
+<li>SDAP: refactor pwexpire policy</li>
+<li>SDAP: enable change phase of pw expire policy check</li>
+<li>UTIL: convert
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/GeneralizedTime.html">GeneralizedTime?</a>!
+to unix time</li>
+<li>SDAP: Lock out ssh keys when account naturally expires</li>
+<li>SDAP: fix minor neglect in is_account_locked()</li>
+<li>ldap_child: fix coverity warning</li>
+<li>MAN: libkrb5 and SSSD use different expansions</li>
+<li>IPA: set EINVAL if dn can&#8217;t be linearized</li>
+<li>LDAP: remove unused code</li>
+<li>LDAP: fix a typo in debug message</li>
+<li>MAN: Update ppolicy description</li>
+<li>simple-access-provider: make user grp res more robust</li>
+<li>LDAP: warn about lockout option being deprecated</li>
+<li>krb5: new option krb5_map_user</li>
+</ul>
+<p>Stephen Gallagher (3):</p>
+<ul class="simple">
+<li>AD: Clean up ad_access_gpo</li>
+<li>AD: Always get domain-specific ID connection</li>
+<li>AD GPO: Always look up GPOs from machine domain</li>
+</ul>
+<p>Sumit Bose (25):</p>
+<ul class="simple">
+<li>ldap_child: initialized ccname_file_dummy</li>
+<li>PAM: use the logon_name as the key for the PAM initgr cache</li>
+<li>pam_initgr_check_timeout: add debug output</li>
+<li>ipa: do not treat missing sub-domain users as error</li>
+<li>ipa: make sure extdom expo data is available</li>
+<li>LDAP/AD: do not resolve group members during tokenGroups request</li>
+<li>IPA idviews: check if view name is set</li>
+<li>IPA: make sure output variable is set</li>
+<li>GPO: error out instead of leaving array element uninitialized</li>
+<li>sdap: properly handle binary objectGuid attribute</li>
+<li>IPA: do not try to save override data for the default view</li>
+<li>IPA: use sysdb_attrs_add_string_safe to add group member</li>
+<li>IPA: check ghosts in groups found by uuid as well</li>
+<li>IPA: allow initgroups by SID for AD users</li>
+<li>IPA: do initgroups if extdom exop supports it</li>
+<li>IPA: update initgr expire timestamp conditionally</li>
+<li>IPA: enhance ipa_initgr_get_overrides_send()</li>
+<li>IPA: search for overrides during initgroups in sever mode</li>
+<li>IPA: do not add domain name unconditionally</li>
+<li>NSS: check for overrides before calling backend</li>
+<li>IPA: allow initgroups by UUID for FreeIPA users</li>
+<li>SDAP: use DN to update entry</li>
+<li>IPA: do not fail if view name lookup failed on older versions</li>
+<li>libwbclient-sssd: update interface to version 0.12</li>
+<li>ldap: use proper sysdb name in groups_by_user_done()</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#packaging-changes">Packaging Changes</a></li>
+<li><a class="reference internal" href="#documentation-changes">Documentation Changes</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.12.5.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.12.5.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

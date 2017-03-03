@@ -1,0 +1,446 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>SSSD now allows the responders to be activated by the systemd service
+manager and exit when idle. This means the <code class="docutils literal"><span class="pre">services</span></code> line in
+sssd.conf is optional and the responders can be started on-demand,
+simplifying the sssd configuration. Please note that this change is
+backwards-compatible and the responders listed explicitly in
+sssd.conf&#8217;s services line are managed by sssd in the same manner as
+in previous releases. Please refer to <code class="docutils literal"><span class="pre">man</span> <span class="pre">sssd.conf(5)</span></code> for more
+information</li>
+<li>The sudo provider is no longer disabled for configurations that do
+not explicitly include the <code class="docutils literal"><span class="pre">sudo</span></code> responder in the <code class="docutils literal"><span class="pre">services</span></code>
+list. In order to disable the sudo-related back end code that
+executes the periodic LDAP queries, set the <code class="docutils literal"><span class="pre">sudo_provider</span></code> to
+<code class="docutils literal"><span class="pre">none</span></code> explicitly</li>
+<li>The watchdog signal handler no longer uses signal-unsafe functions.
+This bug was causing a deadlock in case the watchdog was about to
+kill a stuck process</li>
+<li>A bug that prevented TLS to be set up correctly on systems where
+libldap links with GnuTLS was fixed</li>
+<li>The functionality to alter SSSD configuration through the D-Bus
+interface provided by the IFP responder was removed. This
+functionality was not used to the best of our knowledge, had no tests
+and prevented the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InfoPipe.html">InfoPipe?</a>
+responder from running as a non-privileged user.</li>
+<li>A bug that prevented statically-linked applications from using
+libnss_sss was fixed by removing dependency on <code class="docutils literal"><span class="pre">-lpthreads</span></code> from
+the <code class="docutils literal"><span class="pre">libnss_sss</span></code> library (please see
+<a class="reference external" href="https://sourceware.org/bugzilla/show_bug.cgi?id=20500">​https://sourceware.org/bugzilla/show_bug.cgi?id=20500</a>
+for an example on why linking with <code class="docutils literal"><span class="pre">-lpthread</span></code> from an NSS modules
+is problematic)</li>
+<li>Previously, SSSD did not ignore GPOs that were missing the
+gPCFunctionalityVersion attribute and failed the whole GPO
+processing. Starting with this version, the GPOs without the
+gPCFunctionalityVersion are skipped.</li>
+</ul>
+</div>
+<div class="section" id="packaging-changes">
+<h1>Packaging Changes<a class="headerlink" href="#packaging-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>The Augeas development libraries are no longer required since the
+configuration manipulation interface was dropped from the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InfoPipe.html">InfoPipe?</a>
+responder</li>
+<li>The <code class="docutils literal"><span class="pre">libsss_config.so</span></code> internal library was removed as well due to
+removal of the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InfoPipe.html">InfoPipe?</a>
+config management</li>
+<li>In order to manage socket-activated or bus activated responders, each
+responder is now represented by a systemd service file (e.g.
+<code class="docutils literal"><span class="pre">sssd-nss.service</span></code>). All responders except
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/InfoPipe.html">InfoPipe?</a>,
+which is bus-activated, are also managed by a socket unit file (e.g.
+<code class="docutils literal"><span class="pre">sssd-nss.socket</span></code>)</li>
+</ul>
+</div>
+<div class="section" id="documentation-changes">
+<h1>Documentation Changes<a class="headerlink" href="#documentation-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>The sssd-secrets responder gained a new option <code class="docutils literal"><span class="pre">max_payload_size</span></code>
+that allows the administrator to limit the maximum size of a secret</li>
+<li>A new option <code class="docutils literal"><span class="pre">responder_idle_timeout</span></code> was added to support idle
+termination of socket-activated responders</li>
+<li>The <code class="docutils literal"><span class="pre">sssd-ad</span></code> and <code class="docutils literal"><span class="pre">sssd-ipa</span></code> man pages now summarize differences
+between the generic Kerberos/LDAP back end and the specialized IPA/AD
+back ends</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets Fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/697">#697</a></dt>
+<dd>Use command line arguments instead env vars for krb5_child</dd>
+<dt><a class="reference external" href="/sssd/ticket/2201">#2201</a></dt>
+<dd>Man pages do not specify that sssd dyndns_refresh_interval &lt; 60 is
+pulled to 60 seconds</dd>
+<dt><a class="reference external" href="/sssd/ticket/2243">#2243</a></dt>
+<dd>[RFE] Socket-activate responders</dd>
+<dt><a class="reference external" href="/sssd/ticket/2517">#2517</a></dt>
+<dd>krb5_child: Remove getenv() ran as root</dd>
+<dt><a class="reference external" href="/sssd/ticket/3060">#3060</a></dt>
+<dd>better debugging of timestamp cache modifications</dd>
+<dt><a class="reference external" href="/sssd/ticket/3129">#3129</a></dt>
+<dd>[RFE] socket-activate the IFP responder</dd>
+<dt><a class="reference external" href="/sssd/ticket/3151">#3151</a></dt>
+<dd>cache_req: complete the needs of NSS responders</dd>
+<dt><a class="reference external" href="/sssd/ticket/3156">#3156</a></dt>
+<dd>nss_sss might leak memory when calling thread goes away</dd>
+<dt><a class="reference external" href="/sssd/ticket/3214">#3214</a></dt>
+<dd>Update man pages for any AD provider config options that differ from
+ldap/krb5 providers defaults</dd>
+<dt><a class="reference external" href="/sssd/ticket/3215">#3215</a></dt>
+<dd>Review and update SSSD&#8217;s wiki pages for 1.15 Alpha release</dd>
+<dt><a class="reference external" href="/sssd/ticket/3235">#3235</a></dt>
+<dd>SSSCTL should not be case sensitive when searching for usernames or
+groups in a case-insensitive domain</dd>
+<dt><a class="reference external" href="/sssd/ticket/3245">#3245</a></dt>
+<dd>[RFE] Shutdown timeout for {socket,bus}-activated responders</dd>
+<dt><a class="reference external" href="/sssd/ticket/3275">#3275</a></dt>
+<dd>Unchecked return value of sss_cmd_empty_packet(pctx-&gt;creq-&gt;out);</dd>
+<dt><a class="reference external" href="/sssd/ticket/3283">#3283</a></dt>
+<dd>getsidbyid can fail in some cases due to cache_req refactoring</dd>
+<dt><a class="reference external" href="/sssd/ticket/3284">#3284</a></dt>
+<dd>getsidbyname does not work properly with case insensitive domains</dd>
+</dl>
+</div></div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Amith Kumar (1):</p>
+<ul class="simple">
+<li>MAN: Updation of sssd-ad man page for case when
+dyndns_refresh_interval &lt; 60 seconds</li>
+</ul>
+<p>Carl Henrik Lunde (1):</p>
+<ul class="simple">
+<li>Prevent use after free in fd_input_available</li>
+</ul>
+<p>David Michael (1):</p>
+<ul class="simple">
+<li>BUILD: Find a host-prefixed krb5-config when cross-compiling</li>
+</ul>
+<p>Fabiano Fidêncio (34):</p>
+<ul class="simple">
+<li>SECRETS: Fix secrets rule in the allowed sections</li>
+<li>SECRETS: Add allowed_sec_users_options</li>
+<li>SECRETS: Delete all secrets stored during &#8220;max_secrets&#8221; test</li>
+<li>SECRETS: Add configurable payload size limit of a secret</li>
+<li>BUILD: Drop libsss_config</li>
+<li>IFP: Remove
+&#8220;<a class="reference external" href="https://docs.pagure.org/sssd-test2/ChangeDebugTemporarily.html">ChangeDebugTemporarily?</a>&#8221;
+method</li>
+<li>AUTOFS: Check return of sss_cmd_empty_packet()</li>
+<li>SUDO: Drop logic to disable the backend in case the provider is not
+set</li>
+<li>MONITOR: Expose the monitor&#8217;s services type</li>
+<li>MONITOR: Pass the service type to the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/RegisterService.html">RegisterService?</a>
+method</li>
+<li>UTIL: Introduce &#8211;socket-activated cmdline option for responders</li>
+<li>UTIL: Introduce &#8211;dbus-activated cmd option for responders</li>
+<li>RESPONDER: Make responders&#8217; common code ready for socket activation</li>
+<li>AUTOFS: Make AutoFS responder socket-activatable</li>
+<li>NSS: Make NSS responder socket-activatable</li>
+<li>PAC: Make PAC responder socket-activatable</li>
+<li>PAM: Make PAM responder socket-activatable</li>
+<li>SSH: Make SSH responder socket-activatable</li>
+<li>SUDO: Make Sudo responder socket-activatable</li>
+<li>IFP: Make IFP responder dbus-activatable</li>
+<li>MONITOR: Split up check_services()</li>
+<li>MONITOR: Deal with no services set up</li>
+<li>MONITOR: Deal with socket-activated responders</li>
+<li>MAN: Mention that the services&#8217; list is optional</li>
+<li>MAN: &#8220;user&#8221; doesn&#8217;t work with socket-activated services</li>
+<li>MONITOR: Don&#8217;t expose monitor_common_send_id()</li>
+<li>SBUS: Add a time_t pointer to the sbus_connection</li>
+<li>SBUS: Add destructor data to sbus_connection</li>
+<li>RESPONDER: Make clear {reset_,}idle_timer() are related to client</li>
+<li>RESPONDER: Don&#8217;t expose client_idle_handler()</li>
+<li>RESPONDER: Shutdown {dbus,socket}-activated responders in case
+they&#8217;re idle</li>
+<li>RESPONDER: Change how client timeout is calculated</li>
+<li>SERVER: Set the process group during server_setup()</li>
+<li>WATCHDOG: Avoid non async-signal-safe from the signal_handler</li>
+</ul>
+<p>Howard Guo (1):</p>
+<ul class="simple">
+<li>sss_client: Defer thread cancellation until completion of nss/pam
+operations</li>
+</ul>
+<p>Jakub Hrozek (16):</p>
+<ul class="simple">
+<li>Updating the version for the 1.14.3 development</li>
+<li>Updating the version to track sssd-1-15 development</li>
+<li>SYSDB: Split sysdb_try_to_find_expected_dn() into smaller
+functions</li>
+<li>SYSDB: Augment sysdb_try_to_find_expected_dn to match search
+base as well</li>
+<li>MONITOR: Do not set up watchdog for monitor</li>
+<li>MONITOR: Remove deprecated pong sbus method</li>
+<li>MONITOR: Remove unused shutDown sbus method</li>
+<li>Qualify ghost user attribute in case ldap_group_nesting_level is
+set to 0</li>
+<li>tests: Add a test for group resolution with
+ldap_group_nesting_level=0</li>
+<li>BUILD: Fix a typo in inotify.m4</li>
+<li>SSH: Use default_domain_suffix for users&#8217; authorized keys</li>
+<li>SYSDB: Suppress sysdb_delete_ts_entry failed: 0</li>
+<li>STAP: Only print transaction statistics if the script caught some
+transactions</li>
+<li>test_sssctl: Add an integration test for sssctl netgroup-show</li>
+<li>KRB5: Advise the user to inspect the krb5_child.log if the child
+fails with a System Error</li>
+<li>IFP: Fix
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/GetUserAttr.html">GetUserAttr?</a></li>
+</ul>
+<p>Justin Stephenson (2):</p>
+<ul class="simple">
+<li>MAN: Document different defaults for AD provider</li>
+<li>MAN: Document different defaults for IPA provider</li>
+</ul>
+<p>Lukas Slebodnik (45):</p>
+<ul class="simple">
+<li>crypto: Port libcrypto code to openssl-1.1</li>
+<li>BUILD: Fix build without samba</li>
+<li>libcrypto: Check right value of CRYPTO_memcmp</li>
+<li>crypto-tests: Add unit test for sss_encrypt + sss_decrypt</li>
+<li>crypto-tests: Rename encrypt decrypt test case</li>
+<li>BUILD: Accept krb5 1.15 for building the PAC plugin</li>
+<li>dlopen-test: Use portable macro for location of .libs</li>
+<li>dlopen-test: Add missing libraries to the check list</li>
+<li>dlopen-test: Move libraries to the right &#8220;sections&#8221;</li>
+<li>dlopen-test: Add check for untested libraries</li>
+<li>BUILD: Fix linking with librt</li>
+<li>KRB5: Remove spurious warning in logs</li>
+<li>TESTS: Check new line at end of file</li>
+<li>UTIL: Fix implicit declaration of function &#8216;htobe32&#8217;</li>
+<li>SYSDB: Remove unused prototype from header file</li>
+<li>sssctl: Fix missing declaration</li>
+<li>UTIL: Fix compilation of sss_utf8 with libunistring</li>
+<li>CONFDB: Supress clang false passitive warnings</li>
+<li>SIFP: Fix warning format-security</li>
+<li>RESPONDER: Remove dead assignment to the variable ret</li>
+<li>Fix compilation with python3.6</li>
+<li>intg: Generate tmp dir with lowercase</li>
+<li>LDAP: Fix debug messages after errors in *_get_send</li>
+<li>LDAP: Removed unused attr_type from users_get_send</li>
+<li>LDAP: Remove unused parameter attr_type from groups_get_send</li>
+<li>DP: Remove unused constants BE_ATTR_*</li>
+<li>DP: Remove unused attr_type from struct dp_id_data</li>
+<li>LDAP: Remove attrs_type related TODO comments</li>
+<li>sssd_ldb.py: Remove a leftover debug message</li>
+<li>intg: Fix python2,3 urllib</li>
+<li>intg: Avoid using xrange in tests</li>
+<li>intg: Avoid using iteritems for dictionary</li>
+<li>intg: Use bytes with hash function</li>
+<li>intg: Fix creating of slapd configuration</li>
+<li>intg: Use bytes for value of attributes in ldif</li>
+<li>intg: Use bytes as input in ctypes</li>
+<li>intg: Return strings from ctypes wrappers</li>
+<li>intg: Convert output of executed commands to strings</li>
+<li>intg: Return list for enumeration functions</li>
+<li>SYSDB: Update filter for get object by id</li>
+<li>sysdb-tests: Add test for sysdb_search_object_by_id</li>
+<li>sysdb: Search also aliases in sysdb_search_object_by_name</li>
+<li>sysdb-tests: Add test for sysdb_search_object_by_name</li>
+<li>MONITOR: Fix warning with undefined macro HAVE_SYSTEMD</li>
+<li>UTIL: Unset O_NONBLOCK for ldap connection</li>
+</ul>
+<p>Michal Židek (7):</p>
+<ul class="simple">
+<li>sssctl: Flags for command initialization</li>
+<li>ipa: Nested netgroups do not work</li>
+<li>common: Fix domain case sensitivity init</li>
+<li>sssctl: Search by alias</li>
+<li>sssctl: Case insensitive filters</li>
+<li>tests: sssctl user/group-show basic tests</li>
+<li>MAN: sssctl debug level</li>
+</ul>
+<p>Mike Ely (1):</p>
+<ul class="simple">
+<li>ad_access_filter search for nested groups</li>
+</ul>
+<p>Pavel Březina (40):</p>
+<ul class="simple">
+<li>cache_req: move from switch to plugins; add logic</li>
+<li>cache_req: move from switch to plugins, add plugins</li>
+<li>cache_req: switch to new code</li>
+<li>cache_req: delete old code</li>
+<li>sudo: do not store usn if no rules are found</li>
+<li>nss: move nss_ctx-&gt;global_names to rctx</li>
+<li>ifp: remove unused fields from state</li>
+<li>setent_notify: remove unused private context</li>
+<li>sss_crypto.h: include required headers</li>
+<li>sss_output_name: do not require fq name</li>
+<li>cache_req: fix initgroups by name</li>
+<li>cache_req: skip first search on bypass cache</li>
+<li>cache_req: encapsulate output data into structure</li>
+<li>cache_req: add ability to gather result from all domains</li>
+<li>cache_req: add ability to filter domains by enumeration</li>
+<li>cache_req: add user enumeration</li>
+<li>cache_req: add group enumeration</li>
+<li>cache_req: add support for service by name</li>
+<li>cache_req: add support for service by port</li>
+<li>cache_req: add support for services enumeration</li>
+<li>cache_req: add support for netgroups</li>
+<li>cache_req: allow shallow copy of result</li>
+<li>cache_req: allow to return well known object as result</li>
+<li>cache_req: return well known objects in object by sid</li>
+<li>cache_req: make sure that we always fetch default attrs</li>
+<li>cache_req: allow upn search with attrs</li>
+<li>cache_req: add object by name</li>
+<li>cache_req: add object by id</li>
+<li>cache_req: make plug-ins definition const</li>
+<li>cache_req: improve debugging</li>
+<li>cache_req: fix plugin function description</li>
+<li>cache_req: allow to search subdomains without fqn</li>
+<li>cache_req: do not set ncache if dp request fails</li>
+<li>responders: unify usage of sss_cmd_send_empty and _error</li>
+<li>responders: remove checks that are handled inside cache_req</li>
+<li>responders: do not try to contact DP with LOCAL provider</li>
+<li>utils: add sss_ptr_hash module</li>
+<li>nss: rewrite nss responder so it uses cache_req</li>
+<li>nss: make nss responder tests work with new code</li>
+<li>nss: remove the old code</li>
+</ul>
+<p>Petr Cech (2):</p>
+<ul class="simple">
+<li>SYSDB: Adding message to inform which cache is used</li>
+<li>SYSDB: Adding message about reason why cache changed</li>
+</ul>
+<p>Petr Čech (5):</p>
+<ul class="simple">
+<li>SYSDB: Adding lowercase sudoUser form</li>
+<li>TESTS: Extending sysdb sudo store tests</li>
+<li>RESPONDER: Adding of return value checking</li>
+<li>UTIL: Removing of never read value</li>
+<li>SYSDB: Fixing of sudorule without a sudoUser</li>
+</ul>
+<p>Sorah Fukumori (1):</p>
+<ul class="simple">
+<li>BUILD: Fix installation without samba</li>
+</ul>
+<p>Sumit Bose (11):</p>
+<ul class="simple">
+<li>sysdb: add parent_dom to sysdb_get_direct_parents()</li>
+<li>sdap: make some nested group related calls public</li>
+<li>LDAP/AD: resolve domain local groups for remote users</li>
+<li>PAM: add a test for filter_responses()</li>
+<li>PAM: add pam_response_filter option</li>
+<li>IPA/AD: check auth ctx before using it</li>
+<li>krb5: Use command line arguments instead env vars for krb5_child</li>
+<li>krb5: fix two memory leaks</li>
+<li>krb5: add tests for common functions</li>
+<li>sss_ptr_hash_delete_all: use unsigned long int</li>
+<li>libwbclient-sssd: wbcLookupSid() allow NULL arguments</li>
+</ul>
+<p>Victor Tapia (1):</p>
+<ul class="simple">
+<li>MONITOR: Create pidfile after responders started</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#packaging-changes">Packaging Changes</a></li>
+<li><a class="reference internal" href="#documentation-changes">Documentation Changes</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets Fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.15.0.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.15.0.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

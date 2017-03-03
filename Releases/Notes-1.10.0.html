@@ -1,0 +1,1113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Highlights &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="highlights">
+<h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>The main focus of the 1.10 release was improving the Active Directory
+integration.<ul>
+<li>The Active Directory provider now includes support for Site-based
+discovery. This feature allows the Active Directory clients to
+find the most suitable Domain Controller to connect to.</li>
+<li>Support for dynamic DNS updates in the Active Directory provider.
+This feature enables the clients to automatically update or
+refresh their DNS records stored in the AD server.</li>
+<li>The Active Directory provider now includes support for retrieving
+identity information and authentication as users from trusted
+domains in the same forest. The SSSD looks up the information
+using the Global Catalog.</li>
+<li>The group memberships for Active Directory users can optionally be
+read from the PAC during login. If the PAC is not available (such
+as when group membership is requested for a user who has never
+logged in), the SSSD falls back to using tokenGroups. To enable
+this feature, add <code class="docutils literal"><span class="pre">pac</span></code> to the list of configured services in
+the <code class="docutils literal"><span class="pre">[sssd]</span></code> section of the <code class="docutils literal"><span class="pre">sssd.conf</span></code> config file.</li>
+<li>The Active Directory provider is able to autodiscover the NetBIOS
+(flat) name of the domain it connects to. The NetBIOS name is
+discovered automatically on startup.</li>
+<li>The support for Enterprise Kerberos principals was added.
+Currently the enterprise principals are only enabled by default in
+the Active Directory provider</li>
+</ul>
+</li>
+<li>A new library, called libsss_nss_idmap was introduced. This library
+allows the user to convert Windows Security Identifiers (SIDs) to
+names and vice versa. The library also includes Python bindings.</li>
+<li>A new option <code class="docutils literal"><span class="pre">ipa_dyndns_ttl</span></code> was added, allowing the client to set
+a custom TTL on IPA dynamic DNS updates</li>
+<li>A new <code class="docutils literal"><span class="pre">ignore_group_members</span> <span class="pre">option</span></code> was added. This option can be
+used to suppress downloading group members on group lookups, making
+the group lookups much faster for environments that do not need to
+know the group members.</li>
+<li>A new option <code class="docutils literal"><span class="pre">ldap_rfc2307_fallback_to_local_users</span></code> was added. If
+this option is set to true, SSSD is able to resolve local group
+members of LDAP groups.</li>
+<li>The <code class="docutils literal"><span class="pre">subdomain_homedir</span></code> configuration option gained a new template
+expansion <code class="docutils literal"><span class="pre">%F</span></code> that expands to the flat name (NetBIOS name) of the
+trusted AD domain</li>
+<li>The <code class="docutils literal"><span class="pre">full_name_format</span></code> option now accepts a new parameter that
+expands to the NetBIOS name of the domain</li>
+<li>The new <code class="docutils literal"><span class="pre">krb5_use_kdcinfo</span></code> option allows the administrator to
+disable the Kerberos locator plugin and rely on information read from
+the krb5.conf file completely.</li>
+<li>A new option <code class="docutils literal"><span class="pre">ldap_disable_range_retrieval</span></code> was added. Switching
+this option to True skips large Active Directory groups that might
+otherwise take a long time to download and process.</li>
+<li>A new option <code class="docutils literal"><span class="pre">refresh_expired_interval</span></code> was added. This option
+allows to configure a background task that would automatically
+refresh entries that are nearing their expiration time. In this
+release, only refreshing netgroups is implemented.</li>
+<li>Setting the SELinux context on the IPA server now also works for
+users coming from a trusted Active Directory domain</li>
+<li>Many internal interfaces were refactored, making the code more
+readable and maintainable in the long term. This refactoring includes
+the subdomains code, the sysdb interface as a whole, internal error
+code reporting, SELinux login context processing and processing of
+nested LDAP groups.</li>
+</ul>
+</div>
+<div class="section" id="packaging-changes">
+<h1>Packaging changes<a class="headerlink" href="#packaging-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>The shared components of the SSSD are now built as a shared library
+to reduce amount of duplicated code being linked into multiple SSSD
+binaries and lower the disk usage of SSSD installation.</li>
+<li>The check that ensured that SSSD is running with the same ldb version
+it was built against was made optional, defaulting to false. You can
+enable the strict check again by selecting &#8211;enable-ldb-version-check
+during configure</li>
+<li>The SSSD python ConfigAPI was moved to its own noarch subpackage to
+make the SSSD packaging more compliant with the Fedora packaging
+guidelines</li>
+<li>The libsss_nss_idmap library and its Python bindings are packaged
+in separate subpackages</li>
+<li>The upstream RPM specfile now packages each provider separately. The
+SSSD deamon and the responders are now included in the sssd-common
+package, while the sssd package has become a &#8220;meta package&#8221; that
+Requires all the existing providers for backwards compatibility.</li>
+<li>The libsss_sudo and libsss_autofs libraries are now part of the
+sssd-common package</li>
+</ul>
+</div>
+<div class="section" id="tickets-fixed">
+<h1>Tickets fixed<a class="headerlink" href="#tickets-fixed" title="Permalink to this headline">¶</a></h1>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/1199">#1199</a></dt>
+<dd>[RFE] Prune idle connections from responders</dd>
+<dt><a class="reference external" href="/sssd/ticket/1693">#1693</a></dt>
+<dd>sudoHost mismatch response is incorrect sometimes</dd>
+<dt><a class="reference external" href="/sssd/ticket/1806">#1806</a></dt>
+<dd>sssd_be goes to 99% CPU and causes significant login delays when
+client is under load</dd>
+<dt><a class="reference external" href="/sssd/ticket/1815">#1815</a></dt>
+<dd>&#8220;touch&#8221; krb5.conf file after installing new domain-realm mappings</dd>
+<dt><a class="reference external" href="/sssd/ticket/1847">#1847</a></dt>
+<dd>if there is no blank line at the end of /etc/sssd/sssd.conf, sssd
+wont start and you get an error in /var/log/messages about &#8220;sssd:
+Cannot load configuration database&#8221;.</dd>
+<dt><a class="reference external" href="/sssd/ticket/1849">#1849</a></dt>
+<dd>improper use of negative value</dd>
+<dt><a class="reference external" href="/sssd/ticket/1863">#1863</a></dt>
+<dd>Dereference after a NULL check in krb5_child.c</dd>
+<dt><a class="reference external" href="/sssd/ticket/1873">#1873</a></dt>
+<dd>password migration is not working using sssd</dd>
+<dt><a class="reference external" href="/sssd/ticket/1886">#1886</a></dt>
+<dd>If previous SRV query failed, the next try might not be retried in
+some cases</dd>
+<dt><a class="reference external" href="/sssd/ticket/1894">#1894</a></dt>
+<dd>sssd_be crashes while processing ASQ dereference request</dd>
+<dt><a class="reference external" href="/sssd/ticket/1931">#1931</a></dt>
+<dd>cannot login to the 1st domain when 2 domains are configured in sssd</dd>
+<dt><a class="reference external" href="/sssd/ticket/1936">#1936</a></dt>
+<dd>GSSAPI working only on first login</dd>
+<dt><a class="reference external" href="/sssd/ticket/1947">#1947</a></dt>
+<dd>[abrt] sssd-1.10.0-4.fc19.beta1: get_server_status: Process
+/usr/libexec/sssd/sssd_be was killed by signal 11 (SIGSEGV)</dd>
+<dt><a class="reference external" href="/sssd/ticket/1949">#1949</a></dt>
+<dd>SSH host keys are not removed from cache when host is deleted in IPA</dd>
+<dt><a class="reference external" href="/sssd/ticket/1953">#1953</a></dt>
+<dd>System error while trying to auth as an expired user</dd>
+<dt><a class="reference external" href="/sssd/ticket/1959">#1959</a></dt>
+<dd>Enhance sssd init script so that it would source a configuration</dd>
+<dt><a class="reference external" href="/sssd/ticket/1969">#1969</a></dt>
+<dd>dead code in SRV resolution</dd>
+<dt><a class="reference external" href="/sssd/ticket/1973">#1973</a></dt>
+<dd>Improve global catalog DNS SRV lookups</dd>
+<dt><a class="reference external" href="/sssd/ticket/1980">#1980</a></dt>
+<dd>SSSD service randomly dies</dd>
+<dt><a class="reference external" href="/sssd/ticket/1986">#1986</a></dt>
+<dd>SYSV init script should use &#64;sbindir&#64;</dd>
+<dt><a class="reference external" href="/sssd/ticket/1989">#1989</a></dt>
+<dd>Fix core dump in the PAC responder</dd>
+<dt><a class="reference external" href="/sssd/ticket/1995">#1995</a></dt>
+<dd>The PAC responder is contacted even for local IPA users.</dd>
+</dl>
+</div><p>`</p>
+<div><dl class="docutils">
+<dt><a class="reference external" href="/sssd/ticket/364">#364</a></dt>
+<dd>[RFE] Recognize trusted domains in AD provider</dd>
+<dt><a class="reference external" href="/sssd/ticket/453">#453</a></dt>
+<dd>Replace pam status codes with sssd specific codes</dd>
+<dt><a class="reference external" href="/sssd/ticket/812">#812</a></dt>
+<dd>Support libnl 3.x</dd>
+<dt><a class="reference external" href="/sssd/ticket/902">#902</a></dt>
+<dd>[RFE] Allow setting krb5_renew_interval with a delimiter</dd>
+<dt><a class="reference external" href="/sssd/ticket/1032">#1032</a></dt>
+<dd>[RFE] sssd should support DNS sites</dd>
+<dt><a class="reference external" href="/sssd/ticket/1033">#1033</a></dt>
+<dd>[RFE] implement a script/tool joining to the Active Directory domain</dd>
+<dt><a class="reference external" href="/sssd/ticket/1287">#1287</a></dt>
+<dd>compilation warnings with -O2</dd>
+<dt><a class="reference external" href="/sssd/ticket/1327">#1327</a></dt>
+<dd>When multiple values are assigned, sss_debuglevel should display a
+usage message</dd>
+<dt><a class="reference external" href="/sssd/ticket/1371">#1371</a></dt>
+<dd>Missing resolv.conf should be non-fatal</dd>
+<dt><a class="reference external" href="/sssd/ticket/1376">#1376</a></dt>
+<dd>[RFE] Add support for suppressing group members</dd>
+<dt><a class="reference external" href="/sssd/ticket/1405">#1405</a></dt>
+<dd>[RFE] Kerberos canonicalization should be skipped on
+password-changes in AD provider</dd>
+<dt><a class="reference external" href="/sssd/ticket/1414">#1414</a></dt>
+<dd>[RFE] Improve syslog message when configuration cannot be loaded</dd>
+<dt><a class="reference external" href="/sssd/ticket/1468">#1468</a></dt>
+<dd>[RFE] AD: Should be able to log in as long or short domains</dd>
+<dt><a class="reference external" href="/sssd/ticket/1476">#1476</a></dt>
+<dd>SSSD has a much longer TTL when updating a DNS record than IPA
+client install placed in the beginning</dd>
+<dt><a class="reference external" href="/sssd/ticket/1481">#1481</a></dt>
+<dd>Move sss_cache to the main subpackage</dd>
+<dt><a class="reference external" href="/sssd/ticket/1484">#1484</a></dt>
+<dd>failover should protect against empty host names</dd>
+<dt><a class="reference external" href="/sssd/ticket/1495">#1495</a></dt>
+<dd>include talloc log in our debug facility</dd>
+<dt><a class="reference external" href="/sssd/ticket/1504">#1504</a></dt>
+<dd>[RFE] AD dyndns updates</dd>
+<dt><a class="reference external" href="/sssd/ticket/1510">#1510</a></dt>
+<dd>Split providers into their own subpackages</dd>
+<dt><a class="reference external" href="/sssd/ticket/1557">#1557</a></dt>
+<dd>[RFE] Use the Global Catalog in SSSD for the AD provider</dd>
+<dt><a class="reference external" href="/sssd/ticket/1558">#1558</a></dt>
+<dd>[RFE] Use MS-PAC to retrieve user&#8217;s group list</dd>
+<dt><a class="reference external" href="/sssd/ticket/1559">#1559</a></dt>
+<dd>[RFE] Use the getpwnam()/getgrnam() interface as a gateway to
+resolve SID to Names</dd>
+<dt><a class="reference external" href="/sssd/ticket/1566">#1566</a></dt>
+<dd>drop the libldb version requirement</dd>
+<dt><a class="reference external" href="/sssd/ticket/1575">#1575</a></dt>
+<dd>Change responder contexts hierarchy</dd>
+<dt><a class="reference external" href="/sssd/ticket/1586">#1586</a></dt>
+<dd>Make authtoken opaque objects</dd>
+<dt><a class="reference external" href="/sssd/ticket/1603">#1603</a></dt>
+<dd>[RFE] Send user principal together with the PAC to the pac responder</dd>
+<dt><a class="reference external" href="/sssd/ticket/1609">#1609</a></dt>
+<dd>[RFE] Subdomain homedir template should be configurable/use flatname
+by default</dd>
+<dt><a class="reference external" href="/sssd/ticket/1625">#1625</a></dt>
+<dd>Confusing error messages for invalid sssd.conf</dd>
+<dt><a class="reference external" href="/sssd/ticket/1643">#1643</a></dt>
+<dd>Refactor sysdb interface</dd>
+<dt><a class="reference external" href="/sssd/ticket/1648">#1648</a></dt>
+<dd>Fully qualified account names form should be able to use flatname in
+the fq format</dd>
+<dt><a class="reference external" href="/sssd/ticket/1660">#1660</a></dt>
+<dd>LDAP_CONTROL_X_DEREF: sssd should fallback if server returns
+LDAP_UNAVAILABLE_CRITICAL_EXTENSION error</dd>
+<dt><a class="reference external" href="/sssd/ticket/1712">#1712</a></dt>
+<dd>sudoNotBefore/sudoNotAfter not supported by sssd sudoers plugin</dd>
+<dt><a class="reference external" href="/sssd/ticket/1713">#1713</a></dt>
+<dd>[RFE] Add a task to the SSSD to periodically refresh cached entries</dd>
+<dt><a class="reference external" href="/sssd/ticket/1733">#1733</a></dt>
+<dd>[RFE] support autoconfiguring SUDO with ipa provider and compat tree</dd>
+<dt><a class="reference external" href="/sssd/ticket/1738">#1738</a></dt>
+<dd>Decrease the krb5_auth_timeout default value of 15</dd>
+<dt><a class="reference external" href="/sssd/ticket/1741">#1741</a></dt>
+<dd>sss_cache doesn&#8217;t support subdomains</dd>
+<dt><a class="reference external" href="/sssd/ticket/1743">#1743</a></dt>
+<dd>selinux: move all logic to responder, provider should only update db</dd>
+<dt><a class="reference external" href="/sssd/ticket/1744">#1744</a></dt>
+<dd>selinux: reuse IPA_HBAC_REFRESH or provide an alternative</dd>
+<dt><a class="reference external" href="/sssd/ticket/1745">#1745</a></dt>
+<dd>Unnecessary output is seen when invalid option is passed to
+sss_cache</dd>
+<dt><a class="reference external" href="/sssd/ticket/1746">#1746</a></dt>
+<dd>sss_* tools with use_fully_qualified_names should require fqdn</dd>
+<dt><a class="reference external" href="/sssd/ticket/1747">#1747</a></dt>
+<dd>Refactor subdomain interfaces</dd>
+<dt><a class="reference external" href="/sssd/ticket/1756">#1756</a></dt>
+<dd>append new line to error string from poptStrerror()</dd>
+<dt><a class="reference external" href="/sssd/ticket/1763">#1763</a></dt>
+<dd>check the return values of sysdb_transaction_commit in sysdb tests</dd>
+<dt><a class="reference external" href="/sssd/ticket/1765">#1765</a></dt>
+<dd>remove the alt_db_path parameter of sysdb_init</dd>
+<dt><a class="reference external" href="/sssd/ticket/1766">#1766</a></dt>
+<dd>use an explanatory macro for checking if a domain is a subdomain</dd>
+<dt><a class="reference external" href="/sssd/ticket/1767">#1767</a></dt>
+<dd>unify sss_mc_set_recycled</dd>
+<dt><a class="reference external" href="/sssd/ticket/1771">#1771</a></dt>
+<dd>Negative cache messages are displayed at too low of a DEBUG level</dd>
+<dt><a class="reference external" href="/sssd/ticket/1772">#1772</a></dt>
+<dd>Rename or alias the SAFEALIGN macros</dd>
+<dt><a class="reference external" href="/sssd/ticket/1774">#1774</a></dt>
+<dd>move processing of password expiration back to PAM provider only</dd>
+<dt><a class="reference external" href="/sssd/ticket/1784">#1784</a></dt>
+<dd>rewrite nested group processing to follow the tevent_req coding
+style</dd>
+<dt><a class="reference external" href="/sssd/ticket/1785">#1785</a></dt>
+<dd>NSCD warning is irritating</dd>
+<dt><a class="reference external" href="/sssd/ticket/1786">#1786</a></dt>
+<dd>Use new interface from ding-libs ini interface</dd>
+<dt><a class="reference external" href="/sssd/ticket/1789">#1789</a></dt>
+<dd>ldap_access_order improvements (man page fix)</dd>
+<dt><a class="reference external" href="/sssd/ticket/1790">#1790</a></dt>
+<dd>Possible null derefence in ipa_subdomains.c</dd>
+<dt><a class="reference external" href="/sssd/ticket/1794">#1794</a></dt>
+<dd>reuse open_cloexec elsewhere in the code</dd>
+<dt><a class="reference external" href="/sssd/ticket/1797">#1797</a></dt>
+<dd>Use hardened flags for building RPMs</dd>
+<dt><a class="reference external" href="/sssd/ticket/1802">#1802</a></dt>
+<dd>[abrt] sssd-1.9.3-1.fc18: talloc_abort: Process
+/usr/libexec/sssd/sssd_be was killed by signal 6 (SIGABRT)</dd>
+<dt><a class="reference external" href="/sssd/ticket/1803">#1803</a></dt>
+<dd>SSSD returns System Error if the ccachedir is not writable</dd>
+<dt><a class="reference external" href="/sssd/ticket/1804">#1804</a></dt>
+<dd>Filter out inappropriate multicast and subnet broadcast addresses
+from IPA dynamic DNS update</dd>
+<dt><a class="reference external" href="/sssd/ticket/1805">#1805</a></dt>
+<dd>[RFE] Add a new override_homedir expansion for the &#8220;original value&#8221;</dd>
+<dt><a class="reference external" href="/sssd/ticket/1809">#1809</a></dt>
+<dd>Document that SSSD domains should only be named using ASCII
+characters</dd>
+<dt><a class="reference external" href="/sssd/ticket/1810">#1810</a></dt>
+<dd>Uninitialized scalar variable in responder_get_domain</dd>
+<dt><a class="reference external" href="/sssd/ticket/1811">#1811</a></dt>
+<dd>Unchecked return value in tests</dd>
+<dt><a class="reference external" href="/sssd/ticket/1812">#1812</a></dt>
+<dd>[RFE] make the get_next_domain() function a little more readable</dd>
+<dt><a class="reference external" href="/sssd/ticket/1813">#1813</a></dt>
+<dd>make the ldb check configurable</dd>
+<dt><a class="reference external" href="/sssd/ticket/1816">#1816</a></dt>
+<dd>Non-fatal errors looking up trusted domains with IPA back end</dd>
+<dt><a class="reference external" href="/sssd/ticket/1819">#1819</a></dt>
+<dd>Refresh doxygen template files</dd>
+<dt><a class="reference external" href="/sssd/ticket/1820">#1820</a></dt>
+<dd>sysdb unit tests uses system memberof</dd>
+<dt><a class="reference external" href="/sssd/ticket/1823">#1823</a></dt>
+<dd>getgrnam / getgrgid for large user groups is too slow due to range
+retrieval functionality</dd>
+<dt><a class="reference external" href="/sssd/ticket/1825">#1825</a></dt>
+<dd>Invalid assignment to enum</dd>
+<dt><a class="reference external" href="/sssd/ticket/1830">#1830</a></dt>
+<dd>make the authtok structure really opaque</dd>
+<dt><a class="reference external" href="/sssd/ticket/1831">#1831</a></dt>
+<dd>use the -v flag with nsupdate to force TCP transmission for better
+security</dd>
+<dt><a class="reference external" href="/sssd/ticket/1832">#1832</a></dt>
+<dd>[RFE] Provide a new option to update the reverse DNS zone in IPA
+domain</dd>
+<dt><a class="reference external" href="/sssd/ticket/1833">#1833</a></dt>
+<dd>segmentation fault in cmocka unit tests with raised optization level</dd>
+<dt><a class="reference external" href="/sssd/ticket/1834">#1834</a></dt>
+<dd>Support for libini 1.0</dd>
+<dt><a class="reference external" href="/sssd/ticket/1838">#1838</a></dt>
+<dd>nss and pam clients broken in master</dd>
+<dt><a class="reference external" href="/sssd/ticket/1839">#1839</a></dt>
+<dd>Incorrect *.py[co] files placement</dd>
+<dt><a class="reference external" href="/sssd/ticket/1840">#1840</a></dt>
+<dd>Add &#8211;with-test-dir=/dev/shm to DISTCHECK_CONFIGURE_FLAGS</dd>
+<dt><a class="reference external" href="/sssd/ticket/1842">#1842</a></dt>
+<dd>Allow usage of enterprise principals</dd>
+<dt><a class="reference external" href="/sssd/ticket/1843">#1843</a></dt>
+<dd>Add exit value section to sss_ssh_* man page pages</dd>
+<dt><a class="reference external" href="/sssd/ticket/1844">#1844</a></dt>
+<dd>add a call to calculated the range for a given domain SID to
+libsss_idmap</dd>
+<dt><a class="reference external" href="/sssd/ticket/1845">#1845</a></dt>
+<dd>move libsss_sudo and libsss_autofs back into the main sssd package</dd>
+<dt><a class="reference external" href="/sssd/ticket/1848">#1848</a></dt>
+<dd>unused parameter in ipa_selinux handler</dd>
+<dt><a class="reference external" href="/sssd/ticket/1860">#1860</a></dt>
+<dd>pidfile() may leak memory on error</dd>
+<dt><a class="reference external" href="/sssd/ticket/1861">#1861</a></dt>
+<dd>potential out-of-bounds-write in sss_idmap_sid_to_dom_sid</dd>
+<dt><a class="reference external" href="/sssd/ticket/1862">#1862</a></dt>
+<dd>negative return in files.c</dd>
+<dt><a class="reference external" href="/sssd/ticket/1864">#1864</a></dt>
+<dd>Bad comparisons in checks found by new Coverity instance</dd>
+<dt><a class="reference external" href="/sssd/ticket/1865">#1865</a></dt>
+<dd>Logically dead code in tools_util.c</dd>
+<dt><a class="reference external" href="/sssd/ticket/1867">#1867</a></dt>
+<dd>document that AD provider is always case insensitive</dd>
+<dt><a class="reference external" href="/sssd/ticket/1870">#1870</a></dt>
+<dd>wrong failure handler in sdap_get_map</dd>
+<dt><a class="reference external" href="/sssd/ticket/1877">#1877</a></dt>
+<dd>ding-libs.dhash: uninitialized pointer read</dd>
+<dt><a class="reference external" href="/sssd/ticket/1883">#1883</a></dt>
+<dd>Add a new option to disable the Kerberos locator plugin completely</dd>
+<dt><a class="reference external" href="/sssd/ticket/1888">#1888</a></dt>
+<dd>freeipa 3.2 trusted ad user not listed in external group</dd>
+<dt><a class="reference external" href="/sssd/ticket/1889">#1889</a></dt>
+<dd>coverity: dead code in sudo client</dd>
+<dt><a class="reference external" href="/sssd/ticket/1890">#1890</a></dt>
+<dd>SSSD doesn&#8217;t display warning for last grace login.</dd>
+<dt><a class="reference external" href="/sssd/ticket/1891">#1891</a></dt>
+<dd>unite periodic refresh API</dd>
+<dt><a class="reference external" href="/sssd/ticket/1892">#1892</a></dt>
+<dd>In IPA AD trust setup, the sssd logs throws
+&#8216;sysdb_search_user_by_name failed&#8217; error when AD user tries to
+login via ipa client.</dd>
+<dt><a class="reference external" href="/sssd/ticket/1897">#1897</a></dt>
+<dd>Autenticity of ipa server can&#8217;t be established</dd>
+<dt><a class="reference external" href="/sssd/ticket/1900">#1900</a></dt>
+<dd>Uninitialized scalar variable in idmap.c</dd>
+<dt><a class="reference external" href="/sssd/ticket/1901">#1901</a></dt>
+<dd>confdb: possible double free in new ini module</dd>
+<dt><a class="reference external" href="/sssd/ticket/1905">#1905</a></dt>
+<dd>pysss_nss_idmap improvements</dd>
+<dt><a class="reference external" href="/sssd/ticket/1909">#1909</a></dt>
+<dd>Clarify the AD site discovery in sssd-ad man page</dd>
+<dt><a class="reference external" href="/sssd/ticket/1910">#1910</a></dt>
+<dd>Clarify that AD DNS updates are performed using GSS-TSIG</dd>
+<dt><a class="reference external" href="/sssd/ticket/1912">#1912</a></dt>
+<dd>SUDO is not working for users from trusted AD domain</dd>
+<dt><a class="reference external" href="/sssd/ticket/1913">#1913</a></dt>
+<dd>SSSD crashes during nsupdate if the client hostname can&#8217;t be
+resolved</dd>
+<dt><a class="reference external" href="/sssd/ticket/1914">#1914</a></dt>
+<dd>pysss_nss_idmap: Support also Unicode strings and return them by
+default</dd>
+<dt><a class="reference external" href="/sssd/ticket/1915">#1915</a></dt>
+<dd>Turn on dyndns updates by default in the AD provider</dd>
+<dt><a class="reference external" href="/sssd/ticket/1921">#1921</a></dt>
+<dd>Login failure: Enterprise Principal enabled by default for AD
+Provider</dd>
+<dt><a class="reference external" href="/sssd/ticket/1922">#1922</a></dt>
+<dd>sssd_be crashes when looking up users in the LDAP provider with ID
+mapping</dd>
+<dt><a class="reference external" href="/sssd/ticket/1924">#1924</a></dt>
+<dd>MAN: Make it clear which address is used to update DNS records</dd>
+<dt><a class="reference external" href="/sssd/ticket/1927">#1927</a></dt>
+<dd>Provide a script to create a SRPM without having to run configure</dd>
+<dt><a class="reference external" href="/sssd/ticket/1928">#1928</a></dt>
+<dd>Libtool fails to find dependent libraries</dd>
+<dt><a class="reference external" href="/sssd/ticket/1929">#1929</a></dt>
+<dd>Junk character in sssd_domain.log for domain string when sssd tries
+to go online from offline mode</dd>
+<dt><a class="reference external" href="/sssd/ticket/1930">#1930</a></dt>
+<dd>Crash with negative values in ldap_idmap_range_size</dd>
+<dt><a class="reference external" href="/sssd/ticket/1934">#1934</a></dt>
+<dd>sssd crashes if junk is present in sssd.conf</dd>
+<dt><a class="reference external" href="/sssd/ticket/1950">#1950</a></dt>
+<dd>segfault while processing ASQ request</dd>
+<dt><a class="reference external" href="/sssd/ticket/1951">#1951</a></dt>
+<dd>NetBIOS domain name should be read at startup</dd>
+<dt><a class="reference external" href="/sssd/ticket/1971">#1971</a></dt>
+<dd>Dereference before NULL check in nscd.c</dd>
+<dt><a class="reference external" href="/sssd/ticket/1972">#1972</a></dt>
+<dd>Dereference after a NULL check in tests/common_dom.c</dd>
+<dt><a class="reference external" href="/sssd/ticket/1976">#1976</a></dt>
+<dd>Copy-n-paste error in AD provider</dd>
+<dt><a class="reference external" href="/sssd/ticket/2362">#2362</a></dt>
+<dd>RHEL6.5 sssd_be crash when debug_level 3 or higher</dd>
+</dl>
+</div><p>`</p>
+</div>
+<div class="section" id="detailed-changelog">
+<h1>Detailed Changelog<a class="headerlink" href="#detailed-changelog" title="Permalink to this headline">¶</a></h1>
+<p>Abhishek Singh (4):</p>
+<ul class="simple">
+<li>filename in comment is corrected</li>
+<li>cmocka unittest for find_uid added</li>
+<li>cmocka unittest for io added</li>
+<li>Fix segmentation fault in test_io.</li>
+</ul>
+<p>Ariel Barria (4):</p>
+<ul class="simple">
+<li>Improve syslog message when configuration cannot be loaded</li>
+<li>Allow setting krb5_renew_interval with a delimiter</li>
+<li>Confusing error messages for invalid sssd.conf</li>
+<li>Removing BUILD.txt content</li>
+</ul>
+<p>Jakub Hrozek (144):</p>
+<ul class="simple">
+<li>Bump version to 1.10dev</li>
+<li>Require ar in configure.ac</li>
+<li>TESTS: Fix a couple of debug-level setters</li>
+<li>SYSDB: Remove unused macros</li>
+<li>LDAP: Remove double break</li>
+<li>Indentation fix</li>
+<li>Bump the version and reset release back to 0</li>
+<li>tests: add a unit test for sysdb_netgroup_base_dn</li>
+<li>tests: unit test for test_sysdb_search_users</li>
+<li>tests: adda a unit test for test_sysdb_search_groups</li>
+<li>tests: test sysdb_initgroups</li>
+<li>tests: add unit test for sysdb_get_new_id</li>
+<li>tests: unit test for sysdb_remove_attrs</li>
+<li>TOOLS: set domain in check_group_names</li>
+<li>Fix code style</li>
+<li>Don&#8217;t use srcdir with tests</li>
+<li>krb5: include backwards compatible declaration of krb5_trace_info</li>
+<li>LDAP: Check for authtok validity</li>
+<li>Filter out multicast addresses from IPA DNS updates</li>
+<li>Lower the DEBUG level if an entry cannot be deleted from memcache</li>
+<li>Fix the krb5 password expiration warning</li>
+<li>Remove enumerate=true from man sssd-ldap</li>
+<li>Do not process success case in an else</li>
+<li>Revert &#8220;Add debug message to autofs client&#8221;</li>
+<li>Don&#8217;t treat 0 as default for pam_pwd_expiration warning</li>
+<li>Remove unused functions</li>
+<li>Use the correct memory context in be_req_create</li>
+<li>Check the return value of sysdb_search_services</li>
+<li>Detect the presence of libcmocka during configure</li>
+<li>Add utility functions for tests that use sysdb or tevent.</li>
+<li>Move sss_cmd_execute from client to responder code.</li>
+<li>CMocka based test for the NSS responder</li>
+<li>Retry the correct service on krb5 child timeout</li>
+<li>Remove duplicate remake from bashrc_sssd</li>
+<li>Provide a be_get_account_info_send function</li>
+<li>Add unit tests for simple access test by groups</li>
+<li>Do not compile main() in DP if UNIT_TESTING is defined</li>
+<li>Resolve GIDs in the simple access provider</li>
+<li>Return error code from ipa_subdom_store</li>
+<li>Move signal.m4 from src/util to external</li>
+<li>Document what does access_provider=ad do</li>
+<li>Include config.h to build io.c on RHEL5</li>
+<li>selinux: Remove unused parameter</li>
+<li>Updating the translations for the 1.10 alpha release</li>
+<li>Updating the version for the 1.10 beta1 release</li>
+<li>krb5 child: Use the correct type when processing OTP</li>
+<li>pidfile(): Do not leak fd on error</li>
+<li>Fix potential out-of-bounds write in sss_idmap_sid_to_dom_sid</li>
+<li>Return errno, not -1 on failure in files.c</li>
+<li>Check for correct variable name</li>
+<li>Init failover with be_res options</li>
+<li>Centralize resolv_init, remove resolv context list</li>
+<li>dyndns: Fix initializing sdap_id_ctx</li>
+<li>Check for the correct variables</li>
+<li>Allocate PAM DP request data on responder context</li>
+<li>LDAP: Always fail if a map can&#8217;t be found</li>
+<li>Put the override_homedir into an included xml file</li>
+<li>Allow using flatname for subdomain home dir template</li>
+<li>Fix simple access group control in case-insensitive domains</li>
+<li>Make leak checks usable in tests that do not utilize check</li>
+<li>tests: Fix the order of key/values</li>
+<li>LDAP: do not invalidate pointer with realloc while processing ghost
+users</li>
+<li>Convert the simple access check to new error codes</li>
+<li>tests: Link the simple access tests with -ldl</li>
+<li>Do not keep growing event context</li>
+<li>Document the naming convention for SSSD domains</li>
+<li>Document that the AD provider is case-insensitive</li>
+<li>selinux: if no domain matches, make the debug message louder</li>
+<li>Only try to relink ghost users if we&#8217;re not enumerating</li>
+<li>Display the last grace warning, too</li>
+<li>Refactor dynamic DNS updates</li>
+<li>Convert IPA-specific options to be back-end agnostic</li>
+<li>dyndns: new option dyndns_refresh_interval</li>
+<li>resolver: Return PTR record as string</li>
+<li>dyndns: New option dyndns_update_ptr</li>
+<li>dyndns: new option dyndns_force_tcp</li>
+<li>dyndns: new option dyndns_auth</li>
+<li>Split out the common code from timed DNS updates</li>
+<li>Active Directory dynamic DNS updates</li>
+<li>AD: Always initialize ID mapping</li>
+<li>Only check UPN if enterprise principals are not used</li>
+<li>Updating the translations for the 1.10 beta1 release</li>
+<li>Update the version for the 1.10 beta2 release</li>
+<li>Actually use the index parameter in
+resolv_get_sockaddr_address_index</li>
+<li>Fix a typo in sssd-ad man page</li>
+<li>tests: Do not set cwd twice</li>
+<li>Enable the AD dynamic DNS updates by default</li>
+<li>man: Clarify that AD dyndns updates are secured using GSS-TSIG</li>
+<li>LDAP: Always initialize idmap object</li>
+<li>Re-add a useful DEBUG message</li>
+<li>man: Clarify the AD site discovery documentation</li>
+<li>man: Note that IPA updates are secured with GSS-TSIG</li>
+<li>Remove unneeded parameter of setup_child and namespace it</li>
+<li>Fix dyndns timer initialization</li>
+<li>IPA: Check for ENOMEM</li>
+<li>Remove unneeded comment</li>
+<li>FO: Fix setting status of duplicates</li>
+<li>AD dyndns: extract the host name from URI</li>
+<li>Add utility functions for formatting fully-qualified names</li>
+<li>Check the validity of FQname format prior to using it</li>
+<li>Allow flat name in the FQname format</li>
+<li>Remove branching to improve readability</li>
+<li>tests: Link fqnames_tests with libsss_test_common.la</li>
+<li>Do not obfuscate calls with booleans</li>
+<li>LDAP: sdap_id_ctx might contain several connections</li>
+<li>LDAP: Refactor account info handler into a tevent request</li>
+<li>LDAP: Pass in a connection to ID functions</li>
+<li>LDAP: new SDAP domain structure</li>
+<li>LDAP: return sdap search return code to ID</li>
+<li>Move domain_to_basedn outside IPA subtree</li>
+<li>New utility function sss_get_domain_name</li>
+<li>LDAP: split a function to create search bases</li>
+<li>LDAP: store FQDNs for trusted users and groups</li>
+<li>Split generating primary GID for ID mapped users into a separate
+function</li>
+<li>LDAP: Do not store separate GID for subdomain users</li>
+<li>AD: Add additional service to support Global Catalog lookups</li>
+<li>AD ID lookups - choose GC or LDAP as appropriate</li>
+<li>AD: Store trusted AD domains as subdomains</li>
+<li>rpm: Fold libsss_sudo and libsss_autofs back into the main SSSD
+package</li>
+<li>dyndns: Fix NULL check</li>
+<li>man: document the need to set ldap_access_order</li>
+<li>A new option krb5_use_kdcinfo</li>
+<li>Fix allocation check in the AD provider</li>
+<li>rpm: Use hardened flags for RPM build</li>
+<li>rpm: Split providers into separate subpackages</li>
+<li>Update transifex URL to transifex.com</li>
+<li>Updating translations for the 1.10 beta2 release</li>
+<li>Bumping the version for the 1.10 final release</li>
+<li>Use the correct talloc context when creating AD subdomains</li>
+<li>AD: Fix segfault in DEBUG message</li>
+<li>AD: Remove ad_options-&gt;auth options reference</li>
+<li>rpm: couple of small fixes</li>
+<li>Fix allocation check</li>
+<li>Fix dp_copy_options</li>
+<li>FO: Check the return value of send_fn</li>
+<li>LDAP: Retry SID search based on result of LDAP search, not the return
+code</li>
+<li>IPA: Do not download or store the member attribute of host groups</li>
+<li>AD: kinit with the local DC even when talking to a GC</li>
+<li>KRB5: guess UPN for subdomain users</li>
+<li>AD: Write out domain-realm mappings</li>
+<li>Fix compilation warning</li>
+<li>Update the translations for the 1.10.0 release</li>
+<li>Update the version for the 1.10.0 release</li>
+<li>Updating the version for the 1.10.1 release</li>
+</ul>
+<p>James Hogarth (1):</p>
+<ul class="simple">
+<li>Make TTL configurable for dynamic dns updates</li>
+</ul>
+<p>Jan Cholasta (8):</p>
+<ul class="simple">
+<li>LDAP: If deref search fails, try again without deref</li>
+<li>Add exit status section to sss_ssh_* man pages</li>
+<li>UTIL: Add function sss_names_init_from_args</li>
+<li>SSH: Fix parsing of names from client requests</li>
+<li>SSH: Use separate field for domain name in client requests</li>
+<li>SSH: Do not skip domains with use_fully_qualified_names in host
+key requests</li>
+<li>SSH: When host is removed from LDAP, remove it from the cache as well</li>
+<li>SSH: Update known_hosts file after unsuccessful requests as well.</li>
+</ul>
+<p>Jan Engelhardt (1):</p>
+<ul class="simple">
+<li>sysdb: try dealing with binary-content attributes</li>
+</ul>
+<p>John Hodrien (1):</p>
+<ul class="simple">
+<li>Correct sss_ssh_knowhostsproxy typo in man pages</li>
+</ul>
+<p>Kamil Dudka (1):</p>
+<ul class="simple">
+<li>sssd-1.8.0: work around a bug in cov-build from Coverity</li>
+</ul>
+<p>Lukas Slebodnik (37):</p>
+<ul class="simple">
+<li>Improved readability of get_next_domain()</li>
+<li>Fixed typo in debug message.</li>
+<li>Removing unused parameter type from
+sudosrv_get_sudorules_query_cache()</li>
+<li>Reuse sss_open_cloexec at other places in code.</li>
+<li>More generalized function open_debug_file_ex()</li>
+<li>Removing unused header file providers.h</li>
+<li>Fix sss_client breakage.</li>
+<li>Removing unused declaration of functions and variable.</li>
+<li>Making the ldb check configurable</li>
+<li>Fixing duplicate const</li>
+<li>Reusing create_pam_data() on the other places.</li>
+<li>Making the authtok structure really opaque.</li>
+<li>LDAP: Fix value initialization warnings</li>
+<li>Incorrect *.py[co] files placement</li>
+<li>Fix krbcc dir creation issue with MIT krb5 1.11</li>
+<li>Default TEST_DIR to cwd, not empty string if not set explicitly</li>
+<li>SUDO: IPA provider</li>
+<li>Fixes compilation without selinux.</li>
+<li>Fix broken build with selinux.</li>
+<li>Fix segfault in AD Subdomains Module</li>
+<li>Fixing critical format string issues.</li>
+<li>Adding script to create a SRPM</li>
+<li>Removing unused functions.</li>
+<li>Adding option to disable retrieving large AD groups.</li>
+<li>Making order in tests.</li>
+<li>Remove empty directories after tests run.</li>
+<li>Prevent segfault while processing ASQ request</li>
+<li>Fix compilation with disabled link_all_deplibs.</li>
+<li>Use deep copy for dns_domain and discovery_domain</li>
+<li>Fix dereference after a NULL check in tests.</li>
+<li>Change order of libraries in linking process.</li>
+<li>Fix wrong detection of krb5 ccname</li>
+<li>Every time return directory for krb5 cache collection.</li>
+<li>Do not switch to credentials everytime.</li>
+<li>Add missing argument to DEBUG message</li>
+<li>Handle too many results from getnetgr.</li>
+<li>Do not call sss_cmd_done in function check_cache.</li>
+</ul>
+<p>Michal Zidek (22):</p>
+<ul class="simple">
+<li>sss_debuglevel: Multiple arguments are treated as error.</li>
+<li>Include talloc log in our debug facility</li>
+<li>failover: Protect against empty host names</li>
+<li>sss_cache: Call DEBUG_INIT sooner</li>
+<li>tools: Respect use_fully_qualified_names</li>
+<li>Possible null derefence in ipa_subdomains.c.</li>
+<li>Unchecked return value in files.c</li>
+<li>Use the same dbg level for all ncache hits.</li>
+<li>Remove the alt_db_path parameter of sysdb_init</li>
+<li>File descriptor leak in nss responder.</li>
+<li>Debug message in sss_mc_create_file.</li>
+<li>Move SELinux processing to provider.</li>
+<li>Reuse cached SELinux mappings.</li>
+<li>Make the SELinux refresh time configurable.</li>
+<li>tests: Print warning if LDB_MODULES_PATH is not set</li>
+<li>Check for waitpid failure at wrong place.</li>
+<li>Wrong condition after waitpid.</li>
+<li>sss_cache: support for subdomains</li>
+<li>sss_cache: Remove annoying messages</li>
+<li>Inform about function duplication.</li>
+<li>libsss_idmap: function to calculate range</li>
+<li>Rename SAFEALIGN macros.</li>
+</ul>
+<p>Milan Cejnar (1):</p>
+<ul class="simple">
+<li>tools: append new line to string from poptStrerror()</li>
+</ul>
+<p>Nathaniel
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/McCallum.html">McCallum?</a> (1):</p>
+<ul class="simple">
+<li>Add support for krb5 1.11&#8217;s responder callback.</li>
+</ul>
+<p>Ondrej Kos (25):</p>
+<ul class="simple">
+<li>MAN: quotation fix</li>
+<li>Display more information on DB version mismatch</li>
+<li>SYSDB: split sysdb_add_user</li>
+<li>TESTS: Fix coverity issues 13126, 13127</li>
+<li>TESTS: include error message on fail</li>
+<li>Fix uninitialized time_t var in responder</li>
+<li>krb5_child: fix value type and initialization</li>
+<li>Fix initialization of multiple variables</li>
+<li>Fix coverity issue 13136</li>
+<li>Decrease krb5_auth_timeout default</li>
+<li>Update README file</li>
+<li>LDAP: Fix value initialization</li>
+<li>Provide libnl3 support</li>
+<li>DB: Switch to new libini_config API</li>
+<li>CONFDB: prevent double free</li>
+<li>IDMAP: Fix variable initialization</li>
+<li>Fix segfault in DYNDNS</li>
+<li>DB: Fix segfault when configuration file cannot be parsed</li>
+<li>Move nscd.c from tools to util</li>
+<li>Check NSCD configuration file</li>
+<li>Fail with misconfigured id-mapping ranges</li>
+<li>MAN: state default dyndns interface</li>
+<li>DB: Don&#8217;t add invalid ranges</li>
+<li>Don&#8217;t test for NULL in nscd config check</li>
+<li>KRB: Handle preauthentication error correctly</li>
+</ul>
+<p>Paul B. Henson (1):</p>
+<ul class="simple">
+<li>Add ignore_group_members option.</li>
+</ul>
+<p>Pavel Březina (63):</p>
+<ul class="simple">
+<li>sudo: do not hardcode protocol version</li>
+<li>fix -O3 variable may be uninitialized warnings</li>
+<li>sudo: print message if old protocol is used</li>
+<li>sudo manpage: clarify that sudoHost may contain wildcards and not
+regular expression</li>
+<li>use talloc_zfree when freeing rhostent in resolver</li>
+<li>set ret to EOK after for loop in sdap_sudo_purge_sudoers</li>
+<li>Fix LDAP authentication - invalid password length</li>
+<li>set struct bet_info-&gt;bet_type</li>
+<li>krb: recreate ccache if it was deleted</li>
+<li>dp: check whether hostid backend is configured before filing be
+request</li>
+<li>get_next_domain() test dom-&gt;parent-&gt;next for NULL</li>
+<li>subdomains: replace invalid characters with underscore in krb5
+mapping file name</li>
+<li>if selinux is disabled, ignore that selogin dir is missing</li>
+<li>sdap_fill_memberships: continue if a member is not foud in sysdb</li>
+<li>Add debug message to autofs client</li>
+<li>autofs: fix invalid header &#8216;number of entries&#8217; in packet</li>
+<li>build: require libcmocka on fedora 18+</li>
+<li>fix segfault in nss responder unit test</li>
+<li>krb5-utils-tests: remove invalid condition</li>
+<li>correct order in error_to_str table</li>
+<li>do not leak memory on failure in *_process_init()</li>
+<li>change responder contexts hierarchy</li>
+<li>coding style fix</li>
+<li>refactor nested group processing: add new code</li>
+<li>refactor nested group processing: replace old code</li>
+<li>resolv: add resolv_get_domain request to resolv utils</li>
+<li>resolv: add resolv_discover_srv request to resolv utils</li>
+<li>DNS sites support - SRV lookup plugin interface</li>
+<li>DNS sites support - SRV DNS lookup plugin</li>
+<li>fail over - add function to insert multiple servers to the list</li>
+<li>DNS sites support - replace SRV lookup code with a plugin call</li>
+<li>DNS sites support - use SRV DNS lookup plugin in all providers</li>
+<li>DNS sites support - add IPA SRV plugin</li>
+<li>sudo client: remove dead code</li>
+<li>add fo_discover_servers request</li>
+<li>IPA SRV plugin: use fo_discover_servers request</li>
+<li>IPA SRV plugin: improve debugging</li>
+<li>sdap: add sdap_connect_host request</li>
+<li>add sss_ldap_encode_ndr_uint32</li>
+<li>DNS sites support - add AD SRV plugin</li>
+<li>dns srv plugin: compare domain names case insensitive</li>
+<li>AD SRV plugin: check if site name is empty</li>
+<li>fo_discover_servers_send: don&#8217;t crash when backup_domain is NULL</li>
+<li>sudo responder: search rules for subdomains in parent domain subtree</li>
+<li>back end: periodic task API</li>
+<li>back end: periodical refresh of expired records API</li>
+<li>back end: add refresh expired records periodic task</li>
+<li>providers: refresh expired netgroups</li>
+<li>be_ptask: send and recv shadow a global declaration</li>
+<li>be_refresh: send and recv shadow a global declaration</li>
+<li>failover: set state-&gt;out when meta server remains in
+SRV_RESOLVE_ERROR</li>
+<li>subdomains: touch krb5.conf when creating new domain-realm mappings</li>
+<li>nested groups: allocate more space if deref returns more members</li>
+<li>handle ERR_ACCOUNT_EXPIRED properly</li>
+<li>nested groups: do not return ENOMEM if num_groups is 0</li>
+<li>nested groups: do not expect any particular number of groups</li>
+<li>failover: do not return invalid pointer when server is already
+present</li>
+<li>failover: return error when SRV lookup returned only duplicates</li>
+<li>collapse_srv_lookup may free the server, make it clear from the API</li>
+<li>failover: if expanded server is marked as neutral, invoke srv
+collapse</li>
+<li>init script: source /etc/sysconfig/sssd</li>
+<li>fix dead code in fail_over_srv.c</li>
+<li>sudo responder: use different callback for oob refresh</li>
+</ul>
+<p>Simo Sorce (132):</p>
+<ul class="simple">
+<li>Add helpers to set common mc record fields</li>
+<li>Save errno before it might be modified.</li>
+<li>Revert &#8220;Avoid accessing half-deallocated memory when using
+talloc_zfree macro.&#8221;</li>
+<li>Avoid duplicating macros</li>
+<li>Avoid const warnings when deallocating memory</li>
+<li>Fix tevent_req style for krb5_auth</li>
+<li>Fix ipa_subdomain_id names and tevent_req style</li>
+<li>Fix tevent_req style for get_netgroup in ipa_id</li>
+<li>Streamline ipa_account_info handler</li>
+<li>Use an entry type mask macro to filter entry types</li>
+<li>Fix comment on wrong line</li>
+<li>Remove redundant definition.</li>
+<li>Fix tevent_req style for sdap_async_sudo.</li>
+<li>Remove unhelpful vtable from sss_cache</li>
+<li>Remove dead netgroup functions</li>
+<li>Revert &#8220;Add a default section to a switch-statement&#8221;</li>
+<li>Add sysdb_search_service() helper function</li>
+<li>Use sysdb_search_service() for all svc queries</li>
+<li>Fix sdap reinit.</li>
+<li>Code can only check for cached passwords</li>
+<li>Add function to safely wipe memory.</li>
+<li>Add authtok utility functions.</li>
+<li>Change pam data auth tokens.</li>
+<li>Use new sysdb_search_service() in sss_cache</li>
+<li>The Big sysdb/domain split-up!</li>
+<li>Refactor sysdb initialization</li>
+<li>Refactor single domain initialization</li>
+<li>Remove the sysdb_ctx_get_domain() function.</li>
+<li>Make sysdb_user_dn() require a domain explictly.</li>
+<li>Make sysdb_group_dn() require a domain explictly.</li>
+<li>Make sysdb_netgroup_dn() require a domain explictly.</li>
+<li>Make sysdb_netgroup_base_dn() require a domain.</li>
+<li>Make sysdb_domain_dn() require a domain.</li>
+<li>Make sysdb_custom_dn() require a domain.</li>
+<li>Make sysdb_custom_subtree_dn() require a domain.</li>
+<li>Move range objects into their own top-level tree.</li>
+<li>Upgrade DB and move ranges into top level object</li>
+<li>Pass domain to sysdb_get&lt;pw/gr&gt;nam() functions</li>
+<li>Pass domain to sysdb_get&lt;pwu/grg&gt;&lt;id() functions</li>
+<li>Pass domain to sysdb_enum&lt;pw/gr&gt;ebt() functions</li>
+<li>Add domain option to sysdb_get/netgr/attrs() fns</li>
+<li>Add domain argument to sysdb_initgroups()</li>
+<li>Add domain argument to sysdb_get_user_attr()</li>
+<li>Add domain to sysdb_search_user_by_name()</li>
+<li>Add domain to sysdb_search_user_by_uid()</li>
+<li>Add domain to sysdb_search_group_by_name()</li>
+<li>Add domain to sysdb_search_group_by_gid()</li>
+<li>Add domain arg to sysdb_search_netgroup_by_name()</li>
+<li>Add domain argument to sysdb_set_user_attr()</li>
+<li>Add domain argument to sysdb_set_group_attr()</li>
+<li>Add domain argument to sysdb_set_netgroup_attr()</li>
+<li>Add domain argument to sysdb_get_new_id()</li>
+<li>Add domain argument to sysdb_add_basic_user()</li>
+<li>Add domain argument to sysdb_add_user()</li>
+<li>Add domain arguments to sysdb_add_group functions.</li>
+<li>Add domain arguments to sysdb_add_inetgroup fns.</li>
+<li>Add domain argument to sysdb_store_user()</li>
+<li>Add domain argument to sysdb_store_group()</li>
+<li>Add domain arg to sysdb group member functions</li>
+<li>Add domain argument to sysdb_cache_password()</li>
+<li>Add domain argument to sysdb_cache_auth()</li>
+<li>Add domain argument to sysdb_store_custom()</li>
+<li>Add domain argument to sysdb_search_custom()</li>
+<li>Add domain to sysdb_delete_custom</li>
+<li>Add domain arg to sysdb_search_users()</li>
+<li>Add domain argument to sysdb_delete_user()</li>
+<li>Add domain argument to sysdb_search_groups()</li>
+<li>Add domain argument to sysdb_delete_group()</li>
+<li>Add domain arg to sysdb_search/delete_netgroup()</li>
+<li>Add domain argument to sysdb_has/set_enumerated()</li>
+<li>Add domain argument to sysdb_remove_attrs()</li>
+<li>Add domain argument to sysdb_idmap_ funcitons</li>
+<li>Add domain arguemnt to sysdb_get_real_name()</li>
+<li>Add domain argument to sysdb autofs functions</li>
+<li>Add domain argument to sysdb selinux functions</li>
+<li>Add domain arguments to sysdb services functions</li>
+<li>Add domain arguments to sysdb ssh functions</li>
+<li>Add domain arguments to sysdb sudo functions</li>
+<li>Add domain to some subdomain functions</li>
+<li>Pass the domain to upgrade functions</li>
+<li>Move mpg flag to the domain where it belongs</li>
+<li>Kill sysdb-&gt;domain</li>
+<li>Stop creating fake sysdb contexts</li>
+<li>Tidy up BASE dn macros</li>
+<li>Remove outdated code.</li>
+<li>Move ldap provider access functions</li>
+<li>Remove sysdb as a be context structure member</li>
+<li>Remove sysdb as a be request structure member</li>
+<li>Remove sysdb argument from ipa_host_info_send()</li>
+<li>Remove unused structure</li>
+<li>Remove sysdb argument from hbac_user_attrs_to_rule()</li>
+<li>Remove sysdb arg from hbac_service_attrs_to_rule()</li>
+<li>Remove sysdb arg from hbac_*host_attrs_to_rule()</li>
+<li>Remove sysdb arg from ipa_hbac_service_info_send()</li>
+<li>Remove sysdb arg from [ipa_]hbac_sysdb_save()</li>
+<li>Remove sysdb argument from hbac_get_cached_rules()</li>
+<li>Remove hbac_ctx_sysdb()</li>
+<li>Remove hbac_ctx_be()</li>
+<li>Remove hbac_ctx_ev()</li>
+<li>Remove hbac_ctx_sdap_id_[ctx|op]()</li>
+<li>Move hbac_ctx_is_offline()</li>
+<li>Do not pass NULL to ipa_subdomain_retrieve()</li>
+<li>Split simple_access_check function out</li>
+<li>Pass domain not be_req to access check functions</li>
+<li>Remove domain from be_req structure</li>
+<li>Introduce be_req_terminate() helper</li>
+<li>Add be_req_create() helper</li>
+<li>Add be_req_get_be_ctx() helper.</li>
+<li>Add be_req_get_data() helper funciton.</li>
+<li>Make struct be_req opaque</li>
+<li>Add realm info to sss_domain_info</li>
+<li>Avoid sysdb_subdom in sysdb_get_subdomains()</li>
+<li>Update main domain info in place</li>
+<li>Refactor sysdb_master_domain_add_info()</li>
+<li>Add sysdb_subdomain_store() function</li>
+<li>Remove sysdb_subdom completely</li>
+<li>Add function get_next_domain()</li>
+<li>Add ability to disable domains</li>
+<li>Change the way domains are linked.</li>
+<li>Parent and subdomains use the same sysdb</li>
+<li>Introduce IS_SUBDOMAIN() macro</li>
+<li>krb5_child style fix</li>
+<li>Refactor krb5 child</li>
+<li>Add SSSD specific error codes and definitions</li>
+<li>Use SSSD specific errors for offline auth</li>
+<li>Return ERR_INTERNAL instead of EIO</li>
+<li>Cleanup error message handling for krb5 child</li>
+<li>Improve IS_SSSD_ERROR() macro</li>
+<li>Use common error facility instead of sdap_result</li>
+<li>Convert sdap_access to new error codes</li>
+<li>ldap: Fallback option for rfc2307 schema</li>
+<li>Further restrict become_user drop of privileges.</li>
+</ul>
+<p>Stef Walter (1):</p>
+<ul class="simple">
+<li>Add a domain config attribute for realmd</li>
+</ul>
+<p>Stephen Gallagher (13):</p>
+<ul class="simple">
+<li>LDAP: Better debug logging when saving groups</li>
+<li>Correct format security for talloc_named of auth tokens</li>
+<li>Fix minor grammar error in log</li>
+<li>NSS: Add original homedir to home directory template options</li>
+<li>BUILD: Build shared components as an internal shared library</li>
+<li>BUILD: Add contributed macros and aliases to simplify building</li>
+<li>BUILD: Include build aliases in the tarball</li>
+<li>BUILD: Fix cmocka detection</li>
+<li>BUILD: Fix up whitespace in Makefile.am</li>
+<li>BUILD: Always run distcheck and RPM tests in /dev/shm</li>
+<li>Remove old hash support from example spec</li>
+<li>Add &#8216;description&#8217; attribute to SSSDConfig API</li>
+<li>Configure SYSV init scripts properly</li>
+</ul>
+<p>Sumit Bose (54):</p>
+<ul class="simple">
+<li>Add a default section to a switch-statement</li>
+<li>Fix and rename get_my_domain_data()</li>
+<li>Refactoring: remove duplicated code in nss responder</li>
+<li>Allow usage of enterprise principals</li>
+<li>Make IPA SELinux provider aware of subdomain users</li>
+<li>Add override_homedir.xml to po4a.cfg</li>
+<li>Remove unused TALLOC_CTX from responder_get_domain()</li>
+<li>responder_get_domain: do not return disabled domains</li>
+<li>responder_get_domain(): remove timeout calculation</li>
+<li>LDAP: always store SID if available</li>
+<li>Add secid filter to responder-dp protocol</li>
+<li>Add two new request types to the data-provider interface</li>
+<li>Add idmap context to nss context</li>
+<li>Add responder_get_domain_by_id()</li>
+<li>sysdb: add sysdb_search_object_by_sid()</li>
+<li>Add sss_ncache_set_sid() and sss_ncache_check_sid()</li>
+<li>Remove unused attribute list</li>
+<li>Use struct to hold different types of request parameters</li>
+<li>Add SID related lookups to IPA subdomains</li>
+<li>Add SID related calls to the NSS responder</li>
+<li>Add client library for SID related lookups</li>
+<li>Add python interface to libsss_nss_idmap</li>
+<li>AD: read flat name and SID of the AD domain</li>
+<li>Add missing \n to debug string</li>
+<li>Fix missing initialization in Python bindings for libsss_nss_idmap</li>
+<li>Add support for tuples and unicode pysss_nss_idmap.so</li>
+<li>Always update cached upn if enterprise principals are used</li>
+<li>Fix return code for AD subdomain request</li>
+<li>pysss_nss_idmap: do not treat strings as sequences</li>
+<li>IPA: Always initialize ID mapping</li>
+<li>Handle SID strings in sdap_attrs_get_sid_str() as well</li>
+<li>IPA: read user and group SID</li>
+<li>Add SID related requests to the LDAP provider</li>
+<li>Set canonicalize flag if enterprise principals are used</li>
+<li>Lookup domains at startup</li>
+<li>Add be request queue</li>
+<li>Use queue for get_subdomains</li>
+<li>Read SIDs of groups with sysdb_initgroups() as well</li>
+<li>Enhance PAC responder for AD users</li>
+<li>Intermittent fix for get_user_and_group_users_done</li>
+<li>Always send the PAC to the PAC responder</li>
+<li>Implicitly activate the PAC responder for AD provider</li>
+<li>Fix some doxygen warnings</li>
+<li>Use principal from the ticket to find validation entry</li>
+<li>Set default realm for enterprise principals</li>
+<li>PAC: do not expect that sysdb_search_object_by_sid() return
+ENOENT</li>
+<li>PAC: do not delete originalDN or cached password if present</li>
+<li>KRB5: use the right authtok type for renewals</li>
+<li>Fix typo in pack_authtok()</li>
+<li>Revert &#8220;Always send the PAC to the PAC responder&#8221;</li>
+<li>krb5: do not send pac for IPA users from the local domain</li>
+<li>krb5: do not use enterprise principals for renewals</li>
+<li>Revert &#8220;Implicitly activate the PAC responder for AD provider&#8221;</li>
+<li>Use forest for GC SRV lookups</li>
+</ul>
+<p>Thorsten Scherf (1):</p>
+<ul class="simple">
+<li>Updated Doxygen configuration to 1.8.1</li>
+</ul>
+<p>Yuri Chornoivan (3):</p>
+<ul class="simple">
+<li>Fix typos in man pages</li>
+<li>Fix minor typos</li>
+<li>Fix minor typos</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Highlights</a></li>
+<li><a class="reference internal" href="#packaging-changes">Packaging changes</a></li>
+<li><a class="reference internal" href="#tickets-fixed">Tickets fixed</a></li>
+<li><a class="reference internal" href="#detailed-changelog">Detailed Changelog</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Releases/Notes-1.10.0.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/Releases/Notes-1.10.0.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

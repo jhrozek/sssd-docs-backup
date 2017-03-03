@@ -1,0 +1,454 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Email Notification of Ticket Changes &#8212; sssd 1.15.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.15.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="email-notification-of-ticket-changes">
+<h1>Email Notification of Ticket Changes<a class="headerlink" href="#email-notification-of-ticket-changes" title="Permalink to this headline">¶</a></h1>
+<div class="system-message"><p><strong>Error: Macro TracGuideToc(None) failed</strong></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;NoneType&#39;</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span> <span class="s1">&#39;find&#39;</span>
+</pre></div>
+</div>
+</div><p>Trac supports notification of ticket changes via email.</p>
+<p>Email notification is useful to keep users up-to-date on tickets/issues
+of interest, and also provides a convenient way to post all ticket
+changes to a dedicated mailing list. For example, this is how the
+<a class="reference external" href="http://lists.edgewall.com/archive/trac-tickets/">​Trac-tickets</a>
+mailing list is set up.</p>
+<p>Disabled by default, notification can be activated and configured in
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">trac.ini</a>.</p>
+<div class="section" id="receiving-notification-mails">
+<h2>Receiving Notification Mails<a class="headerlink" href="#receiving-notification-mails" title="Permalink to this headline">¶</a></h2>
+<p>When reporting a new ticket or adding a comment, enter a valid email
+address or your username in the <em>reporter</em>, <em>assigned to/owner</em> or <em>cc</em>
+field. Trac will automatically send you an email when changes are made
+to the ticket (depending on how notification is configured).</p>
+<p>This is useful to keep up-to-date on an issue or enhancement request
+that interests you.</p>
+<div class="section" id="how-to-use-your-username-to-receive-notification-mails">
+<h3>How to use your username to receive notification mails<a class="headerlink" href="#how-to-use-your-username-to-receive-notification-mails" title="Permalink to this headline">¶</a></h3>
+<p>To receive notification mails, you can either enter a full email address
+or your username. To get notified with a simple username or login, you
+need to specify a valid email address in the <em>Preferences</em> page.</p>
+<p>Alternatively, a default domain name (<strong>``smtp_default_domain``</strong>) can
+be set in the
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">TracIni</a> file (see
+<a class="reference external" href="https://fedorahosted.org/sssd#ConfigurationOptions">Configuration
+Options</a> below).
+In this case, the default domain will be appended to the username, which
+can be useful for an &#8220;Intranet&#8221; kind of installation.</p>
+<p>When using apache and mod_kerb for authentication against Kerberos /
+Active Directory, usernames take the form
+(<strong>``username&#64;EXAMPLE.LOCAL``</strong>). To avoid this being interpreted as an
+email address, add the Kerberos domain to (<strong>``ignore_domains``</strong>).</p>
+</div>
+</div>
+<div class="section" id="configuring-smtp-notification">
+<h2>Configuring SMTP Notification<a class="headerlink" href="#configuring-smtp-notification" title="Permalink to this headline">¶</a></h2>
+<p><strong>Important:</strong> For
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracNotification.html">TracNotification</a>
+to work correctly, the <code class="docutils literal"><span class="pre">[trac]</span> <span class="pre">base_url</span></code> option must be set in
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">trac.ini</a>.</p>
+<div class="section" id="configuration-options">
+<h3>Configuration Options<a class="headerlink" href="#configuration-options" title="Permalink to this headline">¶</a></h3>
+<p>These are the available options for the <code class="docutils literal"><span class="pre">[notification]</span></code> section in
+trac.ini.</p>
+<ul class="simple">
+<li><strong>``smtp_enabled``</strong>: Enable email notification.</li>
+<li><strong>``smtp_from``</strong>: Email address to use for <em>Sender</em>-headers in
+notification emails.</li>
+<li><strong>``smtp_from_name``</strong>: Sender name to use for <em>Sender</em>-headers in
+notification emails.</li>
+<li><strong>``smtp_replyto``</strong>: Email address to use for <em>Reply-To</em>-headers in
+notification emails.</li>
+<li><strong>``smtp_default_domain``</strong>: (<em>since 0.10</em>) Append the specified
+domain to addresses that do not contain one. Fully qualified
+addresses are not modified. The default domain is appended to all
+username/login for which an email address cannot be found from the
+user settings.</li>
+<li><strong>``smtp_always_cc``</strong>: List of email addresses to always send
+notifications to. <em>Typically used to post ticket changes to a
+dedicated mailing list.</em></li>
+<li><strong>``smtp_always_bcc``</strong>: (<em>since 0.10</em>) List of email addresses to
+always send notifications to, but keeps addresses not visible from
+other recipients of the notification email</li>
+<li><strong>``smtp_subject_prefix``</strong>: (<em>since 0.10.1</em>) Text that is inserted
+before the subject of the email. Set to &#8220;__default__&#8221; by default.</li>
+<li><strong>``always_notify_reporter``</strong>: Always send notifications to any
+address in the reporter field (default: false).</li>
+<li><strong>``always_notify_owner``</strong>: (<em>since 0.9</em>) Always send notifications
+to the address in the owner field (default: false).</li>
+<li><strong>``always_notify_updater``</strong>: (<em>since 0.10</em>) Always send a
+notification to the updater of a ticket (default: true).</li>
+<li><strong>``use_public_cc``</strong>: (<em>since 0.10</em>) Addresses in To: (owner,
+reporter) and Cc: lists are visible by all recipients (default is
+<em>Bcc:</em> - hidden copy).</li>
+<li><strong>``use_short_addr``</strong>: (<em>since 0.10</em>) Enable delivery of
+notifications to addresses that do not contain a domain (i.e. do not
+end with <em>&#64;&lt;domain.com&gt;</em>).This option is useful for intranets, where
+the SMTP server can handle local addresses and map the username/login
+to a local mailbox. See also <code class="docutils literal"><span class="pre">smtp_default_domain</span></code>. Do not use this
+option with a public SMTP server.</li>
+<li><strong>``ignore_domains``</strong>: Comma-separated list of domains that should
+not be considered part of email addresses (for usernames with
+Kerberos domains).</li>
+<li><strong>``mime_encoding``</strong>: (<em>since 0.10</em>) This option allows selecting
+the MIME encoding scheme. Supported values:<ul>
+<li><code class="docutils literal"><span class="pre">none</span></code>: default value, uses 7bit encoding if the text is plain
+ASCII, or 8bit otherwise.</li>
+<li><code class="docutils literal"><span class="pre">base64</span></code>: works with any kind of content. May cause some issues
+with touchy anti-spam/anti-virus engines.</li>
+<li><code class="docutils literal"><span class="pre">qp</span></code> or <code class="docutils literal"><span class="pre">quoted-printable</span></code>: best for european languages (more
+compact than base64) if 8bit encoding cannot be used.</li>
+</ul>
+</li>
+<li><strong>``ticket_subject_template``</strong>: (<em>since 0.11</em>) A <a class="reference external" href="http://genshi.edgewall.org/wiki/Documentation/text-templates.html">​Genshi text
+template</a>
+snippet used to get the notification subject.</li>
+<li><strong>``email_sender``</strong>: (<em>since 0.12</em>) Name of the component
+implementing <code class="docutils literal"><span class="pre">IEmailSender</span></code>. This component is used by the
+notification system to send emails. Trac currently provides the
+following components:<ul>
+<li><code class="docutils literal"><span class="pre">SmtpEmailSender</span></code>: connects to an SMTP server (default).</li>
+<li><code class="docutils literal"><span class="pre">SendmailEmailSender</span></code>: runs a <code class="docutils literal"><span class="pre">sendmail</span></code>-compatible
+executable.</li>
+</ul>
+</li>
+</ul>
+<p>Either <strong>``smtp_from``</strong> or <strong>``smtp_replyto``</strong> (or both) <em>must</em> be
+set, otherwise Trac refuses to send notification mails.</p>
+<p>The following options are specific to email delivery through SMTP.</p>
+<ul class="simple">
+<li><strong>``smtp_server``</strong>: SMTP server used for notification messages.</li>
+<li><strong>``smtp_port``</strong>: (<em>since 0.9</em>) Port used to contact the SMTP
+server.</li>
+<li><strong>``smtp_user``</strong>: (<em>since 0.9</em>) User name for authentication SMTP
+account.</li>
+<li><strong>``smtp_password``</strong>: (<em>since 0.9</em>) Password for authentication SMTP
+account.</li>
+<li><strong>``use_tls``</strong>: (<em>since 0.10</em>) Toggle to send notifications via a
+SMTP server using
+<a class="reference external" href="http://en.wikipedia.org/wiki/Transport_Layer_Security">​TLS</a>,
+such as GMail.</li>
+</ul>
+<p>The following option is specific to email delivery through a
+<code class="docutils literal"><span class="pre">sendmail</span></code>-compatible executable.</p>
+<ul class="simple">
+<li><strong>``sendmail_path``</strong>: (<em>since 0.12</em>) Path to the sendmail
+executable. The sendmail program must accept the <code class="docutils literal"><span class="pre">-i</span></code> and <code class="docutils literal"><span class="pre">-f</span></code>
+options.</li>
+</ul>
+</div>
+<div class="section" id="example-configuration-smtp">
+<h3>Example Configuration (SMTP)<a class="headerlink" href="#example-configuration-smtp" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="example-configuration-sendmail">
+<h3>Example Configuration (<code class="docutils literal"><span class="pre">sendmail</span></code>)<a class="headerlink" href="#example-configuration-sendmail" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="customizing-the-e-mail-subject">
+<h3>Customizing the e-mail subject<a class="headerlink" href="#customizing-the-e-mail-subject" title="Permalink to this headline">¶</a></h3>
+<p>The e-mail subject can be customized with the
+<code class="docutils literal"><span class="pre">ticket_subject_template</span></code> option, which contains a <a class="reference external" href="http://genshi.edgewall.org/wiki/Documentation/text-templates.html">​Genshi text
+template</a>
+snippet. The default value is:</p>
+<p>The following variables are available in the template:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">env</span></code>: The project environment (see
+<a class="reference external" href="http://trac.edgewall.org/intertrac/source%3A/trunk/trac/env.py">​env.py</a>).</li>
+<li><code class="docutils literal"><span class="pre">prefix</span></code>: The prefix defined in <code class="docutils literal"><span class="pre">smtp_subject_prefix</span></code>.</li>
+<li><code class="docutils literal"><span class="pre">summary</span></code>: The ticket summary, with the old value if the summary
+was edited.</li>
+<li><code class="docutils literal"><span class="pre">ticket</span></code>: The ticket model object (see
+<a class="reference external" href="http://trac.edgewall.org/intertrac/source%3A/trunk/trac/ticket/model.py">​model.py</a>).
+Individual ticket fields can be addressed by appending the field name
+separated by a dot, e.g. <code class="docutils literal"><span class="pre">$ticket.milestone</span></code>.</li>
+</ul>
+</div>
+<div class="section" id="customizing-the-e-mail-content">
+<h3>Customizing the e-mail content<a class="headerlink" href="#customizing-the-e-mail-content" title="Permalink to this headline">¶</a></h3>
+<p>The notification e-mail content is generated based on
+<code class="docutils literal"><span class="pre">ticket_notify_email.txt</span></code> in <code class="docutils literal"><span class="pre">trac/templates</span></code>. You can add your own
+version of this template by adding a <code class="docutils literal"><span class="pre">ticket_notify_email.txt</span></code> to the
+templates directory of your environment. The default looks like this:</p>
+</div>
+</div>
+<div class="section" id="sample-email">
+<h2>Sample Email<a class="headerlink" href="#sample-email" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="customizing-e-mail-content-for-ms-outlook">
+<h2>Customizing e-mail content for MS Outlook<a class="headerlink" href="#customizing-e-mail-content-for-ms-outlook" title="Permalink to this headline">¶</a></h2>
+<p>Out-of-the-box, MS Outlook normally presents plain text e-mails with a
+variable-width font; the ticket properties table will most certainly
+look like a mess in MS Outlook. This can be fixed with some
+customization of the <a class="reference external" href="https://fedorahosted.org/sssd#Customizingthee-mailcontent">e-mail
+template</a>.</p>
+<p>Replace the following second row in the template:</p>
+<p>with this instead (<em>requires Python 2.6 or later</em>):</p>
+<p>The table of ticket properties is replaced with a list of a selection of
+the properties. A tab character separates the name and value in such a
+way that most people should find this more pleasing than the default
+table, when using MS Outlook.</p>
+<div class="wikipage" style="margin: 1em 1.75em; border:1px dotted"></div>
+<div class="section" id="testing">
+<h2>#42: testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="42%" />
+<col width="58%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Reporter:</td>
+<td><a class="reference external" href="mailto:jonas&#37;&#52;&#48;example&#46;com">jonas<span>&#64;</span>example<span>&#46;</span>com</a></td>
+</tr>
+<tr class="row-even"><td>Owner:</td>
+<td>anonymous</td>
+</tr>
+<tr class="row-odd"><td>Type:</td>
+<td>defect</td>
+</tr>
+<tr class="row-even"><td>Status:</td>
+<td>assigned</td>
+</tr>
+<tr class="row-odd"><td>Priority:</td>
+<td>lowest</td>
+</tr>
+<tr class="row-even"><td>Milestone:</td>
+<td>0.9</td>
+</tr>
+<tr class="row-odd"><td>Component:</td>
+<td>report system</td>
+</tr>
+<tr class="row-even"><td>Severity:</td>
+<td>major</td>
+</tr>
+<tr class="row-odd"><td>Resolution:</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>Keywords:</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<p>&nbsp;&nbsp;* priority: &nbsp;low =&gt; highest
+&nbsp;&nbsp;* owner: &nbsp;jonas =&gt; anonymous
+&nbsp;&nbsp;* cc: &nbsp;<a class="reference external" href="mailto:daniel&#37;&#52;&#48;example&#46;com">daniel<span>&#64;</span>example<span>&#46;</span>com</a> =&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="reference external" href="mailto:daniel&#37;&#52;&#48;example&#46;com">daniel<span>&#64;</span>example<span>&#46;</span>com</a>, <a class="reference external" href="mailto:jonas&#37;&#52;&#48;example&#46;com">jonas<span>&#64;</span>example<span>&#46;</span>com</a>
+&nbsp;&nbsp;* status: &nbsp;new =&gt; assigned
+Comment:
+I&#8217;m interested too!
+&#8211;
+Ticket URL: &lt;<a class="reference external" href="http://example.com/trac/ticket/42">http://example.com/trac/ticket/42</a>&gt;
+My Project &lt;<a class="reference external" href="http://myproj.example.com/">http://myproj.example.com/</a>&gt;</p>
+</div><p><strong>Important</strong>: Only those ticket fields that are listed in <code class="docutils literal"><span class="pre">sel</span></code> are
+part of the HTML mail. If you have defined custom ticket fields which
+shall be part of the mail they have to be added to <code class="docutils literal"><span class="pre">sel</span></code>, example:</p>
+<p>However, it&#8217;s not as perfect as an automatically HTML-formatted e-mail
+would be, but presented ticket properties are at least readable by
+default in MS Outlook...</p>
+</div>
+<div class="section" id="using-gmail-as-the-smtp-relay-host">
+<h2>Using GMail as the SMTP relay host<a class="headerlink" href="#using-gmail-as-the-smtp-relay-host" title="Permalink to this headline">¶</a></h2>
+<p>Use the following configuration snippet</p>
+<p>where <em>user</em> and <em>password</em> match an existing GMail account, <em>i.e.</em> the
+ones you use to log in on <a class="reference external" href="http://gmail.com">​http://gmail.com</a></p>
+<div class="line-block">
+<div class="line">Alternatively, you can use <code class="docutils literal"><span class="pre">smtp_port</span> <span class="pre">=</span> <span class="pre">25</span></code>.</div>
+<div class="line">You should not use <code class="docutils literal"><span class="pre">smtp_port</span> <span class="pre">=</span> <span class="pre">465</span></code>. It will not work and your
+ticket submission may deadlock. Port 465 is reserved for the SMTPS
+protocol, which is not supported by Trac. See
+<a class="reference external" href="https://fedorahosted.org/sssd/ticket/7107#comment:2">#7107</a> for
+details.</div>
+</div>
+</div>
+<div class="section" id="filtering-notifications-for-one-s-own-changes">
+<h2>Filtering notifications for one&#8217;s own changes<a class="headerlink" href="#filtering-notifications-for-one-s-own-changes" title="Permalink to this headline">¶</a></h2>
+<p>In Gmail, use the filter:</p>
+<p>For Trac .10, use the filter:</p>
+<p>to delete these notifications.</p>
+<p>In Thunderbird, there is no such solution if you use IMAP (see
+<a class="reference external" href="http://kb.mozillazine.org/Filters_(Thunderbird)#Filtering_the_message_body">​http://kb.mozillazine.org/Filters_(Thunderbird)#Filtering_the_message_body</a>).</p>
+<p>The best you can do is to set &#8220;always_notify_updater&#8221; in conf/trac.ini
+to false. You will however still get an email if you comment a ticket
+that you own or have reported.</p>
+<p>You can also add this plugin:
+<a class="reference external" href="http://trac-hacks.org/wiki/NeverNotifyUpdaterPlugin">​http://trac-hacks.org/wiki/NeverNotifyUpdaterPlugin</a></p>
+</div>
+<div class="section" id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h2>
+<p>If you cannot get the notification working, first make sure the log is
+activated and have a look at the log to find if an error message has
+been logged. See
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracLogging.html">TracLogging</a>
+for help about the log feature.</p>
+<p>Notification errors are not reported through the web interface, so the
+user who submit a change or a new ticket never gets notified about a
+notification failure. The Trac administrator needs to look at the log to
+find the error trace.</p>
+<div class="section" id="permission-denied-error">
+<h3><em>Permission denied</em> error<a class="headerlink" href="#permission-denied-error" title="Permalink to this headline">¶</a></h3>
+<p>Typical error message:</p>
+<p>This error usually comes from a security settings on the server: many
+Linux distributions do not let the web server (Apache, ...) to post
+email message to the local SMTP server.</p>
+<p>Many users get confused when their manual attempts to contact the SMTP
+server succeed:</p>
+<p>The trouble is that a regular user may connect to the SMTP server, but
+the web server cannot:</p>
+<p>In such a case, you need to configure your server so that the web server
+is authorized to post to the SMTP server. The actual settings depend on
+your Linux distribution and current security policy. You may find help
+browsing the Trac
+<a class="reference external" href="http://trac.edgewall.org/intertrac/MailingList">​MailingList</a>
+archive.</p>
+<p>Relevant ML threads:</p>
+<ul class="simple">
+<li>SELinux:
+<a class="reference external" href="http://article.gmane.org/gmane.comp.version-control.subversion.trac.general/7518">​http://article.gmane.org/gmane.comp.version-control.subversion.trac.general/7518</a></li>
+</ul>
+<p>For SELinux in Fedora 10:</p>
+</div>
+<div class="section" id="suspected-spam-error">
+<h3><em>Suspected spam</em> error<a class="headerlink" href="#suspected-spam-error" title="Permalink to this headline">¶</a></h3>
+<p>Some SMTP servers may reject the notification email sent by Trac.</p>
+<p>The default Trac configuration uses Base64 encoding to send emails to
+the recipients. The whole body of the email is encoded, which sometimes
+trigger <em>false positive</em> SPAM detection on sensitive email servers. In
+such an event, it is recommended to change the default encoding to
+&#8220;quoted-printable&#8221; using the <code class="docutils literal"><span class="pre">mime_encoding</span></code> option.</p>
+<p>Quoted printable encoding works better with languages that use one of
+the Latin charsets. For Asian charsets, it is recommended to stick with
+the Base64 encoding.</p>
+</div>
+<div class="section" id="invalid-address-error">
+<h3><em>501, 5.5.4 Invalid Address</em> error<a class="headerlink" href="#invalid-address-error" title="Permalink to this headline">¶</a></h3>
+<p>On IIS 6.0 you could get a</p>
+<p>in the trac log. Have a look
+<a class="reference external" href="http://support.microsoft.com/kb/291828">​here</a> for instructions on
+resolving it.</p>
+<hr class="docutils" />
+<p>See also:
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracTickets.html">TracTickets</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracIni.html">TracIni</a>,
+<a class="reference external" href="https://docs.pagure.org/sssd-test2/TracGuide.html">TracGuide</a></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Email Notification of Ticket Changes</a><ul>
+<li><a class="reference internal" href="#receiving-notification-mails">Receiving Notification Mails</a><ul>
+<li><a class="reference internal" href="#how-to-use-your-username-to-receive-notification-mails">How to use your username to receive notification mails</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuring-smtp-notification">Configuring SMTP Notification</a><ul>
+<li><a class="reference internal" href="#configuration-options">Configuration Options</a></li>
+<li><a class="reference internal" href="#example-configuration-smtp">Example Configuration (SMTP)</a></li>
+<li><a class="reference internal" href="#example-configuration-sendmail">Example Configuration (<code class="docutils literal"><span class="pre">sendmail</span></code>)</a></li>
+<li><a class="reference internal" href="#customizing-the-e-mail-subject">Customizing the e-mail subject</a></li>
+<li><a class="reference internal" href="#customizing-the-e-mail-content">Customizing the e-mail content</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sample-email">Sample Email</a></li>
+<li><a class="reference internal" href="#customizing-e-mail-content-for-ms-outlook">Customizing e-mail content for MS Outlook</a></li>
+<li><a class="reference internal" href="#testing">#42: testing</a></li>
+<li><a class="reference internal" href="#using-gmail-as-the-smtp-relay-host">Using GMail as the SMTP relay host</a></li>
+<li><a class="reference internal" href="#filtering-notifications-for-one-s-own-changes">Filtering notifications for one&#8217;s own changes</a></li>
+<li><a class="reference internal" href="#troubleshooting">Troubleshooting</a><ul>
+<li><a class="reference internal" href="#permission-denied-error"><em>Permission denied</em> error</a></li>
+<li><a class="reference internal" href="#suspected-spam-error"><em>Suspected spam</em> error</a></li>
+<li><a class="reference internal" href="#invalid-address-error"><em>501, 5.5.4 Invalid Address</em> error</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TracNotification.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Red Hat.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/TracNotification.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
